@@ -19,6 +19,7 @@ import "../../css/admin/admin-deck-groups.scss";
 import VueCompositionAPI from '@vue/composition-api'
 import {ref, reactive, computed, onMounted} from "@vue/composition-api";
 import useNewDeckGroup from "../composables/useNewDeckGroup";
+import useDeckGroupLists from "../composables/useDeckGroupLists";
 
 Vue.use(VueCompositionAPI)
 Vue.component('ajax-action-not-form', AjaxActionNotForm);
@@ -85,6 +86,64 @@ export const vdata = {
   },
   // hoverNotifications  : [] as Array<_HoverNotification>,
   sendOnlineDeckGroups: null as Server,
+  tableData           : {
+    columns          : [
+      {
+        label  : 'Name',
+        field  : 'name',
+        tooltip: 'Endpoint Name',
+      },
+      {
+        label: 'Created At',
+        field: 'created_at',
+      },
+      {
+        label: 'Updated At',
+        field: 'updated_at',
+      },
+    ],
+    rows             : [],
+    isLoading        : true,
+    totalRecords     : 0,
+    totalTrashed     : 0,
+    serverParams     : {
+      columnFilters: {},
+      sort         : {
+        created_at : '',
+        modified_at: '',
+      },
+      page         : 1,
+      perPage      : 10
+    },
+    paginationOptions: {
+      enabled         : true,
+      mode            : 'page',
+      perPage         : Cookies.get('alfPerPage') ? Number(Cookies.get('alfPerPage')) : 2,
+      position        : 'bottom',
+      perPageDropdown : [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
+      dropdownAllowAll: true,
+      setCurrentPage  : 1,
+      nextLabel       : 'next',
+      prevLabel       : 'prev',
+      rowsPerPageLabel: 'Rows per page',
+      ofLabel         : 'of',
+      pageLabel       : 'page', // for 'pages' mode
+      allLabel        : 'All',
+    },
+    searchOptions    : {
+      enabled       : true,
+      trigger       : '', // can be "enter"
+      skipDiacritics: true,
+      placeholder   : 'Search links',
+    },
+    sortOption       : {
+      enabled: false,
+    },
+    //
+    post_status         : 'publish',
+    selectedRowsToDelete: [] as Array<_Endpoint>,
+    searchKeyword       : '',
+  },
   //
   debug          : false,
   page           : 1,
@@ -118,7 +177,11 @@ const mDeckGroup    = {
     this.newDeckGroup.xhrCreateNewDeckGroup();
   },
 };
-const mComDeckGroup = {};
+const mComDeckGroup = {
+  tableDataValue() {
+    return dis(this).deckGroups.tableData.value;
+  }
+};
 
 const v_method   = {...mDeckGroup, ...mGeneral};
 const v_computed = {...mComDeckGroup, ...mComputedGeneral,};
@@ -266,13 +329,13 @@ const m_listner = {
 
 const m_init = {
   init() {
-    let dis = this;
-    vdis    = dis;
-    vComp   = dis;
+    vdis  = this;
+    vComp = this;
     // @ts-ignore
     this.listner_init();
     this.nn();
     this.generalInit();
+    dis(this).deckGroups.loadItems();
     // vdis.xhrLoadEndpoints();
   },
   pageChanged(page) {
@@ -480,6 +543,17 @@ let vmethods = {
 var vdis: typeof vmethods    = null;
 var vComp: typeof v_computed = null;
 
+function setup(props) {
+  return {
+    newDeckGroup: useNewDeckGroup(),
+    deckGroups  : useDeckGroupLists(),
+  };
+}
+
+function dis(context): ReturnType<typeof setup> {
+  return context;
+}
+
 (function () {
 
   let elem = ".deck-groups";
@@ -490,14 +564,10 @@ var vComp: typeof v_computed = null;
 
   function loadInstance1() {
     new Vue({
-      el     : elem,
-      data   : vdata,
-      methods: vmethods,
-      setup(props) {
-        return {
-          newDeckGroup: useNewDeckGroup(),
-        };
-      },
+      el        : elem,
+      data      : vdata,
+      methods   : vmethods,
+      setup,
       created   : function () {
         // console.clear();
         jQuery(elem).css("display", "block");

@@ -7,6 +7,7 @@
 	}
 
 	use Illuminate\Database\Capsule\Manager as Capsule;
+	use Illuminate\Database\Schema\Blueprint;
 	use Illuminate\Support\Facades\Schema;
 
 	$capsule = new Capsule;
@@ -27,9 +28,10 @@
 
 	$schema_builder = $capsule->connection()->getSchemaBuilder();
 	if ( ! $schema_builder->hasTable( $table_deck_groups ) ) {
-		Capsule::schema()->create( $table_deck_groups, function ( $table ) {
+		Capsule::schema()->create( $table_deck_groups, function (Blueprint  $table ) {
 			$table->increments( 'id' );
 			$table->string( 'name' )->unique();
+			$table->softDeletes();
 			$table->timestamps();
 		} );
 	}

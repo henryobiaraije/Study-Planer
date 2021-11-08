@@ -28,5 +28,8 @@
   },
   "require": {
     "illuminate/database": "^8.69"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^5.3"
   }
 }

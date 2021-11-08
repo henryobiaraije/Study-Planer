@@ -22,16 +22,47 @@
 				</form >
 			</div >
 			<div class="table-area flex-1" >
-				<table >
-					<thead >
-					<tr >
-						<th >Id</th >
-						<th ></th >
-						<th ></th >
-						<th ></th >
-					</tr >
-					</thead >
-				</table >
+				<vue-good-table
+						:columns="tableDataValue.columns"
+						:mode="'remote'"
+						:rows="tableDataValue.rows"
+						:total-rows="tableDataValue.totalRecords"
+						:compact-mode="true"
+						:line-numbers="true"
+						:is-loading="deckGroups.tableData.isLoading"
+						:pagination-options="tableDataValue.paginationOptions"
+						:search-options="tableDataValue.searchOptions"
+						:sort-options="tableDataValue.sortOption"
+						:select-options="{ enabled: true, selectOnCheckboxOnly: true, }"
+						:theme="''"
+						@on-page-change="deckGroups.onPageChange"
+						@on-sort-change="deckGroups.onSortChange"
+						@on-column-filter="deckGroups.onColumnFilter"
+						@on-per-page-change="deckGroups.onPerPageChange"
+						@on-selected-rows-change="deckGroups.onCheckboxSelected"
+						@on-search="deckGroups.onSearch"
+				>
+<!--					<template slot="table-row" slot-scope="props" >-->
+<!--						<input @input="tableOnEdit(props.row)" v-if="props.column.field === 'name'" v-model="props.row.name" />-->
+<!--						<input @input="tableOnEdit(props.row)" v-else-if="props.column.field ==='endpoint'" v-model="props.row.endpoint" />-->
+<!--					</template >-->
+					<div slot="selected-row-actions" >
+						<!--					<ajax-action-not-form-->
+						<!--							button-text="Update Selected "-->
+						<!--							css-classes="button button-primary"-->
+						<!--							icon="fa fa-save"-->
+						<!--							@click="xhrUpdateBatchEndpoints()"-->
+						<!--							:ajax="ajax.update" >-->
+						<!--					</ajax-action-not-form >-->
+						<ajax-action-not-form
+								button-text="Delete Selected "
+								css-classes="button button-link-delete"
+								icon="fa fa-trash"
+								@click="xhrBatchDeleteEndpoint()"
+								:ajax="ajax.delete" >
+						</ajax-action-not-form >
+					</div >
+				</vue-good-table >
 			</div >
 		</div >
 
