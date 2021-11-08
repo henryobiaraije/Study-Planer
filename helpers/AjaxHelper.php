@@ -4,8 +4,7 @@
 	namespace StudyPlanner\Helpers;
 
 
-
-
+	use Model\DeckGroup;
 	use StudyPlanner\Libs\Common;
 
 	class AjaxHelper {
@@ -30,38 +29,27 @@
 
 		private function init_ajax() {
 			add_action( 'admin_sp_ajax_admin_create_new_deck_group', array( $this, 'ajax_admin_create_new_deck_group' ) );
-			}
+		}
 
 		public function ajax_admin_create_new_deck_group( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_create_new_deck_group',
+//				'post' => $post,
+//			] );
+
+			$all             = $post[ Common::VAR_2 ];
+			$deck_group_name = sanitize_text_field( $all['deck_group_name'] );
+
+			$deck_group = DeckGroup::firstOrCreate( [ 'name' => $deck_group_name ] );
+
 			Common::send_error( [
 				'ajax_admin_create_new_deck_group',
-				'post' => $post,
+				'post'             => $post,
+				'$deck_group_name' => $deck_group_name,
+				'$deck_group' => $deck_group,
 			] );
 
-			$params         = $post[ Common::VAR_2 ]['params'];
-			$per_page       = 5;
-			$page           = 1;
-			$search_keyword = sanitize_text_field( $params['search_keyword'] );
-			$status         = 'publish';
-			$endpoints      = Endpoint::get_public( [
-				'search_keyword' => $search_keyword,
-				'page'           => $page,
-				'per_page'       => $per_page,
-				'status'         => $status,
-			] );
-//			Common::send_error( [
-//				'ajax_public_search_for_keyword',
-//				'post'            => $post,
-//				'$params'         => $params,
-//				'$per_page'       => $per_page,
-//				'$page'           => $page,
-//				'$search_keyword' => $search_keyword,
-//				'$status'         => $status,
-//				'$endpoints'      => $endpoints,
-//			] );
-			Common::send_success( 'Loaded', [
-				'details' => $endpoints,
-			] );
+			Common::send_success( 'Deck group created.' );
 
 		}
 

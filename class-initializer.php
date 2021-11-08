@@ -5,6 +5,7 @@
 
 	namespace StudyPlanner;
 
+	use StudyPlanner\Helpers\AjaxHelper;
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Pages\AdminDeckGroups;
@@ -76,6 +77,7 @@
 			add_action( 'wp_enqueue_scripts', array( $this, 'register_default_frontend_scripts' ) );
 
 
+			AjaxHelper::get_instance();
 			AdminDeckGroups::get_instance();
 
 

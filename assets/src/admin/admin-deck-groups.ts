@@ -34,7 +34,7 @@ const localize = pereere_dot_com_sp_general_localize_4736;
 Store.initAdmin({
   serverUrl   : localize.ajax_url,
   actionString: localize.ajax_action,
-  nonce: localize.nonce,
+  nonce       : localize.nonce,
 });
 
 export const vdata = {
@@ -114,9 +114,9 @@ const mComputedGeneral = {
 };
 
 const mDeckGroup    = {
-  createDeckGroup(){
-
-  }
+  createDeckGroup() {
+    this.newDeckGroup.xhrCreateNewDeckGroup();
+  },
 };
 const mComDeckGroup = {};
 
@@ -494,12 +494,9 @@ var vComp: typeof v_computed = null;
       data   : vdata,
       methods: vmethods,
       setup(props) {
-
-        // const {} = useNewDeckGroup();
-
         return {
           newDeckGroup: useNewDeckGroup(),
-        }//anything returned here will be available for the rest of the component
+        };
       },
       created   : function () {
         // console.clear();

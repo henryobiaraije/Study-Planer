@@ -21,7 +21,9 @@
 	$capsule->bootEloquent();
 
 	global $wpdb;
-	$table_deck_groups = $wpdb->prefix . 'sp_deck_group';
+	$prefix = $wpdb->prefix . 'sp_';
+	define( 'SP_DB_PREFIX', $prefix );
+	$table_deck_groups = $prefix . 'deck_groups';
 
 	$schema_builder = $capsule->connection()->getSchemaBuilder();
 	if ( ! $schema_builder->hasTable( $table_deck_groups ) ) {
@@ -31,3 +33,4 @@
 			$table->timestamps();
 		} );
 	}
+

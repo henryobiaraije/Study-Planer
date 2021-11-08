@@ -1,25 +1,25 @@
 import {_Ajax, HandleAjax} from "../classes/HandleAjax";
 import {InterFuncSuccess, Server} from "../static/server";
-import { Store } from "../static/store";
+import {Store} from "../static/store";
+import {ref} from "@vue/composition-api";
 
 export default function () {
-  const groupName = '';
-  const ajax      = {
+  const groupName = ref('');
+  const ajax      = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
+  });
 
-  } as _Ajax;
-
-  const xhrCreateEndpoint = () => {
-    const handleAjax: HandleAjax = new HandleAjax(ajax);
+  const xhrCreateNewDeckGroup = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     new Server().send_online({
       data: [
         Store.nonce,
         {
-          deck_group_name: groupName,
+          deck_group_name: groupName.value,
           // name    : vdata.vEndpoints.create.name,
           // endpoint: vdata.vEndpoints.create.endpoint,
         }
@@ -50,6 +50,6 @@ export default function () {
   return {
     ajax,
     groupName,
-    xhrCreateEndpoint,
+    xhrCreateNewDeckGroup,
   };
 }

@@ -16,10 +16,9 @@
 
   // Define the props by using Vue's canonical way.
 
-
   // HelloWorld class will be a Vue component
   @Component
-  export default class AjaxActionNotForm extends Vue {
+  export default class AjaxAction extends Vue {
     // Declared as component data
     public message = 'Hello World!';
 

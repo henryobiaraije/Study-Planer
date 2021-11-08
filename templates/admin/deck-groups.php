@@ -5,20 +5,19 @@
 
 <div class="deck-groups" >
 
-
 	<div class="all-loaded" style="display: none;" >
 		<div class="flex flex-wrap" >
 			<div class="form-area flex-1" >
 				<form @submit.prevent="createDeckGroup()" class="bg-white rounded p-2" >
 					<label class="tw-simple-input" >
 						<span class="tw-title" >Deck group name</span >
-						<input v-model="newDeckGroup.groupName" class="w-full" type="text" >
+						<input v-model="newDeckGroup.groupName.value" name="deck_group" required type="text" >
 					</label >
 					<ajax-action
 							button-text="Create"
 							css-classes="button"
 							icon="fa fa-plus"
-							:ajax="newDeckGroup.ajax" >
+							:ajax="newDeckGroup.ajax.value" >
 					</ajax-action >
 				</form >
 			</div >

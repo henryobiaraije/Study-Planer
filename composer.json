@@ -16,10 +16,11 @@
   },
   "autoload": {
     "psr-4": {
-      "Controllers\\": "app/controllers",
-      "Models\\": "app/models"
+      "App\\Controllers\\": "app/controllers",
+      "App\\Models\\": "app/models"
     },
     "classmap": [
+      "models\\",
       "pages\\",
       "libs\\",
       "helpers\\"
