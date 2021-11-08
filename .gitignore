@@ -1,0 +1,5 @@
+assets/_extra/fontawesome-free
+assets/_extra/bootstrap-4
+assets/node_modules
+
+/vendor/

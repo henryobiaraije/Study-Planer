@@ -1,0 +1,11 @@
+/*!*********************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./css/admin/test2.scss ***!
+  \*********************************************************************************************************************************************************/
+.check {
+  color: blue;
+}
+.check .check-inner {
+  color: green;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9rbm93bGVkZ2ViYXNlLW1vZHVsZXMvLi9jc3MvYWRtaW4vdGVzdDIuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFBQTtFQUNFO0FBQ0Y7QUFBRTtFQUNFO0FBRUosQyIsImZpbGUiOiJhZG1pbi9hZG1pbi1kZWNrcy5jc3MiLCJzb3VyY2VzQ29udGVudCI6WyIuY2hlY2t7XG4gIGNvbG9yOmJsdWU7XG4gIC5jaGVjay1pbm5lcntcbiAgICBjb2xvcjpncmVlbjtcbiAgfVxufSJdLCJzb3VyY2VSb290IjoiIn0=*/

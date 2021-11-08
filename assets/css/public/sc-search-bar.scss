@@ -1,0 +1,139 @@
+.sc-search-bar {
+  @import "../../_extra/default-sc-search-bar";
+  $form_height: 60px;
+  $c_blue: #0049db;
+  $sbe_break_point: 900px;
+  form {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: $form_height;
+    @include mix-display-flex-no-wrap;
+    .input-section {
+      @include mix-flex(8);
+      position: relative;
+      border-radius: 10px 0 0 10px;
+      border: 1px solid #bfbfbf;
+      background: #fff;
+      span.search-svg-left {
+        position: absolute;
+        left: 12px;
+        top: 19px;
+        svg {
+          width: 20px;
+          height: 20px;
+          fill: #858585;
+          @include mixin-transform(340deg);
+        }
+      }
+      input.sbe-search-input {
+        height: $form_height - 4px;
+        width: 100%;
+        background: #fff;
+        border: 0;
+        outline: none;
+        padding-left: 43px;
+        font-size: 1.125rem;
+        border-radius: 10px 0 0 10px;
+        @include mix-placeholder {
+          color: #a0a1a0;
+          font-size: 1.125rem;
+        }
+        @include media-max-width($sbe_break_point) {
+          font-size: 14px;
+          @include mix-placeholder {
+            font-size: 14px;
+          }
+        }
+      }
+      ul.sbe-results {
+        position: absolute;
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+        z-index: 9999;
+        top: 103%;
+        li.result-item {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          a {
+            width: 100%;
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 15px;
+            background: #fff;
+            border-bottom: 1px solid #c7c7c7;
+            color: #000;
+            @include mixin-transition(all 0.1s);
+            &:hover {
+              color: #fff;
+              background: $c_blue;
+            }
+          }
+        }
+      }
+      span.clear-text {
+        position: absolute;
+        right: 10px;
+        top: 21px;
+        background: #fff;
+        cursor: pointer;
+        svg {
+          width: 15px;
+          height: 15px;
+        }
+      }
+    }
+    a.search-button-link{
+      background: $c_blue;
+      height: 60px;
+      font-size: 17px;
+      color: #fff;
+      padding: 0;
+      position: relative;
+      border-radius: 0 10px 10px 0;
+      max-width: 219px;
+      border: 0;
+      text-decoration: none;
+      button.sbe-search-button {
+        background: $c_blue;
+        height: 60px;
+        font-size: 17px;
+        color: #fff;
+        padding: 2px 22px;
+        position: relative;
+        border-radius: 0 10px 10px 0;
+        max-width: 219px;
+        border: 0;
+        span.search-svg-right {
+          font-size: 20px;
+          position: relative;
+          color: #fff;
+          svg {
+            fill: #ffffff;
+            width: 20px;
+            height: 20px;
+          }
+        }
+        @include media-min-width($sbe_break_point) {
+          span.search-svg-right {
+            display: none;
+          }
+        }
+        @include media-max-width($sbe_break_point) {
+          padding: 5px 20px;
+          span.submit-text {
+            display: none;
+          }
+        }
+      }
+    }
+
+  }
+}
+#main-content{
+  background-color: #f8e547 !important;
+}
