@@ -6,8 +6,8 @@
 <div class="deck-groups" >
 
 	<div class="all-loaded" style="display: none;" >
-		<div class="flex flex-wrap" >
-			<div class="form-area flex-1" >
+		<div class="flex flex-wrap gap-3 px-1 md:px-4" >
+			<div class="form-area flex-1 md:flex-none  md:w-30 " >
 				<form @submit.prevent="createDeckGroup()" class="bg-white rounded p-2" >
 					<label class="tw-simple-input" >
 						<span class="tw-title" >Deck group name</span >

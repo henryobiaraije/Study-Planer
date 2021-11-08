@@ -150,12 +150,12 @@ export default function () {
         tt().isLoading = true;
       },
       funcSuccess(done: InterFuncSuccess) {
-        console.log({done})
-        tt().isLoading    = false;
-        tt().rows         = done.data.deck_group;
-        tt().totalRecords = done.data.total;
-        // jQuery('.page-loading').hide();
-        // jQuery('.page-loaded').show();
+        const groups = done.data.deck_groups;
+        const total  = done.data.total;
+        console.log({done, groups, total});
+        tt().isLoading       = false;
+        tableData.value.rows = groups;
+        tt().totalRecords    = total;
       },
       funcFailue(done) {
         handleAjax.error(done);
