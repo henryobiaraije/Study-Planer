@@ -4,13 +4,14 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="6">
+          <list size="7">
             <item index="0" class="java.lang.String" itemvalue="v-model" />
             <item index="1" class="java.lang.String" itemvalue="@submit.prevent" />
             <item index="2" class="java.lang.String" itemvalue="@input" />
             <item index="3" class="java.lang.String" itemvalue="slot-scope" />
             <item index="4" class="java.lang.String" itemvalue="v-if" />
             <item index="5" class="java.lang.String" itemvalue="v-else-if" />
+            <item index="6" class="java.lang.String" itemvalue="v-else" />
           </list>
         </value>
       </option>
@@ -19,7 +20,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="10">
+          <list size="12">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -30,6 +31,8 @@
             <item index="7" class="java.lang.String" itemvalue="ajax-action" />
             <item index="8" class="java.lang.String" itemvalue="vue-good-table" />
             <item index="9" class="java.lang.String" itemvalue="ajax-action-not-form" />
+            <item index="10" class="java.lang.String" itemvalue="time-ago" />
+            <item index="11" class="java.lang.String" itemvalue="time-comp" />
           </list>
         </value>
       </option>

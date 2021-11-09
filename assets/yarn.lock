@@ -4684,6 +4684,11 @@
     "source-map" "~0.7.2"
     "source-map-support" "~0.5.19"
 
+"timeago.js@^4.0.0-beta.3":
+  "integrity" "sha512-98KoI4axalqyrlZMEavKfBBtJOJugHtpC1n/TPLx3edS0GFSUg9YkvtqFKAaOHjbaz5729b2U0MczMr39TM65A=="
+  "resolved" "https://registry.npmjs.org/timeago.js/-/timeago.js-4.0.0-beta.3.tgz"
+  "version" "4.0.0-beta.3"
+
 "timsort@^0.3.0":
   "integrity" "sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q="
   "resolved" "https://registry.npmjs.org/timsort/-/timsort-0.3.0.tgz"

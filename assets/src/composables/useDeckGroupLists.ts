@@ -23,6 +23,14 @@ export default function () {
         label: 'Updated At',
         field: 'updated_at',
       },
+      // {
+      //   label: 'Decks',
+      //   field: 'decks',
+      // },
+      // {
+      //   label: 'Cards',
+      //   field: 'cards',
+      // },
     ],
     rows             : [],
     isLoading        : true,
@@ -40,7 +48,7 @@ export default function () {
     paginationOptions: {
       enabled         : true,
       mode            : 'page',
-      perPage         : Cookies.get('alfPerPage') ? Number(Cookies.get('alfPerPage')) : 2,
+      perPage         : Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 2,
       position        : 'bottom',
       perPageDropdown : [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
       dropdownAllowAll: true,
@@ -90,45 +98,48 @@ export default function () {
   const onCheckboxSelected = (deckGroups: Array<_DeckGroup>) => {
     tt().selectedRowsToDelete = deckGroups;
   };
-  const onEdit             = (deckGroups: _DeckGroup) => {
-    if (undefined === editedItems[deckGroups.id]) {
-      editedItems[deckGroups.id] = {
+
+  const onEdit          = (item: _DeckGroup) => {
+    console.log('edited', {item});
+    if (undefined === editedItems.value[item.id]) {
+      editedItems.value[item.id] = {
         editCounter: 0,
       };
     }
-    editedItems[deckGroups.id].editCounter++;
+    editedItems.value[item.id].editCounter++;
     setTimeout(() => {
-      editedItems[deckGroups.id].editCounter--;
-      if (editedItems[deckGroups.id].editCounter === 0) {
-        xhrUpdate(deckGroups);
+      editedItems.value[item.id].editCounter--;
+      if (editedItems.value[item.id].editCounter === 0) {
+        xhrUpdateBatch([item]);
       }
     }, 500);
   };
-  const onSearch           = (params: { searchTerm: string }) => {
+  const onSearch        = (params: { searchTerm: string }) => {
     tt().searchKeyword = params.searchTerm;
     xhrLoad();
   };
-  const onPageChange       = (params: { currentPage: number, currentPerPage: number, prevPage: number, total: number }) => {
+  const onPageChange    = (params: { currentPage: number, currentPerPage: number, prevPage: number, total: number }) => {
     tt().paginationOptions.setCurrentPage = params.currentPage;
     tt().paginationOptions.perPage        = params.currentPerPage;
     xhrLoad();
   };
-  const onSortChange       = (params) => {
+  const onSortChange    = (params) => {
 
   };
-  const onColumnFilter     = (params) => {
+  const onColumnFilter  = (params) => {
     //
     console.log('sort change');
   };
-  const onPerPageChange    = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
+  const onPerPageChange = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
     tt().paginationOptions.setCurrentPage = params.currentPage;
     tt().paginationOptions.perPage        = params.currentPerPage;
+    Cookies.set('spPerPage', params.currentPerPage);
     xhrLoad();
   };
-  const loadItems          = () => {
+  const loadItems       = () => {
     xhrLoad();
   };
-  const tt                 = () => tableData.value;
+  const tt              = () => tableData.value;
 
   const xhrLoad = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxUpdate.value);
@@ -164,13 +175,13 @@ export default function () {
     });
   };
 
-  const xhrUpdate = (deckGroup: _DeckGroup) => {
+  const xhrUpdateBatch = (deckGroups: Array<_DeckGroup>) => {
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     sendOnline                   = new Server().send_online({
       data: [
         vdata.localize.nonce,
         {
-          deck_group: deckGroupToEdit,
+          deck_groups: deckGroups,
         }
       ],
       what: "admin_sp_ajax_admin_update_deck_group",

@@ -13,6 +13,7 @@ import {_HoverNotification} from "../vue-component/enums";
 import 'vue-good-table/dist/vue-good-table.css'
 import {VueGoodTable} from 'vue-good-table';
 import AjaxActionNotForm from "../vue-component/AjaxActionNotForm.vue";
+import TimeComp from "../vue-component/TimeComp.vue";
 import Cookies from 'js-cookie';
 import {_Endpoint} from "../interfaces/inter-sbe";
 import "../../css/admin/admin-deck-groups.scss";
@@ -579,6 +580,7 @@ function dis(context): ReturnType<typeof setup> {
       },
       computed  : v_computed,
       components: {
+        TimeComp,
         'ajax-action': AjaxAction,
         // 'ajax-action-not-form': AjaxActionNotForm,
         LoadingButton,

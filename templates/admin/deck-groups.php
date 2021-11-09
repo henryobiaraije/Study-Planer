@@ -3,7 +3,21 @@
 
 ?>
 
-<div class="deck-groups" >
+<div class="deck-groups wrap" >
+
+	<?php /***** Header ******/ ?>
+	<!--	<editor-fold desc="Header">-->
+	<ul class="subsubsub" >
+		<li ><h1 class="wp-heading-inline" >Active Deck Groups</h1 ></li >
+		<li class="all" ><a href="edit.php?post_type=post" class="current" aria-current="page" >
+				Active <span class="count" >(7,294)</span ></a > |
+		</li >
+		<li class="publish" ><a href="edit.php?post_status=publish&amp;post_type=post" >
+				Trashed <span class="count" >(7,293)</span ></a > |
+		</li >
+	</ul >
+	<br />
+	<!--	</editor-fold>-->
 
 	<div class="all-loaded" style="display: none;" >
 		<div class="flex flex-wrap gap-3 px-1 md:px-4" >
@@ -42,20 +56,41 @@
 						@on-selected-rows-change="deckGroups.onCheckboxSelected"
 						@on-search="deckGroups.onSearch"
 				>
-<!--					<template slot="table-row" slot-scope="props" >-->
-<!--						<input @input="tableOnEdit(props.row)" v-if="props.column.field === 'name'" v-model="props.row.name" />-->
-<!--						<input @input="tableOnEdit(props.row)" v-else-if="props.column.field ==='endpoint'" v-model="props.row.endpoint" />-->
-<!--					</template >-->
+					<template slot="table-row" slot-scope="props" >
+						<div v-if="props.column.field === 'name'" >
+							<input @input="deckGroups.onEdit(props.row)" v-model="props.row.name" />
+						</div >
+						<span v-else-if="props.column.field === 'created_at'" >
+							<time-comp :time="props.row.created_at" ></time-comp >
+						</span >
+						<span v-else-if="props.column.field === 'updated_at'" >
+							<time-comp :time="props.row.updated_at" ></time-comp >
+						</span >
+						<span v-else >
+				      {{props.formattedRow[props.column.field]}}
+				    </span >
+					</template >
+					<!--					<template slot="table-row" slot-scope="props" >-->
+					<!--						<input @input="tableOnEdit(props.row)" v-if="props.column.field === 'name'" v-model="props.row.name" />-->
+					<!--						<input @input="tableOnEdit(props.row)" v-else-if="props.column.field ==='endpoint'" v-model="props.row.endpoint" />-->
+					<!--					</template >-->
 					<div slot="selected-row-actions" >
-						<!--					<ajax-action-not-form-->
-						<!--							button-text="Update Selected "-->
-						<!--							css-classes="button button-primary"-->
-						<!--							icon="fa fa-save"-->
-						<!--							@click="xhrUpdateBatchEndpoints()"-->
-						<!--							:ajax="ajax.update" >-->
-						<!--					</ajax-action-not-form >-->
 						<ajax-action-not-form
-								button-text="Delete Selected "
+								button-text="Update Selected "
+								css-classes="button button-primary"
+								icon="fa fa-save"
+								@click="xhrUpdateBatchEndpoints()"
+								:ajax="ajax.update" >
+						</ajax-action-not-form >
+						<ajax-action-not-form
+								button-text="Trash Selected "
+								css-classes="button button-link-delete"
+								icon="fa fa-trash"
+								@click="xhrBatchTrashEndpoint()"
+								:ajax="ajax.delete" >
+						</ajax-action-not-form >
+						<ajax-action-not-form
+								button-text="Delete Selected Permanently "
 								css-classes="button button-link-delete"
 								icon="fa fa-trash"
 								@click="xhrBatchDeleteEndpoint()"
@@ -65,7 +100,6 @@
 				</vue-good-table >
 			</div >
 		</div >
-
 	</div >
 
 

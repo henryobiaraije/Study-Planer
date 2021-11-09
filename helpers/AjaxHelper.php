@@ -72,29 +72,42 @@
 //			] );
 
 
-			Common::send_success( 'Deck group loaded.', $deck_groups );
+			Common::send_success( 'Deck group loaded.', $deck_groups, [
+				'post' => $post,
+			] );
 
 		}
 
 		public function ajax_admin_update_deck_group( $post ) : void {
-			Common::send_error( [
-				'ajax_admin_update_deck_group',
-				'post' => $post,
-			] );
+//			Common::send_error( [
+//				'ajax_admin_update_deck_group',
+//				'post' => $post,
+//			] );
 
-			$all             = $post[ Common::VAR_2 ];
-			$deck_group_name = sanitize_text_field( $all['deck_group_name'] );
+			$all  = $post[ Common::VAR_2 ];
+			$args = wp_parse_args(
+				$all,
+				[
+					'deck_groups' => [],
+				] );
+			foreach ( $args['deck_groups'] as $group ) {
+				$name = sanitize_text_field( $group['name'] );
+				$id   = (int) sanitize_text_field( $group['id'] );
+				DeckGroup::query()->where( 'id', '=', $id )->update( [
+					'name' => $name,
+				] );
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'  => $post,
+//					'$all'  => $all,
+//					'$name' => $name,
+//					'$id'   => $id,
+//					'$args' => $args,
+//				] );
+			}
 
-			$deck_group = DeckGroup::firstOrCreate( [ 'name' => $deck_group_name ] );
 
-			Common::send_error( [
-				'ajax_admin_create_new_deck_group',
-				'post'             => $post,
-				'$deck_group_name' => $deck_group_name,
-				'$deck_group'      => $deck_group,
-			] );
-
-			Common::send_success( 'Deck group created.' );
+			Common::send_success( 'Saved.' );
 
 		}
 
