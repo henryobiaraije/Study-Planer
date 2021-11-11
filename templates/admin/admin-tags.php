@@ -47,6 +47,60 @@
 				</div >
 			<?php endif; ?>
 			<div class="table-area flex-1" >
+				<vue-good-table
+						:columns="tableDataValue.columns"
+						:mode="'remote'"
+						:rows="tableDataValue.rows"
+						:total-rows="tableDataValue.totalRecords"
+						:compact-mode="true"
+						:line-numbers="true"
+						:is-loading="tableDataValue.isLoading"
+						:pagination-options="tableDataValue.paginationOptions"
+						:search-options="tableDataValue.searchOptions"
+						:sort-options="tableDataValue.sortOption"
+						:select-options="{ enabled: true, selectOnCheckboxOnly: true, }"
+						:theme="''"
+						@on-page-change="tags.onPageChange"
+						@on-sort-change="tags.onSortChange"
+						@on-column-filter="tags.onColumnFilter"
+						@on-per-page-change="tags.onPerPageChange"
+						@on-selected-rows-change="tags.onSelect"
+						@on-search="tags.onSearch"
+				>
+					<template slot="table-row" slot-scope="props" >
+						<div v-if="props.column.field === 'name'" >
+							<input @input="tags.onEdit(props.row)" v-model="props.row.name" />
+						</div >
+						<span v-else-if="props.column.field === 'created_at'" >
+							<time-comp :time="props.row.created_at" ></time-comp >
+						</span >
+						<span v-else-if="props.column.field === 'updated_at'" >
+							<time-comp :time="props.row.updated_at" ></time-comp >
+						</span >
+						<span v-else >
+				      {{props.formattedRow[props.column.field]}}
+				    </span >
+					</template >
+					<div slot="selected-row-actions" >
+						<?php if ( $in_trash ): ?>
+							<ajax-action-not-form
+									button-text="Delete Selected Permanently "
+									css-classes="button button-link-delete"
+									icon="fa fa-trash"
+									@click="tags.batchDelete()"
+									:ajax="tags.ajaxDelete.value" >
+							</ajax-action-not-form >
+						<?php else: ?>
+							<ajax-action-not-form
+									button-text="Trash Selected "
+									css-classes="button button-link-delete"
+									icon="fa fa-trash"
+									@click="tags.batchTrash()"
+									:ajax="tags.ajaxTrash.value" >
+							</ajax-action-not-form >
+						<?php endif; ?>
+					</div >
+				</vue-good-table >
 			</div >
 		</div >
 	</div >

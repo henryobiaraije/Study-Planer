@@ -35,6 +35,9 @@
 			add_action( 'admin_sp_ajax_admin_delete_deck_group', array( $this, 'ajax_admin_delete_deck_group' ) );
 			add_action( 'admin_sp_ajax_admin_trash_deck_group', array( $this, 'ajax_admin_trash_deck_group' ) );
 			add_action( 'admin_sp_ajax_admin_create_tag', array( $this, 'ajax_admin_create_tag' ) );
+			add_action( 'admin_sp_ajax_admin_load_tags', array( $this, 'ajax_admin_load_tags' ) );
+			add_action( 'admin_sp_ajax_admin_trash_tags', array( $this, 'ajax_admin_trash_tags' ) );
+			add_action( 'admin_sp_ajax_admin_delete_tags', array( $this, 'ajax_admin_delete_tags' ) );
 		}
 
 		public function ajax_admin_create_tag( $post ) : void {
@@ -58,7 +61,118 @@
 
 		}
 
+		public function ajax_admin_load_tags( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_load_tags',
+//				'post' => $post,
+//			] );
+
+			$params         = $post[ Common::VAR_2 ]['params'];
+			$per_page       = (int) sanitize_text_field( $params['per_page'] );
+			$page           = (int) sanitize_text_field( $params['page'] );
+			$search_keyword = sanitize_text_field( $params['search_keyword'] );
+			$status         = sanitize_text_field( $params['status'] );
+//			Common::send_error( [
+//				'ajax_admin_load_tags',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$status'         => $status,
+//			] );
+
+			$items  = Tag::get_tags( [
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			] );
+			$totals = Tag::get_totals();
+
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$deck_groups'    => $deck_groups,
+//				'$status'         => $status,
+//			] );
+
+
+			Common::send_success( 'Tag loaded.', [
+				'details' => $items,
+				'totals'  => $totals,
+			], [
+//				'post' => $post,
+			] );
+
+		}
+
+		public function ajax_admin_trash_tags( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_trash_tags',
+//				'post' => $post,
+//			] );
+
+			$all  = $post[ Common::VAR_2 ];
+			$args = wp_parse_args(
+				$all,
+				[
+					'items' => [],
+				] );
+			foreach ( $args['items'] as $one ) {
+				$id = (int) sanitize_text_field( $one['id'] );
+				Tag::query()->where( 'id', '=', $id )->delete();
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'  => $post,
+//					'$all'  => $all,
+//					'$id'   => $id,
+//					'$args' => $args,
+//					'$one' => $one,
+//				] );
+			}
+
+
+			Common::send_success( 'Trashed successfully.' );
+
+		}
+
+		public function ajax_admin_delete_tags( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_delete_tags',
+//				'post' => $post,
+//			] );
+
+			$all  = $post[ Common::VAR_2 ];
+			$args = wp_parse_args(
+				$all,
+				[
+					'items' => [],
+				] );
+			foreach ( $args['items'] as $one ) {
+				$id = (int) sanitize_text_field( $one['id'] );
+				Tag::query()->where( 'id', '=', $id )->forceDelete();
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'  => $post,
+//					'$all'  => $all,
+//					'$name' => $name,
+//					'$id'   => $id,
+//					'$args' => $args,
+//				] );
+			}
+
+
+			Common::send_success( 'Deleted.' );
+
+		}
+
 		// <editor-fold desc="Deck Groups">
+
 		public function ajax_admin_load_deck_group( $post ) : void {
 //			Common::send_error( [
 //				'ajax_admin_load_deck_group',
@@ -134,7 +248,7 @@
 			}
 
 
-			Common::send_success( 'Deleted successfully.' );
+			Common::send_success( 'Trashed successfully.' );
 
 		}
 

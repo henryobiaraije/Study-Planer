@@ -120,7 +120,7 @@ export default function (status = 'publish') {
   let sendOnline              = null;
   tableData.value.post_status = status;
   //
-  const create           = () => {
+  const create                = () => {
     xhrCreate();
   }
   const batchUpdate           = () => {
@@ -137,7 +137,7 @@ export default function (status = 'publish') {
   }
   //
   const onSelect              = (items: { selectedRows: Array<_Tag> }) => {
-    console.log('selected', {items});
+    // console.log('selected', {items});
     tt().selectedRows = items.selectedRows;
   };
   const onEdit                = (item: _Tag) => {
@@ -203,12 +203,12 @@ export default function (status = 'publish') {
       },
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.stop();
-        const groups    = done.data.details.deck_groups;
+        const items     = done.data.details.items;
         const total     = done.data.details.total;
         const theTotals = done.data.totals;
-        console.log({done, groups, total, totals});
+        // console.log({done, groups, total, totals});
         tt().isLoading       = false;
-        tableData.value.rows = groups;
+        tableData.value.rows = items;
         totals.value         = theTotals;
         tt().totalRecords    = total;
       },
@@ -233,6 +233,7 @@ export default function (status = 'publish') {
       },
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.success(done);
+        newName.value = '';
       },
       funcFailue(done) {
         handleAjax.error(done);
@@ -271,10 +272,10 @@ export default function (status = 'publish') {
       data: [
         vdata.localize.nonce,
         {
-          deck_groups: items,
+          items: items,
         }
       ],
-      what: "admin_sp_ajax_admin_trash_deck_group",
+      what: "admin_sp_ajax_admin_trash_tags",
       funcBefore() {
         handleAjax.start();
       },
@@ -288,7 +289,7 @@ export default function (status = 'publish') {
     });
   };
   const xhrDeleteBatch = (items: Array<_Tag>) => {
-    if (!confirm('Are you sure you want to delete these items? This action is not reversible.')) {
+    if (!confirm('Are you sure you want to delete these item(s)? This action is not reversible.')) {
       return;
     }
     const handleAjax: HandleAjax = new HandleAjax(ajaxDelete.value);
@@ -296,10 +297,10 @@ export default function (status = 'publish') {
       data: [
         vdata.localize.nonce,
         {
-          deck_groups: items,
+          items: items,
         }
       ],
-      what: "admin_sp_ajax_admin_delete_deck_group",
+      what: "admin_sp_ajax_admin_delete_tags",
       funcBefore() {
         handleAjax.start();
       },
@@ -315,7 +316,7 @@ export default function (status = 'publish') {
 
   return {
     ajax, ajaxCreate, ajaxUpdate, ajaxTrash, ajaxDelete,
-    total, editedItems, tableData, load,create,
+    total, editedItems, tableData, load, create,
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
     onSortChange, onColumnFilter,
     batchUpdate, batchDelete, batchTrash,

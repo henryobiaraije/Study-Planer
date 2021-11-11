@@ -37,9 +37,9 @@ function setup(props) {
   const url          = new URL(window.location.href);
   const searchParams = new URLSearchParams(url.search);
   const status = searchParams.get('status');
-  console.log('in setup',{url,searchParams,status});
+  // console.log('in setup',{url,searchParams,status});
   return {
-    tags: useTags(),
+    tags: useTags(status),
   };
 }
 
