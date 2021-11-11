@@ -2,10 +2,11 @@ import {_Ajax, HandleAjax} from "../classes/HandleAjax";
 import {InterFuncSuccess, Server} from "../static/server";
 import {Store} from "../static/store";
 import {ref} from "@vue/composition-api";
+import useDeckGroupLists from "./useDeckGroupLists";
 
 export default function () {
-  const groupName = ref('');
-  const ajax      = ref<_Ajax>({
+  let groupName = ref('');
+  const ajax    = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
@@ -31,6 +32,8 @@ export default function () {
       },
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.success(done);
+        useDeckGroupLists().load();
+        groupName.value = '';
         // vdata.vEndpoints.create = {
         //   endpoint   : '',
         //   name       : '',

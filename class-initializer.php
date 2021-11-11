@@ -5,9 +5,13 @@
 
 	namespace StudyPlanner;
 
+
+	use Illuminate\Database\Capsule\Manager;
+	use Model\DeckGroup;
 	use StudyPlanner\Helpers\AjaxHelper;
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
+	use StudyPlanner\Pages\Admin_Tags;
 	use StudyPlanner\Pages\AdminDeckGroups;
 
 	if ( ! defined( 'ABSPATH' ) ) {
@@ -76,10 +80,9 @@
 			add_action( 'admin_enqueue_scripts', array( $this, 'register_default_admin_scripts' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'register_default_frontend_scripts' ) );
 
-
 			AjaxHelper::get_instance();
 			AdminDeckGroups::get_instance();
-
+			Admin_Tags::get_instance();
 
 			// Localize all added general object
 			add_action( 'wp_footer', array( $this, 'output_localized' ), 10 );
@@ -92,9 +95,18 @@
 				return $email;
 			}, 10, 2 );
 
+			DeckGroup::get_totals();
+//			$only_trashed = DeckGroup::onlyTrashed()->toSql();
+//			dd($only_trashed);
+//			$active = DeckGroup::query()
+//				->selectRaw( Manager::raw('count(*) as count'))
+//				->get();
+//			Common::in_script([
+////				'active query' => $active->toSql(),
+//				'$active' => $active,
+//			]);
 
 		}
-
 
 		public function output_localized() {
 			self::$general_localize['ajax_url']    = Common::get_ajax_url();

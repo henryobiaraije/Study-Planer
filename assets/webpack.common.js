@@ -8,6 +8,7 @@ const devMode = process.env.NODE_ENV !== "production";
 module.exports = {
     entry: {
         'admin/admin-deck-groups': './src/admin/admin-deck-groups.ts',
+        'admin/admin-tags': './src/admin/admin-tags.ts',
         'admin/admin-decks': './src/admin/admin-decks.ts',
     },
     module: {

@@ -17,12 +17,10 @@ import TimeComp from "../vue-component/TimeComp.vue";
 import Cookies from 'js-cookie';
 import {_Endpoint} from "../interfaces/inter-sbe";
 import "../../css/admin/admin-deck-groups.scss";
-import VueCompositionAPI from '@vue/composition-api'
-import {ref, reactive, computed, onMounted} from "@vue/composition-api";
+import "./install-composition-api";
 import useNewDeckGroup from "../composables/useNewDeckGroup";
 import useDeckGroupLists from "../composables/useDeckGroupLists";
 
-Vue.use(VueCompositionAPI)
 Vue.component('ajax-action-not-form', AjaxActionNotForm);
 
 declare var jQuery: any;
@@ -163,7 +161,6 @@ const mGeneral         = {
       errorMessage  : '',
       success       : false,
       successMessage: '',
-
     };
   },
 };
@@ -545,9 +542,13 @@ var vdis: typeof vmethods    = null;
 var vComp: typeof v_computed = null;
 
 function setup(props) {
+  const url          = new URL(window.location.href);
+  const searchParams = new URLSearchParams(url.search);
+  const status = searchParams.get('status');
+  console.log('in setup',{url,searchParams,status});
   return {
     newDeckGroup: useNewDeckGroup(),
-    deckGroups  : useDeckGroupLists(),
+    deckGroups  : useDeckGroupLists(status),
   };
 }
 

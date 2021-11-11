@@ -1,19 +1,29 @@
 <?php
 
-
+	$active_url = 'admin.php?page=study-planner-deck-groups';
+	$trash_url  = 'admin.php?page=study-planner-deck-groups&status=trash';
+	$page_title = 'Deck Groups';
+	$status     = filter_input( INPUT_GET, 'status' );
+	$in_trash   = false;
+	if ( 'trash' === $status ) {
+		$in_trash   = true;
+		$page_title .= " <span class='text-red-500'>(Trashed)</span> ";
+	} else {
+		$page_title .= " <span class='text-green-500'>(Active)</span> ";
+	}
 ?>
 
 <div class="deck-groups wrap" >
 
 	<?php /***** Header ******/ ?>
 	<!--	<editor-fold desc="Header">-->
-	<ul class="subsubsub" >
-		<li ><h1 class="wp-heading-inline" >Active Deck Groups</h1 ></li >
-		<li class="all" ><a href="edit.php?post_type=post" class="current" aria-current="page" >
-				Active <span class="count" >(7,294)</span ></a > |
+	<ul class="subsubsub all-loaded w-full p-0" style="display: none" >
+		<li ><h1 class="wp-heading-inline" ><?php echo $page_title; ?> </h1 ></li >
+		<li class="all" ><a href="<?php echo $active_url; ?>" class="" aria-current="page" >
+				Active <span class="count" >({{deckGroups.totals.value.active}})</span ></a > |
 		</li >
-		<li class="publish" ><a href="edit.php?post_status=publish&amp;post_type=post" >
-				Trashed <span class="count" >(7,293)</span ></a > |
+		<li class="publish" ><a href="<?php echo $trash_url; ?>" >
+				Trashed <span class="count" >({{deckGroups.totals.value.trashed}})</span ></a >
 		</li >
 	</ul >
 	<br />
@@ -21,20 +31,22 @@
 
 	<div class="all-loaded" style="display: none;" >
 		<div class="flex flex-wrap gap-3 px-1 md:px-4" >
-			<div class="form-area flex-1 md:flex-none  md:w-30 " >
-				<form @submit.prevent="createDeckGroup()" class="bg-white rounded p-2" >
-					<label class="tw-simple-input" >
-						<span class="tw-title" >Deck group name</span >
-						<input v-model="newDeckGroup.groupName.value" name="deck_group" required type="text" >
-					</label >
-					<ajax-action
-							button-text="Create"
-							css-classes="button"
-							icon="fa fa-plus"
-							:ajax="newDeckGroup.ajax.value" >
-					</ajax-action >
-				</form >
-			</div >
+			<?php if ( ! $in_trash ): ?>
+				<div class="form-area flex-1 md:flex-none  md:w-30 " >
+					<form @submit.prevent="createDeckGroup()" class="bg-white rounded p-2" >
+						<label class="tw-simple-input" >
+							<span class="tw-title" >Deck group name</span >
+							<input v-model="newDeckGroup.groupName.value" name="deck_group" required type="text" >
+						</label >
+						<ajax-action
+								button-text="Create"
+								css-classes="button"
+								icon="fa fa-plus"
+								:ajax="newDeckGroup.ajax.value" >
+						</ajax-action >
+					</form >
+				</div >
+			<?php endif; ?>
 			<div class="table-area flex-1" >
 				<vue-good-table
 						:columns="tableDataValue.columns"
@@ -43,7 +55,7 @@
 						:total-rows="tableDataValue.totalRecords"
 						:compact-mode="true"
 						:line-numbers="true"
-						:is-loading="deckGroups.tableData.isLoading"
+						:is-loading="tableDataValue.isLoading"
 						:pagination-options="tableDataValue.paginationOptions"
 						:search-options="tableDataValue.searchOptions"
 						:sort-options="tableDataValue.sortOption"
@@ -53,7 +65,7 @@
 						@on-sort-change="deckGroups.onSortChange"
 						@on-column-filter="deckGroups.onColumnFilter"
 						@on-per-page-change="deckGroups.onPerPageChange"
-						@on-selected-rows-change="deckGroups.onCheckboxSelected"
+						@on-selected-rows-change="deckGroups.onSelect"
 						@on-search="deckGroups.onSearch"
 				>
 					<template slot="table-row" slot-scope="props" >
@@ -75,27 +87,23 @@
 					<!--						<input @input="tableOnEdit(props.row)" v-else-if="props.column.field ==='endpoint'" v-model="props.row.endpoint" />-->
 					<!--					</template >-->
 					<div slot="selected-row-actions" >
-						<ajax-action-not-form
-								button-text="Update Selected "
-								css-classes="button button-primary"
-								icon="fa fa-save"
-								@click="xhrUpdateBatchEndpoints()"
-								:ajax="ajax.update" >
-						</ajax-action-not-form >
-						<ajax-action-not-form
-								button-text="Trash Selected "
-								css-classes="button button-link-delete"
-								icon="fa fa-trash"
-								@click="xhrBatchTrashEndpoint()"
-								:ajax="ajax.delete" >
-						</ajax-action-not-form >
-						<ajax-action-not-form
-								button-text="Delete Selected Permanently "
-								css-classes="button button-link-delete"
-								icon="fa fa-trash"
-								@click="xhrBatchDeleteEndpoint()"
-								:ajax="ajax.delete" >
-						</ajax-action-not-form >
+						<?php if ( $in_trash ): ?>
+							<ajax-action-not-form
+									button-text="Delete Selected Permanently "
+									css-classes="button button-link-delete"
+									icon="fa fa-trash"
+									@click="deckGroups.batchDelete()"
+									:ajax="deckGroups.ajaxDelete.value" >
+							</ajax-action-not-form >
+						<?php else: ?>
+							<ajax-action-not-form
+									button-text="Trash Selected "
+									css-classes="button button-link-delete"
+									icon="fa fa-trash"
+									@click="deckGroups.batchTrash()"
+									:ajax="deckGroups.ajaxTrash.value" >
+							</ajax-action-not-form >
+						<?php endif; ?>
 					</div >
 				</vue-good-table >
 			</div >

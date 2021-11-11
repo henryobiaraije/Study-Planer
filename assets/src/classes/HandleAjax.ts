@@ -87,8 +87,24 @@ export class HandleAjax {
       this.ajax.success = false;
     }, 6000);
   }
+  public successWithoutNotification(data: InterFuncSuccess): void {
+    this.ajax.successMessage = data.message;
+    this.ajax.success        = true;
+    this.ajax.sending        = false;
+    const dis                = this;
+    this.notify.type         = ENUM_NOTIFICATION_TYPE.SUCCESS;
+    this.notify.text         = data.message;
+    // HandleAjax.hoverNotifications.push(this.notify);
+    // console.log('adding trigger', this.notify);
+    jQuery('body').trigger('addNotification', this.notify);
 
-  public stop() {
+    setTimeout(() => {
+      dis.showModal     = false;
+      this.ajax.success = false;
+    }, 6000);
+  }
+
+  public stop():void {
     this.ajax.sending = false;
   }
 }

@@ -27,7 +27,8 @@
     "vue-good-table": "^2.21.10",
     "vue-property-decorator": "^9.1.2",
     "vue-table-dynamic": "^0.4.10",
-    "vuedraggable": "^2.24.3"
+    "vuedraggable": "^2.24.3",
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
@@ -53,6 +54,7 @@
     "typescript": "^4.3.2",
     "vue-loader": "^15.9.7",
     "vue-template-compiler": "^2.6.13",
+    "vuex-module-decorators": "^1.0.1",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.0"
   }
