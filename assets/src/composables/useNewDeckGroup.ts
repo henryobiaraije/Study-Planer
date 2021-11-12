@@ -3,6 +3,7 @@ import {InterFuncSuccess, Server} from "../static/server";
 import {Store} from "../static/store";
 import {ref} from "@vue/composition-api";
 import useDeckGroupLists from "./useDeckGroupLists";
+import {_Tag} from "../interfaces/inter-sp";
 
 export default function () {
   let groupName = ref('');
@@ -13,6 +14,7 @@ export default function () {
     success       : false,
     successMessage: '',
   });
+  const newTags = ref<Array<_Tag>>([]);
 
   const xhrCreateNewDeckGroup = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
@@ -21,8 +23,7 @@ export default function () {
         Store.nonce,
         {
           deck_group_name: groupName.value,
-          // name    : vdata.vEndpoints.create.name,
-          // endpoint: vdata.vEndpoints.create.endpoint,
+          tags           : newTags.value,
         }
       ],
       what: "admin_sp_ajax_admin_create_new_deck_group",
@@ -34,6 +35,7 @@ export default function () {
         handleAjax.success(done);
         useDeckGroupLists().load();
         groupName.value = '';
+        newTags.value   = [];
         // vdata.vEndpoints.create = {
         //   endpoint   : '',
         //   name       : '',
@@ -54,5 +56,6 @@ export default function () {
     ajax,
     groupName,
     xhrCreateNewDeckGroup,
+    newTags,
   };
 }

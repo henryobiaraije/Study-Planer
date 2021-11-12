@@ -32,10 +32,16 @@
 	global $wpdb;
 	$prefix = $wpdb->prefix . 'sp_';
 	define( 'SP_DB_PREFIX', $prefix );
-	$table_deck_groups = $prefix . 'deck_groups';
-	$table_tags        = $prefix . 'tags';
+	$table_deck_groups = SP_DB_PREFIX . 'deck_groups';
+	$table_tags        = SP_DB_PREFIX . 'tags';
+	$table_taggables   = SP_DB_PREFIX . 'taggables';
+	$table_decks       = SP_DB_PREFIX . 'decks';
+	define( 'SP_TABLE_DECK_GROUPS', $table_deck_groups );
+	define( 'SP_TABLE_TAGS', $table_tags );
+	define( 'SP_TABLE_TAGGABLES', $table_taggables );
+	define( 'SP_TABLE_DECKS', $table_decks );
 
-
+	// Deck groups
 	if ( ! $schema_builder->hasTable( $table_deck_groups ) ) {
 		Capsule::schema()->create( $table_deck_groups, function ( Blueprint $table ) {
 			$table->increments( 'id' );
@@ -45,10 +51,33 @@
 		} );
 	}
 
+	// Deck
+	if ( ! $schema_builder->hasTable( $table_decks ) ) {
+		Capsule::schema()->create( $table_decks, function ( Blueprint $table ) {
+			$table->id();
+			$table->string( 'name' )->unique();
+			$table->foreignId( 'deck_group_id' )->constrained();
+			$table->softDeletes();
+			$table->timestamps();
+		} );
+	}
+	// Tags
 	if ( ! $schema_builder->hasTable( $table_tags ) ) {
 		Capsule::schema()->create( $table_tags, function ( Blueprint $table ) {
-			$table->increments( 'id' );
+			$table->id( 'id' );
 			$table->string( 'name' )->unique();
+			$table->softDeletes();
+			$table->timestamps();
+		} );
+	}
+	// Taggables
+	if ( ! $schema_builder->hasTable( $table_taggables ) ) {
+		Capsule::schema()->create( $table_taggables, function ( Blueprint $table ) use ( $table_tags ) {
+//			$table->foreignId( 'tag_id' )->references( 'id')->on($table_tags)->onDelete( 'cascade');
+			$table->id();
+			$table->foreignId( 'tag_id' )->constrained( $table_tags )->onDelete( 'cascade' );
+			$table->string( 'taggable_id' );
+			$table->string( 'taggable_type' );
 			$table->softDeletes();
 			$table->timestamps();
 		} );

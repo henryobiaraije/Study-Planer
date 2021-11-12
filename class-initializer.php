@@ -279,6 +279,9 @@
 				wp_register_style( $base . 'bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css', [], 1.0 );
 			}
 
+			$css_general = Initializer::$css_url . '/general.css';
+			wp_enqueue_style( 'sp-general', $css_general, [], Initializer::$script_version );
+
 
 			add_action( 'sp_enqueue_default_admin_scripts', function () use ( $base ) {
 //    wp_enqueue_script($base.'vue');
@@ -374,7 +377,6 @@
 
 
 		}
-
 
 		public function on_activate() {
 			//

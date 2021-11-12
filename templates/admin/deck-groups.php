@@ -38,6 +38,27 @@
 							<span class="tw-title" >Deck group name</span >
 							<input v-model="newDeckGroup.groupName.value" name="deck_group" required type="text" >
 						</label >
+						<div >
+							<span >Tags</span >
+							<vue-mulitiselect
+									v-model="newDeckGroup.newTags.value"
+									:options="searchTags.results.value"
+									:multiple="true"
+									:loading="searchTags.ajax.value.sending"
+									:searchable="true"
+									:close-on-select="true"
+									:taggable="true"
+									:createTag="false"
+									@tag="searchTags.addTag"
+									@search-change="searchTags.search"
+									placeholder="Tags"
+									label="name"
+									track-by="id"
+							></vue-mulitiselect >
+						</div >
+						<br />
+						<hr />
+						<br />
 						<ajax-action
 								button-text="Create"
 								css-classes="button"
@@ -71,6 +92,18 @@
 					<template slot="table-row" slot-scope="props" >
 						<div v-if="props.column.field === 'name'" >
 							<input @input="deckGroups.onEdit(props.row)" v-model="props.row.name" />
+							<div class="row-actions" >
+							<span class="edit" >
+								<a @click.prevent="deckGroups.openEditModal(props.row,'#modal-edit')" class="text-blue-500 font-bold" href="#" >
+									Edit <i class="fa fa-pencil" ></i ></a >  </span >
+							</div >
+						</div >
+						<div v-else-if="props.column.field === 'tags'" >
+							<ul class="" style="min-width: 100px;" >
+								<li v-for="(item,itemIndex) in props.row.tags"
+								    class="inline-flex items-center bg-gray-500 justify-center mr-1 px-2 py-1 text-xs font-bold leading-none text-white bg-gray-500 rounded" >{{item.name}}
+								</li >
+							</ul >
 						</div >
 						<span v-else-if="props.column.field === 'created_at'" >
 							<time-comp :time="props.row.created_at" ></time-comp >
@@ -107,6 +140,50 @@
 					</div >
 				</vue-good-table >
 			</div >
+		</div >
+	</div >
+
+	<?php /** Edit Modal */ ?>
+	<div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="exampleModalEdit" aria-hidden="true" >
+		<div class="modal-dialog" >
+			<form @submit.prevent="deckGroups.updateEditing" class="modal-content" >
+				<div class="modal-header" >
+					<h5 class="modal-title" id="exampleModalEdit" >Edit Deck Group</h5 >
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button >
+				</div >
+				<div v-if="null !== deckGroupToEdit" class="modal-body" >
+					<label class="tw-simple-input" >
+						<span class="tw-title" >Deck group name</span >
+						<input v-model="deckGroupToEdit.name" name="deck_group" required type="text" >
+					</label >
+					<div >
+						<span >Tags</span >
+						<vue-mulitiselect
+								v-model="deckGroupToEdit.tags"
+								:options="searchTags.results.value"
+								:multiple="true"
+								:loading="searchTags.ajax.value.sending"
+								:searchable="true"
+								:close-on-select="true"
+								:taggable="true"
+								:createTag="false"
+								@tag="searchTags.addTag"
+								@search-change="searchTags.search"
+								placeholder="Tags"
+								label="name"
+								track-by="id"
+						></vue-mulitiselect >
+					</div >
+				</div >
+				<div class="modal-footer" >
+					<ajax-action
+							button-text="Update"
+							css-classes="button"
+							icon="fa fa-save"
+							:ajax="deckGroups.ajaxUpdate.value" >
+					</ajax-action >
+				</div >
+			</form >
 		</div >
 	</div >
 

@@ -4,7 +4,7 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="7">
+          <list size="11">
             <item index="0" class="java.lang.String" itemvalue="v-model" />
             <item index="1" class="java.lang.String" itemvalue="@submit.prevent" />
             <item index="2" class="java.lang.String" itemvalue="@input" />
@@ -12,6 +12,10 @@
             <item index="4" class="java.lang.String" itemvalue="v-if" />
             <item index="5" class="java.lang.String" itemvalue="v-else-if" />
             <item index="6" class="java.lang.String" itemvalue="v-else" />
+            <item index="7" class="java.lang.String" itemvalue="@click.prevent" />
+            <item index="8" class="java.lang.String" itemvalue=":disabled" />
+            <item index="9" class="java.lang.String" itemvalue="@change" />
+            <item index="10" class="java.lang.String" itemvalue="v-for" />
           </list>
         </value>
       </option>
@@ -20,7 +24,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="12">
+          <list size="15">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -33,6 +37,9 @@
             <item index="9" class="java.lang.String" itemvalue="ajax-action-not-form" />
             <item index="10" class="java.lang.String" itemvalue="time-ago" />
             <item index="11" class="java.lang.String" itemvalue="time-comp" />
+            <item index="12" class="java.lang.String" itemvalue="multiselect" />
+            <item index="13" class="java.lang.String" itemvalue="mulitiselect" />
+            <item index="14" class="java.lang.String" itemvalue="vue-mulitiselect" />
           </list>
         </value>
       </option>

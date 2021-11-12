@@ -9,8 +9,8 @@
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
 	use Illuminate\Database\Eloquent\SoftDeletes;
-	use Illuminate\Support\Facades\DB;
 	use StudyPlanner\Libs\Common;
+	use StudyPlanner\Models\Tag;
 
 	class DeckGroup extends Model {
 		protected $table = SP_DB_PREFIX . 'deck_groups';
@@ -24,6 +24,9 @@
 			'is_admin' => 'boolean',
 		];
 
+		public function tags() {
+			return $this->morphToMany( Tag::class, 'taggable', SP_TABLE_TAGGABLES );
+		}
 
 		public static function get_deck_groups( $args ) : array {
 			$default = [
@@ -35,11 +38,11 @@
 			];
 			$args    = wp_parse_args( $args, $default );
 			if ( $args['with_trashed'] ) {
-				$deck_groups = DeckGroup::withoutTrashed();
+				$deck_groups = DeckGroup::withoutTrashed()::with( 'tags' );
 			} elseif ( $args['only_trashed'] ) {
 				$deck_groups = DeckGroup::onlyTrashed();
 			} else {
-				$deck_groups = DeckGroup::query();
+				$deck_groups = DeckGroup::with( 'tags' );
 			}
 			$deck_groups = $deck_groups
 				->where( 'name', 'like', "%{$args['search']}%" );
@@ -64,14 +67,14 @@
 		}
 
 		public static function get_totals() : array {
-			$all            = [
+			$all     = [
 				'active'  => 0,
 				'trashed' => 0,
 			];
-			$active         = DeckGroup::query()
+			$active  = DeckGroup::query()
 				->selectRaw( Manager::raw( 'count(*) as count' ) )
 				->get();
-			$trashed        = DeckGroup::onlyTrashed()
+			$trashed = DeckGroup::onlyTrashed()
 				->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
 
 			$all['active']  = $active[0]['count'];

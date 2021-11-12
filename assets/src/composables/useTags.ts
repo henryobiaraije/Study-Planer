@@ -117,6 +117,7 @@ export default function (status = 'publish') {
   let total                   = ref<number>(0);
   //
   const newName               = ref('');
+  const newTags               = ref<Array<_Tag>>([]);
   let sendOnline              = null;
   tableData.value.post_status = status;
   //
@@ -182,6 +183,7 @@ export default function (status = 'publish') {
   };
   const tt                    = () => tableData.value;
 
+
   const xhrLoad        = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     sendOnline                   = new Server().send_online({
@@ -203,9 +205,9 @@ export default function (status = 'publish') {
       },
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.stop();
-        const items     = done.data.details.items;
-        const total     = done.data.details.total;
-        const theTotals = done.data.totals;
+        const items          = done.data.details.items;
+        const total          = done.data.details.total;
+        const theTotals      = done.data.totals;
         // console.log({done, groups, total, totals});
         tt().isLoading       = false;
         tableData.value.rows = items;
@@ -234,6 +236,7 @@ export default function (status = 'publish') {
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.success(done);
         newName.value = '';
+        xhrLoad();
       },
       funcFailue(done) {
         handleAjax.error(done);
@@ -320,7 +323,7 @@ export default function (status = 'publish') {
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
     onSortChange, onColumnFilter,
     batchUpdate, batchDelete, batchTrash,
-    totals, newName
-  };
+    totals, newName, newTags,
+  }
 
 }

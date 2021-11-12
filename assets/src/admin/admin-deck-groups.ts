@@ -20,6 +20,12 @@ import "../../css/admin/admin-deck-groups.scss";
 import "./install-composition-api";
 import useNewDeckGroup from "../composables/useNewDeckGroup";
 import useDeckGroupLists from "../composables/useDeckGroupLists";
+import useTagSearch from "../composables/useTagSearch";
+// import Multiselect from '@vueform/multiselect'
+import Multiselect from 'vue-multiselect'
+import "vue-multiselect/dist/vue-multiselect.min.css";
+import {_DeckGroup} from "../interfaces/inter-sp";
+// import "@vueform/multiselect/themes/default.css";
 
 Vue.component('ajax-action-not-form', AjaxActionNotForm);
 
@@ -178,6 +184,9 @@ const mDeckGroup    = {
 const mComDeckGroup = {
   tableDataValue() {
     return dis(this).deckGroups.tableData.value;
+  },
+  deckGroupToEdit() {
+    return dis(this).deckGroups.deckGroupToEdit.value;
   }
 };
 
@@ -544,11 +553,12 @@ var vComp: typeof v_computed = null;
 function setup(props) {
   const url          = new URL(window.location.href);
   const searchParams = new URLSearchParams(url.search);
-  const status = searchParams.get('status');
-  console.log('in setup',{url,searchParams,status});
+  const status       = searchParams.get('status');
+  console.log('in setup', {url, searchParams, status});
   return {
     newDeckGroup: useNewDeckGroup(),
     deckGroups  : useDeckGroupLists(status),
+    searchTags  : useTagSearch(),
   };
 }
 
@@ -588,6 +598,7 @@ function dis(context): ReturnType<typeof setup> {
         HoverNotifications,
         // VueTableDynamic,
         VueGoodTable,
+        'vue-mulitiselect': Multiselect,
       },
     });
   }

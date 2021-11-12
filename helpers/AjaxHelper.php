@@ -36,10 +36,12 @@
 			add_action( 'admin_sp_ajax_admin_trash_deck_group', array( $this, 'ajax_admin_trash_deck_group' ) );
 			add_action( 'admin_sp_ajax_admin_create_tag', array( $this, 'ajax_admin_create_tag' ) );
 			add_action( 'admin_sp_ajax_admin_load_tags', array( $this, 'ajax_admin_load_tags' ) );
+			add_action( 'admin_sp_ajax_admin_search_tags', array( $this, 'ajax_admin_search_tags' ) );
 			add_action( 'admin_sp_ajax_admin_trash_tags', array( $this, 'ajax_admin_trash_tags' ) );
 			add_action( 'admin_sp_ajax_admin_delete_tags', array( $this, 'ajax_admin_delete_tags' ) );
 		}
 
+		// <editor-fold desc="Tags">
 		public function ajax_admin_create_tag( $post ) : void {
 //			Common::send_error( [
 //				'ajax_admin_create_tag',
@@ -57,7 +59,57 @@
 //				'$name' => $name,
 //			] );
 
-			Common::send_success( 'Created successfully.' );
+			Common::send_success( 'Created successfully.', $create );
+
+		}
+
+		public function ajax_admin_search_tags( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_load_tags',
+//				'post' => $post,
+//			] );
+
+			$params         = $post[ Common::VAR_2 ]['params'];
+			$per_page       = (int) sanitize_text_field( $params['per_page'] );
+			$page           = (int) sanitize_text_field( $params['page'] );
+			$search_keyword = sanitize_text_field( $params['search_keyword'] );
+			$status         = sanitize_text_field( $params['status'] );
+//			Common::send_error( [
+//				'ajax_admin_load_tags',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$status'         => $status,
+//			] );
+
+			$items  = Tag::get_tags( [
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			] );
+			$totals = Tag::get_totals();
+
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$deck_groups'    => $deck_groups,
+//				'$status'         => $status,
+//			] );
+
+
+			Common::send_success( 'Tag loaded.', [
+				'details' => $items,
+				'totals'  => $totals,
+			], [
+//				'post' => $post,
+			] );
 
 		}
 
@@ -170,6 +222,7 @@
 			Common::send_success( 'Deleted.' );
 
 		}
+		// </editor-fold desc="Tags">
 
 		// <editor-fold desc="Deck Groups">
 
@@ -295,18 +348,29 @@
 					'deck_groups' => [],
 				] );
 			foreach ( $args['deck_groups'] as $group ) {
-				$name = sanitize_text_field( $group['name'] );
-				$id   = (int) sanitize_text_field( $group['id'] );
-				DeckGroup::query()->where( 'id', '=', $id )->update( [
+				$name       = sanitize_text_field( $group['name'] );
+				$id         = (int) sanitize_text_field( $group['id'] );
+				$update_id  = DeckGroup::query()->where( 'id', '=', $id )->update( [
 					'name' => $name,
 				] );
+				$deck_group = DeckGroup::find( $id );
+				$deck_group->tags()->detach();
+				foreach ( $group['tags'] as $one ) {
+					$tag_id = (int) sanitize_text_field( $one['id'] );
+					$tag    = Tag::find( $tag_id );
+					$deck_group->tags()->save( $tag );
+				}
+
 //				Common::send_error( [
 //					'ajax_admin_create_new_deck_group',
-//					'post'  => $post,
-//					'$all'  => $all,
-//					'$name' => $name,
-//					'$id'   => $id,
-//					'$args' => $args,
+//					'post'        => $post,
+//					'$all'        => $all,
+//					'$name'       => $name,
+//					'$id'         => $id,
+//					'$args'       => $args,
+//					'$group'      => $group,
+//					'$deck_group' => $deck_group,
+//					'$update_id'  => $update_id,
 //				] );
 			}
 
@@ -323,14 +387,30 @@
 
 			$all             = $post[ Common::VAR_2 ];
 			$deck_group_name = sanitize_text_field( $all['deck_group_name'] );
+			$tags            = $all['tags'];
 
-			$deck_group = DeckGroup::firstOrCreate( [ 'name' => $deck_group_name ] );
+			$create     = DeckGroup::firstOrCreate( [ 'name' => $deck_group_name ] );
+			$deck_group = DeckGroup::find( $create->id );
+			foreach ( $tags as $one ) {
+				$tag = Tag::find( $one['id'] );
+				$deck_group->tags()->save( $tag );
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'             => $post,
+//					'toSql'             => $deck_group->tags()->toSql(),
+//					'$deck_group_name' => $deck_group_name,
+//					'$tags'            => $tags,
+//					'$tag'            => $tag,
+////				'$deck_group'      => $deck_group,
+//				] );
+			}
 
 //			Common::send_error( [
 //				'ajax_admin_create_new_deck_group',
 //				'post'             => $post,
 //				'$deck_group_name' => $deck_group_name,
-//				'$deck_group'      => $deck_group,
+//				'$tags'            => $tags,
+////				'$deck_group'      => $deck_group,
 //			] );
 
 			Common::send_success( 'Deck group created.' );

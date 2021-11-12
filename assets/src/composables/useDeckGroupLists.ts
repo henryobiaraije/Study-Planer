@@ -6,12 +6,18 @@ import Cookies from 'js-cookie';
 import {vdata} from "../admin/admin-deck-groups";
 import {_DeckGroup} from "../interfaces/inter-sp";
 
+declare var bootstrap;
+
 const tableData = ref({
   columns          : [
     {
       label  : 'Name',
       field  : 'name',
       tooltip: 'Endpoint Name',
+    },
+    {
+      label: 'Tags',
+      field: 'tags',
     },
     {
       label: 'Created At',
@@ -78,59 +84,63 @@ const totals    = ref({
 });
 
 export default function (status = 'publish') {
-  const ajax            = ref<_Ajax>({
+  const ajax                  = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxUpdate      = ref<_Ajax>({
+  const ajaxUpdate            = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxTrash       = ref<_Ajax>({
+  const ajaxTrash             = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxDelete      = ref<_Ajax>({
+  const ajaxDelete            = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
+  const modalEditId           = ref('');
   tableData.value.post_status = status;
-  console.log('in function', {status});
-  const editedItems     = ref([]);
-  let sendOnline        = null;
-  let deckGroupToEdit   = ref<_DeckGroup>(null);
-  let total             = ref<number>(0);
+  // console.log('in function', {status});
+  const editedItems           = ref([]);
+  let sendOnline              = null;
+  let deckGroupToEdit         = ref<_DeckGroup>(null);
+  let total                   = ref<number>(0);
   //
-  const batchUpdate     = () => {
+  const updateEditing         = () => {
+    xhrUpdateBatch([deckGroupToEdit.value]);
+  }
+  const batchUpdate           = () => {
     xhrUpdateBatch(tt().selectedRows);
   }
-  const batchTrash      = () => {
+  const batchTrash            = () => {
     xhrTrashBatch(tt().selectedRows);
   }
-  const batchDelete     = () => {
+  const batchDelete           = () => {
     xhrDeleteBatch(tt().selectedRows);
   }
-  const load            = () => {
+  const load                  = () => {
     xhrLoad();
   }
   //
-  const onSelect        = (items: { selectedRows: Array<_DeckGroup> }) => {
+  const onSelect              = (items: { selectedRows: Array<_DeckGroup> }) => {
     console.log('selected', {items});
     tt().selectedRows = items.selectedRows;
   };
-  const onEdit          = (item: _DeckGroup) => {
+  const onEdit                = (item: _DeckGroup) => {
     console.log('edited', {item});
     if (undefined === editedItems.value[item.id]) {
       editedItems.value[item.id] = {
@@ -145,34 +155,53 @@ export default function (status = 'publish') {
       }
     }, 500);
   };
-  const onSearch        = (params: { searchTerm: string }) => {
+  const onSearch              = (params: { searchTerm: string }) => {
     tt().searchKeyword = params.searchTerm;
     xhrLoad();
   };
-  const onPageChange    = (params: { currentPage: number, currentPerPage: number, prevPage: number, total: number }) => {
+  const onPageChange          = (params: { currentPage: number, currentPerPage: number, prevPage: number, total: number }) => {
     tt().paginationOptions.setCurrentPage = params.currentPage;
     tt().paginationOptions.perPage        = params.currentPerPage;
     xhrLoad();
   };
-  const onSortChange    = (params) => {
+  const onSortChange          = (params) => {
 
   };
-  const onColumnFilter  = (params) => {
+  const onColumnFilter        = (params) => {
     //
     console.log('sort change');
   };
-  const onPerPageChange = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
+  const onPerPageChange       = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
     tt().paginationOptions.setCurrentPage = params.currentPage;
     tt().paginationOptions.perPage        = params.currentPerPage;
     // Cookies.set('spPerPage', params.currentPerPage);
     xhrLoad();
   };
-  const loadItems       = () => {
+  const loadItems             = () => {
     xhrLoad();
   };
-  const tt              = () => tableData.value;
+  const openEditModal         = (item: _DeckGroup, modalId: string) => {
+    deckGroupToEdit.value = item;
+    modalEditId.value     = modalId;
+    const modalElement    = jQuery(modalId)[0];
+    const myModal         = new bootstrap.Modal(modalElement);
+    myModal.show();
+    modalElement.addEventListener('shown.bs.modal', function () {
 
-  const xhrLoad = () => {
+    });
+    modalElement.addEventListener('hidden.bs.modal', function () {
+      deckGroupToEdit.value = null;
+    });
+  }
+  const closeEditModal        = () => {
+    const modalElement = jQuery(modalEditId.value)[0];
+    const myModal      = new bootstrap.Modal(modalElement);
+    myModal.hide();
+    deckGroupToEdit.value = null;
+  };
+  const tt                    = () => tableData.value;
+
+  const xhrLoad        = () => {
     console.log('start loading');
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     sendOnline                   = new Server().send_online({
@@ -209,7 +238,6 @@ export default function (status = 'publish') {
       },
     });
   };
-
   const xhrUpdateBatch = (items: Array<_DeckGroup>) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxUpdate.value);
     sendOnline                   = new Server().send_online({
@@ -233,8 +261,7 @@ export default function (status = 'publish') {
       },
     });
   };
-
-  const xhrTrashBatch = (items: Array<_DeckGroup>) => {
+  const xhrTrashBatch  = (items: Array<_DeckGroup>) => {
     if (!confirm('Are you sure you want to trash these items?')) {
       return;
     }
@@ -259,7 +286,6 @@ export default function (status = 'publish') {
       },
     });
   };
-
   const xhrDeleteBatch = (items: Array<_DeckGroup>) => {
     if (!confirm('Are you sure you want to delete these items? This action is not reversible.')) {
       return;
@@ -295,9 +321,9 @@ export default function (status = 'publish') {
     ajax, ajaxUpdate, ajaxTrash, ajaxDelete,
     total, deckGroupToEdit, editedItems, tableData, load,
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
-    onSortChange, onColumnFilter,
+    onSortChange, onColumnFilter, updateEditing,
     batchUpdate, batchDelete, batchTrash,
-    totals,
+    totals, closeEditModal, openEditModal
   };
 
 }
