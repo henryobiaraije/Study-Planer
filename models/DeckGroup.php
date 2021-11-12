@@ -28,6 +28,10 @@
 			return $this->morphToMany( Tag::class, 'taggable', SP_TABLE_TAGGABLES );
 		}
 
+		public function decks() {
+			return $this->hasMany( Deck::class, 'deck_group_id' );
+		}
+
 		public static function get_deck_groups( $args ) : array {
 			$default = [
 				'search'       => '',
@@ -64,6 +68,32 @@
 				'total'       => $total,
 				'deck_groups' => $deck_groups->all(),
 			];
+		}
+
+		public static function get_deck_simple( $args ) : array {
+			$default = [
+				'search'       => '',
+				'page'         => 1,
+				'per_page'     => 5,
+				'with_trashed' => false,
+				'only_trashed' => false,
+			];
+			$args    = wp_parse_args( $args, $default );
+			if ( $args['with_trashed'] ) {
+				$deck_groups = DeckGroup::withoutTrashed()::with( 'tags' );
+			} elseif ( $args['only_trashed'] ) {
+				$deck_groups = DeckGroup::onlyTrashed();
+			} else {
+				$deck_groups = DeckGroup::with( 'tags' );
+			}
+			$deck_groups = $deck_groups
+				->where( 'name', 'like', "%{$args['search']}%" );
+			$offset      = ( $args['page'] - 1 );
+			$deck_groups = $deck_groups->offset( $offset )
+				->limit( $args['per_page'] )
+				->orderByDesc( 'id' )->get();
+
+			return $deck_groups->all();
 		}
 
 		public static function get_totals() : array {

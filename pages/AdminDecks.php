@@ -55,10 +55,10 @@
 
 			add_submenu_page(
 				'study-planner',
-				'Deck Groups',
-				'Deck Groups',
+				'Decks',
+				'Decks',
 				'manage_options',
-				'study-planner-deck-groups',
+				'study-planner-decks',
 				array( $this, 'load_view' )
 			);
 		}

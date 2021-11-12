@@ -13,14 +13,67 @@
 	}
 ?>
 
-<div class="admin-deck wrap" >
+<div class="admin-decks wrap" >
 
 	<?php /***** Header ******/ ?>
 
 
-	<div class="all-loaded" style="display: none;" >
+	<div class=" all-loaded" style="display: none;" >
 		<div class="flex flex-wrap gap-3 px-1 md:px-4" >
-			Admin Decks
+			<?php if ( ! $in_trash ): ?>
+				<div class="form-area flex-1 md:flex-none  md:w-30 " >
+					<form @submit.prevent="decks.create()" class="bg-white rounded p-2" >
+						<label class="tw-simple-input" >
+							<span class="tw-title" >Deck </span >
+							<input v-model="deckNew.name" name="deck" required type="text" >
+						</label >
+						<div >
+							<span >Deck Group</span >
+							<vue-mulitiselect
+									v-model="deckNew.deckGroup"
+									:options="deckGroups.searchResults.value"
+									:multiple="false"
+									:loading="deckGroups.ajaxSearch.value.sending"
+									:searchable="true"
+									:allowEmpty="false"
+									:close-on-select="true"
+									:taggable="false"
+									:createTag="false"
+									@search-change="deckGroups.search"
+									placeholder="Deck Group"
+									label="name"
+									track-by="id"
+							></vue-mulitiselect >
+						</div >
+						<div class="mt-2" >
+							<span >Tags</span >
+							<vue-mulitiselect
+									v-model="deckNew.tags"
+									:options="searchTags.results.value"
+									:multiple="true"
+									:loading="searchTags.ajax.value.sending"
+									:searchable="true"
+									:close-on-select="true"
+									:taggable="true"
+									:createTag="false"
+									@tag="searchTags.addTag"
+									@search-change="searchTags.search"
+									placeholder="Tags"
+									label="name"
+									track-by="id"
+							></vue-mulitiselect >
+						</div >
+						<div class="mt-3" >
+							<ajax-action
+									button-text="Create"
+									css-classes="button"
+									icon="fa fa-plus"
+									:ajax="decks.ajaxCreate.value" >
+							</ajax-action >
+						</div >
+					</form >
+				</div >
+			<?php endif; ?>
 		</div >
 	</div >
 

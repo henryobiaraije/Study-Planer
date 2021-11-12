@@ -172,22 +172,25 @@ const mComputedGeneral = {
   },
 };
 
-const mDeckGroup    = {
+const mDeck    = {
   createDeckGroup() {
     this.newDeckGroup.xhrCreateNewDeckGroup();
   },
 };
-const mComDeckGroup = {
+const mComDeck = {
   tableDataValue() {
     return dis(this).decks.tableData.value;
   },
   deckGroupToEdit() {
     return dis(this).decks.itemToEdit.value;
-  }
+  },
+  deckNew() {
+    return dis(this).decks.newItem.value;
+  },
 };
 
-const v_method   = {...mDeckGroup, ...mGeneral};
-const v_computed = {...mComDeckGroup, ...mComputedGeneral,};
+const v_method   = {...mDeck, ...mGeneral};
+const v_computed = {...mComDeck, ...mComputedGeneral,};
 
 const xhr = {
   xhrUpdateEndpoint(endpoint: _Endpoint) {
@@ -554,6 +557,7 @@ function setup(props) {
   return {
     decks     : useDecks(status),
     searchTags: useTagSearch(),
+    deckGroups: useDeckGroupLists(),
   };
 }
 

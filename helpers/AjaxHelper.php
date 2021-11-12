@@ -4,6 +4,8 @@
 	namespace StudyPlanner\Helpers;
 
 
+	use Illuminate\Database\Capsule\Manager;
+	use Model\Deck;
 	use Model\DeckGroup;
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Models\Tag;
@@ -32,6 +34,7 @@
 			add_action( 'admin_sp_ajax_admin_create_new_deck_group', array( $this, 'ajax_admin_create_new_deck_group' ) );
 			add_action( 'admin_sp_ajax_admin_update_deck_group', array( $this, 'ajax_admin_update_deck_group' ) );
 			add_action( 'admin_sp_ajax_admin_load_deck_group', array( $this, 'ajax_admin_load_deck_group' ) );
+			add_action( 'admin_sp_ajax_admin_search_deck_group', array( $this, 'ajax_admin_search_deck_group' ) );
 			add_action( 'admin_sp_ajax_admin_delete_deck_group', array( $this, 'ajax_admin_delete_deck_group' ) );
 			add_action( 'admin_sp_ajax_admin_trash_deck_group', array( $this, 'ajax_admin_trash_deck_group' ) );
 			add_action( 'admin_sp_ajax_admin_create_tag', array( $this, 'ajax_admin_create_tag' ) );
@@ -39,6 +42,8 @@
 			add_action( 'admin_sp_ajax_admin_search_tags', array( $this, 'ajax_admin_search_tags' ) );
 			add_action( 'admin_sp_ajax_admin_trash_tags', array( $this, 'ajax_admin_trash_tags' ) );
 			add_action( 'admin_sp_ajax_admin_delete_tags', array( $this, 'ajax_admin_delete_tags' ) );
+			add_action( 'admin_sp_ajax_admin_load_decks', array( $this, 'ajax_admin_load_decks' ) );
+			add_action( 'admin_sp_ajax_admin_create_new_deck', array( $this, 'ajax_admin_create_new_deck' ) );
 		}
 
 		// <editor-fold desc="Tags">
@@ -222,9 +227,149 @@
 			Common::send_success( 'Deleted.' );
 
 		}
+
 		// </editor-fold desc="Tags">
 
+		public function ajax_admin_load_decks( $post ) : void {
+			Common::send_error( [
+				'ajax_admin_load_deck_group',
+				'post' => $post,
+			] );
+
+			$params         = $post[ Common::VAR_2 ]['params'];
+			$per_page       = (int) sanitize_text_field( $params['per_page'] );
+			$page           = (int) sanitize_text_field( $params['page'] );
+			$search_keyword = sanitize_text_field( $params['search_keyword'] );
+			$status         = sanitize_text_field( $params['status'] );
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$status'         => $status,
+//			] );
+
+			$deck_groups = DeckGroup::get_deck_groups( [
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			] );
+			$totals      = DeckGroup::get_totals();
+
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$deck_groups'    => $deck_groups,
+//				'$status'         => $status,
+//			] );
+
+
+			Common::send_success( 'Deck group loaded.', [
+				'details' => $deck_groups,
+				'totals'  => $totals,
+			], [
+				'post' => $post,
+			] );
+
+		}
+
+		public function ajax_admin_create_new_deck( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_create_new_deck',
+//				'post' => $post,
+//			] );
+
+			$all        = $post[ Common::VAR_2 ];
+			$name       = sanitize_text_field( $all['name'] );
+			$deck_group = $all['deck_group'];
+			$tags       = $all['tags'];
+
+			if ( empty( $deck_group ) ) {
+				Common::send_error( 'Please select a deck group' );
+			}
+
+			$deck          = Deck::firstOrCreate( [ 'name' => $name ] );
+			$deck_group_id = (int) sanitize_text_field( $deck_group['id'] );
+			$deck_group    = DeckGroup::find( $deck_group_id );
+			$deck_group->decks()->save( $deck );
+			foreach ( $tags as $one ) {
+				$tag = Tag::find( $one['id'] );
+				$deck->tags()->save( $tag );
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'           => $post,
+//					'$deck_group_id' => $deck_group_id,
+//					'$tags'          => $tags,
+//					'$name'          => $name,
+//					'$tag'           => $tag,
+////				'$deck_group'      => $deck_group,
+//				] );
+			}
+
+//			Common::send_error( [
+//				'ajax_admin_create_new_deck_group',
+//				'post'           => $post,
+//				'$deck_group_id' => $deck_group_id,
+//				'$tags'          => $tags,
+//				'$name'          => $name,
+//			] );
+
+			Common::send_success( 'Deck created.' );
+
+		}
+
 		// <editor-fold desc="Deck Groups">
+
+		public function ajax_admin_search_deck_group( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post' => $post,
+//			] );
+
+			$params         = $post[ Common::VAR_2 ]['params'];
+			$per_page       = (int) sanitize_text_field( $params['per_page'] );
+			$page           = (int) sanitize_text_field( $params['page'] );
+			$search_keyword = sanitize_text_field( $params['search_keyword'] );
+			$status         = sanitize_text_field( $params['status'] );
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$status'         => $status,
+//			] );
+
+			$deck_groups = DeckGroup::get_deck_simple( [
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			] );
+
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$deck_groups'    => $deck_groups,
+//				'$status'         => $status,
+//			] );
+
+
+			Common::send_success( 'Deck group found.', $deck_groups );
+
+		}
 
 		public function ajax_admin_load_deck_group( $post ) : void {
 //			Common::send_error( [
@@ -416,6 +561,7 @@
 			Common::send_success( 'Deck group created.' );
 
 		}
+
 		// </editor-fold >
 
 

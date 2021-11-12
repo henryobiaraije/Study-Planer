@@ -84,41 +84,49 @@ const totals    = ref({
 });
 
 export default function (status = 'publish') {
-  const ajax                  = ref<_Ajax>({
+  const ajax          = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxUpdate            = ref<_Ajax>({
+  const ajaxSearch    = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxTrash             = ref<_Ajax>({
+  const ajaxUpdate    = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxDelete            = ref<_Ajax>({
+  const ajaxTrash     = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const modalEditId           = ref('');
+  const ajaxDelete    = ref<_Ajax>({
+    sending       : false,
+    error         : false,
+    errorMessage  : '',
+    success       : false,
+    successMessage: '',
+  });
+  const modalEditId   = ref('');
+  const editedItems   = ref([]);
+  let sendOnline      = null;
+  let deckGroupToEdit = ref<_DeckGroup>(null);
+  let total           = ref<number>(0);
+  let searchResults   = ref<Array<_DeckGroup>>([]);
+
   tableData.value.post_status = status;
-  // console.log('in function', {status});
-  const editedItems           = ref([]);
-  let sendOnline              = null;
-  let deckGroupToEdit         = ref<_DeckGroup>(null);
-  let total                   = ref<number>(0);
   //
   const updateEditing         = () => {
     xhrUpdateBatch([deckGroupToEdit.value]);
@@ -134,6 +142,9 @@ export default function (status = 'publish') {
   }
   const load                  = () => {
     xhrLoad();
+  }
+  const search                = (query: string) => {
+    xhrSearch(query);
   }
   //
   const onSelect              = (items: { selectedRows: Array<_DeckGroup> }) => {
@@ -238,6 +249,36 @@ export default function (status = 'publish') {
       },
     });
   };
+  const xhrSearch      = (query: string) => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
+    sendOnline                   = new Server().send_online({
+      data: [
+        vdata.localize.nonce,
+        {
+          params: {
+            per_page      : 5,
+            page          : 1,
+            search_keyword: query,
+            status        : 'publish',
+          },
+        }
+      ],
+      what: "admin_sp_ajax_admin_search_deck_group",
+      funcBefore() {
+        handleAjax.start();
+        tt().isLoading = true;
+      },
+      funcSuccess(done: InterFuncSuccess) {
+        handleAjax.stop();
+        const groups        = done.data;
+        searchResults.value = groups;
+      },
+      funcFailue(done) {
+        handleAjax.error(done);
+        tt().isLoading = false;
+      },
+    });
+  };
   const xhrUpdateBatch = (items: Array<_DeckGroup>) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxUpdate.value);
     sendOnline                   = new Server().send_online({
@@ -318,12 +359,12 @@ export default function (status = 'publish') {
   // });
 
   return {
-    ajax, ajaxUpdate, ajaxTrash, ajaxDelete,
+    ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxSearch,
     total, deckGroupToEdit, editedItems, tableData, load,
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
     onSortChange, onColumnFilter, updateEditing,
-    batchUpdate, batchDelete, batchTrash,
-    totals, closeEditModal, openEditModal
+    batchUpdate, batchDelete, batchTrash, search,
+    totals, closeEditModal, openEditModal, searchResults
   };
 
 }

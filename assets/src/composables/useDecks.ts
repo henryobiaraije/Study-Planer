@@ -3,7 +3,8 @@ import {InterFuncSuccess, Server} from "../static/server";
 import {Store} from "../static/store";
 import {ref, onMounted} from "@vue/composition-api";
 import Cookies from 'js-cookie';
-import {_Deck, _DeckGroup} from "../interfaces/inter-sp";
+import {_Deck, _Tag, _DeckGroup} from "../interfaces/inter-sp";
+import useDeckGroupLists from "./useDeckGroupLists";
 
 declare var bootstrap;
 
@@ -95,6 +96,13 @@ export default function (status = 'publish') {
     success       : false,
     successMessage: '',
   });
+  const ajaxCreate            = ref<_Ajax>({
+    sending       : false,
+    error         : false,
+    errorMessage  : '',
+    success       : false,
+    successMessage: '',
+  });
   const ajaxUpdate            = ref<_Ajax>({
     sending       : false,
     error         : false,
@@ -118,12 +126,17 @@ export default function (status = 'publish') {
   });
   const modalEditId           = ref('');
   tableData.value.post_status = status;
-  // console.log('in function', {status});
   const editedItems           = ref<Array<_Deck>>([]);
   let sendOnline              = null;
   let itemToEdit              = ref<_Deck>(null);
   let total                   = ref<number>(0);
+  let newItem                 = ref({
+    name     : '',
+    deckGroup: null as _DeckGroup,
+    tags     : [] as Array<_Tag>
+  })
   //
+  const create                = () => {xhrCreateNew();}
   const updateEditing         = () => {
     xhrUpdateBatch([itemToEdit.value]);
   }
@@ -185,7 +198,7 @@ export default function (status = 'publish') {
     xhrLoad();
   };
   const openEditModal         = (item: _Deck, modalId: string) => {
-    itemToEdit.value  = item;
+    itemToEdit.value   = item;
     modalEditId.value  = modalId;
     const modalElement = jQuery(modalId)[0];
     const myModal      = new bootstrap.Modal(modalElement);
@@ -315,6 +328,33 @@ export default function (status = 'publish') {
       },
     });
   };
+  const xhrCreateNew   = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
+    new Server().send_online({
+      data: [
+        Store.nonce,
+        {
+          name      : newItem.value.name,
+          deck_group: newItem.value.deckGroup,
+          tags      : newItem.value.tags,
+        }
+      ],
+      what: "admin_sp_ajax_admin_create_new_deck",
+      funcBefore() {
+        handleAjax.start();
+      },
+      funcSuccess(done: InterFuncSuccess) {
+        handleAjax.success(done);
+        useDeckGroupLists().load();
+        newItem.value.name      = '';
+        newItem.value.tags      = [];
+        newItem.value.deckGroup = null;
+      },
+      funcFailue(done) {
+        handleAjax.error(done);
+      },
+    });
+  };
 
   // onMounted(() => {
   //   tableData.value.post_status = status;
@@ -322,8 +362,8 @@ export default function (status = 'publish') {
   // });
 
   return {
-    ajax, ajaxUpdate, ajaxTrash, ajaxDelete,
-    total, itemToEdit, editedItems, tableData, load,
+    ajax, ajaxUpdate, ajaxTrash, ajaxDelete,ajaxCreate,
+    total, create, itemToEdit, editedItems, tableData, load, newItem,
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
     onSortChange, onColumnFilter, updateEditing,
     batchUpdate, batchDelete, batchTrash,

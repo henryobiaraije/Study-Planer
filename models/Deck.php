@@ -17,12 +17,16 @@
 
 		use SoftDeletes;
 
-		protected $dates = [ 'deleted_at' ];
+		protected $dates    = [ 'deleted_at' ];
 		protected $fillable = [ 'name', 'deck_group_id' ];
 
 
 		public function tags() {
 			return $this->morphToMany( Tag::class, 'taggable', SP_TABLE_TAGGABLES );
+		}
+
+		public function deck_group() {
+			return $this->belongsTo( DeckGroup::class, 'deck_group_id' );
 		}
 
 		public static function get_decks( $args ) : array {

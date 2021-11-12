@@ -12,6 +12,7 @@
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Pages\Admin_Tags;
+	use StudyPlanner\Pages\AdminDeck;
 	use StudyPlanner\Pages\AdminDeckGroups;
 
 	if ( ! defined( 'ABSPATH' ) ) {
@@ -82,6 +83,7 @@
 
 			AjaxHelper::get_instance();
 			AdminDeckGroups::get_instance();
+			AdminDeck::get_instance();
 			Admin_Tags::get_instance();
 
 			// Localize all added general object
