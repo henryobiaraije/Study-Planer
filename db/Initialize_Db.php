@@ -55,14 +55,12 @@
 			global $wpdb;
 			$prefix = $wpdb->prefix . 'sp_';
 			define( 'SP_DB_PREFIX', $prefix );
-			$table_deck_groups = SP_DB_PREFIX . 'deck_groups';
-			$table_tags        = SP_DB_PREFIX . 'tags';
-			$table_taggables   = SP_DB_PREFIX . 'taggables';
-			$table_decks       = SP_DB_PREFIX . 'decks';
-			define( 'SP_TABLE_DECK_GROUPS', $table_deck_groups );
-			define( 'SP_TABLE_TAGS', $table_tags );
-			define( 'SP_TABLE_TAGGABLES', $table_taggables );
-			define( 'SP_TABLE_DECKS', $table_decks );
+			define( 'SP_TABLE_DECK_GROUPS', SP_DB_PREFIX . 'deck_groups' );
+			define( 'SP_TABLE_TAGS', SP_DB_PREFIX . 'tags' );
+			define( 'SP_TABLE_TAGGABLES', SP_DB_PREFIX . 'taggables' );
+			define( 'SP_TABLE_DECKS', SP_DB_PREFIX . 'decks' );
+			define( 'SP_TABLE_CARD_GROUPS', SP_DB_PREFIX . 'card_groups' );
+			define( 'SP_TABLE_CARDS', SP_DB_PREFIX . 'cards' );
 		}
 
 		private function create_default_rows() {
@@ -140,6 +138,35 @@
 					$table->foreignId( 'tag_id' )->constrained( SP_TABLE_TAGS )->onDelete( 'cascade' );
 					$table->string( 'taggable_id' );
 					$table->string( 'taggable_type' );
+					$table->softDeletes();
+					$table->timestamps();
+				} );
+			}
+
+			// Card group
+			if ( ! $this->schema_builder->hasTable( SP_TABLE_CARD_GROUPS ) ) {
+				Capsule::schema()->create( SP_TABLE_CARD_GROUPS, function ( Blueprint $table ) {
+					$table->id();
+					$table->foreignId( 'deck_id' )->constrained( SP_TABLE_DECKS );
+					$table->text( 'whole_question' );
+					$table->string( 'taggable_type' );
+					$table->softDeletes();
+					$table->timestamps();
+				} );
+			}
+
+			// Card
+			if ( ! $this->schema_builder->hasTable( SP_TABLE_CARDS ) ) {
+				Capsule::schema()->create( SP_TABLE_CARDS, function ( Blueprint $table ) {
+					global $wpdb;
+					$table->id();
+					$table->foreignId( 'bg_image_id' )->references( 'id' )->on( $wpdb->prefix . 'posts' );
+					$table->foreignId( 'card_group_id' )->references( 'id' )->on( SP_TABLE_CARD_GROUPS );
+					$table->text( 'question' );
+					$table->text( 'answer' );
+					$table->boolean( 'reverse' );
+					$table->index( 'x_position' );
+					$table->index( 'y_position' );
 					$table->softDeletes();
 					$table->timestamps();
 				} );

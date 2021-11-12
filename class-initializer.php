@@ -11,6 +11,8 @@
 	use StudyPlanner\Helpers\AjaxHelper;
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
+	use StudyPlanner\Pages\Admin_Basic_Card;
+	use StudyPlanner\Pages\Admin_Cards;
 	use StudyPlanner\Pages\Admin_Tags;
 	use StudyPlanner\Pages\AdminDeck;
 	use StudyPlanner\Pages\AdminDeckGroups;
@@ -85,6 +87,8 @@
 			AdminDeckGroups::get_instance();
 			AdminDeck::get_instance();
 			Admin_Tags::get_instance();
+			Admin_Cards::get_instance();
+			Admin_Basic_Card::get_instance();
 
 			// Localize all added general object
 			add_action( 'wp_footer', array( $this, 'output_localized' ), 10 );
