@@ -23,12 +23,14 @@
       "models\\",
       "pages\\",
       "libs\\",
-      "helpers\\"
+      "helpers\\",
+      "db\\"
     ]
   },
   "require": {
     "illuminate/database": "^8.69",
-    "illuminate/events": "^8.70"
+    "illuminate/events": "^8.70",
+    "ext-pdo": "*"
   },
   "require-dev": {
     "symfony/var-dumper": "^5.3"

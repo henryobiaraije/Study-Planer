@@ -42,9 +42,9 @@
 			];
 			$args    = wp_parse_args( $args, $default );
 			if ( $args['with_trashed'] ) {
-				$deck_groups = DeckGroup::withoutTrashed()::with( 'tags' );
+				$deck_groups = DeckGroup::with( 'tags' )->withoutTrashed();
 			} elseif ( $args['only_trashed'] ) {
-				$deck_groups = DeckGroup::onlyTrashed();
+				$deck_groups = DeckGroup::with( 'tags' )->onlyTrashed();
 			} else {
 				$deck_groups = DeckGroup::with( 'tags' );
 			}

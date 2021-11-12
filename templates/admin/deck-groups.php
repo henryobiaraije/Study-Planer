@@ -5,7 +5,9 @@
 	$page_title = 'Deck Groups';
 	$status     = filter_input( INPUT_GET, 'status' );
 	$in_trash   = false;
+	$disabled   = '';
 	if ( 'trash' === $status ) {
+		$disabled   = 'disabled';
 		$in_trash   = true;
 		$page_title .= " <span class='text-red-500'>(Trashed)</span> ";
 	} else {
@@ -91,12 +93,14 @@
 				>
 					<template slot="table-row" slot-scope="props" >
 						<div v-if="props.column.field === 'name'" >
-							<input @input="deckGroups.onEdit(props.row)" v-model="props.row.name" />
-							<div class="row-actions" >
-							<span class="edit" >
-								<a @click.prevent="deckGroups.openEditModal(props.row,'#modal-edit')" class="text-blue-500 font-bold" href="#" >
-									Edit <i class="fa fa-pencil" ></i ></a >  </span >
-							</div >
+							<input @input="deckGroups.onEdit(props.row)" <?php echo $disabled ?> v-model="props.row.name" />
+							<?php if ( ! $in_trash ): ?>
+								<div class="row-actions" >
+									<span class="edit" >
+										<a @click.prevent="deckGroups.openEditModal(props.row,'#modal-edit')" class="text-blue-500 font-bold" href="#" >
+											Edit <i class="fa fa-pen-alt" ></i ></a >  </span >
+								</div >
+							<?php endif; ?>
 						</div >
 						<div v-else-if="props.column.field === 'tags'" >
 							<ul class="" style="min-width: 100px;" >

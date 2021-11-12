@@ -1,8 +1,8 @@
 <template >
   <span >
-    <small style="font-size: 10px;" ><code >{{ normalDatetime }}</code ></small >
+    <small class="text-xs" style="font-size: 10px;" ><code >{{ normalDatetime }}</code ></small >
     <br />
-    <span >{{ formattedTime }} </span >
+    <span  class="text-xs" >{{ formattedTime }} </span >
   </span >
 </template >
 

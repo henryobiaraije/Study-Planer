@@ -39,18 +39,18 @@
 			];
 			$args    = wp_parse_args( $args, $default );
 			if ( $args['with_trashed'] ) {
-				$deck_groups = DeckGroup::withoutTrashed()::with( 'tags' );
+				$deck = Deck::with( 'tags', 'deck_group' )->withoutTrashed();
 			} elseif ( $args['only_trashed'] ) {
-				$deck_groups = DeckGroup::onlyTrashed();
+				$deck = Deck::with( 'tags', 'deck_group' )->onlyTrashed();
 			} else {
-				$deck_groups = DeckGroup::with( 'tags' );
+				$deck = Deck::with( 'tags', 'deck_group' );
 			}
-			$deck_groups = $deck_groups
+			$deck = $deck
 				->where( 'name', 'like', "%{$args['search']}%" );
 
-			$total       = $deck_groups->count();
-			$offset      = ( $args['page'] - 1 );
-			$deck_groups = $deck_groups->offset( $offset )
+			$total  = $deck->count();
+			$offset = ( $args['page'] - 1 );
+			$deck   = $deck->offset( $offset )
 				->limit( $args['per_page'] )
 				->orderByDesc( 'id' )->get();
 
@@ -62,8 +62,8 @@
 //			] );
 
 			return [
-				'total'       => $total,
-				'deck_groups' => $deck_groups->all(),
+				'total' => $total,
+				'decks' => $deck->all(),
 			];
 		}
 
@@ -72,10 +72,10 @@
 				'active'  => 0,
 				'trashed' => 0,
 			];
-			$active  = DeckGroup::query()
+			$active  = Deck::query()
 				->selectRaw( Manager::raw( 'count(*) as count' ) )
 				->get();
-			$trashed = DeckGroup::onlyTrashed()
+			$trashed = Deck::onlyTrashed()
 				->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
 
 			$all['active']  = $active[0]['count'];

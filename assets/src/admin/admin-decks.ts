@@ -181,7 +181,7 @@ const mComDeck = {
   tableDataValue() {
     return dis(this).decks.tableData.value;
   },
-  deckGroupToEdit() {
+  deckToEdit() {
     return dis(this).decks.itemToEdit.value;
   },
   deckNew() {

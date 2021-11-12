@@ -44,6 +44,9 @@
 			add_action( 'admin_sp_ajax_admin_delete_tags', array( $this, 'ajax_admin_delete_tags' ) );
 			add_action( 'admin_sp_ajax_admin_load_decks', array( $this, 'ajax_admin_load_decks' ) );
 			add_action( 'admin_sp_ajax_admin_create_new_deck', array( $this, 'ajax_admin_create_new_deck' ) );
+			add_action( 'admin_sp_ajax_admin_update_decks', array( $this, 'ajax_admin_update_decks' ) );
+			add_action( 'admin_sp_ajax_admin_trash_decks', array( $this, 'ajax_admin_trash_decks' ) );
+			add_action( 'admin_sp_ajax_admin_delete_decks', array( $this, 'ajax_admin_delete_decks' ) );
 		}
 
 		// <editor-fold desc="Tags">
@@ -230,11 +233,73 @@
 
 		// </editor-fold desc="Tags">
 
+		public function ajax_admin_trash_decks( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_trash_deck_group',
+//				'post' => $post,
+//			] );
+
+			$all  = $post[ Common::VAR_2 ];
+			$args = wp_parse_args(
+				$all,
+				[
+					'decks' => [],
+				] );
+			foreach ( $args['decks'] as $item ) {
+				$id = (int) sanitize_text_field( $item['id'] );
+				Deck::find( $id )->delete();
+//				Deck::query()->where( 'id', '=', $id )->delete();
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'  => $post,
+//					'$all'  => $all,
+//					'$id'   => $id,
+//					'$args' => $args,
+//				] );
+			}
+
+
+			Common::send_success( 'Trashed successfully.' );
+
+		}
+
+		public function ajax_admin_delete_decks( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_trash_deck_group',
+//				'post' => $post,
+//			] );
+
+			$all  = $post[ Common::VAR_2 ];
+			$args = wp_parse_args(
+				$all,
+				[
+					'decks' => [],
+				] );
+			foreach ( $args['decks'] as $item ) {
+				$id   = (int) sanitize_text_field( $item['id'] );
+				$deck = Deck::withTrashed()->find( $id );
+				$deck->tags()->detach();
+				$deck->forceDelete();
+//				Deck::query()->where( 'id', '=', $id )->delete();
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'  => $post,
+//					'$all'  => $all,
+//					'$id'   => $id,
+//					'$args' => $args,
+//				] );
+			}
+
+
+			Common::send_success( 'Deleted successfully.' );
+
+		}
+
 		public function ajax_admin_load_decks( $post ) : void {
-			Common::send_error( [
-				'ajax_admin_load_deck_group',
-				'post' => $post,
-			] );
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post' => $post,
+//			] );
 
 			$params         = $post[ Common::VAR_2 ]['params'];
 			$per_page       = (int) sanitize_text_field( $params['per_page'] );
@@ -251,13 +316,13 @@
 //				'$status'         => $status,
 //			] );
 
-			$deck_groups = DeckGroup::get_deck_groups( [
+			$decks  = Deck::get_decks( [
 				'search'       => $search_keyword,
 				'page'         => $page,
 				'per_page'     => $per_page,
 				'only_trashed' => ( 'trash' === $status ) ? true : false,
 			] );
-			$totals      = DeckGroup::get_totals();
+			$totals = Deck::get_totals();
 
 //			Common::send_error( [
 //				'ajax_admin_load_deck_group',
@@ -271,8 +336,8 @@
 //			] );
 
 
-			Common::send_success( 'Deck group loaded.', [
-				'details' => $deck_groups,
+			Common::send_success( 'Decks loaded.', [
+				'details' => $decks,
 				'totals'  => $totals,
 			], [
 				'post' => $post,
@@ -324,6 +389,58 @@
 			Common::send_success( 'Deck created.' );
 
 		}
+
+		public function ajax_admin_update_decks( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_update_decks',
+//				'post' => $post,
+//			] );
+
+			$all = $post[ Common::VAR_2 ];
+
+			$decks = $all['decks'];
+			foreach ( $decks as $one_deck ) {
+				$name          = sanitize_text_field( $one_deck['name'] );
+				$e_deck_group  = $one_deck['deck_group'];
+				$tags          = $one_deck['tags'];
+				$deck_id       = (int) sanitize_text_field( $one_deck['id'] );
+				$deck_group_id = (int) sanitize_text_field( $e_deck_group['id'] );
+
+				if ( empty( $e_deck_group ) ) {
+					Common::send_error( 'Please select a deck group' );
+				}
+
+				$deck = Deck::find( $deck_id );
+				$deck->update( [ 'name' => $name, 'deck_group_id' => $deck_group_id ] );
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'           => $post,
+//					'$deck_group_id' => $deck_group_id,
+//					'$tags'          => $tags,
+//					'$name'          => $name,
+//					'$e_deck_group'  => $e_deck_group,
+//				] );
+				$deck->tags()->detach();
+				foreach ( $tags as $one ) {
+					$tag_id = (int) sanitize_text_field( $one['id'] );
+					$tag    = Tag::find( $tag_id );
+					$deck->tags()->save( $tag );
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'           => $post,
+//					'$deck_group_id' => $deck_group_id,
+//					'$tags'          => $tags,
+//					'$name'          => $name,
+//					'$tag'           => $tag,
+////				'$deck_group'      => $deck_group,
+//				] );
+				}
+			}
+
+			Common::send_success( 'Saved.' );
+
+		}
+
 
 		// <editor-fold desc="Deck Groups">
 
@@ -463,8 +580,11 @@
 					'deck_groups' => [],
 				] );
 			foreach ( $args['deck_groups'] as $group ) {
-				$id = (int) sanitize_text_field( $group['id'] );
-				DeckGroup::query()->where( 'id', '=', $id )->forceDelete();
+				$id         = (int) sanitize_text_field( $group['id'] );
+				$deck_group = DeckGroup::withTrashed()->find( $id );
+				$deck_group->tags()->detach();
+				$deck_group->forceDelete();
+//				DeckGroup::query()->where( 'id', '=', $id )->forceDelete();
 //				Common::send_error( [
 //					'ajax_admin_create_new_deck_group',
 //					'post'  => $post,

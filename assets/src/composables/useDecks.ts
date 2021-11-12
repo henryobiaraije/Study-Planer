@@ -219,7 +219,6 @@ export default function (status = 'publish') {
   const tt                    = () => tableData.value;
 
   const xhrLoad        = () => {
-    console.log('start loading');
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     sendOnline                   = new Server().send_online({
       data: [
@@ -240,12 +239,12 @@ export default function (status = 'publish') {
       },
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.stop();
-        const groups    = done.data.details.deck_groups;
+        const items     = done.data.details.decks;
         const total     = done.data.details.total;
         const theTotals = done.data.totals;
-        console.log({done, groups, total, totals});
+        console.log({done, items, total, totals});
         tt().isLoading       = false;
-        tableData.value.rows = groups;
+        tableData.value.rows = items;
         totals.value         = theTotals;
         tt().totalRecords    = total;
       },
@@ -261,10 +260,10 @@ export default function (status = 'publish') {
       data: [
         Store.nonce,
         {
-          deck_groups: items,
+          decks: items,
         }
       ],
-      what: "admin_sp_ajax_admin_update_deck_group",
+      what: "admin_sp_ajax_admin_update_decks",
       funcBefore() {
         handleAjax.start();
         // vdata.tableData.isLoading = true;
@@ -287,10 +286,10 @@ export default function (status = 'publish') {
       data: [
         Store.nonce,
         {
-          deck_groups: items,
+          decks: items,
         }
       ],
-      what: "admin_sp_ajax_admin_trash_deck_group",
+      what: "admin_sp_ajax_admin_trash_decks",
       funcBefore() {
         handleAjax.start();
       },
@@ -312,10 +311,10 @@ export default function (status = 'publish') {
       data: [
         Store.nonce,
         {
-          deck_groups: items,
+          decks: items,
         }
       ],
-      what: "admin_sp_ajax_admin_delete_deck_group",
+      what: "admin_sp_ajax_admin_delete_decks",
       funcBefore() {
         handleAjax.start();
       },
@@ -349,6 +348,7 @@ export default function (status = 'publish') {
         newItem.value.name      = '';
         newItem.value.tags      = [];
         newItem.value.deckGroup = null;
+        xhrLoad();
       },
       funcFailue(done) {
         handleAjax.error(done);
@@ -362,7 +362,7 @@ export default function (status = 'publish') {
   // });
 
   return {
-    ajax, ajaxUpdate, ajaxTrash, ajaxDelete,ajaxCreate,
+    ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate,
     total, create, itemToEdit, editedItems, tableData, load, newItem,
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
     onSortChange, onColumnFilter, updateEditing,

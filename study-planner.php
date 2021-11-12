@@ -32,13 +32,16 @@
 
 //    require_once 'languages.php';
 	require_once __DIR__.'/vendor/autoload.php';
-	require_once __DIR__.'/bootstrap.php';
+//	require_once __DIR__.'/bootstrap.php';
 	require_once __DIR__.'/functions.php';
 	require_once __DIR__.'/class-initializer.php';
 
+	use StudyPlanner\Db\Initialize_Db;
 	use StudyPlanner\Initializer;
 
+	Initialize_Db::get_instance();
 	$initializer = Initializer::get_instance();
+
 
 	register_activation_hook( __FILE__, [ $initializer, 'on_activate' ] );
 	register_deactivation_hook( __FILE__, [ $initializer, 'on_deactivate' ] );
