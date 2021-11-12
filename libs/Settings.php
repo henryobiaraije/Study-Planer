@@ -7,8 +7,8 @@
 	class Settings {
 
 		// Options
-		public const OP_UNCATEGORIZED_DECK_GROUP_ID = 'sp_uncat_db_id';
-		public const OP_UNCATEGORIZED_DECK_ID = 'sp_uncat_db_id';
+		public const OP_UNCATEGORIZED_DECK_GROUP_ID = 'sp_uncat_dkgrp_id';
+		public const OP_UNCATEGORIZED_DECK_ID = 'sp_uncat_dk_id';
 
 		// Cookies
 

@@ -29,7 +29,7 @@
 		</li >
 	</ul >
 	<br />
-	<!--	</editor-fold>-->
+	<!--	</editor-fold  desc="Header">-->
 
 	<div class=" all-loaded" style="display: none;" >
 		<div class="flex flex-wrap gap-3 px-1 md:px-4" >
@@ -110,7 +110,10 @@
 				>
 					<template slot="table-row" slot-scope="props" >
 						<div v-if="props.column.field === 'name'" >
-							<input @input="decks.onEdit(props.row)" <?php echo $disabled ?> v-model="props.row.name" />
+							<input @input="decks.onEdit(props.row)"
+								<?php echo $disabled ?>
+								     :disabled="props.row.name === 'Uncategorized'"
+								     v-model="props.row.name" />
 							<?php if ( ! $in_trash ): ?>
 								<div class="row-actions" >
 									<span class="edit" >
@@ -120,7 +123,7 @@
 							<?php endif; ?>
 						</div >
 						<div v-else-if="props.column.field === 'deck_group'" >
-							{{props.row.deck_group.name}}
+							{{props.row.deck_group ? props.row.deck_group.name : ''}}
 						</div >
 						<div v-else-if="props.column.field === 'tags'" >
 							<ul class="" style="min-width: 100px;" >

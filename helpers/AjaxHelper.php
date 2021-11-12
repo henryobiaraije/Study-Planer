@@ -7,6 +7,8 @@
 	use Illuminate\Database\Capsule\Manager;
 	use Model\Deck;
 	use Model\DeckGroup;
+	use PDOException;
+	use PHPMailer\PHPMailer\Exception;
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Models\Tag;
 
@@ -364,6 +366,7 @@
 			$deck_group_id = (int) sanitize_text_field( $deck_group['id'] );
 			$deck_group    = DeckGroup::find( $deck_group_id );
 			$deck_group->decks()->save( $deck );
+			$deck->tags()->detach();
 			foreach ( $tags as $one ) {
 				$tag = Tag::find( $one['id'] );
 				$deck->tags()->save( $tag );
@@ -440,7 +443,6 @@
 			Common::send_success( 'Saved.' );
 
 		}
-
 
 		// <editor-fold desc="Deck Groups">
 
@@ -654,8 +656,9 @@
 			$deck_group_name = sanitize_text_field( $all['deck_group_name'] );
 			$tags            = $all['tags'];
 
-			$create     = DeckGroup::firstOrCreate( [ 'name' => $deck_group_name ] );
+			$create = DeckGroup::firstOrCreate( [ 'name' => $deck_group_name ] );
 			$deck_group = DeckGroup::find( $create->id );
+			$deck_group->tags()->detach();
 			foreach ( $tags as $one ) {
 				$tag = Tag::find( $one['id'] );
 				$deck_group->tags()->save( $tag );
@@ -669,6 +672,7 @@
 ////				'$deck_group'      => $deck_group,
 //				] );
 			}
+
 
 //			Common::send_error( [
 //				'ajax_admin_create_new_deck_group',

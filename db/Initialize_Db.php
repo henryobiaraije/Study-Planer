@@ -5,6 +5,7 @@
 
 
 	use Illuminate\Database\Capsule\Manager as Capsule;
+	use Illuminate\Database\Eloquent\ModelNotFoundException;
 	use Illuminate\Database\Schema\Blueprint;
 	use Model\Deck;
 	use Model\DeckGroup;
@@ -85,14 +86,12 @@
 
 		private function create_default_deck( $deck_group ) {
 			try {
-				$deck = Deck::query()->firstOrFail( [
-					'name'          => 'Uncategorized',
-					'deck_group_id' => $deck_group->id,
-				] );
-			} catch ( PDOException $e ) {
-				$deck = Deck::firstOrCreate( [
-					'name'          => 'Uncategorized',
-				] );
+				$deck = Deck::query()
+					->where( 'name', '=', 'Uncategorized' )
+					->where( 'deck_group_id', '=', $deck_group->id )
+					->firstOrFail();
+			} catch ( ModelNotFoundException $e ) {
+				$deck = Deck::where( 'name', 'Uncategorized' );
 				$deck->delete();
 				$deck = Deck::firstOrCreate( [
 					'name'          => 'Uncategorized',
@@ -133,11 +132,12 @@
 					$table->timestamps();
 				} );
 			}
+
 			// Taggables
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_TAGGABLES ) ) {
 				Capsule::schema()->create( SP_TABLE_TAGGABLES, function ( Blueprint $table ) {
 					$table->id();
-					$table->foreignId( 'tag_id' )->constrained( SP_TABLE_TAGGABLES )->onDelete( 'cascade' );
+					$table->foreignId( 'tag_id' )->constrained( SP_TABLE_TAGS )->onDelete( 'cascade' );
 					$table->string( 'taggable_id' );
 					$table->string( 'taggable_type' );
 					$table->softDeletes();

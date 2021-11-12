@@ -93,7 +93,9 @@
 				>
 					<template slot="table-row" slot-scope="props" >
 						<div v-if="props.column.field === 'name'" >
-							<input @input="deckGroups.onEdit(props.row)" <?php echo $disabled ?> v-model="props.row.name" />
+							<input @input="deckGroups.onEdit(props.row)"
+							       :disabled="props.row.name === 'Uncategorized'"
+								<?php echo $disabled ?> v-model="props.row.name" />
 							<?php if ( ! $in_trash ): ?>
 								<div class="row-actions" >
 									<span class="edit" >
