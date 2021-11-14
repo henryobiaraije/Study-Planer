@@ -65,6 +65,7 @@
 			add_action( 'admin_sp_ajax_admin_create_new_basic_card', array( $this, 'ajax_admin_create_new_basic_card' ) );
 			add_action( 'admin_sp_ajax_admin_load_image_attachment', array( $this, 'ajax_admin_load_image_attachment' ) );
 			add_action( 'admin_sp_ajax_admin_load_basic_card', array( $this, 'ajax_admin_load_basic_card' ) );
+			add_action( 'admin_sp_ajax_admin_update_basic_card', array( $this, 'admin_update_basic_card' ) );
 			// </editor-fold desc="Card">
 		}
 
@@ -101,6 +102,113 @@
 
 		}
 
+		public function admin_update_basic_card( $post ) : void {
+//			Common::send_error( [
+//				'admin_update_basic_card',
+//				'post' => $post,
+//			] );
+
+			$all                 = $post[ Common::VAR_2 ];
+			$e_card              = $all['card'];
+			$e_card_group        = $all['cardGroup'];
+			$e_deck              = $e_card_group['deck'];
+			$e_card_group_id     = $e_card_group['id'];
+			$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
+			$question            = $e_card_group['whole_question'];
+			$answer              = $e_card['answer'];
+			$e_set_bg_as_default = $all['set_bg_as_default'];
+			$schedule_at         = $e_card_group['scheduled_at'];
+			$reverse             = $e_card_group['reverse'];
+			$e_cards             = $e_card_group['cards'];
+			$cg_name             = sanitize_text_field( $e_card_group['name'] );
+			if ( empty( $schedule_at ) ) {
+				$schedule_at = Common::getDateTime();
+			} else {
+				$schedule_at = Common::format_datetime( $schedule_at );
+			}
+			if ( empty( $e_cards ) ) {
+				Common::send_error( 'The card is empty' );
+			}
+			if ( empty( $e_deck ) ) {
+				Common::send_error( 'Please select a deck' );
+			}
+			if ( empty( $question ) ) {
+				Common::send_error( 'Please provide a question' );
+			}
+			if ( empty( $answer ) ) {
+				Common::send_error( 'Please provide an answer' );
+			}
+
+			$e_deck_id = $e_card_group['deck']['id'];
+			$e_tags    = $e_card_group['tags'];
+			$deck      = Deck::find( $e_deck_id );
+			if ( empty( $deck ) ) {
+				Common::send_error( 'Invalid deck' );
+			}
+			$card_group = CardGroup::find( $e_card_group_id );
+			if ( empty( $card_group ) ) {
+				Common::send_error( 'Invalid card group' );
+			}
+			$card_id = $e_cards[0]['id'];
+			$card    = Card::find( $card_id );
+			if ( empty( $card ) ) {
+				Common::send_error( 'Invalid card' );
+			}
+
+			Manager::beginTransaction();
+
+			$card_group->whole_question = $question;
+			$card_group->scheduled_at   = $schedule_at;
+			$card_group->bg_image_id    = $bg_image_id;
+			$card_group->name           = $cg_name;
+			$card_group->deck_id        = $e_deck_id;
+			$card_group->save();
+			$card_group->tags()->detach();
+			foreach ( $e_tags as $one ) {
+				$tag_id = $one['id'];
+				$tag    = Tag::find( $tag_id );
+				if ( ! empty( $tag ) ) {
+					$card_group->tags()->save( $tag );
+				}
+			}
+			$card->question = $question;
+			$card->answer   = $answer;
+			$card->save();
+			Manager::commit();
+
+			if ( $e_set_bg_as_default ) {
+				update_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, $bg_image_id );
+			}
+			// Create card group
+
+
+//			Common::send_error( [
+//				'ajax_admin_create_new_basic_card',
+//				'post'                 => $post,
+//				'$e_card'              => $e_card,
+//				'toSql'                => $card_group->toSql(),
+//				'$reverse'             => $reverse,
+//				'$card'                => $card,
+//				'$e_card_group_id'     => $e_card_group_id,
+//				'$e_card_group'        => $e_card_group,
+//				'$question'            => $question,
+//				'$e_set_bg_as_default' => $e_set_bg_as_default,
+//				'$bg_image_id'         => $bg_image_id,
+//				'$answer'              => $answer,
+//				'$deck'                => $deck,
+//				'$cg_name'             => $cg_name,
+//				'$e_tags'              => $e_tags,
+//				'$schedule_at'         => $schedule_at,
+//			] );
+
+			$edit_page = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
+			             . '&action=card-edit'
+			             . '&card-group=' . $card_group->id;
+
+			Common::send_success( 'Updated successfully.', $edit_page );
+
+		}
+
 		public function ajax_admin_create_new_basic_card( $post ) : void {
 //			Common::send_error( [
 //				'ajax_admin_create_new_basic_card',
@@ -112,14 +220,13 @@
 			$e_card_group        = $all['cardGroup'];
 			$e_deck              = $e_card_group['deck'];
 			$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
-			$question            = $e_card['question'];
+			$question            = $e_card_group['whole_question'];
 			$answer              = $e_card['answer'];
-			$e_schedule_now      = $all['schedule_now'];
 			$e_set_bg_as_default = $all['set_bg_as_default'];
 			$schedule_at         = $e_card_group['scheduled_at'];
 			$reverse             = $e_card_group['reverse'];
 			$cg_name             = sanitize_text_field( $e_card_group['name'] );
-			if ( true === $e_schedule_now ) {
+			if ( empty( $schedule_at ) ) {
 				$schedule_at = Common::getDateTime();
 			} else {
 				$schedule_at = Common::format_datetime( $schedule_at );
@@ -141,7 +248,6 @@
 				Common::send_error( 'Invalid deck' );
 			}
 
-
 			Manager::beginTransaction();
 			$card_group                 = new CardGroup();
 			$card_group->whole_question = $question;
@@ -150,6 +256,7 @@
 			$card_group->bg_image_id    = $bg_image_id;
 			$card_group->name           = $cg_name;
 			$card_group->deck_id        = $e_deck_id;
+			$card_group->reverse        = $reverse;
 			$card_group->save();
 			$card_group->tags()->detach();
 			foreach ( $e_tags as $one ) {
@@ -165,6 +272,10 @@
 			$card->card_group_id = $card_group->id;
 			$card->save();
 			Manager::commit();
+
+			if ( $e_set_bg_as_default ) {
+				update_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, $bg_image_id );
+			}
 			// Create card group
 
 
@@ -194,23 +305,32 @@
 		}
 
 		public function ajax_admin_load_basic_card( $post ) : void {
-			Common::send_error( [
-				'ajax_admin_create_new_basic_card',
-				'post' => $post,
+//			Common::send_error( [
+//				'ajax_admin_create_new_basic_card',
+//				'post' => $post,
+//			] );
+
+			$all           = $post[ Common::VAR_2 ];
+			$card_group_id = (int) sanitize_text_field( $all['card_group_id'] );
+
+			$card_group = CardGroup::with( 'tags', 'cards', 'deck' )->find( $card_group_id );
+			if ( empty( $card_group ) ) {
+				Common::send_error( 'Invalid card group' );
+			}
+//			$cards = $card_group->cards;
+
+//			Common::send_error( [
+//				'ajax_admin_create_new_basic_card',
+//				'post'           => $post,
+//				'$card_group_id' => $card_group_id,
+//				'$card_group'    => $card_group,
+////				'$cards'         => $cards,
+//			] );
+
+
+			Common::send_success( 'Loaded successfully.', [
+				'card_group' => $card_group,
 			] );
-
-			$all                 = $post[ Common::VAR_2 ];
-			$card_group_id       = (int) sanitize_text_field( $all['card_group_id'] );
-
-
-
-			Common::send_error( [
-				'ajax_admin_create_new_basic_card',
-				'post'                 => $post,
-			] );
-
-
-			Common::send_success( 'Created successfully.' );
 
 		}
 

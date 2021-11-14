@@ -1,8 +1,10 @@
 <template >
   <span >
-    <small class="text-xs" style="font-size: 10px;" ><code >{{ normalDatetime }}</code ></small >
-    <br />
-    <span  class="text-xs" >{{ formattedTime }} </span >
+    <span v-if="null !==time" >
+      <small class="text-xs" style="font-size: 10px;" ><code >{{ normalDatetime }}</code ></small >
+      <br />
+      <span class="text-xs" >{{ formattedTime }} </span >
+    </span >
   </span >
 </template >
 

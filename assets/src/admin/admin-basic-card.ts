@@ -145,6 +145,7 @@ export const vdata = {
     searchKeyword       : '',
   },
   //
+  showMain       : false,
   debug          : false,
   page           : 1,
   languageIndex  : 1,
@@ -183,7 +184,7 @@ const mComCard = {
   deckToEdit() {
     return dis(this).decks.itemToEdit.value;
   },
-  basicCard() {
+  basicCardItem() {
     return dis(this).basicCard.item.value;
   },
   basicCardGroup() {
@@ -343,7 +344,14 @@ const m_init = {
     this.listner_init();
     this.nn();
     this.generalInit();
-    this.basicCard.load();
+    this.basicCard.load().then(() => {
+      jQuery('.all-loading').hide();
+      jQuery('.all-loaded').show();
+      vdata.showMain = true;
+    }).catch(() => {
+      jQuery('.all-loading').hide();
+      jQuery('.all-error').show();
+    });
     // vdis.xhrLoadEndpoints();
   },
   pageChanged(page) {
@@ -589,8 +597,7 @@ function dis(context): ReturnType<typeof setup> {
         jQuery(elem).css("display", "block");
         this.initUnhide();
         this.init();
-        jQuery('.all-loading').hide();
-        jQuery('.all-loaded').show();
+
         console.log('Created');
       },
       computed  : v_computed,

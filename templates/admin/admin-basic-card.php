@@ -2,8 +2,10 @@
 
 	$action     = filter_input( INPUT_GET, 'action' );
 	$page_title = 'New Card';
+	$is_editing = false;
 	if ( 'card-edit' === $action ) {
 		$page_title = 'Edit Card';
+		$is_editing = true;
 	}
 
 ?>
@@ -16,7 +18,7 @@
 	<!--	</editor-fold  desc="Header">-->
 
 	<div class=" all-loaded" style="display: none;" >
-		<form @submit.prevent="basicCard.createOrUpdate()" class="rounded p-2 shadow bg-gray-300" >
+		<form v-if="showMain" @submit.prevent="basicCard.createOrUpdate()" class="rounded md:p-4 shadow bg-gray-300" style="max-width:1000px; margin: auto" >
 			<label class="my-2 bg-white my-2 p-2 rounded shadow" >
 				<span class="" >Name</span >
 				<input v-model="basicCardGroup.name" required type="text" >
@@ -24,26 +26,41 @@
 			<div class="sp-wp-editor bg-white my-2 p-2 rounded shadow" >
 				<span class="editor-title" >Question</span >
 				<div class="editor-input" >
-					<input-editor v-model="basicCard.question" ></input-editor >
+					<input-editor
+							:value="basicCardGroup.whole_question"
+							v-model="basicCardGroup.whole_question" ></input-editor >
 				</div >
 			</div >
 			<div class="sp-wp-editor bg-white my-2 p-2 rounded shadow" >
 				<span class="editor-title" >Answer</span >
 				<div class="editor-input" >
-					<input-editor v-model="basicCard.answer" ></input-editor >
+					<input-editor v-model="basicCardItem.answer" ></input-editor >
 				</div >
 			</div >
 			<div class="my-2 bg-white my-2 p-2 rounded shadow" >
-				<span class="" >Scheduled at</span >
+				<span class="" >Scheduled at (optional)</span >
 				<div class="border-1 p-1 px-2 mb-3 mt-0" >
 					<label >
-						Now <input v-model="basicCard.scheduleNow.value" type="checkbox" >
-					</label >
-					<label v-if="!basicCard.scheduleNow.value" >
-						<span > | Or Later</span >
-						<input v-model="basicCardGroup.scheduled_at" required type="datetime-local" >
+						<span > </span >
+						<input v-model="basicCardGroup.scheduled_at" type="datetime-local" >
 					</label >
 				</div >
+				<?php if ( $is_editing ): ?>
+					<div class="flex bg-gray-100 rounded " >
+						<div class="rounded bg-white text-black flex-auto m-2 p-1 text-center md:w-full" >
+							Created:
+							<time-comp :time="basicCardGroup.created_at" ></time-comp >
+						</div >
+						<div class="rounded bg-white text-black flex-1 flex-auto m-2 p-1 text-center md:w-full" >
+							Updated:
+							<time-comp :time="basicCardGroup.updated_at" ></time-comp >
+						</div >
+						<div class="rounded bg-white text-black flex-1 flex-auto m-2 p-1 text-center md:w-full" >
+							Trashed:
+							<time-comp :time="basicCardGroup.deleted_at" ></time-comp >
+						</div >
+					</div >
+				<?php endif; ?>
 			</div >
 			<label class="sp-wp-checkbox my-2 border-1 p-1 bg-white my-2 p-2 rounded shadow" >
 				<span >Reverse</span >
@@ -97,18 +114,25 @@
 				></pick-image >
 			</div >
 			<ajax-action
-					button-text="Create"
+					button-text="<?php echo $is_editing ? 'Update' : 'Create' ?>"
 					css-classes="button"
-					icon="fa fa-plus"
+					icon="fa <?php echo $is_editing ? 'fa-upload' : 'fa-plus' ?>"
 					:ajax="basicCard.ajaxCreate.value" >
 			</ajax-action >
 		</form >
-	</div >
 
-
-	<hover-notifications ></hover-notifications >
-	<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
-		<div style="text-align: center;flex: 12;font-size: 50px;" >
-			<i class="fa fa-spin fa-spinner" ></i ></div >
+		<hover-notifications ></hover-notifications >
+		<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
+			<div style="text-align: center;flex: 12;font-size: 50px;" >
+				<i class="fa fa-spin fa-spinner" ></i ></div >
+		</div >
+		<div class="all-error" style="display: none" >
+			<div class="text-red font-bold text-center bg-red-100 rounded p-4 m-auto text-red-500 " >
+				Invalid Card Group
+			</div >
+		</div >
 	</div >
 </div >
+
+
+

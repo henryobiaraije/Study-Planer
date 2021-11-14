@@ -23,7 +23,7 @@
 			'card_type',
 			'scheduled_at',
 			'name',
-			'name',
+			'reverse',
 		];
 
 

@@ -1,6 +1,9 @@
 <template >
   <!--  <div :id="divId" style="height: 50px" v-html="newContent" ></div >-->
-  <div :id="divId" style="min-height: 30px" v-html="newContent" ></div >
+  <div :id="divId" style="min-height: 30px" v-html="newContent" >{{ value }}</div >
+  <!--  <div >-->
+  <!--    Some content {{ media }} {{ value.length }} {{ value }}-->
+  <!--  </div >-->
 </template >
 
 <script lang="ts" >
@@ -20,25 +23,36 @@ export default class InputEditor extends Vue {
   /********** Props **********/
          // @Prop({default: []}) readonly selectedIds: Array<number>;
   @Prop({default: false}) readonly media: boolean;
-  @Prop({default: ''}) readonly value: string;
+  @Prop({default: '', required: true}) readonly value: string;
+
+  public created2() {
+    setTimeout(() => {
+      const original = this.value;
+      console.log('value = ' + this.value.length, {original})
+    }, 2000);
+  }
 
   public created() {
-    const original      = this.value;
-    let content: string = this.value;
-    content             = content.replace('/(?:\\r\\n|\\r|\\n)/g', '');
-    content             = content.replace(/>n</g, '><');
-    // console.log({content, original});
-    this.newContent     = content;
-    this.$emit('input', this.newContent);
-    this.divId = 'wp-editor-' + Math.random().toString(36).substr(3, 10);
     setTimeout(() => {
-      this.initEditor();
+      const original = this.value;
+      console.log('value = ' + this.value, {original})
+      let content: string = this.value;
+      content             = content.replace('/(?:\\r\\n|\\r|\\n)/g', '');
+      content             = content.replace(/>n</g, '><');
+      // console.log({content, original});
+      this.newContent     = content;
+      this.$emit('input', this.newContent);
+      this.divId = 'wp-editor-' + Math.random().toString(36).substr(3, 10);
+      setTimeout(() => {
+        this.initEditor();
+      }, 1000);
     }, 1000);
+
   }
 
   public beforeUnmount() {
-    wp.editor.remove(this.divId);
-    console.log('beforeUnmount');
+    // wp.editor.remove(this.divId);
+    // console.log('beforeUnmount');
   }
 
   private initEditor() {

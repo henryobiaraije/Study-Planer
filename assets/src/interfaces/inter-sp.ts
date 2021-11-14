@@ -31,10 +31,9 @@ interface _TimeStamps {
   deleted_at: string;
 }
 
+
 export interface _BasicCard extends _TimeStamps {
-  id: string;
-  deck: _Deck;
-  tags: Array<_Tag>;
+  id: number;
   question: string;
   answer: string;
   x_position: number;
@@ -46,7 +45,8 @@ export interface _CardGroup extends _TimeStamps {
   bg_image_id: number;
   deck: _Deck,
   group_type: string;
-  tags : Array<_Tag>;
+  tags: Array<_Tag>;
+  cards: Array<_BasicCard>,
   name: string,
   whole_question: string,
   scheduled_at: string,
