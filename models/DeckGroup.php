@@ -70,7 +70,7 @@
 			];
 		}
 
-		public static function get_deck_simple( $args ) : array {
+		public static function get_deck_groups_simple( $args ) : array {
 			$default = [
 				'search'       => '',
 				'page'         => 1,

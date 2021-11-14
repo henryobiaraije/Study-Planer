@@ -594,6 +594,10 @@
 			return $date;
 
 		}
+		public static function format_datetime( $date ) {
+			return date( 'Y-m-d H:i:s', strtotime( $date ) );
+
+		}
 
 		/**
 		 * @param  int     $days

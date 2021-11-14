@@ -5,6 +5,7 @@ import {ref, onMounted} from "@vue/composition-api";
 import Cookies from 'js-cookie';
 import {_Deck, _Tag, _DeckGroup} from "../interfaces/inter-sp";
 import useDeckGroupLists from "./useDeckGroupLists";
+import {vdata} from "../admin/admin-deck-groups";
 
 declare var bootstrap;
 
@@ -96,6 +97,13 @@ export default function (status = 'publish') {
     success       : false,
     successMessage: '',
   });
+  const ajaxSearch            = ref<_Ajax>({
+    sending       : false,
+    error         : false,
+    errorMessage  : '',
+    success       : false,
+    successMessage: '',
+  });
   const ajaxCreate            = ref<_Ajax>({
     sending       : false,
     error         : false,
@@ -135,6 +143,7 @@ export default function (status = 'publish') {
     deckGroup: null as _DeckGroup,
     tags     : [] as Array<_Tag>
   })
+  let searchResults           = ref<Array<_DeckGroup>>([]);
   //
   const create                = () => {xhrCreateNew();}
   const updateEditing         = () => {
@@ -151,6 +160,9 @@ export default function (status = 'publish') {
   }
   const load                  = () => {
     xhrLoad();
+  }
+  const search                = (query: string) => {
+    xhrSearch(query);
   }
   //
   const onSelect              = (items: { selectedRows: Array<_Deck> }) => {
@@ -247,6 +259,36 @@ export default function (status = 'publish') {
         tableData.value.rows = items;
         totals.value         = theTotals;
         tt().totalRecords    = total;
+      },
+      funcFailue(done) {
+        handleAjax.error(done);
+        tt().isLoading = false;
+      },
+    });
+  };
+  const xhrSearch      = (query: string) => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
+    sendOnline                   = new Server().send_online({
+      data: [
+        vdata.localize.nonce,
+        {
+          params: {
+            per_page      : 5,
+            page          : 1,
+            search_keyword: query,
+            status        : 'publish',
+          },
+        }
+      ],
+      what: "admin_sp_ajax_admin_search_decks",
+      funcBefore() {
+        handleAjax.start();
+        tt().isLoading = true;
+      },
+      funcSuccess(done: InterFuncSuccess) {
+        handleAjax.stop();
+        const items         = done.data;
+        searchResults.value = items;
       },
       funcFailue(done) {
         handleAjax.error(done);
@@ -362,12 +404,12 @@ export default function (status = 'publish') {
   // });
 
   return {
-    ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate,
+    ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch,
     total, create, itemToEdit, editedItems, tableData, load, newItem,
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
     onSortChange, onColumnFilter, updateEditing,
     batchUpdate, batchDelete, batchTrash,
-    totals, closeEditModal, openEditModal
+    totals, closeEditModal, openEditModal, search, searchResults,
   };
 
 }

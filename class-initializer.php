@@ -119,6 +119,10 @@
 			self::$general_localize['ajax_action'] = self::$ajax_action;
 			self::$general_localize['site_url']    = site_url();
 			self::$general_localize['nonce']       = wp_create_nonce( self::$nonce_key );
+
+			$default_bg_image = (int) get_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, 0 );
+
+			self::$general_localize['default_bg_image'] = $default_bg_image;
 //   Common::in_script([
 //     'in_footer',
 //     'localiz' => self::$general_localize,

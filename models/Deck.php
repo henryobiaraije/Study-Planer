@@ -29,6 +29,36 @@
 			return $this->belongsTo( DeckGroup::class, 'deck_group_id' );
 		}
 
+		public function card_group() {
+			return $this->hasMany( CardGroup::class, 'deck_id' );
+		}
+
+		public static function get_deck_simple( $args ) : array {
+			$default = [
+				'search'       => '',
+				'page'         => 1,
+				'per_page'     => 5,
+				'with_trashed' => false,
+				'only_trashed' => false,
+			];
+			$args    = wp_parse_args( $args, $default );
+			if ( $args['with_trashed'] ) {
+				$items = Deck::withoutTrashed()::with( 'tags' );
+			} elseif ( $args['only_trashed'] ) {
+				$items = Deck::onlyTrashed();
+			} else {
+				$items = Deck::with( 'tags' );
+			}
+			$items  = $items
+				->where( 'name', 'like', "%{$args['search']}%" );
+			$offset = ( $args['page'] - 1 );
+			$items  = $items->offset( $offset )
+				->limit( $args['per_page'] )
+				->orderByDesc( 'id' )->get();
+
+			return $items->all();
+		}
+
 		public static function get_decks( $args ) : array {
 			$default = [
 				'search'       => '',

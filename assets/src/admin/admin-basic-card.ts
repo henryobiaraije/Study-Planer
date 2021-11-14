@@ -14,17 +14,16 @@ import AjaxActionNotForm from "../vue-component/AjaxActionNotForm.vue";
 import TimeComp from "../vue-component/TimeComp.vue";
 import Cookies from 'js-cookie';
 import {_Endpoint} from "../interfaces/inter-sbe";
-import "../../css/admin/admin-deck-groups.scss";
-import "./install-composition-api";
-import useNewDeckGroup from "../composables/useNewDeckGroup";
-import useDeckGroupLists from "../composables/useDeckGroupLists";
 import useTagSearch from "../composables/useTagSearch";
-// import Multiselect from '@vueform/multiselect'
 import Multiselect from 'vue-multiselect'
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import {_DeckGroup} from "../interfaces/inter-sp";
 import useDecks from "../composables/useDecks";
+import useBasicCard from "../composables/useBasicCard";
+import InputEditor from "../vue-component/InputEditor.vue";
 
+import "../../css/admin/admin-basic-card.scss";
+import "./install-composition-api";
 
 declare var jQuery: any;
 declare var bootstrap: any;
@@ -172,25 +171,28 @@ const mComputedGeneral = {
   },
 };
 
-const mDeck    = {
+const mCard    = {
   createDeckGroup() {
     this.newDeckGroup.xhrCreateNewDeckGroup();
   },
 };
-const mComDeck = {
+const mComCard = {
   tableDataValue() {
     return dis(this).decks.tableData.value;
   },
   deckToEdit() {
     return dis(this).decks.itemToEdit.value;
   },
-  deckNew() {
-    return dis(this).decks.newItem.value;
+  newBasicCard() {
+    return dis(this).basicCard.newItem.value;
+  },
+  newBasicCardGroup() {
+    return dis(this).basicCard.cardGroup.value;
   },
 };
 
-const v_method   = {...mDeck, ...mGeneral};
-const v_computed = {...mComDeck, ...mComputedGeneral,};
+const v_method   = {...mCard, ...mGeneral};
+const v_computed = {...mComCard, ...mComputedGeneral,};
 
 const xhr = {
   xhrUpdateEndpoint(endpoint: _Endpoint) {
@@ -553,11 +555,13 @@ function setup(props) {
   const url          = new URL(window.location.href);
   const searchParams = new URLSearchParams(url.search);
   const status       = searchParams.get('status');
+  const action       = searchParams.get('action');
+
   // console.log('in setup', {url, searchParams, status});
   return {
     decks     : useDecks(status),
     searchTags: useTagSearch(),
-    deckGroups: useDeckGroupLists(),
+    basicCard : useBasicCard(action),
   };
 }
 
@@ -590,6 +594,8 @@ function dis(context): ReturnType<typeof setup> {
       },
       computed  : v_computed,
       components: {
+        InputEditor,
+        // 'input-editor': InputCk,
         TimeComp,
         'ajax-action': AjaxAction,
         // 'ajax-action-not-form': AjaxActionNotForm,

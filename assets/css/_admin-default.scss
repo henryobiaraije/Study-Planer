@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 .all-loading {
   width: 100%;
   height: 400px;
@@ -30,5 +29,17 @@
     input[type='text'] {
       @apply py-0 px-1 bg-white text-black rounded w-full mt-1;
     }
+  }
+}
+
+
+.sp-wp-editor {
+  margin-bottom: 10px;
+  .editor-title {
+  }
+  .editor-input{
+    border: 1px solid black;
+    border-radius: 2px;
+    padding: 0 1em;
   }
 }

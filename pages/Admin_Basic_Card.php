@@ -79,12 +79,13 @@
 
 		public function register_scripts() : void {
 			$dis = $this;
-			$css  = Initializer::$js_url . '/admin/admin-basic-card.css';
-			$js   = Initializer::$js_url . '/admin/admin-basic-card.js';
+			$css = Initializer::$js_url . '/admin/admin-basic-card.css';
+			$js  = Initializer::$js_url . '/admin/admin-basic-card.js';
 
 			wp_register_style( 'sp-admin-basic-card', $css, [], Initializer::$script_version );
 			wp_register_script( 'sp-admin-basic-card', $js, [ 'jquery' ], Initializer::$script_version, true );
-
+			wp_enqueue_editor();
+			wp_enqueue_media();
 			// enqueue the scripts
 			add_action( 'sp_enqueue_default_admin_basic_card', function () use ( $dis ) {
 				do_action( 'sp_enqueue_default_admin_scripts' );

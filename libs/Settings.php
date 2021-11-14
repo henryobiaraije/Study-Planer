@@ -8,7 +8,8 @@
 
 		// Options
 		public const OP_UNCATEGORIZED_DECK_GROUP_ID = 'sp_uncat_dkgrp_id';
-		public const OP_UNCATEGORIZED_DECK_ID = 'sp_uncat_dk_id';
+		public const OP_UNCATEGORIZED_DECK_ID       = 'sp_uncat_dk_id';
+		public const OP_DEFAULT_CARD_BG_IMAGE       = 'sp_df_cd_bg_img';
 
 		// Cookies
 

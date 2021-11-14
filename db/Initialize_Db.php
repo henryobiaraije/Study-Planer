@@ -104,7 +104,7 @@
 			// Deck groups
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_DECK_GROUPS ) ) {
 				Capsule::schema()->create( SP_TABLE_DECK_GROUPS, function ( Blueprint $table ) {
-					$table->increments( 'id' );
+					$table->id();
 					$table->string( 'name' )->unique();
 					$table->softDeletes();
 					$table->timestamps();
@@ -124,7 +124,7 @@
 			// Tags
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_TAGS ) ) {
 				Capsule::schema()->create( SP_TABLE_TAGS, function ( Blueprint $table ) {
-					$table->id( 'id' );
+					$table->id();
 					$table->string( 'name' )->unique();
 					$table->softDeletes();
 					$table->timestamps();
@@ -146,10 +146,15 @@
 			// Card group
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_CARD_GROUPS ) ) {
 				Capsule::schema()->create( SP_TABLE_CARD_GROUPS, function ( Blueprint $table ) {
+					global $wpdb;
 					$table->id();
 					$table->foreignId( 'deck_id' )->constrained( SP_TABLE_DECKS );
+					$table->foreignId( 'bg_image_id' )->references( 'ID' )->on( $wpdb->prefix . 'posts' );
+					$table->text( 'name' );
 					$table->text( 'whole_question' );
-					$table->string( 'taggable_type' );
+					$table->string( 'card_type' );
+					$table->dateTime( 'scheduled_at' );
+					$table->boolean( 'reverse' );
 					$table->softDeletes();
 					$table->timestamps();
 				} );
@@ -158,15 +163,12 @@
 			// Card
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_CARDS ) ) {
 				Capsule::schema()->create( SP_TABLE_CARDS, function ( Blueprint $table ) {
-					global $wpdb;
 					$table->id();
-					$table->foreignId( 'bg_image_id' )->references( 'id' )->on( $wpdb->prefix . 'posts' );
 					$table->foreignId( 'card_group_id' )->references( 'id' )->on( SP_TABLE_CARD_GROUPS );
 					$table->text( 'question' );
 					$table->text( 'answer' );
-					$table->boolean( 'reverse' );
-					$table->index( 'x_position' );
-					$table->index( 'y_position' );
+					$table->integer( 'x_position' );
+					$table->integer( 'y_position' );
 					$table->softDeletes();
 					$table->timestamps();
 				} );
