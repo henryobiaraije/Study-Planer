@@ -66,9 +66,60 @@
 			add_action( 'admin_sp_ajax_admin_load_image_attachment', array( $this, 'ajax_admin_load_image_attachment' ) );
 			add_action( 'admin_sp_ajax_admin_load_basic_card', array( $this, 'ajax_admin_load_basic_card' ) );
 			add_action( 'admin_sp_ajax_admin_update_basic_card', array( $this, 'admin_update_basic_card' ) );
+			add_action( 'admin_sp_ajax_admin_load_cards_groups', array( $this, 'ajax_admin_load_cards_groups' ) );
 			// </editor-fold desc="Card">
 		}
 
+
+		public function ajax_admin_load_cards_groups( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post' => $post,
+//			] );
+
+			$params         = $post[ Common::VAR_2 ]['params'];
+			$per_page       = (int) sanitize_text_field( $params['per_page'] );
+			$page           = (int) sanitize_text_field( $params['page'] );
+			$search_keyword = sanitize_text_field( $params['search_keyword'] );
+			$status         = sanitize_text_field( $params['status'] );
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$status'         => $status,
+//			] );
+
+			$card_groups = CardGroup::get_card_groups( [
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			] );
+			$totals      = CardGroup::get_totals();
+
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'            => $post,
+//				'$params'         => $params,
+//				'$per_page'       => $per_page,
+//				'$page'           => $page,
+//				'$search_keyword' => $search_keyword,
+//				'$card_groups'    => $card_groups,
+//				'$status'         => $status,
+//			] );
+
+
+			Common::send_success( 'Card group loaded.', [
+				'details' => $card_groups,
+				'totals'  => $totals,
+			], [
+//				'post' => $post,
+			] );
+
+		}
 
 		public function ajax_admin_load_image_attachment( $post ) : void {
 
@@ -297,7 +348,6 @@
 //			] );
 
 			$edit_page = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
-			             . '&action=card-edit'
 			             . '&card-group=' . $card_group->id;
 
 			Common::send_success( 'Created successfully.', $edit_page );

@@ -51,4 +51,6 @@ export interface _CardGroup extends _TimeStamps {
   whole_question: string,
   scheduled_at: string,
   reverse: boolean;
+  cards_count?: number;
+  card_group_edit_url?: string;
 }

@@ -1,15 +1,14 @@
 <?php
 
-	$action     = filter_input( INPUT_GET, 'action' );
+	$card_group = filter_input( INPUT_GET, 'card-group' );
 	$page_title = 'New Card';
 	$is_editing = false;
-	if ( 'card-edit' === $action ) {
+	if ( ! empty( $card_group ) ) {
 		$page_title = 'Edit Card';
 		$is_editing = true;
 	}
 
 ?>
-
 
 <div class="admin-basic-card wrap" >
 	<!--	<editor-fold desc="Header">-->
@@ -17,7 +16,7 @@
 	<br />
 	<!--	</editor-fold  desc="Header">-->
 
-	<div class=" all-loaded" style="display: none;" >
+	<div class="all-loaded" style="display: none;" >
 		<form v-if="showMain" @submit.prevent="basicCard.createOrUpdate()" class="rounded md:p-4 shadow bg-gray-300" style="max-width:1000px; margin: auto" >
 			<label class="my-2 bg-white my-2 p-2 rounded shadow" >
 				<span class="" >Name</span >
@@ -121,15 +120,16 @@
 			</ajax-action >
 		</form >
 
-		<hover-notifications ></hover-notifications >
-		<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
-			<div style="text-align: center;flex: 12;font-size: 50px;" >
-				<i class="fa fa-spin fa-spinner" ></i ></div >
-		</div >
-		<div class="all-error" style="display: none" >
-			<div class="text-red font-bold text-center bg-red-100 rounded p-4 m-auto text-red-500 " >
-				Invalid Card Group
-			</div >
+
+	</div >
+	<hover-notifications ></hover-notifications >
+	<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
+		<div style="text-align: center;flex: 12;font-size: 50px;" >
+			<i class="fa fa-spin fa-spinner" ></i ></div >
+	</div >
+	<div class="all-error" style="display: none" >
+		<div class="text-red font-bold text-center bg-red-100 rounded p-4 m-auto text-red-500 " >
+			Invalid Card Group
 		</div >
 	</div >
 </div >

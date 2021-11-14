@@ -9,7 +9,9 @@
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
 	use Illuminate\Database\Eloquent\SoftDeletes;
+	use StudyPlanner\Initializer;
 	use StudyPlanner\Libs\Common;
+	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Models\Tag;
 
 	class CardGroup extends Model {
@@ -25,6 +27,7 @@
 			'name',
 			'reverse',
 		];
+		protected $appends  = [ 'card_group_edit_url' ];
 
 
 		public function cards() : \Illuminate\Database\Eloquent\Relations\HasMany {
@@ -39,5 +42,75 @@
 			return $this->morphToMany( Tag::class, 'taggable', SP_TABLE_TAGGABLES );
 		}
 
+		public static function get_card_groups( $args ) : array {
+			$default = [
+				'search'       => '',
+				'page'         => 1,
+				'per_page'     => 5,
+				'with_trashed' => false,
+				'only_trashed' => false,
+			];
+			$args    = wp_parse_args( $args, $default );
+			if ( $args['with_trashed'] ) {
+				$card_groups = CardGroup::with( 'tags' )->withoutTrashed();
+			} elseif ( $args['only_trashed'] ) {
+				$card_groups = CardGroup::with( 'tags' )->onlyTrashed();
+			} else {
+				$card_groups = CardGroup::with( 'tags' );
+			}
+			$card_groups = $card_groups
+				->where( 'name', 'like', "%{$args['search']}%" );
 
+			$total       = $card_groups->count();
+			$offset      = ( $args['page'] - 1 );
+			$card_groups = $card_groups->offset( $offset )
+				->withCount( 'cards' )
+				->with( 'deck' )
+				->limit( $args['per_page'] )
+				->orderByDesc( 'id' )->get();
+
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'$args'        => $args,
+//				'$deck_groups' => $deck_groups->toSql(),
+//				'getQuery'     => $deck_groups->getQuery(),
+//			] );
+
+			return [
+				'total'       => $total,
+				'card_groups' => $card_groups->all(),
+			];
+		}
+
+		public function getCardGroupEditUrlAttribute() {
+			$card_type = $this->card_type;
+			$card_url  = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
+			             . '&card-group=' . $this->id;
+			return $card_url;
+		}
+
+		public static function get_totals() : array {
+			$all     = [
+				'active'  => 0,
+				'trashed' => 0,
+			];
+			$active  = CardGroup::query()
+				->selectRaw( Manager::raw( 'count(*) as count' ) )
+				->get();
+			$trashed = CardGroup::onlyTrashed()
+				->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
+
+			$all['active']  = $active[0]['count'];
+			$all['trashed'] = $trashed[0]['count'];
+
+//			Common::send_error( [
+//				'query log' => Manager::getQueryLog(),
+////				'active query' => $active->toSql(),
+//				'$active'  => $active,
+//				'$trashed' => $trashed,
+//				'count'    => $active[0]['count'],
+//			] );
+
+			return $all;
+		}
 	}

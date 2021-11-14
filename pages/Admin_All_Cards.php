@@ -65,7 +65,7 @@
 
 		public function load_view() : void {
 			do_action( 'sp_enqueue_default_admin_cards' );
-			\StudyPlanner\load_template( 'admin/admin-cards' );
+			\StudyPlanner\load_template( 'admin/admin-all-cards' );
 		}
 
 		public function get_page_data() : array {
@@ -82,17 +82,17 @@
 		public function register_scripts() : void {
 			$dis = $this;
 //			$css = Initializer::$css_url . '/admin/admin-deck-groups.css';
-			$css  = Initializer::$js_url . '/admin/admin-cards.css';
-			$js   = Initializer::$js_url . '/admin/admin-cards.js';
+			$css  = Initializer::$js_url . '/admin/admin-all-cards.css';
+			$js   = Initializer::$js_url . '/admin/admin-all-cards.js';
 
-			wp_register_style( 'sp-admin-cards', $css, [], Initializer::$script_version );
-			wp_register_script( 'sp-admin-cards', $js, [ 'jquery' ], Initializer::$script_version, true );
+			wp_register_style( 'sp-admin-all-cards', $css, [], Initializer::$script_version );
+			wp_register_script( 'sp-admin-all-cards', $js, [ 'jquery' ], Initializer::$script_version, true );
 
 			// enqueue the scripts
 			add_action( 'sp_enqueue_default_admin_cards', function () use ( $dis ) {
 				do_action( 'sp_enqueue_default_admin_scripts' );
-				wp_enqueue_style( 'sp-admin-cards' );
-				wp_enqueue_script( 'sp-admin-cards' );
+				wp_enqueue_style( 'sp-admin-all-cards' );
+				wp_enqueue_script( 'sp-admin-all-cards' );
 
 				$dis->localize_data();
 			} );
