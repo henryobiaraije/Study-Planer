@@ -3,11 +3,12 @@
 	namespace StudyPlanner\Pages;
 
 	use StudyPlanner\Initializer;
+	use StudyPlanner\Libs\Settings;
 
 	/**
 	 * Class AdminEndpoints
 	 */
-	class Admin_Cards {
+	class Admin_All_Cards {
 		/**
 		 * @var self $instance
 		 */
@@ -50,15 +51,16 @@
 		 * Add admin menus
 		 */
 		public function add_admin_menu() : void {
-
 			add_submenu_page(
 				'study-planner',
 				'All Cards',
 				'All Cards',
 				'manage_options',
-				'study-planner-deck-cards',
+				Settings::SLUG_ALL_CARDS,
 				array( $this, 'load_view' )
 			);
+			$url = Initializer::get_admin_url( Settings::SLUG_ALL_CARDS);
+			Initializer::add_to_localize( 'page_all_cards', $url);
 		}
 
 		public function load_view() : void {

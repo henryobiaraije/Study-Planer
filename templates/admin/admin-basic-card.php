@@ -2,7 +2,7 @@
 
 	$action     = filter_input( INPUT_GET, 'action' );
 	$page_title = 'New Card';
-	if ( 'edit-deck' === $action ) {
+	if ( 'card-edit' === $action ) {
 		$page_title = 'Edit Card';
 	}
 
@@ -16,43 +16,43 @@
 	<!--	</editor-fold  desc="Header">-->
 
 	<div class=" all-loaded" style="display: none;" >
-		<form @submit.prevent="basicCard.create()" class="bg-white rounded p-2" >
-			<label class="my-2" >
+		<form @submit.prevent="basicCard.createOrUpdate()" class="rounded p-2 shadow bg-gray-300" >
+			<label class="my-2 bg-white my-2 p-2 rounded shadow" >
 				<span class="" >Name</span >
-				<input v-model="newBasicCardGroup.name" required type="text" >
+				<input v-model="basicCardGroup.name" required type="text" >
 			</label >
-			<div class="sp-wp-editor" >
+			<div class="sp-wp-editor bg-white my-2 p-2 rounded shadow" >
 				<span class="editor-title" >Question</span >
 				<div class="editor-input" >
-					<input-editor v-model="newBasicCard.question" ></input-editor >
+					<input-editor v-model="basicCard.question" ></input-editor >
 				</div >
 			</div >
-			<div class="sp-wp-editor" >
+			<div class="sp-wp-editor bg-white my-2 p-2 rounded shadow" >
 				<span class="editor-title" >Answer</span >
 				<div class="editor-input" >
-					<input-editor v-model="newBasicCard.answer" ></input-editor >
+					<input-editor v-model="basicCard.answer" ></input-editor >
 				</div >
 			</div >
-			<div class="my-2" >
+			<div class="my-2 bg-white my-2 p-2 rounded shadow" >
 				<span class="" >Scheduled at</span >
 				<div class="border-1 p-1 px-2 mb-3 mt-0" >
 					<label >
-						Now <input v-model="basicCard.newCardScheduleNow.value" type="checkbox" >
+						Now <input v-model="basicCard.scheduleNow.value" type="checkbox" >
 					</label >
-					<label v-if="!basicCard.newCardScheduleNow.value" >
+					<label v-if="!basicCard.scheduleNow.value" >
 						<span > | Or Later</span >
-						<input v-model="newBasicCardGroup.scheduled_at" required type="datetime-local" >
+						<input v-model="basicCardGroup.scheduled_at" required type="datetime-local" >
 					</label >
 				</div >
 			</div >
-			<label class="sp-wp-checkbox my-2 border-1 p-1" >
+			<label class="sp-wp-checkbox my-2 border-1 p-1 bg-white my-2 p-2 rounded shadow" >
 				<span >Reverse</span >
-				<input v-model="newBasicCardGroup.reverse" type="checkbox" class="" >
+				<input v-model="basicCardGroup.reverse" type="checkbox" class="" >
 			</label >
-			<div >
+			<div class="bg-white my-2 p-2 rounded shadow" >
 				<span >Deck </span >
 				<vue-mulitiselect
-						v-model="newBasicCardGroup.deck"
+						v-model="basicCardGroup.deck"
 						:options="decks.searchResults.value"
 						:multiple="false"
 						:loading="decks.ajaxSearch.value.sending"
@@ -67,10 +67,10 @@
 						track-by="id"
 				></vue-mulitiselect >
 			</div >
-			<div class="mt-2 mb-2" >
+			<div class="mt-2 mb-2 bg-white my-2 p-2 rounded shadow" >
 				<span >Tags</span >
 				<vue-mulitiselect
-						v-model="newBasicCardGroup.tags"
+						v-model="basicCardGroup.tags"
 						:options="searchTags.results.value"
 						:multiple="true"
 						:loading="searchTags.ajax.value.sending"
@@ -85,9 +85,14 @@
 						track-by="id"
 				></vue-mulitiselect >
 			</div >
-			<div class="m-4" >
+			<div class="my-4 bg-white my-2 p-2 rounded shadow" >
+				<span >Background Image</span >
+				<label class="block mb-2" >
+					<span >Set as Default</span >
+					<input v-model="basicCard.setBgAsDefault.value" type="checkbox" >
+				</label >
 				<pick-image
-						v-model="newBasicCardGroup.bg_image"
+						v-model="basicCardGroup.bg_image_id"
 						:default-image="localize.default_bg_image"
 				></pick-image >
 			</div >

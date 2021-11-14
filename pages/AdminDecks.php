@@ -8,6 +8,7 @@
 	}
 
 	use StudyPlanner\Initializer;
+	use StudyPlanner\Libs\Settings;
 
 	/**
 	 * Class AdminDeck
@@ -52,15 +53,16 @@
 		 * Add admin menus
 		 */
 		public function add_admin_menu() : void {
-
 			add_submenu_page(
 				'study-planner',
 				'Decks',
 				'Decks',
 				'manage_options',
-				'study-planner-decks',
+				Settings::SLUG_DECKS,
 				array( $this, 'load_view' )
 			);
+			$url = Initializer::get_admin_url( Settings::SLUG_DECKS );
+			Initializer::add_to_localize( 'page_decks', $url );
 		}
 
 		public function load_view() : void {

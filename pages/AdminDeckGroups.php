@@ -3,6 +3,7 @@
 	namespace StudyPlanner\Pages;
 
 	use StudyPlanner\Initializer;
+	use StudyPlanner\Libs\Settings;
 
 	/**
 	 * Class AdminEndpoints
@@ -47,15 +48,16 @@
 		 * Add admin menus
 		 */
 		public function add_admin_menu() : void {
-
 			add_submenu_page(
 				'study-planner',
 				'Deck Groups',
 				'Deck Groups',
 				'manage_options',
-				'study-planner-deck-groups',
+				Settings::SLUG_DECK_GROUPS,
 				array( $this, 'load_view' )
 			);
+			$url = Initializer::get_admin_url( Settings::SLUG_DECK_GROUPS);
+			Initializer::add_to_localize( 'page_deck_groups', $url );
 		}
 
 		public function load_view() : void {

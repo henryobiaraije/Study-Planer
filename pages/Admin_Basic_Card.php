@@ -3,6 +3,7 @@
 	namespace StudyPlanner\Pages;
 
 	use StudyPlanner\Initializer;
+	use StudyPlanner\Libs\Settings;
 
 	/**
 	 * Class Admin_Basic_Card
@@ -56,9 +57,11 @@
 				'Basic Card',
 				'Basic Card',
 				'manage_options',
-				'study-planner-basic-card',
+				Settings::SLUG_BASIC_CARD,
 				array( $this, 'load_view' )
 			);
+			$url = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD);
+			Initializer::add_to_localize( 'page_basic_card', $url );
 		}
 
 		public function load_view() : void {

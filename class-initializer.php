@@ -12,7 +12,7 @@
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Pages\Admin_Basic_Card;
-	use StudyPlanner\Pages\Admin_Cards;
+	use StudyPlanner\Pages\Admin_All_Cards;
 	use StudyPlanner\Pages\Admin_Tags;
 	use StudyPlanner\Pages\AdminDeck;
 	use StudyPlanner\Pages\AdminDeckGroups;
@@ -87,7 +87,7 @@
 			AdminDeckGroups::get_instance();
 			AdminDeck::get_instance();
 			Admin_Tags::get_instance();
-			Admin_Cards::get_instance();
+			Admin_All_Cards::get_instance();
 			Admin_Basic_Card::get_instance();
 
 			// Localize all added general object
@@ -140,6 +140,19 @@
 //     '$value' => $value,
 //   ]);
 			self::$general_localize[ $key ] = $value;
+		}
+
+		public static function get_admin_url($slug) : string {
+			return $url = get_admin_url().'admin.php?page='.$slug;
+		}
+
+		public static function get_from_localize( $key, $value ) {
+//   Common::in_script([
+//     'add local',
+//     '$key'   => $key,
+//     '$value' => $value,
+//   ]);
+			return self::$general_localize[ $key ];
 		}
 
 		public function add_customize_view_to_footer() {

@@ -13,6 +13,13 @@
 
 		// Cookies
 
+		// Menu Slugs
+		public const SLUG_DECKS       = 'study-planner-decks';
+		public const SLUG_TAGS        = 'study-planner-tags';
+		public const SLUG_DECK_GROUPS = 'study-planner-deck-groups';
+		public const SLUG_ALL_CARDS   = 'study-planner-deck-cards';
+		public const SLUG_BASIC_CARD   = 'study-planner-basic-card';
+
 		// Post types
 		public const POST_TYPE_SEARCH_ENDPOINT = 'sbe_search_endpoint';
 

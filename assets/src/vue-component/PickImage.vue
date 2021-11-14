@@ -85,12 +85,15 @@ $height: 150px;
   display: inline-block;
   position: relative;
   cursor: pointer;
+  border-radius: 5px;
+  overflow: hidden;
   &:hover {
     opacity: 0.8;
   }
   img {
     width: $width;
     height: $height;
+    border: 0;
   }
   span.loading {
     position: absolute;

@@ -5,43 +5,43 @@ import {InterFuncSuccess, Server} from "../static/server";
 import {Store} from "../static/store";
 import useDeckGroupLists from "./useDeckGroupLists";
 
-export default function (action = '') {
-  const ajax             = ref<_Ajax>({
+export default function (cardGroupId = 0) {
+  const ajax         = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxCreate       = ref<_Ajax>({
+  const ajaxCreate   = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxUpdate       = ref<_Ajax>({
+  const ajaxUpdate   = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxTrash        = ref<_Ajax>({
+  const ajaxTrash    = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxDelete       = ref<_Ajax>({
+  const ajaxDelete   = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  let newItem            = ref<_BasicCard>({
+  let item           = ref<_BasicCard>({
     id        : '',
     deck      : null,
     tags      : [],
@@ -53,12 +53,12 @@ export default function (action = '') {
     updated_at: '',
     deleted_at: '',
   });
-  let cardGroup          = ref<_CardGroup>({
+  let cardGroup      = ref<_CardGroup>({
     tags          : [],
     id            : 0,
     deck          : null,
     reverse       : false,
-    bg_image      : 0,
+    bg_image_id   : 0,
     name          : '',
     group_type    : '',
     whole_question: '',
@@ -67,19 +67,32 @@ export default function (action = '') {
     updated_at    : '',
     deleted_at    : '',
   });
-  let newCardScheduleNow = ref(false);
+  let scheduleNow    = ref(false);
+  let setBgAsDefault = ref(false);
 
-  const create = () => {xhrCreateNew();}
+  const createOrUpdate = () => {
+    if (cardGroupId > 0) {
+      xhrUpdate();
+    } else {
+      xhrCreate();
+    }
+  }
+  const load           = () => {
+    if (cardGroupId > 0) {
+      xhrLoad();
+    }
+  }
 
-  const xhrCreateNew = () => {
+  const xhrCreate = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
     new Server().send_online({
       data: [
         Store.nonce,
         {
-          card        : newItem.value,
-          cardGroup   : cardGroup.value,
-          schedule_now: newCardScheduleNow.value,
+          card             : item.value,
+          cardGroup        : cardGroup.value,
+          schedule_now     : scheduleNow.value,
+          set_bg_as_default: setBgAsDefault.value,
         }
       ],
       what: "admin_sp_ajax_admin_create_new_basic_card",
@@ -87,12 +100,55 @@ export default function (action = '') {
         handleAjax.start();
       },
       funcSuccess(done: InterFuncSuccess) {
-        // handleAjax.success(done);
-        // useDeckGroupLists().load();
-        // newItem.value.name      = '';
-        // newItem.value.tags      = [];
-        // newItem.value.deckGroup = null;
-        // xhrLoad();
+        handleAjax.success(done);
+        window.location = done.data;
+      },
+      funcFailue(done) {
+        handleAjax.error(done);
+      },
+    });
+  };
+  const xhrUpdate = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
+    new Server().send_online({
+      data: [
+        Store.nonce,
+        {
+          card             : item.value,
+          cardGroup        : cardGroup.value,
+          schedule_now     : scheduleNow.value,
+          set_bg_as_default: setBgAsDefault.value,
+        }
+      ],
+      what: "admin_sp_ajax_admin_update_basic_card",
+      funcBefore() {
+        handleAjax.start();
+      },
+      funcSuccess(done: InterFuncSuccess) {
+        handleAjax.success(done);
+        window.location = done.data;
+      },
+      funcFailue(done) {
+        handleAjax.error(done);
+      },
+    });
+  };
+  const xhrLoad   = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
+    new Server().send_online({
+      data: [
+        Store.nonce,
+        {
+          card_group_id: cardGroupId,
+        }
+      ],
+      what: "admin_sp_ajax_admin_load_basic_card",
+      funcBefore() {
+        handleAjax.start();
+      },
+      funcSuccess(done: InterFuncSuccess) {
+        handleAjax.success(done);
+        window.location = done.data;
       },
       funcFailue(done) {
         handleAjax.error(done);
@@ -102,7 +158,7 @@ export default function (action = '') {
 
   return {
     ajaxCreate, ajax, ajaxUpdate, ajaxDelete, ajaxTrash,
-    create, cardGroup,
-    newItem, newCardScheduleNow,
+    createOrUpdate, cardGroup, load,
+    item, scheduleNow, setBgAsDefault,
   };
 }

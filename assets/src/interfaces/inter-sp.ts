@@ -43,7 +43,7 @@ export interface _BasicCard extends _TimeStamps {
 
 export interface _CardGroup extends _TimeStamps {
   id: number;
-  bg_image: number;
+  bg_image_id: number;
   deck: _Deck,
   group_type: string;
   tags : Array<_Tag>;

@@ -23,6 +23,7 @@
 			'card_type',
 			'scheduled_at',
 			'name',
+			'name',
 		];
 
 
@@ -31,7 +32,7 @@
 		}
 
 		public function deck() {
-			return $this->belongsTo( Deck::class, 'deck_id' );
+			return $this->belongsTo( Deck::class );
 		}
 
 		public function tags() {

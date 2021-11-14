@@ -3,6 +3,7 @@
 	namespace StudyPlanner\Pages;
 
 	use StudyPlanner\Initializer;
+	use StudyPlanner\Libs\Settings;
 
 	/**
 	 * Class AdminEndpoints
@@ -52,9 +53,11 @@
 				'Tags',
 				'Tags',
 				'manage_options',
-				'study-planner-tags',
+				Settings::SLUG_TAGS,
 				array( $this, 'load_view' )
 			);
+			$url = Initializer::get_admin_url( Settings::SLUG_TAGS);
+			Initializer::add_to_localize( 'page_tags', $url );
 		}
 
 		public function load_view() : void {

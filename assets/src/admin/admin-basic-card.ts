@@ -183,10 +183,10 @@ const mComCard = {
   deckToEdit() {
     return dis(this).decks.itemToEdit.value;
   },
-  newBasicCard() {
-    return dis(this).basicCard.newItem.value;
+  basicCard() {
+    return dis(this).basicCard.item.value;
   },
-  newBasicCardGroup() {
+  basicCardGroup() {
     return dis(this).basicCard.cardGroup.value;
   },
 };
@@ -343,7 +343,7 @@ const m_init = {
     this.listner_init();
     this.nn();
     this.generalInit();
-    dis(this).decks.loadItems();
+    this.basicCard.load();
     // vdis.xhrLoadEndpoints();
   },
   pageChanged(page) {
@@ -556,12 +556,13 @@ function setup(props) {
   const searchParams = new URLSearchParams(url.search);
   const status       = searchParams.get('status');
   const action       = searchParams.get('action');
+  const cardGroupId  = Number(searchParams.get('card-group'));
 
-  // console.log('in setup', {url, searchParams, status});
+  console.log('in setup', {url, searchParams, status, cardGroupId});
   return {
     decks     : useDecks(status),
     searchTags: useTagSearch(),
-    basicCard : useBasicCard(action),
+    basicCard : useBasicCard(cardGroupId),
   };
 }
 

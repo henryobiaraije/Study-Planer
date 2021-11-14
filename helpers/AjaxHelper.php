@@ -12,7 +12,9 @@
 	use Model\DeckGroup;
 	use PDOException;
 	use PHPMailer\PHPMailer\Exception;
+	use StudyPlanner\Initializer;
 	use StudyPlanner\Libs\Common;
+	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Models\Tag;
 
 	class AjaxHelper {
@@ -62,6 +64,7 @@
 			// <editor-fold desc="Others">
 			add_action( 'admin_sp_ajax_admin_create_new_basic_card', array( $this, 'ajax_admin_create_new_basic_card' ) );
 			add_action( 'admin_sp_ajax_admin_load_image_attachment', array( $this, 'ajax_admin_load_image_attachment' ) );
+			add_action( 'admin_sp_ajax_admin_load_basic_card', array( $this, 'ajax_admin_load_basic_card' ) );
 			// </editor-fold desc="Card">
 		}
 
@@ -79,6 +82,12 @@
 				Common::send_error( 'Invalid image id' );
 			}
 			$attachment_url = wp_get_attachment_image_url( $id, 'full' );
+			if ( empty( $attachment_url ) ) {
+				$default_bg_id = get_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, 0 );
+				if ( ! empty( $default_bg_id ) ) {
+					$attachment_url = wp_get_attachment_image_url( $default_bg_id, 'full' );
+				}
+			}
 
 //			Common::send_error( [
 //				'ajax_admin_create_new_basic_card',
@@ -88,7 +97,7 @@
 //			] );
 
 
-			Common::send_success( 'Image found',$attachment_url );
+			Common::send_success( 'Image found', $attachment_url );
 
 		}
 
@@ -98,16 +107,18 @@
 //				'post' => $post,
 //			] );
 
-			$all            = $post[ Common::VAR_2 ];
-			$e_card         = $all['card'];
-			$e_card_group   = $all['cardGroup'];
-			$e_deck         = $e_card_group['deck'];
-			$question       = $e_card['question'];
-			$answer         = $e_card['answer'];
-			$e_schedule_now = $all['schedule_now'];
-			$schedule_at    = $e_card_group['scheduled_at'];
-			$reverse        = $e_card_group['reverse'];
-			$cg_name        = sanitize_text_field( $e_card_group['name'] );
+			$all                 = $post[ Common::VAR_2 ];
+			$e_card              = $all['card'];
+			$e_card_group        = $all['cardGroup'];
+			$e_deck              = $e_card_group['deck'];
+			$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
+			$question            = $e_card['question'];
+			$answer              = $e_card['answer'];
+			$e_schedule_now      = $all['schedule_now'];
+			$e_set_bg_as_default = $all['set_bg_as_default'];
+			$schedule_at         = $e_card_group['scheduled_at'];
+			$reverse             = $e_card_group['reverse'];
+			$cg_name             = sanitize_text_field( $e_card_group['name'] );
 			if ( true === $e_schedule_now ) {
 				$schedule_at = Common::getDateTime();
 			} else {
@@ -136,40 +147,70 @@
 			$card_group->whole_question = $question;
 			$card_group->card_type      = 'basic';
 			$card_group->scheduled_at   = $schedule_at;
+			$card_group->bg_image_id    = $bg_image_id;
 			$card_group->name           = $cg_name;
-			$card_group->deck()->associate( $deck );
+			$card_group->deck_id        = $e_deck_id;
+			$card_group->save();
 			$card_group->tags()->detach();
 			foreach ( $e_tags as $one ) {
-				$tag_id = $one['tag_id'];
+				$tag_id = $one['id'];
 				$tag    = Tag::find( $tag_id );
 				if ( ! empty( $tag ) ) {
 					$card_group->tags()->save( $tag );
 				}
 			}
-			$card_group->save();
-			$card = new Card();
-//			$card
-
+			$card                = new Card();
+			$card->question      = $question;
+			$card->answer        = $answer;
+			$card->card_group_id = $card_group->id;
+			$card->save();
 			Manager::commit();
 			// Create card group
 
 
+//			Common::send_error( [
+//				'ajax_admin_create_new_basic_card',
+//				'post'                 => $post,
+//				'$e_card'              => $e_card,
+//				'toSql'                => $card_group->toSql(),
+//				'$reverse'             => $reverse,
+//				'$e_card_group'        => $e_card_group,
+//				'$question'            => $question,
+//				'$e_set_bg_as_default' => $e_set_bg_as_default,
+//				'$bg_image_id'         => $bg_image_id,
+//				'$answer'              => $answer,
+//				'$deck'                => $deck,
+//				'$cg_name'             => $cg_name,
+//				'$e_tags'              => $e_tags,
+//				'$schedule_at'         => $schedule_at,
+//			] );
+
+			$edit_page = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
+			             . '&action=card-edit'
+			             . '&card-group=' . $card_group->id;
+
+			Common::send_success( 'Created successfully.', $edit_page );
+
+		}
+
+		public function ajax_admin_load_basic_card( $post ) : void {
 			Common::send_error( [
 				'ajax_admin_create_new_basic_card',
-				'post'          => $post,
-				'$e_card'       => $e_card,
-				'$reverse'      => $reverse,
-				'$e_card_group' => $e_card_group,
-				'$question'     => $question,
-				'$answer'       => $answer,
-				'$deck'         => $deck,
-				'$cg_name'      => $cg_name,
-				'$e_tags'       => $e_tags,
-				'$schedule_at'  => $schedule_at,
+				'post' => $post,
+			] );
+
+			$all                 = $post[ Common::VAR_2 ];
+			$card_group_id       = (int) sanitize_text_field( $all['card_group_id'] );
+
+
+
+			Common::send_error( [
+				'ajax_admin_create_new_basic_card',
+				'post'                 => $post,
 			] );
 
 
-			Common::send_success( 'Trashed successfully.' );
+			Common::send_success( 'Created successfully.' );
 
 		}
 
