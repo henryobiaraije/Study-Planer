@@ -166,6 +166,7 @@
 					$table->id();
 					$table->foreignId( 'card_group_id' )->references( 'id' )->on( SP_TABLE_CARD_GROUPS );
 					$table->string( 'hash' );
+					$table->string( 'c_number' );
 					$table->text( 'question' );
 					$table->text( 'answer' );
 					$table->integer( 'x_position' );

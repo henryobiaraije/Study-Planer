@@ -84,8 +84,13 @@
 
 		public function getCardGroupEditUrlAttribute() {
 			$card_type = $this->card_type;
-			$card_url  = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
-			             . '&card-group=' . $this->id;
+			$slug      = Settings::SLUG_BASIC_CARD;
+			if ( 'gap' === $card_type ) {
+				$slug = Settings::SLUG_GAP_CARD;
+			}
+			$card_url = Initializer::get_admin_url( $slug )
+			            . '&card-group=' . $this->id;
+
 			return $card_url;
 		}
 

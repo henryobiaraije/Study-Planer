@@ -41,7 +41,7 @@
 				<?php /**** Cards formed ***/ ?>
 				<div class="card-preview rounded-3 p-2 bg-gray-300 border-1 border-gray-200" >
 					<h3 class="font-bold fs-5  my-2" >Cards formed ({{gapCard.items.value.length}})
-						<i class="fa fa-reload" ></i ></h3 >
+						<i class="fa fa-redo fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer" ></i ></h3 >
 					<ul >
 						<li v-for="(item,itemIndex) in gapCard.items.value"
 						    :data-hash="item.hash"
@@ -80,6 +80,7 @@
 								Created:
 								<time-comp :time="gapCardGroup.created_at" ></time-comp >
 							</div >
+
 							<div class="rounded bg-white text-black flex-1 flex-auto m-2 p-1 text-center md:w-full" >
 								Scheduled:
 								<time-comp :time="gapCardGroup.scheduled_at" ></time-comp >

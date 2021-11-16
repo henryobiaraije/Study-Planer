@@ -32,19 +32,14 @@ interface _TimeStamps {
 }
 
 
-export interface _BasicCard extends _TimeStamps {
-  id: number;
-  question: string;
-  answer: string;
-  x_position: number;
-  y_position: number;
-}
 
-export interface _GapCard extends _TimeStamps {
+
+export interface _Card extends _TimeStamps {
   id?: number;
   hash: string,
   question: string;
   answer: string;
+  c_number: string;
   x_position?: number;
   y_position?: number;
 }
@@ -55,7 +50,7 @@ export interface _CardGroup extends _TimeStamps {
   deck: _Deck,
   group_type: string;
   tags: Array<_Tag>;
-  cards: Array<_BasicCard>,
+  cards: Array<_Card>,
   name: string,
   whole_question: string,
   scheduled_at: string,

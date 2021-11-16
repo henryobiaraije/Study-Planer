@@ -1,6 +1,8 @@
 <template >
   <!--  <div :id="divId" style="height: 50px" v-html="newContent" ></div >-->
-  <div :id="divId" style="min-height: 30px" v-html="newContent" >{{ value }}</div >
+  <div>
+    <div :id="divId" style="min-height: 30px" v-html="value" >{{ value }}</div >
+  </div>
   <!--  <div >-->
   <!--    Some content {{ media }} {{ value.length }} {{ value }}-->
   <!--  </div >-->

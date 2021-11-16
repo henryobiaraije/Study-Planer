@@ -3,7 +3,7 @@ import {InterFuncSuccess, Server} from "../static/server";
 import {Store} from "../static/store";
 import {ref, onMounted} from "@vue/composition-api";
 import Cookies from 'js-cookie';
-import {_Tag, _DeckGroup, _BasicCard, _CardGroup} from "../interfaces/inter-sp";
+import {_Tag, _DeckGroup, _CardGroup} from "../interfaces/inter-sp";
 import useDeckGroupLists from "./useDeckGroupLists";
 import {vdata} from "../admin/admin-deck-groups";
 

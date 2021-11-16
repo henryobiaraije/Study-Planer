@@ -1,9 +1,10 @@
 import {ref, computed} from "@vue/composition-api";
 import {_Ajax, HandleAjax} from "../classes/HandleAjax";
-import {_Deck, _Tag, _BasicCard, _CardGroup} from "../interfaces/inter-sp";
+import {_Deck, _Tag, _CardGroup, _Card} from "../interfaces/inter-sp";
 import {InterFuncSuccess, Server} from "../static/server";
 import {Store} from "../static/store";
 import useDeckGroupLists from "./useDeckGroupLists";
+import Common from "../classes/Common";
 
 export default function (cardGroupId = 0) {
   const ajax         = ref<_Ajax>({
@@ -41,15 +42,12 @@ export default function (cardGroupId = 0) {
     success       : false,
     successMessage: '',
   });
-  let item           = ref<_BasicCard>({
-    id        : 0,
-    question  : '',
-    answer    : '',
-    x_position: 0,
-    y_position: 0,
-    created_at: '',
-    updated_at: '',
-    deleted_at: '',
+  let item           = ref<_Card>({
+    id      : 0,
+    question: '',
+    answer  : '',
+    c_number: 'c1',
+    hash    : Common.getRandomString(),
   });
   let cardGroup      = ref<_CardGroup>({
     tags          : [],
@@ -172,6 +170,6 @@ export default function (cardGroupId = 0) {
   return {
     ajaxCreate, ajax, ajaxUpdate, ajaxDelete, ajaxTrash,
     createOrUpdate, cardGroup, load,
-    item,  setBgAsDefault,
+    item, setBgAsDefault,
   };
 }

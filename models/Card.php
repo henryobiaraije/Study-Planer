@@ -21,6 +21,8 @@
 			'bg_image_id',
 			'card_group_id',
 			'question',
+			'c_number',
+			'hash',
 			'answer',
 			'x_position',
 			'y_position',
