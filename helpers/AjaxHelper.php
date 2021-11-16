@@ -167,6 +167,7 @@
 //					'ajax_admin_create_new_basic_card',
 //					'post'                 => $post,
 //					'$one_card'            => $one_card,
+//					'$card_id'            => $card_id,
 //					'toSql'                => $card_group->toSql(),
 //					'$reverse'             => $reverse,
 //					'$question'            => $question,
@@ -182,17 +183,14 @@
 //					'$schedule_at'         => $schedule_at,
 //				] );
 			}
-			// Delete cards without not updated
 			Manager::commit();
+			// Delete cards without not updated
 			$all_cards = CardGroup::find( $cg_id )->cards()
 				->whereNotIn( 'c_number', $c_numbers_updated )
 				->forceDelete();
 
 
-			if ( $e_set_bg_as_default ) {
-				update_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, $bg_image_id );
-			}
-
+//
 //			Common::send_error( [
 //				'ajax_admin_create_new_basic_card',
 //				'post'                 => $post,
@@ -211,6 +209,11 @@
 //				'$schedule_at'         => $schedule_at,
 //				'$c_numbers_updated'   => $c_numbers_updated,
 //			] );
+
+
+			if ( $e_set_bg_as_default ) {
+				update_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, $bg_image_id );
+			}
 
 			$edit_page = Initializer::get_admin_url( Settings::SLUG_GAP_CARD )
 			             . '&card-group=' . $card_group->id;

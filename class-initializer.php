@@ -17,6 +17,7 @@
 	use StudyPlanner\Pages\Admin_Tags;
 	use StudyPlanner\Pages\AdminDeck;
 	use StudyPlanner\Pages\AdminDeckGroups;
+	use StudyPlanner\Shortcodes\Short_User_Dashboard;
 
 	if ( ! defined( 'ABSPATH' ) ) {
 		exit(); // exit if accessed directly
@@ -91,6 +92,7 @@
 			Admin_All_Cards::get_instance();
 			Admin_Basic_Card::get_instance();
 			Admin_Gap_Card::get_instance();
+			Short_User_Dashboard::get_instance();
 
 			// Localize all added general object
 			add_action( 'wp_footer', array( $this, 'output_localized' ), 10 );

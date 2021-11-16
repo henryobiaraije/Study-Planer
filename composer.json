@@ -24,7 +24,8 @@
       "pages\\",
       "libs\\",
       "helpers\\",
-      "db\\"
+      "db\\",
+      "shortcodes\\"
     ]
   },
   "require": {
