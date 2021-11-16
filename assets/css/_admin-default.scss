@@ -31,15 +31,20 @@
     }
   }
 }
-
-
 .sp-wp-editor {
   margin-bottom: 10px;
   .editor-title {
   }
-  .editor-input{
-    border: 1px solid black;
-    border-radius: 2px;
-    padding: 0 1em;
+  .editor-input {
+    border: 1px solid #8a8a8a;
+    border-radius: 3px;
+    margin-top: 5px;
+    padding: 5px;
   }
+}
+.wp-die-message, p {
+  font-size: 15px;
+}
+div#wp-editor-g8uuq45id {
+  outline: 0;
 }

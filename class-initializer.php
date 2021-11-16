@@ -13,6 +13,7 @@
 	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Pages\Admin_Basic_Card;
 	use StudyPlanner\Pages\Admin_All_Cards;
+	use StudyPlanner\Pages\Admin_Gap_Card;
 	use StudyPlanner\Pages\Admin_Tags;
 	use StudyPlanner\Pages\AdminDeck;
 	use StudyPlanner\Pages\AdminDeckGroups;
@@ -89,6 +90,7 @@
 			Admin_Tags::get_instance();
 			Admin_All_Cards::get_instance();
 			Admin_Basic_Card::get_instance();
+			Admin_Gap_Card::get_instance();
 
 			// Localize all added general object
 			add_action( 'wp_footer', array( $this, 'output_localized' ), 10 );
@@ -305,6 +307,8 @@
 			$css_general = Initializer::$css_url . '/general.css';
 			wp_enqueue_style( 'sp-general', $css_general, [], Initializer::$script_version );
 
+			wp_enqueue_style('dashboard');
+			wp_enqueue_script('dashboard');
 
 			add_action( 'sp_enqueue_default_admin_scripts', function () use ( $base ) {
 //    wp_enqueue_script($base.'vue');

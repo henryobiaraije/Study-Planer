@@ -11,6 +11,7 @@ module.exports = {
         'admin/admin-tags': './src/admin/admin-tags.ts',
         'admin/admin-decks': './src/admin/admin-decks.ts',
         'admin/admin-basic-card': './src/admin/admin-basic-card.ts',
+        'admin/admin-gap-card': './src/admin/admin-gap-card.ts',
         'admin/admin-all-cards': './src/admin/admin-all-cards.ts',
     },
     module: {

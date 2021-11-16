@@ -26,9 +26,9 @@ export interface _Tag {
 }
 
 interface _TimeStamps {
-  created_at: string;
-  updated_at: string;
-  deleted_at: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
 }
 
 
@@ -38,6 +38,14 @@ export interface _BasicCard extends _TimeStamps {
   answer: string;
   x_position: number;
   y_position: number;
+}
+
+export interface _GapCard extends _TimeStamps {
+  id?: number;
+  question: string;
+  answer: string;
+  x_position?: number;
+  y_position?: number;
 }
 
 export interface _CardGroup extends _TimeStamps {
