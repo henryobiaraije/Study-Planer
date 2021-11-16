@@ -27,7 +27,7 @@
 				<div class="bg-gray-300 shadow rounded sm:p-2 md:p-4 mb-4" >
 					<label class="my-2 bg-white my-2 p-2 rounded shadow" >
 						<span class="" >Name</span >
-						<input v-model="gapCardGroup.name" required type="text" >
+						<input v-model="gapCardGroup.name" name="card_name" required type="text" >
 					</label >
 					<div class="sp-wp-editor bg-white my-2 p-2 rounded shadow" >
 						<span class="editor-title" >Question</span >
@@ -44,6 +44,7 @@
 						<i class="fa fa-reload" ></i ></h3 >
 					<ul >
 						<li v-for="(item,itemIndex) in gapCard.items.value"
+						    :data-hash="item.hash"
 						    class="bg-white p-2 rounded-3" >
 							<ul >
 								<li ><b >Question:</b >
@@ -57,7 +58,7 @@
 					</ul >
 				</div >
 			</div >
-			<div class="sm:flex-1 md:flex-initial bg-gray-300 shadow rounded sm:p-2 md:p-4" >
+			<div class="sm:flex-1 md:flex-initial bg-gray-300 shadow rounded sm:p-2 md:p-4" style="max-width: 300px" >
 				<ajax-action
 						button-text="<?php echo $is_editing ? 'Update' : 'Create' ?>"
 						css-classes="button"
@@ -74,10 +75,14 @@
 						</label >
 					</div >
 					<?php if ( $is_editing ): ?>
-						<div class="flex bg-gray-100 rounded " >
+						<div class="flex flex-wrap bg-gray-100 rounded " >
 							<div class="rounded bg-white text-black flex-auto m-2 p-1 text-center md:w-full" >
 								Created:
 								<time-comp :time="gapCardGroup.created_at" ></time-comp >
+							</div >
+							<div class="rounded bg-white text-black flex-1 flex-auto m-2 p-1 text-center md:w-full" >
+								Scheduled:
+								<time-comp :time="gapCardGroup.scheduled_at" ></time-comp >
 							</div >
 							<div class="rounded bg-white text-black flex-1 flex-auto m-2 p-1 text-center md:w-full" >
 								Updated:

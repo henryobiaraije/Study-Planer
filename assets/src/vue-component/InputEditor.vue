@@ -24,6 +24,7 @@ export default class InputEditor extends Vue {
          // @Prop({default: []}) readonly selectedIds: Array<number>;
   @Prop({default: false}) readonly media: boolean;
   @Prop({default: '', required: true}) readonly value: string;
+  @Prop({default: false, required: false}) readonly withC: boolean;
 
   public created2() {
     setTimeout(() => {
@@ -69,7 +70,7 @@ export default class InputEditor extends Vue {
         toolbar2              : 'formatselect alignjustify forecolor | pastetext removeformat charmap | outdent indent | undo redo | wp_help',
         powerpaste_word_import: 'clean',
         powerpaste_html_import: 'clean',
-        init_instance_callback: function (editor) {
+        init_instance_callback: (editor) => {
           // editor.on('Change', function (e) {
           editor.on('blur', function (e) {
             let content    = tinymce.get(dis.divId).getContent()
@@ -104,7 +105,19 @@ export default class InputEditor extends Vue {
           // editor.on('blur', function(e) {
           //   alert('blur');
           // });
-        }
+
+        },
+        // setup                 : function (editor) {
+        //   const cs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        //   cs.forEach((c) => {
+        //     editor.ui.registry.addButton('customInsertButton', {
+        //       text    : 'c' + c,
+        //       onAction: function (_) {
+        //         editor.insertContent(`&nbsp;<strong>{{c${c}:answer}}</strong>&nbsp;`);
+        //       }
+        //     });
+        //   });
+        // }
       },
     });
   }

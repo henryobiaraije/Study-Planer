@@ -92,7 +92,7 @@ export default function (cardGroupId = 0) {
           set_bg_as_default: setBgAsDefault.value,
         }
       ],
-      what: "admin_sp_ajax_admin_create_new_basic_card",
+      what: "admin_sp_ajax_admin_create_new_gap_card",
       funcBefore() {
         handleAjax.start();
       },

@@ -42,6 +42,7 @@ export interface _BasicCard extends _TimeStamps {
 
 export interface _GapCard extends _TimeStamps {
   id?: number;
+  hash: string,
   question: string;
   answer: string;
   x_position?: number;

@@ -1,37 +1,67 @@
 import {_GapCard} from "../interfaces/inter-sp";
+import Common from "./Common";
 
 export default class RegexHelper {
 
 
+  /**
+   * Forms _GapCards from a whole question
+   * @param wholeQuestion
+   */
   public static getItemsFromGapWholeQuestion(wholeQuestion: string): Array<_GapCard> {
     console.groupCollapsed('getItemsFromGapWholeQuestion');
     const cDetails: { [key: string]: Array<string> } = RegexHelper.getCDetails(wholeQuestion);
     const items: Array<_GapCard>                     = [];
 
     // Get the answer
-    let answer = wholeQuestion;
-    for (let [key, value] of Object.entries(cDetails)) {
-      value.forEach(val => {
-        const _hold = RegexHelper.getAnswerFromCurlyBrackets(val);
-        answer      = answer.replace(val, _hold);
-      });
-    }
+    // let answer = wholeQuestion;
+    // for (let [key, value] of Object.entries(cDetails)) {
+    //   value.forEach(val => {
+    //     const _hold = RegexHelper.getAnswerFromCurlyBrackets(val);
+    //     answer      = answer.replace(val, `<strong>${_hold}</strong>`);
+    //   });
+    // }
+    //
+    // let answer = wholeQuestion;
+    // for (let [key, value] of Object.entries(cDetails)) {
+    //   for (let [key2, value2] of Object.entries(cDetails)) {
+    //     if (key2 === key) {
+    //       value2.forEach(val => {
+    //         const _hold = RegexHelper.getAnswerFromCurlyBrackets(val);
+    //         answer      = answer.replace(val, `<strong>${_hold}</strong>`);
+    //       });
+    //     }
+    //   }
+    // }
+
 
     for (let [key, value] of Object.entries(cDetails)) {
-      let text = wholeQuestion;
+      let question = wholeQuestion;
+      let answer = wholeQuestion;
       for (let [key2, value2] of Object.entries(cDetails)) {
         if (key2 !== key) {
           value2.forEach(val => {
-            const answer  = RegexHelper.getAnswerFromCurlyBrackets(val);
+            const qAnswer  = RegexHelper.getAnswerFromCurlyBrackets(val);
             const _rRegex = new RegExp(val);
-            text          = text.replace(_rRegex, answer);
-            console.log({cDetails, answer, text, key, value, key2, value2, val})
+            question          = question.replace(_rRegex, `${qAnswer}`);
+            const _hold = RegexHelper.getAnswerFromCurlyBrackets(val);
+            answer      = answer.replace(val, `${_hold}`);
+            console.log({cDetails, answer,qAnswer, question, key, value, key2, value2, val})
+          });
+        } else {
+          value2.forEach(val => {
+            const _rRegex = new RegExp(val);
+            question          = question.replace(_rRegex, "<strong>[...]</strong>");
+            const _hold = RegexHelper.getAnswerFromCurlyBrackets(val);
+            answer      = answer.replace(val, `<strong>${_hold}</strong>`);
+            // console.log({cDetails, answer, text, key, value, key2, value2, val})
           });
         }
       }
       items.push({
-        question: text,
+        question: question,
         answer  : answer,
+        hash    : Common.getRandomString(),
       });
     }
     console.groupEnd();
