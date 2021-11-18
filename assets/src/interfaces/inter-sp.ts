@@ -31,7 +31,18 @@ interface _TimeStamps {
   deleted_at?: string;
 }
 
-
+export interface _Study {
+  deck: _Deck,
+  user: any,
+  tags: Array<_Tag>,
+  all_tags: boolean,
+  no_to_revise: number,
+  no_of_new: number,
+  no_on_hold: number,
+  revise_all: boolean,
+  study_all_new: boolean,
+  study_all_on_hold: boolean,
+}
 
 
 export interface _Card extends _TimeStamps {

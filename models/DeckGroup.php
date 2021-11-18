@@ -9,6 +9,7 @@
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
 	use Illuminate\Database\Eloquent\SoftDeletes;
+	use Illuminate\Database\Query\Builder;
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Models\Tag;
 
@@ -29,6 +30,10 @@
 		}
 
 		public function decks() {
+			return $this->hasMany( Deck::class, 'deck_group_id' );
+		}
+
+		public function decks_with_study( $user_id ) {
 			return $this->hasMany( Deck::class, 'deck_group_id' );
 		}
 
@@ -57,6 +62,56 @@
 				->limit( $args['per_page'] )
 				->orderByDesc( 'id' )->get();
 
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'$args'        => $args,
+//				'$deck_groups' => $deck_groups->toSql(),
+//				'getQuery'     => $deck_groups->getQuery(),
+//			] );
+
+			return [
+				'total'       => $total,
+				'deck_groups' => $deck_groups->all(),
+			];
+		}
+
+		public static function get_deck_groups_front_end( $args ) : array {
+			$user_id = get_current_user_id();
+			$default = [
+				'search'       => '',
+				'page'         => 1,
+				'per_page'     => 5,
+				'with_trashed' => false,
+				'only_trashed' => false,
+			];
+			$args    = wp_parse_args( $args, $default );
+			if ( $args['with_trashed'] ) {
+//				$deck_groups = DeckGroup::with( 'tags', 'decks' )->withoutTrashed();
+			} elseif ( $args['only_trashed'] ) {
+//				$deck_groups = DeckGroup::with( 'tags', 'decks' )->onlyTrashed();
+			} else {
+//				$deck_groups = DeckGroup::with( 'tags', 'decks_with_study' );
+				$deck_groups = DeckGroup::with( [
+					'tags',
+					'decks',
+//					'decks.studies' => function ( $query ) use ( $user_id ) {
+//						return $query->where( 'user_id', '=', $user_id );
+//					},
+				] );
+			}
+			$deck_groups = $deck_groups
+				->where( 'name', 'like', "%{$args['search']}%" );
+
+			$total       = $deck_groups->count();
+			$offset      = ( $args['page'] - 1 );
+			$deck_groups = $deck_groups->offset( $offset )
+				->limit( $args['per_page'] )
+				->orderByDesc( 'id' );
+//			Common::send_error( [
+//				__METHOD__,
+//				'query' => $deck_groups->toSql(),
+//			] );
+			$deck_groups = $deck_groups->get();
 //			Common::send_error( [
 //				'ajax_admin_load_deck_group',
 //				'$args'        => $args,

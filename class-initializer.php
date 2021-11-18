@@ -8,6 +8,7 @@
 
 	use Illuminate\Database\Capsule\Manager;
 	use Model\DeckGroup;
+	use StudyPlanner\Helpers\AjaxFrontHelper;
 	use StudyPlanner\Helpers\AjaxHelper;
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
@@ -86,6 +87,7 @@
 			add_action( 'wp_enqueue_scripts', array( $this, 'register_default_frontend_scripts' ) );
 
 			AjaxHelper::get_instance();
+			AjaxFrontHelper::get_instance();
 			AdminDeckGroups::get_instance();
 			AdminDeck::get_instance();
 			Admin_Tags::get_instance();
@@ -334,7 +336,7 @@
 			}
 
 			wp_enqueue_script( 'jquery' );
-			$base = 'SearchBarEndpoints';
+			$base = 'study-planner-';
 			if ( $in_localhost ) {
 				$js_vue          = self::$extra_url . '/vue.js';
 				$js_bootstrap    = self::$extra_url . '/bootstrap-5/js/bootstrap.js';
@@ -358,10 +360,10 @@
 			}
 
 
-			add_action( 'sbe_enqueue_default_frontend_scripts', function () use ( $base ) {
+			add_action( 'sp_enqueue_default_frontend_scripts', function () use ( $base ) {
 //    wp_enqueue_script($base.'vue');
 //					wp_enqueue_script( $base . 'popper' );
-//					wp_enqueue_script( $base . 'bootstrap' );
+					wp_enqueue_script( $base . 'bootstrap' );
 //					wp_enqueue_script( $base . 'fontawesome' );
 //					wp_enqueue_style( $base . 'animated' );
 //					wp_enqueue_style( $base . 'bootstrap' );

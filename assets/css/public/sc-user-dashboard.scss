@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "../admin-default";
+@import "../../_extra/bootstrap5_custom";
+.sp-sc-ud {
+
+}
+#wpcontent {
+  background: #f0f0f0;
+}

@@ -74,7 +74,7 @@
 
 			// enqueue the scripts
 			add_action( 'sp_enqueue_scripts_sc_user_dashboard', function () use ( $dis ) {
-//				do_action( 'bsc_enqueue_default_frontend_scripts' );
+				do_action( 'sp_enqueue_default_frontend_scripts' );
 				wp_enqueue_style( 'sp-sc-user-dashboard' );
 				wp_enqueue_script( 'sp-sc-user-dashboard' );
 

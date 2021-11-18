@@ -13,6 +13,7 @@ module.exports = {
         'admin/admin-basic-card': './src/admin/admin-basic-card.ts',
         'admin/admin-gap-card': './src/admin/admin-gap-card.ts',
         'admin/admin-all-cards': './src/admin/admin-all-cards.ts',
+        'public/sc-user-dashboard': './src/shortcodes/sc-user-dashboard.ts',
     },
     module: {
         rules: [

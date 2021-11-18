@@ -61,6 +61,7 @@
 			define( 'SP_TABLE_DECKS', SP_DB_PREFIX . 'decks' );
 			define( 'SP_TABLE_CARD_GROUPS', SP_DB_PREFIX . 'card_groups' );
 			define( 'SP_TABLE_CARDS', SP_DB_PREFIX . 'cards' );
+			define( 'SP_TABLE_STUDY', SP_DB_PREFIX . 'study' );
 		}
 
 		private function create_default_rows() {
@@ -171,6 +172,25 @@
 					$table->text( 'answer' );
 					$table->integer( 'x_position' );
 					$table->integer( 'y_position' );
+					$table->softDeletes();
+					$table->timestamps();
+				} );
+			}
+
+			// Study
+			if ( ! $this->schema_builder->hasTable( SP_TABLE_STUDY ) ) {
+				Capsule::schema()->create( SP_TABLE_STUDY, function ( Blueprint $table ) {
+					global $wpdb;
+					$table->id();
+					$table->foreignId( 'deck_id' )->references( 'id' )->on( SP_TABLE_DECKS );
+					$table->foreignId( 'user_id' )->references( 'ID' )->on( $wpdb->prefix . 'users' );
+					$table->boolean( 'all_tags' );
+					$table->integer( 'no_to_revise' );
+					$table->integer( 'no_of_new' );
+					$table->integer( 'no_on_hold' );
+					$table->boolean( 'revise_all' );
+					$table->boolean( 'study_all_new' );
+					$table->boolean( 'study_all_on_hold' );
 					$table->softDeletes();
 					$table->timestamps();
 				} );

@@ -25,6 +25,10 @@
 			return $this->morphToMany( Tag::class, 'taggable', SP_TABLE_TAGGABLES );
 		}
 
+		public function studies() {
+			return $this->hasMany( Study::class );
+		}
+
 		public function deck_group() {
 			return $this->belongsTo( DeckGroup::class, 'deck_group_id' );
 		}

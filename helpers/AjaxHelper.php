@@ -73,6 +73,8 @@
 			// </editor-fold desc="Card">
 		}
 
+
+		// <editor-fold desc="Gap Cards">
 		public function ajax_admin_update_gap_card( $post ) : void {
 //			Common::send_error( [
 //				'ajax_admin_update_gap_card',
@@ -401,39 +403,9 @@
 			] );
 
 		}
+		// </editor-fold desc="Gap Cards">
 
-		public function ajax_admin_load_image_attachment( $post ) : void {
-
-//			Common::send_error( [
-//				'ajax_admin_load_image_attachment',
-//				'post' => $post,
-//			] );
-
-			$all = $post[ Common::VAR_2 ];
-			$id  = (int) sanitize_text_field( $all['id'] );
-			if ( $id < 1 ) {
-				Common::send_error( 'Invalid image id' );
-			}
-			$attachment_url = wp_get_attachment_image_url( $id, 'full' );
-			if ( empty( $attachment_url ) ) {
-				$default_bg_id = get_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, 0 );
-				if ( ! empty( $default_bg_id ) ) {
-					$attachment_url = wp_get_attachment_image_url( $default_bg_id, 'full' );
-				}
-			}
-
-//			Common::send_error( [
-//				'ajax_admin_create_new_basic_card',
-//				'post'        => $post,
-//				'$id'         => $id,
-//				'$attachment_url' => $attachment_url,
-//			] );
-
-
-			Common::send_success( 'Image found', $attachment_url );
-
-		}
-
+		// <editor-fold desc="Basic Cards">
 		public function admin_update_basic_card( $post ) : void {
 //			Common::send_error( [
 //				'admin_update_basic_card',
@@ -667,6 +639,7 @@
 			] );
 
 		}
+		// </editor-fold desc="Basic Cards">
 
 		// <editor-fold desc="Tags">
 		public function ajax_admin_create_tag( $post ) : void {
@@ -1355,5 +1328,38 @@
 
 		// </editor-fold  desc="Deck Groups" >
 
+		// <editor-fold desc="Others">
+		public function ajax_admin_load_image_attachment( $post ) : void {
+
+//			Common::send_error( [
+//				'ajax_admin_load_image_attachment',
+//				'post' => $post,
+//			] );
+
+			$all = $post[ Common::VAR_2 ];
+			$id  = (int) sanitize_text_field( $all['id'] );
+			if ( $id < 1 ) {
+				Common::send_error( 'Invalid image id' );
+			}
+			$attachment_url = wp_get_attachment_image_url( $id, 'full' );
+			if ( empty( $attachment_url ) ) {
+				$default_bg_id = get_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, 0 );
+				if ( ! empty( $default_bg_id ) ) {
+					$attachment_url = wp_get_attachment_image_url( $default_bg_id, 'full' );
+				}
+			}
+
+//			Common::send_error( [
+//				'ajax_admin_create_new_basic_card',
+//				'post'        => $post,
+//				'$id'         => $id,
+//				'$attachment_url' => $attachment_url,
+//			] );
+
+
+			Common::send_success( 'Image found', $attachment_url );
+
+		}
+		// </editor-fold desc="Others">
 
 	}
