@@ -9,6 +9,7 @@
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
 	use Illuminate\Database\Eloquent\SoftDeletes;
+	use Illuminate\Support\ItemNotFoundException;
 	use PDOException;
 	use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 	use StudyPlanner\Libs\Common;
@@ -102,27 +103,27 @@
 		}
 
 		public static function get_user_cards( $study_id, $user_id ) {
-			$studies = Study::with( 'deck.CardGroups.cards' )
-				->where( 'id', '=', $study_id )
-				->where( 'user_id', '=', $user_id );
-
 
 			try {
-				$many = Study::with( 'deck.cards' )
+				$study = Study::with( 'deck.cards' )
 					->where( 'id', '=', $study_id )
-					->where( 'user_id', '=', $user_id );
-			} catch ( PDOException $e ) {
-				dd( $e );
+					->where( 'user_id', '=', $user_id )->get()->firstOrFail();
+				$cards = $study->deck->cards;
+
+				Common::send_error( [
+					'ajax_front_create_study',
+					'$study'                 => $study,
+					'$cards'                 => $cards,
+					'Manager::getQueryLog()' => Manager::getQueryLog(),
+					'study_id'               => $study_id,
+				] );
+
+
+			} catch ( ItemNotFoundException $e ) {
+				//todo handle later
 			}
 
 
-			Common::send_error( [
-				'ajax_front_create_study',
-				'$many'                  => $many->get()->first(),
-				'$studies'               => $studies,
-				'Manager::getQueryLog()' => Manager::getQueryLog(),
-				'study_id'               => $study_id,
-			] );
 		}
 
 
