@@ -25,8 +25,16 @@
 			return $this->morphToMany( Tag::class, 'taggable', SP_TABLE_TAGGABLES );
 		}
 
+		public function cards() {
+			return $this->hasManyThrough( Card::class, CardGroup::class);
+		}
+
 		public function studies() {
 			return $this->hasMany( Study::class );
+		}
+
+		public function cardGroups(){
+			return $this->hasMany( CardGroup::class);
 		}
 
 		public function deck_group() {

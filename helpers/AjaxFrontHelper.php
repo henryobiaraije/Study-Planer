@@ -42,44 +42,62 @@
 		private function init_ajax() {
 			add_action( 'admin_sp_ajax_front_get_deck_groups', array( $this, 'ajax_front_get_deck_groups' ) );
 			add_action( 'admin_sp_ajax_front_create_study', array( $this, 'ajax_front_create_study' ) );
+			add_action( 'admin_sp_ajax_front_get_question', array( $this, 'ajax_front_get_question' ) );
 		}
 
 
 		// <editor-fold desc="Gap Cards">
 
-		public function ajax_front_create_study( $post ) : void {
+		/** @noinspection PhpUndefinedFieldInspection */
+		public function ajax_front_get_question( $post ) : void {
 //			Common::send_error( [
-//				'ajax_front_create_study',
+//				'ajax_front_get_question',
 //				'post' => $post,
 //			] );
 
-			$all               = $post[ Common::VAR_2 ]['study'];
-			$deck_id           = (int) sanitize_text_field( $all['deck']['id'] );
-			$study_id          = (int) sanitize_text_field( $all['study']['id'] );
-			$tags              = $all['tags'];
-			$no_of_new         = (int) sanitize_text_field( $all['no_of_new'] );
-			$no_on_hold        = (int) sanitize_text_field( $all['no_on_hold'] );
-			$no_to_revise      = (int) sanitize_text_field( $all['no_to_revise'] );
-			$revise_all        = (bool) sanitize_text_field( $all['revise_all'] );
-			$study_all_new     = (bool) sanitize_text_field( $all['study_all_new'] );
-			$study_all_on_hold = (bool) sanitize_text_field( $all['study_all_on_hold'] );
-			$all_tags          = (bool) sanitize_text_field( $all['all_tags'] );
+			$all      = $post[ Common::VAR_2 ]['study'];
+			$study_id = (int) sanitize_text_field( $all['id'] );
 
-			$deck = Deck::find( $deck_id );
-			if ( empty( $deck ) ) {
-				Common::send_error( 'Invalid deck',[
-					'post' => $post,
-				] );
-			}
-			$study = null;
-			if ( ! empty( $study_id ) ) {
-				$study = Study::find( $study_id );
-				if ( empty( $study ) ) {
-					Common::send_error( 'Invalid study plan' );
-				}
+			$study = Study::with( 'tags', 'deck' )->find( $study_id );
+			if ( empty( $study ) ) {
+				Common::send_error( 'Invalid study plan' );
 			}
 
-			$user_id = get_current_user_id();
+//			Common::send_error( [
+//				'ajax_front_get_question',
+//				'post'      => $post,
+//				'$study_id' => $study_id,
+//				'$study'    => $study,
+//			] );
+
+			$tags              = $study->tags;
+			$no_of_new         = $study->no_of_new;
+			$no_on_hold        = $study->no_on_hold;
+			$no_to_revise      = $study->no_to_revise;
+			$revise_all        = $study->revise_all;
+			$study_all_new     = $study->study_all_new;
+			$study_all_on_hold = $study->study_all_on_hold;
+			$user_id           = get_current_user_id();
+
+			$user_cards = Study::get_user_cards($study->id, $user_id);
+
+
+			Common::send_error( [
+				'ajax_front_create_study',
+				'post'                   => $post,
+				'$user_cards'            => $user_cards->get(),
+				'Manager::getQueryLog()' => Manager::getQueryLog(),
+				'$study_id'              => $study_id,
+				'$study'                 => $study,
+				'$tags'                  => $tags,
+				'$no_of_new'             => $no_of_new,
+				'$no_on_hold'            => $no_on_hold,
+				'$no_to_revise'          => $no_to_revise,
+				'$revise_all'            => $revise_all,
+				'$study_all_new'         => $study_all_new,
+				'$study_all_on_hold'     => $study_all_on_hold,
+				'$user_id'               => $user_id,
+			] );
 
 			Manager::beginTransaction();
 
@@ -141,7 +159,110 @@
 //				'$study_all_on_hold' => $study_all_on_hold,
 //			] );
 
-			Common::send_success( 'Saved.',$new_study );
+			Common::send_success( 'Saved.', $new_study );
+
+		}
+
+		public function ajax_front_create_study( $post ) : void {
+//			Common::send_error( [
+//				'ajax_front_create_study',
+//				'post' => $post,
+//			] );
+
+			$all               = $post[ Common::VAR_2 ]['study'];
+			$deck_id           = (int) sanitize_text_field( $all['deck']['id'] );
+			$study_id          = (int) sanitize_text_field( $all['id'] );
+			$tags              = $all['tags'];
+			$no_of_new         = (int) sanitize_text_field( $all['no_of_new'] );
+			$no_on_hold        = (int) sanitize_text_field( $all['no_on_hold'] );
+			$no_to_revise      = (int) sanitize_text_field( $all['no_to_revise'] );
+			$revise_all        = (bool) sanitize_text_field( $all['revise_all'] );
+			$study_all_new     = (bool) sanitize_text_field( $all['study_all_new'] );
+			$study_all_on_hold = (bool) sanitize_text_field( $all['study_all_on_hold'] );
+			$all_tags          = (bool) sanitize_text_field( $all['all_tags'] );
+
+			$deck = Deck::find( $deck_id );
+			if ( empty( $deck ) ) {
+				Common::send_error( 'Invalid deck', [
+					'post' => $post,
+				] );
+			}
+			$study = null;
+			if ( ! empty( $study_id ) ) {
+				$study = Study::find( $study_id );
+				if ( empty( $study ) ) {
+					Common::send_error( 'Invalid study plan' );
+				}
+			}
+
+			$user_id = get_current_user_id();
+
+			Manager::beginTransaction();
+
+
+//			Common::send_error( [
+//				'ajax_front_create_study',
+//				'post'               => $post,
+//				'$study_id'          => $study_id,
+//				'$study'             => $study,
+//				'$deck_id'           => $deck_id,
+//				'$tags'              => $tags,
+//				'$no_of_new'         => $no_of_new,
+//				'$no_on_hold'        => $no_on_hold,
+//				'$no_to_revise'      => $no_to_revise,
+//				'$revise_all'        => $revise_all,
+//				'$study_all_new'     => $study_all_new,
+//				'$study_all_on_hold' => $study_all_on_hold,
+//			] );
+
+			if ( empty( $study ) ) {
+				$study = new Study();
+			}
+			$study->no_to_revise      = $no_to_revise;
+			$study->no_of_new         = $no_of_new;
+			$study->no_on_hold        = $no_on_hold;
+			$study->revise_all        = $revise_all;
+			$study->study_all_new     = $study_all_new;
+			$study->study_all_on_hold = $study_all_on_hold;
+			$study->user_id           = $user_id;
+			$study->deck_id           = $deck_id;
+			$study->all_tags          = $all_tags;
+//			Common::send_error( [
+//				'ajax_front_create_study',
+//				'post'               => $post,
+//				'$study_id'          => $study_id,
+//				'$study'             => $study,
+//			]);
+			$study->update();
+
+			$study->tags()->detach();
+			foreach ( $tags as $one ) {
+				$tag = Tag::find( $one['id'] );
+				$study->tags()->save( $tag );
+			}
+
+			Manager::commit();
+			$new_study = Study::get_user_study_by_id( $study->id );
+//			$new_study = Study::with( 'tags', 'deck' )->find( $study->id );;
+
+
+//			Common::send_error( [
+//				'ajax_front_create_study',
+//				'post'               => $post,
+//				'$study_id'          => $study_id,
+//				'$new_study'         => $new_study,
+//				'$study'             => $study,
+//				'$deck_id'           => $deck_id,
+//				'$tags'              => $tags,
+//				'$no_of_new'         => $no_of_new,
+//				'$no_on_hold'        => $no_on_hold,
+//				'$no_to_revise'      => $no_to_revise,
+//				'$revise_all'        => $revise_all,
+//				'$study_all_new'     => $study_all_new,
+//				'$study_all_on_hold' => $study_all_on_hold,
+//			] );
+
+			Common::send_success( 'Saved.', $new_study );
 
 		}
 

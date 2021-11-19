@@ -47,23 +47,56 @@
 								</g >
 </svg >
 						</div >
-						<div class="sp-name text-2xl px-10 py-2  flex-1 font-medium" >{{item.name}}</div >
+						<div class="sp-name text-2xl px-10 py-2  flex-1 font-medium
+						items-center flex flex-1 font-medium items-center justify-center px-10 py-2 sp-name text-2xl text-center" >{{item.name}}
+						</div >
 						<div class="sp-deck-count flex-initial flex items-center" >{{item.decks.length}} decks</div >
 					</div >
 					<div class="sp-header-stats rounded py-2 px-4 flex-initial bg-gray-100" >
-						The status
+						<div class="status-title text-center font-bold" >Number of cards due for revision</div >
+						<div class="to-study flex" >
+							<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
+								<div class="study-title whitespace-nowrap" >Previously false</div >
+								<div class="study-number font-bold fs-4" >0</div >
+							</div >
+							<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
+								<div class="study-title whitespace-nowrap" >Revision</div >
+								<div class="study-number font-bold fs-4" >0</div >
+							</div >
+							<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
+								<div class="study-title whitespace-nowrap" >New cards</div >
+								<div class="study-number font-bold fs-4" >{{item.id === 5 ? 20 : 0}}</div >
+							</div >
+						</div >
 					</div >
 				</div >
 				<ul class="sp-decks " :class="['decks-'+item.id]" style="display: none" >
 					<?php /**** Deck header ***/ ?>
 					<li v-for="(item2,itemIndex2) in item.decks" :key="item2.id" class="pl-4 mt-2" >
-						<div @click="userDash.openStudyModal(item2)" class="sp-d-header cursor-pointer  flex gap-2" >
-							<div class="sp-header-title flex bg-gray-100 hover:bg-gray-200  px-3 py-3 flex-1" >
-								<div class="sp-name text-2xl px-10 py-2  flex-1 font-medium" >{{item2.name}}</div >
+						<div class="sp-d-header cursor-pointer  flex gap-2" >
+							<div @click="userDash.openStudyModal(item2)" class="sp-header-title flex bg-gray-100 hover:bg-gray-200  px-3 py-3 flex-1" >
+								<div class="sp-name text-2xl px-10 py-2  flex-1 font-medium
+									text-2xl px-10 py-2  flex-1 font-medium
+									items-center flex flex-1 font-medium items-center justify-center px-10 py-2 sp-name text-2xl text-center" >{{item2.name}}
+								</div >
 								<div class="sp-deck-count flex-initial flex items-center" ></div >
 							</div >
-							<div class="sp-header-stats rounded py-2 px-4 flex-initial bg-gray-100" >
-								The status
+							<div class="sp-header-stats rounded py-2 flex-initial bg-gray-100" >
+								<div class="status-title text-center font-bold" >Number of cards due for revision</div >
+								<div class="to-study flex" >
+									<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
+										<div class="study-title whitespace-nowrap" >Previously false</div >
+										<div class="study-number font-bold fs-4" >0</div >
+									</div >
+									<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
+										<div class="study-title whitespace-nowrap" >Revision</div >
+										<div class="study-number font-bold fs-4" >0</div >
+									</div >
+									<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
+										<div class="study-title whitespace-nowrap" >New cards</div >
+										<div class="study-number font-bold fs-4" >4</div >
+									</div >
+								</div >
 							</div >
 						</div >
 					</li >
@@ -73,13 +106,13 @@
 	</div >
 
 
-	<?php /** Edit Study */ ?>
+	<?php /** Edit Study Modal */ ?>
 	<div class="modal fade" id="modal-new" style="z-index:99999999;display: none" tabindex="-1" aria-labelledby="exampleModalEdit" aria-hidden="true" >
 		<div class="modal-dialog" >
 			<form v-if="null !== studyToEdit" @submit.prevent="userDash.startStudy" class="modal-content" >
 				<div class="modal-header" >
 					<h5 class="modal-title" id="exampleModalEdit" >Study ({{studyToEdit.deck.name}})</h5 >
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button >
+					<button id="hide-modal-new" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button >
 				</div >
 				<div class="modal-body" >
 					<div class="sp-study-input shadow p-2 rounded fs-5 mb-4 shadow p-2 rounded" >
@@ -149,6 +182,31 @@
 							</label >
 						</div >
 					</div >
+				</div >
+				<div class="modal-footer" >
+					<ajax-action
+							button-text="Study"
+							css-classes="button"
+							icon="fa fa-save"
+							:ajax="userDash.ajaxSaveStudy.value" >
+					</ajax-action >
+				</div >
+			</form >
+		</div >
+	</div >
+
+
+	<?php /** Question display modal */ ?>
+	<div class="modal fade" id="modal-questions" style="z-index:99999999;display: none" tabindex="-1" aria-labelledby="exampleModalEdit" aria-hidden="true" >
+		<div class="modal-dialog" >
+			<form v-if="null !== studyToEdit" @submit.prevent="userDash.startStudy" class="modal-content" >
+				<div class="modal-header" >
+					<h5 class="modal-title" id="exampleModalEdit" >Study ({{studyToEdit.deck.name}})</h5 >
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button >
+				</div >
+				<div class="modal-body" >
+
+					<div v-if="userDash.ajaxLoadingCard" style="text-align: center;flex: 12;font-size: 50px;" ><i class="fa fa-spin fa-spinner" ></i ></div >
 				</div >
 				<div class="modal-footer" >
 					<ajax-action

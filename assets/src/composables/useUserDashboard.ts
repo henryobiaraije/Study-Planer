@@ -7,36 +7,31 @@ import {Store} from "../static/store";
 declare var bootstrap;
 
 export default function (status = 'publish') {
-  const ajax          = ref<_Ajax>({
+  const ajax            = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxSaveStudy = ref<_Ajax>({
+  const ajaxSaveStudy   = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  let sendOnline      = null;
-  let deckGroups      = ref<Array<_DeckGroup>>([]);
-  let studies         = ref<Array<_Study>>([]);
-  let studyToEdit     = ref<_Study>(null);
-  let studyToEdit2    = ref<_Study>({
-    deck             : null,
-    no_of_new        : 0,
-    study_all_new    : true,
-    tags             : [],
-    all_tags         : true,
-    no_to_revise     : null,
-    study_all_on_hold: true,
-    no_on_hold       : null,
-    revise_all       : true,
-    user             : null,
+  const ajaxLoadingCard = ref<_Ajax>({
+    sending       : false,
+    error         : false,
+    errorMessage  : '',
+    success       : false,
+    successMessage: '',
   });
+  let sendOnline        = null;
+  let deckGroups        = ref<Array<_DeckGroup>>([]);
+  let studies           = ref<Array<_Study>>([]);
+  let studyToEdit       = ref<_Study>(null);
 
   /**
    * Returns the study belonging to a deck or return a new study
@@ -63,10 +58,10 @@ export default function (status = 'publish') {
   }
 
   //
-  const load            = () => {
+  const load               = () => {
     return xhrLoad();
   }
-  const openStudyModal  = (deck: _Deck) => {
+  const openStudyModal     = (deck: _Deck) => {
     studyToEdit.value  = getStudyForDeck(deck);
     const modalElement = jQuery('#modal-new')[0];
     const myModal      = new bootstrap.Modal(modalElement);
@@ -78,17 +73,36 @@ export default function (status = 'publish') {
 
     });
   };
-  const closeStudyModal = () => {
-    const modalElement = jQuery('#modal-new')[0];
+  const closeStudyModal    = () => {
+    jQuery('#hide-modal-new').trigger('click');
+  };
+  const openQuestionModal  = () => {
+    const modalElement = jQuery('#modal-questions')[0];
+    const myModal      = new bootstrap.Modal(modalElement);
+    myModal.show();
+    modalElement.addEventListener('shown.bs.modal', function () {
+
+    });
+    modalElement.addEventListener('hidden.bs.modal', function () {
+
+    });
+  };
+  const closeQuestionModal = () => {
+    const modalElement = jQuery('#modal-questions')[0];
     const myModal      = new bootstrap.Modal(modalElement);
     myModal.hide();
   };
-  const startStudy      = () => {
-    xhrCreateStudy(studyToEdit.value);
+  const startStudy         = () => {
+    xhrCreateOrUpdateStudy(studyToEdit.value).then(() => {
+      closeStudyModal();
+      openQuestionModal();
+      xhrGetQuestion(studyToEdit.value);
+    });
   }
+
   //
 
-  const xhrLoad        = () => {
+  const xhrLoad                = () => {
     console.log('start loading');
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     return new Promise((resolve, reject) => {
@@ -123,7 +137,33 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrCreateStudy = (study: _Study) => {
+  const xhrGetQuestion         = (study: _Study) => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
+    return new Promise((resolve, reject) => {
+      sendOnline = new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            study: study
+          }
+        ],
+        what: "admin_sp_ajax_front_get_question",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          // studyToEdit.value = done.data;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
+  const xhrCreateOrUpdateStudy = (study: _Study) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -144,6 +184,7 @@ export default function (status = 'publish') {
         },
         funcFailue(done) {
           handleAjax.error(done);
+          reject();
         },
       });
     });
@@ -151,7 +192,7 @@ export default function (status = 'publish') {
 
 
   return {
-    ajax, ajaxSaveStudy,
+    ajax, ajaxSaveStudy, ajaxLoadingCard,
     deckGroups, studyToEdit, startStudy,
     load, openStudyModal, closeStudyModal,
   };

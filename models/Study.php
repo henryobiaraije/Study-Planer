@@ -9,6 +9,8 @@
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
 	use Illuminate\Database\Eloquent\SoftDeletes;
+	use PDOException;
+	use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Models\Tag;
 
@@ -16,6 +18,7 @@
 		protected $table = SP_TABLE_STUDY;
 
 		use SoftDeletes;
+		use HasRelationships;
 
 		protected $fillable = [
 			'user_id',
@@ -42,6 +45,23 @@
 
 		public function deck() {
 			return $this->belongsTo( Deck::class );
+		}
+
+//		public function cards() {
+//			return $this->hasMany( Card::class );
+//		}
+
+
+		public function cards() {
+			return $this->hasManyDeep( Card::class, [
+				Deck::class,
+				CardGroup::class,
+			] );
+//			] )->where( 'user_id', '=', $user_id );
+		}
+
+		public function cardsGroups() {
+
 		}
 
 		public static function get_user_studies( $args ) : array {
@@ -78,7 +98,32 @@
 		}
 
 		public static function get_user_study_by_id( $study_id ) {
-			return Study::with( 'tags', 'deck' )->find($study_id);
+			return Study::with( 'tags', 'deck' )->find( $study_id );
 		}
+
+		public static function get_user_cards( $study_id, $user_id ) {
+			$studies = Study::with( 'deck.CardGroups.cards' )
+				->where( 'id', '=', $study_id )
+				->where( 'user_id', '=', $user_id );
+
+
+			try {
+				$many = Study::with( 'deck.cards' )
+					->where( 'id', '=', $study_id )
+					->where( 'user_id', '=', $user_id );
+			} catch ( PDOException $e ) {
+				dd( $e );
+			}
+
+
+			Common::send_error( [
+				'ajax_front_create_study',
+				'$many'                  => $many->get()->first(),
+				'$studies'               => $studies,
+				'Manager::getQueryLog()' => Manager::getQueryLog(),
+				'study_id'               => $study_id,
+			] );
+		}
+
 
 	}

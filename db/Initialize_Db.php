@@ -4,6 +4,7 @@
 	namespace StudyPlanner\Db;
 
 
+	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Capsule\Manager as Capsule;
 	use Illuminate\Database\Eloquent\ModelNotFoundException;
 	use Illuminate\Database\Schema\Blueprint;
@@ -49,6 +50,10 @@
 			$capsule->bootEloquent();
 			$schema_builder       = $capsule->connection()->getSchemaBuilder();
 			$this->schema_builder = $schema_builder;
+
+			// todo remove after test
+			Manager::enableQueryLog();
+
 		}
 
 		private function define_prefixes() {
@@ -62,6 +67,7 @@
 			define( 'SP_TABLE_CARD_GROUPS', SP_DB_PREFIX . 'card_groups' );
 			define( 'SP_TABLE_CARDS', SP_DB_PREFIX . 'cards' );
 			define( 'SP_TABLE_STUDY', SP_DB_PREFIX . 'study' );
+			define( 'SP_TABLE_ANSWERED', SP_DB_PREFIX . 'answered' );
 		}
 
 		private function create_default_rows() {
@@ -196,6 +202,21 @@
 				} );
 			}
 
+			// Answered
+			if ( ! $this->schema_builder->hasTable( SP_TABLE_ANSWERED ) ) {
+				Capsule::schema()->create( SP_TABLE_ANSWERED, function ( Blueprint $table ) {
+					global $wpdb;
+					$table->id();
+					$table->foreignId( 'study_id' )->references( 'id' )->on( SP_TABLE_STUDY );
+					$table->foreignId( 'card_id' )->references( 'id' )->on( SP_TABLE_CARDS );
+//					$table->foreignId( 'user_id' )->references( 'ID' )->on( $wpdb->prefix . 'users' );
+					$table->text( 'answer' );
+					$table->string( 'grade' );
+					$table->dateTime( 'rejected_at' );
+					$table->softDeletes();
+					$table->timestamps();
+				} );
+			}
 		}
 
 
