@@ -43,12 +43,46 @@
 			add_action( 'admin_sp_ajax_front_get_deck_groups', array( $this, 'ajax_front_get_deck_groups' ) );
 			add_action( 'admin_sp_ajax_front_create_study', array( $this, 'ajax_front_create_study' ) );
 			add_action( 'admin_sp_ajax_front_get_question', array( $this, 'ajax_front_get_question' ) );
+			add_action( 'admin_sp_ajax_admin_get_timezones', array( $this, 'ajax_admin_get_timezones' ) );
+			add_action( 'admin_sp_ajax_admin_update_user_timezone', array( $this, 'ajax_admin_update_user_timezone' ) );
 		}
 
+
+		public function ajax_admin_update_user_timezone( $post ) : void {
+			Initializer::verify_post( $post, true );
+
+//			Common::send_error( [
+//				__METHOD__,
+//				'post' => $post,
+//			] );
+			$all = $post[Common::VAR_2];
+			$time_zone = sanitize_text_field( $all['timezone']);
+			$user_id       = get_current_user_id();
+			update_user_meta( $user_id, Settings::UM_USER_TIMEZONE, $time_zone );
+//			Common::send_error( [
+//				__METHOD__,
+//				'post' => $post,
+//				'$time_zone' => $time_zone,
+//			] );
+			Common::send_success( 'Timezone saved.');
+
+		}
+
+		public function ajax_admin_get_timezones( $post ) : void {
+			Initializer::verify_post( $post, true );
+			$user_id       = get_current_user_id();
+			$user_timezone = get_user_meta( $user_id, Settings::UM_USER_TIMEZONE, true );
+			Common::send_success( 'Timezones loaded.', [
+				'timezones'     => Common::get_time_zones(),
+				'user_timezone' => $user_timezone,
+			] );
+
+		}
 
 		// <editor-fold desc="Gap Cards">
 
 		/** @noinspection PhpUndefinedFieldInspection */
+
 		public function ajax_front_get_question( $post ) : void {
 //			Common::send_error( [
 //				'ajax_front_get_question',
@@ -79,7 +113,7 @@
 			$study_all_on_hold = $study->study_all_on_hold;
 			$user_id           = get_current_user_id();
 
-			$user_cards = Study::get_user_cards($study->id, $user_id);
+			$user_cards = Study::get_user_cards( $study->id, $user_id );
 
 
 			Common::send_error( [

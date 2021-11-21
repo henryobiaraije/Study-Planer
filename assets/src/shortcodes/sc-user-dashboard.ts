@@ -18,6 +18,7 @@ import "../admin/install-composition-api";
 import useUserDashboard from "../composables/useUserDashboard";
 import {_DeckGroup} from "../interfaces/inter-sp";
 import useTagSearch from "../composables/useTagSearch";
+import useTimezones from "../composables/useTimezones";
 
 
 declare var jQuery: any;
@@ -95,6 +96,9 @@ const mGeneral         = {
     const searchParams = new URLSearchParams(url.search);
     const menu         = searchParams.get(key);
     if (null !== menu && menu.length > 3) this.menu = menu;
+    if (menu === 'settings') {
+      dis(this).timezones.loadTimezones();
+    }
   },
   getNewAjax(): _Ajax {
     return {
@@ -117,6 +121,9 @@ const mMethods    = {
     this.menu = menu;
     console.log({menu})
     this.insertUrlParam('dashboard-page', menu);
+    if (menu === 'settings') {
+      dis(this).timezones.loadTimezones();
+    }
   },
   toggle(elemClass) {
     jQuery(elemClass).toggle();
@@ -423,10 +430,9 @@ function setup(props) {
   // const status       = searchParams.get('status');
   // console.log('in setup', {url, searchParams, status});
   return {
-    // decks     : useDecks(status),
     searchTags: useTagSearch(),
-    // deckGroups: useDeckGroupLists(),
-    userDash: useUserDashboard(),
+    userDash  : useUserDashboard(),
+    timezones : useTimezones(),
   };
 }
 

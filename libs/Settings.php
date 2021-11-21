@@ -29,7 +29,7 @@
 		public const PM_ENDPOINT_ENDPOINT = 'sbe_search_endpoint_endpoint';
 
 		// User meta
-
+		public const UM_USER_TIMEZONE = 'sp_user_timezone';
 		//
 		public static function um_variable_link( $link_id ) {
 			return "asl_variable_link_id_$link_id";
