@@ -80,6 +80,7 @@ export const vdata = {
     } as _Ajax,
   },
   //
+  menu           : 'deck-groups',
   debug          : false,
   page           : 1,
   languageIndex  : 1,
@@ -89,6 +90,11 @@ export const vdata = {
 
 const mGeneral         = {
   generalInit() {
+    const key          = 'dashboard-page';
+    const url          = new URL(window.location.href);
+    const searchParams = new URLSearchParams(url.search);
+    const menu         = searchParams.get(key);
+    if (null !== menu && menu.length > 3) this.menu = menu;
   },
   getNewAjax(): _Ajax {
     return {
@@ -107,16 +113,29 @@ const mComputedGeneral = {
 };
 
 const mMethods    = {
+  gotoMenu(menu) {
+    this.menu = menu;
+    console.log({menu})
+    this.insertUrlParam('dashboard-page', menu);
+  },
   toggle(elemClass) {
     jQuery(elemClass).toggle();
   },
-
+  insertUrlParam(key, value) {
+    if (history.pushState) {
+      let searchParams = new URLSearchParams(window.location.search);
+      searchParams.set(key, value);
+      let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + searchParams.toString();
+      window.history.pushState({path: newurl}, '', newurl);
+    }
+  },
 };
 const mComMethods = {
+
   deckGroupList() {
     return dis(this).userDash.deckGroups.value;
   },
-  studyToEdit(){
+  studyToEdit() {
     return dis(this).userDash.studyToEdit.value;
   },
 };
@@ -425,11 +444,11 @@ function dis(context): ReturnType<typeof setup> {
 
   function loadInstance1() {
     new Vue({
-      el        : elem,
-      data      : vdata,
-      methods   : vmethods,
+      el     : elem,
+      data   : vdata,
+      methods: vmethods,
       setup,
-      created   : function () {
+      created: function () {
         // console.clear();
         jQuery(elem).css("display", "block");
         this.initUnhide();
@@ -437,6 +456,7 @@ function dis(context): ReturnType<typeof setup> {
 
         console.log('Created');
       },
+      //@ts-ignore
       computed  : v_computed,
       components: {
         TimeComp,
