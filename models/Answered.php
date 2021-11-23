@@ -17,6 +17,8 @@
 
 		use SoftDeletes;
 
+		protected $dateFormat = 'Y-m-d H:i:s';
+
 		protected $fillable = [
 			'study_id',
 			'card_id',
@@ -28,8 +30,15 @@
 			'rejected_at',
 		];
 
+		protected $casts = [
+			'next_due_at' => 'datetime:Y-m-d H:i:s',
+			'rejected_at' => 'datetime:Y-m-d H:i:s',
+			'created_at'  => 'datetime:Y-m-d H:i:s',
+			'updated_at'  => 'datetime:Y-m-d H:i:s',
+		];
 
-		public static function get_(){
+
+		public static function get_() {
 
 		}
 

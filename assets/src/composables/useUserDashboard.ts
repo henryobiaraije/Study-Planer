@@ -81,7 +81,7 @@ export default function (status = 'publish') {
     xhrCreateOrUpdateStudy(studyToEdit.value).then(() => {
       closeStudyModal();
       openQuestionModal();
-      return xhrGetQuestion(studyToEdit.value);
+      return xhrGetTodayQuestionsInStudy(studyToEdit.value);
     }).then((res) => {
       _nextQuestion();
     });
@@ -95,7 +95,7 @@ export default function (status = 'publish') {
     }
   }
   const _getQuestions      = () => {
-    xhrGetQuestion(studyToEdit.value);
+    xhrGetTodayQuestionsInStudy(studyToEdit.value);
   }
   const getStudyForDeck    = (deck: _Deck) => {
     let study = studies.value.find((s: _Study) => deck.id === s.deck.id);
@@ -167,7 +167,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrGetQuestion         = (study: _Study) => {
+  const xhrGetTodayQuestionsInStudy         = (study: _Study) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -177,7 +177,7 @@ export default function (status = 'publish') {
             study: study
           }
         ],
-        what: "admin_sp_ajax_front_get_question",
+        what: "admin_sp_ajax_front_get_today_questions_in_study",
         funcBefore() {
           handleAjax.start();
         },

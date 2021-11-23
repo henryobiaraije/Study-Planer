@@ -140,13 +140,16 @@
 			}
 
 
-			$previous_answer = $this->second_to_last_answer;
-			$last_answer     = $this->last_answer;
+			$previous_answer       = $this->second_to_last_answer;
+			$last_answer           = $this->last_answer;
+			$new_date              = new DateTime( $next_due_date );
+			$next_due_date_morning = $new_date->setTime( 0, 0, 0 )->format( 'Y-m-d H:i:s' );
 
 			$debug_display = [
 				'previously_answered_at' => $previous_answer ? $previous_answer->created_at : '',
 				'last_answered_at'       => $last_answer->created_at,
 				'next_due_date'          => $next_due_date,
+				'next_due_date_morning'  => $next_due_date_morning,
 				'next_interval'          => $next_interval,
 				'last_button'            => $last_answer->grade,
 				'previous_button'        => $previous_answer->grade,
@@ -164,9 +167,10 @@
 			];
 
 			return [
-				'next_due_date' => $next_due_date,
-				'debug_display' => $debug_display,
-				'next_interval' => $next_interval,
+				'next_due_date'         => $next_due_date,
+				'next_due_date_morning' => $next_due_date_morning,
+				'debug_display'         => $debug_display,
+				'next_interval'         => $next_interval,
 			];
 
 //			Common::send_error( [

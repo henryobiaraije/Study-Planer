@@ -13,6 +13,7 @@
 	use PDOException;
 	use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 	use StudyPlanner\Libs\Common;
+	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Models\Tag;
 
 	class Study extends Model {
@@ -105,18 +106,23 @@
 		public static function get_user_cards( $study_id, $user_id ) {
 
 			try {
-				$study = Study::with( 'deck.cards', 'deck.cards.card_group' )
+				$date_today    = Common::getDateTime();
+				$user_timezone = get_option( Settings::UM_USER_TIMEZONE, null );
+				if(empty($user_timezone)){
+
+				}
+				$study         = Study::with( 'deck.cards', 'deck.cards.card_group' )
 					->where( 'id', '=', $study_id )
 					->where( 'user_id', '=', $user_id )->get()->firstOrFail();
-				$cards = $study->deck->cards;
+				$cards         = $study->deck->cards;
 
-//				Common::send_error( [
-//					'ajax_front_create_study',
-//					'$study'                 => $study,
-//					'$cards'                 => $cards,
-//					'Manager::getQueryLog()' => Manager::getQueryLog(),
-//					'study_id'               => $study_id,
-//				] );
+				Common::send_error( [
+					__METHOD__,
+					'$study'                 => $study,
+					'$cards'                 => $cards,
+					'Manager::getQueryLog()' => Manager::getQueryLog(),
+					'study_id'               => $study_id,
+				] );
 
 
 				return [

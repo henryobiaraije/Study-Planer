@@ -55,7 +55,7 @@
 		private function init_ajax() {
 			add_action( 'admin_sp_ajax_front_get_deck_groups', array( $this, 'ajax_front_get_deck_groups' ) );
 			add_action( 'admin_sp_ajax_front_create_study', array( $this, 'ajax_front_create_study' ) );
-			add_action( 'admin_sp_ajax_front_get_question', array( $this, 'ajax_front_get_question' ) );
+			add_action( 'admin_sp_ajax_front_get_today_questions_in_study', array( $this, 'ajax_front_get_today_questions_in_study' ) );
 			add_action( 'admin_sp_ajax_admin_get_timezones', array( $this, 'ajax_admin_get_timezones' ) );
 			add_action( 'admin_sp_ajax_admin_update_user_timezone', array( $this, 'ajax_admin_update_user_timezone' ) );
 			add_action( 'admin_sp_ajax_front_mark_answer', array( $this, 'ajax_front_mark_answer' ) );
@@ -124,7 +124,7 @@
 				] );
 
 				$next_due_date         = $next_due->get_next_due_date();
-				$answer->next_due_at = $next_due_date['next_due_date'];
+				$answer->next_due_at = $next_due_date['next_due_date_morning'];
 				$answer->next_interval = $next_due_date['next_interval'];
 				$answer->save();
 				Manager::commit();
@@ -155,7 +155,7 @@
 
 		}
 
-		public function ajax_front_get_question( $post ) : void {
+		public function ajax_front_get_today_questions_in_study( $post ) : void {
 //			Common::send_error( [
 //				'ajax_front_get_question',
 //				'post' => $post,
