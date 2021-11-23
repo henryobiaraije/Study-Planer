@@ -10,3 +10,10 @@
 		return __DIR__ . '/templates/' . $template . '.php';
 	}
 
+	function get_all_card_grades() {
+		$default = [ 'again', 'hard', 'good', 'easy' ];
+
+		return apply_filters( 'sp_all_card_grades', $default );
+	}
+
+

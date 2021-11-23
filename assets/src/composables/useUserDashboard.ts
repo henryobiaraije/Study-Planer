@@ -1,63 +1,47 @@
 import {_Ajax, HandleAjax} from "../classes/HandleAjax";
 import {InterFuncSuccess, Server} from "../static/server";
 import {ref, onMounted} from "@vue/composition-api";
-import {_Deck, _DeckGroup, _Study, _Tag} from "../interfaces/inter-sp";
+import {_Card, _Deck, _DeckGroup, _Study, _Tag} from "../interfaces/inter-sp";
 import {Store} from "../static/store";
 
 declare var bootstrap;
 
 export default function (status = 'publish') {
-  const ajax            = ref<_Ajax>({
+  const ajax               = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxSaveStudy   = ref<_Ajax>({
+  const ajaxSaveStudy      = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxLoadingCard = ref<_Ajax>({
+  const ajaxLoadingCard    = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  let sendOnline        = null;
-  let deckGroups        = ref<Array<_DeckGroup>>([]);
-  let studies           = ref<Array<_Study>>([]);
-  let studyToEdit       = ref<_Study>(null);
+  let sendOnline           = null;
+  let deckGroups           = ref<Array<_DeckGroup>>([]);
+  let studies              = ref<Array<_Study>>([]);
+  let studyToEdit          = ref<_Study>(null);
+  let allQuestions         = ref<Array<_Card>>([]);
+  let currentQuestionIndex = ref<number>(-1);
+  let currentQuestion      = ref<_Card>(null);
+  let showCurrentAnswer    = ref<boolean>(false);
+  let showGrade            = ref<boolean>(false);
 
   /**
    * Returns the study belonging to a deck or return a new study
    * @param deck
    */
-  const getStudyForDeck = (deck: _Deck) => {
-    let study = studies.value.find((s: _Study) => deck.id === s.deck.id);
-    if (undefined === study) {
-      study = {
-        deck             : deck,
-        tags             : [],
-        all_tags         : true,
-        no_of_new        : '' as any as number,
-        no_on_hold       : '' as any as number,
-        no_to_revise     : '' as any as number,
-        revise_all       : true,
-        study_all_new    : true,
-        study_all_on_hold: true,
-        user             : null,
-      };
-    }
-    console.log({study});
-    return study;
-  }
-
-  //
   const load               = () => {
     return xhrLoad();
   }
@@ -96,8 +80,53 @@ export default function (status = 'publish') {
     xhrCreateOrUpdateStudy(studyToEdit.value).then(() => {
       closeStudyModal();
       openQuestionModal();
-      xhrGetQuestion(studyToEdit.value);
+      return xhrGetQuestion(studyToEdit.value);
+    }).then((res) => {
+      _nextQuestion();
     });
+  }
+  const _nextQuestion      = () => {
+    currentQuestionIndex.value++;
+    if (currentQuestionIndex.value < (allQuestions.value.length)) {
+      if (allQuestions.value.length > 0) {
+        currentQuestion.value = allQuestions.value[currentQuestionIndex.value];
+      }
+    }
+  }
+  const _getQuestions      = () => {
+    xhrGetQuestion(studyToEdit.value);
+  }
+  const getStudyForDeck    = (deck: _Deck) => {
+    let study = studies.value.find((s: _Study) => deck.id === s.deck.id);
+    if (undefined === study) {
+      study = {
+        deck             : deck,
+        tags             : [],
+        all_tags         : true,
+        no_of_new        : '' as any as number,
+        no_on_hold       : '' as any as number,
+        no_to_revise     : '' as any as number,
+        revise_all       : true,
+        study_all_new    : true,
+        study_all_on_hold: true,
+        user             : null,
+      };
+    }
+    console.log({study});
+    return study;
+  }
+  const _showAnswer        = () => {
+    showCurrentAnswer.value = true;
+    showGrade.value         = true;
+    // console.log('show curr', showCurrentAnswer.value, showGrade.value);
+  }
+  const _markAnswer        = (grade: string) => {
+    xhrMarkAnswer(studyToEdit.value, currentQuestion.value, grade,currentQuestion.value.answer);
+    setTimeout(() => {
+      // showCurrentAnswer.value = false;
+      // showGrade.value         = false;
+      // _nextQuestion();
+    }, 200);
   }
 
   //
@@ -153,6 +182,8 @@ export default function (status = 'publish') {
         },
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
+          console.log(done);
+          allQuestions.value = done.data.user_cards.cards;
           // studyToEdit.value = done.data;
           resolve(0);
         },
@@ -189,12 +220,44 @@ export default function (status = 'publish') {
       });
     });
   };
+  const xhrMarkAnswer          = (study: _Study, card: _Card, grade: string,answer:string) => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
+    return new Promise((resolve, reject) => {
+      sendOnline = new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            study_id: study.id,
+            grade,
+            card_id : card.id,
+            answer
+          }
+        ],
+        what: "admin_sp_ajax_front_mark_answer",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          // studyToEdit.value = done.data;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
 
 
   return {
     ajax, ajaxSaveStudy, ajaxLoadingCard,
-    deckGroups, studyToEdit, startStudy,
-    load, openStudyModal, closeStudyModal,
+    deckGroups, studyToEdit, startStudy, _getQuestions,
+    load, openStudyModal, closeStudyModal, allQuestions,
+    currentQuestion,
+    showCurrentAnswer, showGrade,
+    _showAnswer, _markAnswer,
   };
 
 }

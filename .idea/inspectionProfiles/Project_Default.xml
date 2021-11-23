@@ -4,7 +4,7 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="19">
+          <list size="20">
             <item index="0" class="java.lang.String" itemvalue="v-model" />
             <item index="1" class="java.lang.String" itemvalue="@submit.prevent" />
             <item index="2" class="java.lang.String" itemvalue="@input" />
@@ -24,6 +24,7 @@
             <item index="16" class="java.lang.String" itemvalue="@click" />
             <item index="17" class="java.lang.String" itemvalue="v-model.number" />
             <item index="18" class="java.lang.String" itemvalue=":value" />
+            <item index="19" class="java.lang.String" itemvalue="v-show" />
           </list>
         </value>
       </option>

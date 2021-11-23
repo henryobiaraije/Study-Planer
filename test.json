@@ -1,0 +1,154 @@
+{
+  "data": [
+    {
+      "timestamp_added": "2021-11-20T05:14:54.000000Z",
+      "status": {
+        "timestamp": "2021-11-22T20:20:13.889000Z",
+        "online": "online",
+        "listen_addrs": [
+          "/ip4/24.107.4.95/tcp/44159"
+        ],
+        "height": 1107770
+      },
+      "reward_scale": null,
+      "payer": "14h2zf1gEr9NmvDb2U53qucLN2jLrKU1ECBoxGnSnQ6tiT6V2kM",
+      "owner": "14JUF551GoLwMs7FPrM4VDHdwbWtua8B5ZJaG1GP9X6Zsgbtdab",
+      "nonce": 0,
+      "name": "bright-bamboo-sparrow",
+      "mode": "full",
+      "location_hex": null,
+      "location": null,
+      "last_poc_challenge": null,
+      "last_change_block": 1104711,
+      "geocode": {
+        "short_street": null,
+        "short_state": null,
+        "short_country": null,
+        "short_city": null,
+        "long_street": null,
+        "long_state": null,
+        "long_country": null,
+        "long_city": null,
+        "city_id": null
+      },
+      "gain": 12,
+      "elevation": 0,
+      "block_added": 1104711,
+      "block": 1107902,
+      "address": "112G1onBfPeh6vvetnpAc4sMAc2Q2wicdCjAnuWDG54b3UTxb5VJ"
+    },
+    {
+      "timestamp_added": "2021-10-31T15:59:54.000000Z",
+      "status": {
+        "timestamp": "2021-11-22T16:21:43.124000Z",
+        "online": "online",
+        "listen_addrs": [
+          "/ip4/24.107.4.95/tcp/49870"
+        ],
+        "height": 1107528
+      },
+      "reward_scale": null,
+      "payer": "14h2zf1gEr9NmvDb2U53qucLN2jLrKU1ECBoxGnSnQ6tiT6V2kM",
+      "owner": "14JUF551GoLwMs7FPrM4VDHdwbWtua8B5ZJaG1GP9X6Zsgbtdab",
+      "nonce": 0,
+      "name": "expert-mandarin-loris",
+      "mode": "full",
+      "location_hex": null,
+      "location": null,
+      "last_poc_challenge": null,
+      "last_change_block": 1078465,
+      "geocode": {
+        "short_street": null,
+        "short_state": null,
+        "short_country": null,
+        "short_city": null,
+        "long_street": null,
+        "long_state": null,
+        "long_country": null,
+        "long_city": null,
+        "city_id": null
+      },
+      "gain": 12,
+      "elevation": 0,
+      "block_added": 1078465,
+      "block": 1107902,
+      "address": "11xXCBkYSR56eW1oaRN1urhho7G7XZnvfTniptcKWULGDPwCPWU"
+    },
+    {
+      "timestamp_added": "2021-10-29T22:55:03.000000Z",
+      "status": {
+        "timestamp": "2021-11-22T12:56:06.958000Z",
+        "online": "online",
+        "listen_addrs": [
+          "/ip4/24.107.4.95/tcp/12582"
+        ],
+        "height": 1107350
+      },
+      "reward_scale": null,
+      "payer": "14h2zf1gEr9NmvDb2U53qucLN2jLrKU1ECBoxGnSnQ6tiT6V2kM",
+      "owner": "14JUF551GoLwMs7FPrM4VDHdwbWtua8B5ZJaG1GP9X6Zsgbtdab",
+      "nonce": 0,
+      "name": "tall-chartreuse-mockingbird",
+      "mode": "full",
+      "location_hex": null,
+      "location": null,
+      "last_poc_challenge": null,
+      "last_change_block": 1076015,
+      "geocode": {
+        "short_street": null,
+        "short_state": null,
+        "short_country": null,
+        "short_city": null,
+        "long_street": null,
+        "long_state": null,
+        "long_country": null,
+        "long_city": null,
+        "city_id": null
+      },
+      "gain": 12,
+      "elevation": 0,
+      "block_added": 1076015,
+      "block": 1107902,
+      "address": "11xpFDS3ohr2V59xGhydVgxiqNYC27KpRRd43YmQiC3v4P91Abo"
+    },
+    {
+      "lng": -90.35021349192718,
+      "lat": 38.800406573819785,
+      "timestamp_added": "2021-10-29T21:46:34.000000Z",
+      "status": {
+        "timestamp": "2021-11-22T12:14:31.450000Z",
+        "online": "online",
+        "listen_addrs": [
+          "/ip4/97.85.155.61/tcp/44159"
+        ],
+        "height": 1107315
+      },
+      "reward_scale": 1.0,
+      "payer": "14h2zf1gEr9NmvDb2U53qucLN2jLrKU1ECBoxGnSnQ6tiT6V2kM",
+      "owner": "14JUF551GoLwMs7FPrM4VDHdwbWtua8B5ZJaG1GP9X6Zsgbtdab",
+      "nonce": 2,
+      "name": "sticky-fuzzy-rhino",
+      "mode": "full",
+      "location_hex": "882646370bfffff",
+      "location": "8c2646370b997ff",
+      "last_poc_challenge": 1107580,
+      "last_change_block": 1107623,
+      "geocode": {
+        "short_street": "Thompson Dr",
+        "short_state": "MO",
+        "short_country": "US",
+        "short_city": "Florissant",
+        "long_street": "Thompson Drive",
+        "long_state": "Missouri",
+        "long_country": "United States",
+        "long_city": "Florissant",
+        "city_id": "Zmxvcmlzc2FudG1pc3NvdXJpdW5pdGVkIHN0YXRlcw"
+      },
+      "gain": 58,
+      "elevation": 6,
+      "block_added": 1075950,
+      "block": 1107902,
+      "address": "112iq1hYzXq3sjdx4Sv9yhZe6CBKtK112ja7rfD9ehPRip4m7th1"
+    }
+  ]
+}

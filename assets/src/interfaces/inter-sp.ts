@@ -32,6 +32,7 @@ interface _TimeStamps {
 }
 
 export interface _Study {
+  id?: number,
   deck: _Deck,
   user: any,
   tags: Array<_Tag>,

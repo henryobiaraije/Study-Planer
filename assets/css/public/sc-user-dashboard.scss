@@ -4,9 +4,28 @@
 @import "../admin-default";
 @import "../../_extra/bootstrap5_custom";
 .sp-sc-ud {
-
+  .sp-question {
+    .sp-gap-question {
+      strong {
+        cursor: pointer;
+        &:hover {
+          color: var(--sp-color-accent);
+        }
+      }
+    }
+  }
+  button.sp-action-button {
+    background: #fff;
+    color: black;
+    border: 2px solid #9d9d9d;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    &:hover {
+      background: #eee;
+    }
+  }
 }
 #wpcontent {
   background: #f0f0f0;
 }
-

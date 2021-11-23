@@ -82,6 +82,7 @@ export const vdata = {
   },
   //
   menu           : 'deck-groups',
+  showExtra      : 0,
   debug          : false,
   page           : 1,
   languageIndex  : 1,
@@ -108,6 +109,9 @@ const mGeneral         = {
       success       : false,
       successMessage: '',
     };
+  },
+  incrShowExtra() {
+    this.showExtra++;
   },
 };
 const mComputedGeneral = {
@@ -138,7 +142,9 @@ const mMethods    = {
   },
 };
 const mComMethods = {
-
+  currentQuestion() {
+    return dis(this).userDash.currentQuestion.value;
+  },
   deckGroupList() {
     return dis(this).userDash.deckGroups.value;
   },

@@ -6,6 +6,7 @@
 
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
+	use Model\Answered;
 	use Model\Card;
 	use Model\CardGroup;
 	use Model\CardGroups;
@@ -18,6 +19,7 @@
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Models\Tag;
+	use function StudyPlanner\get_all_card_grades;
 
 	class AjaxFrontHelper {
 		/**
@@ -45,43 +47,64 @@
 			add_action( 'admin_sp_ajax_front_get_question', array( $this, 'ajax_front_get_question' ) );
 			add_action( 'admin_sp_ajax_admin_get_timezones', array( $this, 'ajax_admin_get_timezones' ) );
 			add_action( 'admin_sp_ajax_admin_update_user_timezone', array( $this, 'ajax_admin_update_user_timezone' ) );
+			add_action( 'admin_sp_ajax_front_mark_answer', array( $this, 'ajax_front_mark_answer' ) );
 		}
 
 
-		public function ajax_admin_update_user_timezone( $post ) : void {
-			Initializer::verify_post( $post, true );
-
-//			Common::send_error( [
-//				__METHOD__,
-//				'post' => $post,
-//			] );
-			$all = $post[Common::VAR_2];
-			$time_zone = sanitize_text_field( $all['timezone']);
-			$user_id       = get_current_user_id();
-			update_user_meta( $user_id, Settings::UM_USER_TIMEZONE, $time_zone );
-//			Common::send_error( [
-//				__METHOD__,
-//				'post' => $post,
-//				'$time_zone' => $time_zone,
-//			] );
-			Common::send_success( 'Timezone saved.');
-
-		}
-
-		public function ajax_admin_get_timezones( $post ) : void {
-			Initializer::verify_post( $post, true );
-			$user_id       = get_current_user_id();
-			$user_timezone = get_user_meta( $user_id, Settings::UM_USER_TIMEZONE, true );
-			Common::send_success( 'Timezones loaded.', [
-				'timezones'     => Common::get_time_zones(),
-				'user_timezone' => $user_timezone,
-			] );
-
-		}
 
 		// <editor-fold desc="Gap Cards">
 
 		/** @noinspection PhpUndefinedFieldInspection */
+
+		public function ajax_front_mark_answer( $post ) : void {
+			Initializer::verify_post( $post );
+//			Common::send_error( [
+//				__METHOD__,
+//				'post' => $post,
+//			] );
+
+			$all        = $post[ Common::VAR_2 ];
+			$study_id   = (int) sanitize_text_field( $all['study_id'] );
+			$card_id    = (int) sanitize_text_field( $all['card_id'] );
+			$answer     = $all['answer'];
+			$grade      = sanitize_text_field( $all['grade'] );
+			$all_grades = get_all_card_grades();
+
+			$study = Study::find( $study_id );
+			if ( empty( $study ) ) {
+				Common::send_error( 'Invalid study plan' );
+			}
+			$card = Card::find( $card_id );
+			if ( empty( $card ) ) {
+				Common::send_error( 'Invalid card.' );
+			}
+
+			if ( ! in_array( $grade, $all_grades ) ) {
+				Common::send_error( 'Invalid grade.' );
+			}
+
+			Answered::create( [
+				'study_id' => $study_id,
+				'card_id'  => $card_id,
+				'answer'   => $answer,
+				'grade'    => $grade,
+			] );
+
+			Common::send_error( [
+				'ajax_front_get_question',
+				'post'        => $post,
+				'$study_id'   => $study_id,
+				'$study'      => $study,
+				'$grade'      => $grade,
+				'$card'       => $card,
+				'$all_grades' => $all_grades,
+				'$answer' => $answer,
+			] );
+
+
+			Common::send_success( 'Saved.' );
+
+		}
 
 		public function ajax_front_get_question( $post ) : void {
 //			Common::send_error( [
@@ -116,84 +139,27 @@
 			$user_cards = Study::get_user_cards( $study->id, $user_id );
 
 
-			Common::send_error( [
-				'ajax_front_create_study',
-				'post'                   => $post,
-				'$user_cards'            => $user_cards->get(),
-				'Manager::getQueryLog()' => Manager::getQueryLog(),
-				'$study_id'              => $study_id,
-				'$study'                 => $study,
-				'$tags'                  => $tags,
-				'$no_of_new'             => $no_of_new,
-				'$no_on_hold'            => $no_on_hold,
-				'$no_to_revise'          => $no_to_revise,
-				'$revise_all'            => $revise_all,
-				'$study_all_new'         => $study_all_new,
-				'$study_all_on_hold'     => $study_all_on_hold,
-				'$user_id'               => $user_id,
+//			Common::send_error( [
+//				'ajax_front_create_study',
+//				'post'                   => $post,
+//				'$user_cards'            => $user_cards->get(),
+//				'Manager::getQueryLog()' => Manager::getQueryLog(),
+//				'$study_id'              => $study_id,
+//				'$study'                 => $study,
+//				'$tags'                  => $tags,
+//				'$no_of_new'             => $no_of_new,
+//				'$no_on_hold'            => $no_on_hold,
+//				'$no_to_revise'          => $no_to_revise,
+//				'$revise_all'            => $revise_all,
+//				'$study_all_new'         => $study_all_new,
+//				'$study_all_on_hold'     => $study_all_on_hold,
+//				'$user_id'               => $user_id,
+//			] );
+
+
+			Common::send_success( 'Cards loaded.', [
+				'user_cards' => $user_cards,
 			] );
-
-			Manager::beginTransaction();
-
-
-//			Common::send_error( [
-//				'ajax_front_create_study',
-//				'post'               => $post,
-//				'$study_id'          => $study_id,
-//				'$study'             => $study,
-//				'$deck_id'           => $deck_id,
-//				'$tags'              => $tags,
-//				'$no_of_new'         => $no_of_new,
-//				'$no_on_hold'        => $no_on_hold,
-//				'$no_to_revise'      => $no_to_revise,
-//				'$revise_all'        => $revise_all,
-//				'$study_all_new'     => $study_all_new,
-//				'$study_all_on_hold' => $study_all_on_hold,
-//			] );
-
-			if ( empty( $study ) ) {
-				$study = new Study();
-			}
-			$study->no_to_revise      = $no_to_revise;
-			$study->no_of_new         = $no_of_new;
-			$study->no_on_hold        = $no_on_hold;
-			$study->revise_all        = $revise_all;
-			$study->study_all_new     = $study_all_new;
-			$study->study_all_on_hold = $study_all_on_hold;
-			$study->user_id           = $user_id;
-			$study->deck_id           = $deck_id;
-			$study->all_tags          = $all_tags;
-
-			$study->save();
-
-			$study->tags()->detach();
-			foreach ( $tags as $one ) {
-				$tag = Tag::find( $one['id'] );
-				$study->tags()->save( $tag );
-			}
-
-			Manager::commit();
-			$new_study = Study::get_user_study_by_id( $study->id );
-//			$new_study = Study::with( 'tags', 'deck' )->find( $study->id );;
-
-
-//			Common::send_error( [
-//				'ajax_front_create_study',
-//				'post'               => $post,
-//				'$study_id'          => $study_id,
-//				'$new_study'         => $new_study,
-//				'$study'             => $study,
-//				'$deck_id'           => $deck_id,
-//				'$tags'              => $tags,
-//				'$no_of_new'         => $no_of_new,
-//				'$no_on_hold'        => $no_on_hold,
-//				'$no_to_revise'      => $no_to_revise,
-//				'$revise_all'        => $revise_all,
-//				'$study_all_new'     => $study_all_new,
-//				'$study_all_on_hold' => $study_all_on_hold,
-//			] );
-
-			Common::send_success( 'Saved.', $new_study );
 
 		}
 
@@ -345,6 +311,39 @@
 		}
 
 		// </editor-fold desc="Gap Cards">
+
+		// <editor-fold desc="Others">
+		public function ajax_admin_update_user_timezone( $post ) : void {
+			Initializer::verify_post( $post, true );
+
+//			Common::send_error( [
+//				__METHOD__,
+//				'post' => $post,
+//			] );
+			$all       = $post[ Common::VAR_2 ];
+			$time_zone = sanitize_text_field( $all['timezone'] );
+			$user_id   = get_current_user_id();
+			update_user_meta( $user_id, Settings::UM_USER_TIMEZONE, $time_zone );
+//			Common::send_error( [
+//				__METHOD__,
+//				'post' => $post,
+//				'$time_zone' => $time_zone,
+//			] );
+			Common::send_success( 'Timezone saved.' );
+
+		}
+
+		public function ajax_admin_get_timezones( $post ) : void {
+			Initializer::verify_post( $post, true );
+			$user_id       = get_current_user_id();
+			$user_timezone = get_user_meta( $user_id, Settings::UM_USER_TIMEZONE, true );
+			Common::send_success( 'Timezones loaded.', [
+				'timezones'     => Common::get_time_zones(),
+				'user_timezone' => $user_timezone,
+			] );
+
+		}
+		// </editor-fold desc="Others">
 
 
 	}

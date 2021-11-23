@@ -105,22 +105,29 @@
 		public static function get_user_cards( $study_id, $user_id ) {
 
 			try {
-				$study = Study::with( 'deck.cards' )
+				$study = Study::with( 'deck.cards', 'deck.cards.card_group' )
 					->where( 'id', '=', $study_id )
 					->where( 'user_id', '=', $user_id )->get()->firstOrFail();
 				$cards = $study->deck->cards;
 
-				Common::send_error( [
-					'ajax_front_create_study',
-					'$study'                 => $study,
-					'$cards'                 => $cards,
-					'Manager::getQueryLog()' => Manager::getQueryLog(),
-					'study_id'               => $study_id,
-				] );
+//				Common::send_error( [
+//					'ajax_front_create_study',
+//					'$study'                 => $study,
+//					'$cards'                 => $cards,
+//					'Manager::getQueryLog()' => Manager::getQueryLog(),
+//					'study_id'               => $study_id,
+//				] );
 
+
+				return [
+					'cards' => $cards,
+				];
 
 			} catch ( ItemNotFoundException $e ) {
 				//todo handle later
+				return [
+					'cards' => [],
+				];
 			}
 
 
