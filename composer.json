@@ -25,7 +25,8 @@
       "libs\\",
       "helpers\\",
       "db\\",
-      "shortcodes\\"
+      "shortcodes\\",
+      "services\\"
     ]
   },
   "require": {

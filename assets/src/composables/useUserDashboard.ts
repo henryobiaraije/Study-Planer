@@ -1,42 +1,43 @@
 import {_Ajax, HandleAjax} from "../classes/HandleAjax";
 import {InterFuncSuccess, Server} from "../static/server";
-import {ref, onMounted} from "@vue/composition-api";
+import {ref, onMounted, computed} from "@vue/composition-api";
 import {_Card, _Deck, _DeckGroup, _Study, _Tag} from "../interfaces/inter-sp";
 import {Store} from "../static/store";
 
 declare var bootstrap;
 
 export default function (status = 'publish') {
-  const ajax               = ref<_Ajax>({
+  const ajax                = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxSaveStudy      = ref<_Ajax>({
+  const ajaxSaveStudy       = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxLoadingCard    = ref<_Ajax>({
+  const ajaxLoadingCard     = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  let sendOnline           = null;
-  let deckGroups           = ref<Array<_DeckGroup>>([]);
-  let studies              = ref<Array<_Study>>([]);
-  let studyToEdit          = ref<_Study>(null);
-  let allQuestions         = ref<Array<_Card>>([]);
-  let currentQuestionIndex = ref<number>(-1);
-  let currentQuestion      = ref<_Card>(null);
-  let showCurrentAnswer    = ref<boolean>(false);
-  let showGrade            = ref<boolean>(false);
+  let sendOnline            = null;
+  let deckGroups            = ref<Array<_DeckGroup>>([]);
+  let studies               = ref<Array<_Study>>([]);
+  let studyToEdit           = ref<_Study>(null);
+  let allQuestions          = ref<Array<_Card>>([]);
+  let currentQuestionIndex  = ref<number>(-1);
+  let currentQuestion       = ref<_Card>(null);
+  let showCurrentAnswer     = ref<boolean>(false);
+  let showGrade             = ref<boolean>(false);
+  let lastAnsweredDebugData = ref<Array<{ [key: string]: string }>>(null);
 
   /**
    * Returns the study belonging to a deck or return a new study
@@ -121,11 +122,11 @@ export default function (status = 'publish') {
     // console.log('show curr', showCurrentAnswer.value, showGrade.value);
   }
   const _markAnswer        = (grade: string) => {
-    xhrMarkAnswer(studyToEdit.value, currentQuestion.value, grade,currentQuestion.value.answer);
+    xhrMarkAnswer(studyToEdit.value, currentQuestion.value, grade, currentQuestion.value.answer);
     setTimeout(() => {
-      // showCurrentAnswer.value = false;
-      // showGrade.value         = false;
-      // _nextQuestion();
+      showCurrentAnswer.value = false;
+      showGrade.value         = false;
+      _nextQuestion();
     }, 200);
   }
 
@@ -220,7 +221,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrMarkAnswer          = (study: _Study, card: _Card, grade: string,answer:string) => {
+  const xhrMarkAnswer          = (study: _Study, card: _Card, grade: string, answer: string) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -239,6 +240,11 @@ export default function (status = 'publish') {
         },
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
+          lastAnsweredDebugData.value = done.data.debug_display;
+          const nextInterval: number  = done.data.next_interval;
+          if (1 > nextInterval) {
+            allQuestions.value.push(card);
+          }
           // studyToEdit.value = done.data;
           resolve(0);
         },
@@ -250,14 +256,17 @@ export default function (status = 'publish') {
     });
   };
 
+  const answeredCount = computed<string>(() => {
+    return `${currentQuestionIndex.value + 1} / ${allQuestions.value.length} `;
+  })
 
   return {
     ajax, ajaxSaveStudy, ajaxLoadingCard,
     deckGroups, studyToEdit, startStudy, _getQuestions,
     load, openStudyModal, closeStudyModal, allQuestions,
-    currentQuestion,
+    currentQuestion, answeredCount,
     showCurrentAnswer, showGrade,
-    _showAnswer, _markAnswer,
+    _showAnswer, _markAnswer, lastAnsweredDebugData,
   };
 
 }

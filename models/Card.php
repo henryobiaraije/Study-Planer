@@ -28,6 +28,10 @@
 			'y_position',
 		];
 
+		public function answered() {
+			return $this->hasMany( Answered::class );
+		}
+
 		public function card_group() {
 			return $this->belongsTo( CardGroup::class );
 		}

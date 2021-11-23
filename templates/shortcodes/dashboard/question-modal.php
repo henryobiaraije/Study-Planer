@@ -10,7 +10,9 @@
 	<div class="modal-dialog" style="max-width: 95%;" >
 		<form v-if="null !== studyToEdit" @submit.prevent="userDash.startStudy" class="modal-content" >
 			<div class="modal-header" >
-				<h5 @click.prevent="incrShowExtra" class="modal-title" id="exampleModalEdit" >Study ({{studyToEdit.deck.name}})</h5 >
+				<h5 class="modal-title" id="exampleModalEdit" >
+					<span @click.prevent="incrShowExtra" >Study</span >
+					({{studyToEdit.deck.name}}) | {{userDash.answeredCount.value}}</h5 >
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button >
 			</div >
 			<div class="modal-body" >
@@ -33,19 +35,19 @@
 				</div >
 				<div v-if="userDash.showGrade.value" class="show-grade flex justify-center" >
 					<div class="one-grade flex-initial px-2 mx-2" >
-						<span class="grade-time block text-center" ><1m</span >
+						<span class="grade-time block text-center" ></span >
 						<button @click="userDash._markAnswer('again')" class="sp-action-button" type="button" >Again</button >
 					</div >
 					<div class="one-grade flex-initial mx-2" >
-						<span class="grade-time block text-center" ><6m</span >
+						<span class="grade-time block text-center" ></span >
 						<button @click="userDash._markAnswer('hard')" type="button" class="sp-action-button" >Hard</button >
 					</div >
 					<div class="one-grade flex-initial mx-2" >
-						<span class="grade-time block text-center" ><10m</span >
+						<span class="grade-time block text-center" ></span >
 						<button @click="userDash._markAnswer('good')" type="button" class="sp-action-button" >Good</button >
 					</div >
 					<div class="one-grade flex-initial mx-2" >
-						<span class="grade-time block text-center" >4d</span >
+						<span class="grade-time block text-center" ></span >
 						<button @click="userDash._markAnswer('easy')" type="button" class="sp-action-button" >Easy</button >
 					</div >
 				</div >
@@ -59,6 +61,17 @@
 					</ajax-action-not-form >
 				</div >
 			</div >
+			<?php /** Debug Section */ ?>
+			<section v-if="showExtra && null !== userDash.lastAnsweredDebugData.value" class="debug-section p-2" >
+				<table class="table shadow rounded" >
+					<tbody >
+					<tr v-for="(value,key) in userDash.lastAnsweredDebugData.value" >
+						<td >{{key}}</td >
+						<td >{{value}}</td >
+					</tr >
+					</tbody >
+				</table >
+			</section >
 		</form >
 	</div >
 </div >

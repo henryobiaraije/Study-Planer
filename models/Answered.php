@@ -22,6 +22,9 @@
 			'card_id',
 			'answer',
 			'grade',
+			'ease_factor',
+			'next_interval',
+			'next_due_at',
 			'rejected_at',
 		];
 

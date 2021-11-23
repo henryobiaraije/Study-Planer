@@ -212,6 +212,9 @@
 //					$table->foreignId( 'user_id' )->references( 'ID' )->on( $wpdb->prefix . 'users' );
 					$table->text( 'answer' );
 					$table->string( 'grade' );
+					$table->integer( 'ease_factor' );
+					$table->dateTime( 'next_due_at' );
+					$table->integer( 'next_interval' );
 					$table->dateTime( 'rejected_at' );
 					$table->softDeletes();
 					$table->timestamps();

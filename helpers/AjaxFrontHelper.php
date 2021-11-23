@@ -1,8 +1,13 @@
 <?php
-
+	/**
+	 * Front end ajax helper file
+	 */
 
 	namespace StudyPlanner\Helpers;
 
+	if ( ! defined( 'ABSPATH' ) ) {
+		exit;
+	}
 
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
@@ -19,8 +24,14 @@
 	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
 	use StudyPlanner\Models\Tag;
+	use StudyPlanner\Services\Card_Due_Date_Service;
 	use function StudyPlanner\get_all_card_grades;
 
+	/**
+	 * Class AjaxFrontHelper
+	 *
+	 * @package StudyPlanner\Helpers
+	 */
 	class AjaxFrontHelper {
 		/**
 		 * @var self $instance
@@ -51,10 +62,8 @@
 		}
 
 
-
 		// <editor-fold desc="Gap Cards">
 
-		/** @noinspection PhpUndefinedFieldInspection */
 
 		public function ajax_front_mark_answer( $post ) : void {
 			Initializer::verify_post( $post );
@@ -83,26 +92,66 @@
 				Common::send_error( 'Invalid grade.' );
 			}
 
-			Answered::create( [
-				'study_id' => $study_id,
-				'card_id'  => $card_id,
-				'answer'   => $answer,
-				'grade'    => $grade,
+			Manager::beginTransaction();
+
+			$answer = Answered::create( [
+				'study_id'    => $study_id,
+				'card_id'     => $card_id,
+				'answer'      => $answer,
+				'grade'       => $grade,
+//				'next_due_at' => Common::getDateTime( - 7 ),
 			] );
+//			$answer = Answered::create( [
+//				'study_id'    => $study_id,
+//				'card_id'     => $card_id,
+//				'answer'      => $answer,
+//				'grade'       => $grade,
+//				'next_due_at' => Common::getDateTime( - 4 ),
+//			] );
+//			$answer = Answered::create( [
+//				'study_id'    => $study_id,
+//				'card_id'     => $card_id,
+//				'answer'      => $answer,
+//				'grade'       => $grade,
+//				'next_due_at' => Common::getDateTime(-1),
+//			] );
 
-			Common::send_error( [
-				'ajax_front_get_question',
-				'post'        => $post,
-				'$study_id'   => $study_id,
-				'$study'      => $study,
-				'$grade'      => $grade,
-				'$card'       => $card,
-				'$all_grades' => $all_grades,
-				'$answer' => $answer,
-			] );
+
+			try {
+				$next_due = new Card_Due_Date_Service( [
+					'card_id'  => $card_id,
+					'study_id' => $study_id,
+				] );
+
+				$next_due_date         = $next_due->get_next_due_date();
+				$answer->next_due_at = $next_due_date['next_due_date'];
+				$answer->next_interval = $next_due_date['next_interval'];
+				$answer->save();
+				Manager::commit();
+
+//				Common::send_error( [
+//					'ajax_front_get_question',
+//					'post'           => $post,
+//					'$study_id'      => $study_id,
+//					'$study'         => $study,
+//					'$grade'         => $grade,
+//					'$card'          => $card,
+//					'$all_grades'    => $all_grades,
+//					'$answer'        => $answer,
+//					'$next_due_date' => $next_due_date,
+//				] );
+				Common::send_success( 'Answered.', [
+					'debug_display' => $next_due_date['debug_display'],
+					'next_interval' => $next_due_date['next_interval'],
+				] );
+			} catch ( \Exception $e ) {
+				Common::send_error( 'Error: ' . $e->getMessage() );
+			}
 
 
-			Common::send_success( 'Saved.' );
+
+
+
 
 		}
 
