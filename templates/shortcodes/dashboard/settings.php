@@ -14,7 +14,7 @@
 			</select >
 		</label >
 		<ajax-action
-				button-text="Study"
+				button-text="Save"
 				css-classes="button"
 				icon="fa fa-save"
 				:ajax="timezones.ajax" >

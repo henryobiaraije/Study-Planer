@@ -132,7 +132,7 @@ export default function (status = 'publish') {
 
   //
 
-  const xhrLoad                = () => {
+  const xhrLoad                     = () => {
     console.log('start loading');
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     return new Promise((resolve, reject) => {
@@ -167,7 +167,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrGetTodayQuestionsInStudy         = (study: _Study) => {
+  const xhrGetTodayQuestionsInStudy = (study: _Study) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -195,7 +195,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrCreateOrUpdateStudy = (study: _Study) => {
+  const xhrCreateOrUpdateStudy      = (study: _Study) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -221,7 +221,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrMarkAnswer          = (study: _Study, card: _Card, grade: string, answer: string) => {
+  const xhrMarkAnswer               = (study: _Study, card: _Card, grade: string, answer: string) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -235,6 +235,40 @@ export default function (status = 'publish') {
           }
         ],
         what: "admin_sp_ajax_front_mark_answer",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          lastAnsweredDebugData.value = done.data.debug_display;
+          const nextInterval: number  = done.data.next_interval;
+          if (1 > nextInterval) {
+            allQuestions.value.push(card);
+          }
+          // studyToEdit.value = done.data;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
+  const xhrMarkAnswerOnHold         = (study: _Study, card: _Card, grade: string, answer: string) => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
+    return new Promise((resolve, reject) => {
+      sendOnline = new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            study_id: study.id,
+            grade,
+            card_id : card.id,
+            answer
+          }
+        ],
+        what: "admin_sp_ajax_front_mark_answer_on_hold",
         funcBefore() {
           handleAjax.start();
         },

@@ -25,6 +25,8 @@
 			'answer',
 			'grade',
 			'ease_factor',
+			'answered_as_new',
+			'next_due_answered',
 			'next_interval',
 			'next_due_at',
 			'rejected_at',
@@ -35,6 +37,7 @@
 			'rejected_at' => 'datetime:Y-m-d H:i:s',
 			'created_at'  => 'datetime:Y-m-d H:i:s',
 			'updated_at'  => 'datetime:Y-m-d H:i:s',
+			'next_due_answered'  => 'boolean',
 		];
 
 

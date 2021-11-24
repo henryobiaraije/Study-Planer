@@ -9,6 +9,7 @@
 		exit;
 	}
 
+	use DateTime;
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
 	use Model\Answered;
@@ -59,11 +60,70 @@
 			add_action( 'admin_sp_ajax_admin_get_timezones', array( $this, 'ajax_admin_get_timezones' ) );
 			add_action( 'admin_sp_ajax_admin_update_user_timezone', array( $this, 'ajax_admin_update_user_timezone' ) );
 			add_action( 'admin_sp_ajax_front_mark_answer', array( $this, 'ajax_front_mark_answer' ) );
+			add_action( 'admin_sp_ajax_front_mark_answer_on_hold', array( $this, 'ajax_front_mark_answer_on_hold' ) );
 		}
 
 
 		// <editor-fold desc="Gap Cards">
 
+
+		public function ajax_front_mark_answer_on_hold( $post ) : void {
+			Initializer::verify_post( $post );
+//			Common::send_error( [
+//				__METHOD__,
+//				'post' => $post,
+//			] );
+
+			$all        = $post[ Common::VAR_2 ];
+			$study_id   = (int) sanitize_text_field( $all['study_id'] );
+			$card_id    = (int) sanitize_text_field( $all['card_id'] );
+			$answer     = $all['answer'];
+			$grade      = sanitize_text_field( $all['grade'] );
+			$all_grades = get_all_card_grades();
+
+			$study = Study::find( $study_id );
+			if ( empty( $study ) ) {
+				Common::send_error( 'Invalid study plan' );
+			}
+			$card = Card::find( $card_id );
+			if ( empty( $card ) ) {
+				Common::send_error( 'Invalid card.' );
+			}
+
+			if ( ! in_array( $grade, $all_grades ) ) {
+				Common::send_error( 'Invalid grade.' );
+			}
+
+			Manager::beginTransaction();
+
+			$_tomorro_datetime = new DateTime( Common::getDateTime(1) );
+			$next_due_date = $_tomorro_datetime->setTime( 0, 0, 0 )->format( 'Y-m-d H:i:s' );
+
+			$answer = Answered::create( [
+				'study_id'    => $study_id,
+				'card_id'     => $card_id,
+				'answer'      => $answer,
+				'grade'       => $grade,
+				'next_due_at' => $next_due_date,
+			] );
+			Manager::commit();
+//			$answer = Answered::create( [
+//				'study_id'    => $study_id,
+//				'card_id'     => $card_id,
+//				'answer'      => $answer,
+//				'grade'       => $grade,
+//				'next_due_at' => Common::getDateTime( - 4 ),
+//			] );
+//			$answer = Answered::create( [
+//				'study_id'    => $study_id,
+//				'card_id'     => $card_id,
+//				'answer'      => $answer,
+//				'grade'       => $grade,
+//				'next_due_at' => Common::getDateTime(-1),
+//			] );
+
+
+		}
 
 		public function ajax_front_mark_answer( $post ) : void {
 			Initializer::verify_post( $post );
@@ -185,7 +245,7 @@
 			$study_all_on_hold = $study->study_all_on_hold;
 			$user_id           = get_current_user_id();
 
-			$user_cards = Study::get_user_cards( $study->id, $user_id );
+			$user_cards = Study::get_user_cards_new( $study->id, $user_id );
 
 
 //			Common::send_error( [

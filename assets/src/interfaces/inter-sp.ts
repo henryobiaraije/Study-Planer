@@ -50,6 +50,7 @@ export interface _Card extends _TimeStamps {
   id?: number;
   hash: string,
   question: string;
+  card_group?: _CardGroup,
   answer: string;
   c_number: string;
   x_position?: number;
