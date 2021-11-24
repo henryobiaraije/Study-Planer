@@ -62,6 +62,10 @@
 //			] )->where( 'user_id', '=', $user_id );
 		}
 
+		public function answers() {
+			return $this->hasMany( Answered::class );
+		}
+
 		public function cardsGroups() {
 
 		}
@@ -108,18 +112,174 @@
 			try {
 				$date_today    = Common::getDateTime();
 				$user_timezone = get_option( Settings::UM_USER_TIMEZONE, null );
-				if(empty($user_timezone)){
+				if ( empty( $user_timezone ) ) {
 
 				}
-				$study         = Study::with( 'deck.cards', 'deck.cards.card_group' )
-					->where( 'id', '=', $study_id )
-					->where( 'user_id', '=', $user_id )->get()->firstOrFail();
-				$cards         = $study->deck->cards;
+//				$study = Study::with( [
+//					'deck.cards',
+//					'deck.cards.card_group',
+//					'answers' => function ( $query ) use ( $date_today ) {
+////						$query->where( 'next_due_at', '<', $date_today );
+//						 $query->where( 'id', '>', 14 );
+////						dd( $query->toSql() );
+//					},
+//				] )
+//					->where( 'id', '=', $study_id )
+//					->where( 'user_id', '=', $user_id );
+
+				$study        = Study::with( 'tags' )->find( $study_id );
+				$deck_id      = $study->deck_id;
+				$tags         = [];
+				$add_all_tags = $study->all_tags;
+
+
+				if ( ! $add_all_tags ) {
+					$tags = $study->tags->pluck( 'id' );
+
+				}
+
+//				$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
+//					->join( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.id' )
+//					->join( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tb.tag_id' )
+//					->join( SP_TABLE_TAGGABLES . ' as tb', 'tb.tag_id', '=', 't.id' )
+//					->where( 'tb.taggable_type', '=', CardGroup::class );
+
+				$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
+					->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
+					->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
+					->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
+					->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
+					->select(
+						'c.id as card_id',
+						'd.id as deck_id',
+						'cg.card_type as card_type',
+						'cg.id as card_group_id',
+						't.name as tag_name',
+						'tg.taggable_type as taggable_type',
+					);
+
+				if ( ! $add_all_tags ) {
+					$cards_query = $cards_query->whereIn( 't.id', $tags );
+				}
+
+				$cards_query = $cards_query->where( 'd.id', '=', $deck_id )
+					->groupBy( 'c.id' );
+//				->where( 'tb.taggable_type', '=', CardGroup::class )
+//				dd($cards_query->toSql());
+//				dd( $cards_query->toSql() );
+				// In this deck
+				// In those tags
+				//
+
+
+//				$study = Study::with( [
+//					'deck.cards',
+//					'deck.cards.card_group',
+//					'answers' => function ( $query ) use ( $date_today ) {
+////						$query->where( 'next_due_at', '<', $date_today );
+//						$query->where( 'id', '>', 14 );
+////						dd( $query->toSql() );
+//					},
+//				] )
+//					->where( 'id', '=', $study_id )
+//					->where( 'user_id', '=', $user_id );
+
+
+//				$study = $study->get()->firstOrFail();
+//				$cards = $study->deck->cards;
 
 				Common::send_error( [
 					__METHOD__,
 					'$study'                 => $study,
-					'$cards'                 => $cards,
+					'$tags'                  => $tags,
+					'$add_all_tags'          => $add_all_tags,
+					'card_get'               => $cards_query->get(),
+					'card_query_sql'         => $cards_query->toSql(),
+//					'$cards'                 => $cards,
+					'Manager::getQueryLog()' => Manager::getQueryLog(),
+					'study_id'               => $study_id,
+				] );
+
+
+				return [
+					'cards' => $cards,
+				];
+
+			} catch ( ItemNotFoundException $e ) {
+				//todo handle later
+				return [
+					'cards' => [],
+				];
+			}
+
+
+		}
+
+		public static function get_user_cards2( $study_id, $user_id ) {
+
+			try {
+				$date_today    = Common::getDateTime();
+				$user_timezone = get_option( Settings::UM_USER_TIMEZONE, null );
+				if ( empty( $user_timezone ) ) {
+
+				}
+//				$study = Study::with( [
+//					'deck.cards',
+//					'deck.cards.card_group',
+//					'answers' => function ( $query ) use ( $date_today ) {
+////						$query->where( 'next_due_at', '<', $date_today );
+//						 $query->where( 'id', '>', 14 );
+////						dd( $query->toSql() );
+//					},
+//				] )
+//					->where( 'id', '=', $study_id )
+//					->where( 'user_id', '=', $user_id );
+
+				$study        = Study::with( 'tags' )->find( $study_id );
+				$deck_id      = $study->deck_id;
+				$tags         = [];
+				$add_all_tags = $study->all_tags;
+
+				$cards_query = Card::with( 'card_group.deck' );
+
+				if ( ! $add_all_tags ) {
+					$tags        = $study->tags->pluck( 'id' );
+					$cards_query = $cards_query->with( [
+						'card_group.tags' => function ( $query ) use ( $tags ) {
+							$query->where( SP_TABLE_TAGS . '.id', 'IN', $tags );
+						},
+					] );
+				}
+//				dd( $cards_query->toSql() );
+				// In this deck
+				// In those tags
+				//
+
+
+//				$study = Study::with( [
+//					'deck.cards',
+//					'deck.cards.card_group',
+//					'answers' => function ( $query ) use ( $date_today ) {
+////						$query->where( 'next_due_at', '<', $date_today );
+//						$query->where( 'id', '>', 14 );
+////						dd( $query->toSql() );
+//					},
+//				] )
+//					->where( 'id', '=', $study_id )
+//					->where( 'user_id', '=', $user_id );
+
+
+//				$study = $study->get()->firstOrFail();
+//				$cards = $study->deck->cards;
+
+				Common::send_error( [
+					__METHOD__,
+					'$study'                 => $study,
+					'$tags'                  => $tags,
+					'$add_all_tags'          => $add_all_tags,
+					'card_get'               => $cards_query->get(),
+					'card_query_sql'         => $cards_query->toSql(),
+//					'$cards'                 => $cards,
 					'Manager::getQueryLog()' => Manager::getQueryLog(),
 					'study_id'               => $study_id,
 				] );

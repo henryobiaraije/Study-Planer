@@ -36,4 +36,5 @@
 			return $this->belongsTo( CardGroup::class );
 		}
 
+
 	}
