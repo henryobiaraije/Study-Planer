@@ -12,7 +12,11 @@
 			<div class="modal-header" >
 				<h5 class="modal-title" id="exampleModalEdit" >
 					<span @click.prevent="incrShowExtra" >Study</span >
-					({{studyToEdit.deck.name}}) | {{userDash.answeredCount.value}}</h5 >
+					({{studyToEdit.deck.name}}) | {{userDash.answeredCount.value}}
+					<span v-if="null !== currentQuestion" class="text-sm ring-sp-300 bg-sp-500 text-white font-bold px-2 rounded-2 pb-1 hover:bg-sp-600" >
+						{{currentQuestion.answering_type}}
+					</span >
+				</h5 >
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button >
 			</div >
 			<div class="modal-body" >
@@ -52,15 +56,15 @@
 						<button @click="userDash._markAnswer('easy')" type="button" class="sp-action-button" >Easy</button >
 					</div >
 				</div >
-<!--				<div v-if="showExtra > 5" >-->
-<!--					<ajax-action-not-form-->
-<!--							button-text="Load question"-->
-<!--							@click="userDash._getQuestions"-->
-<!--							css-classes="button"-->
-<!--							icon="fa fa-redo"-->
-<!--							:ajax="userDash.ajaxSaveStudy.value" >-->
-<!--					</ajax-action-not-form >-->
-<!--				</div >-->
+				<!--				<div v-if="showExtra > 5" >-->
+				<!--					<ajax-action-not-form-->
+				<!--							button-text="Load question"-->
+				<!--							@click="userDash._getQuestions"-->
+				<!--							css-classes="button"-->
+				<!--							icon="fa fa-redo"-->
+				<!--							:ajax="userDash.ajaxSaveStudy.value" >-->
+				<!--					</ajax-action-not-form >-->
+				<!--				</div >-->
 			</div >
 			<?php /** Debug Section */ ?>
 			<section v-if="showExtra && null !== userDash.lastAnsweredDebugData.value" class="debug-section p-2" >

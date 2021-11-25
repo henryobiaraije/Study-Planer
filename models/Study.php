@@ -220,6 +220,142 @@
 
 		}
 
+		public static function get_user_cards_on_hold( $study_id, $user_id ) {
+
+			try {
+				$user_timezone_today_midnight = get_user_timezone_date_midnight_today( $user_id );
+
+				$study        = Study::with( 'tags' )->findOrFail( $study_id );
+				$deck_id      = $study->deck_id;
+				$tags         = [];
+				$add_all_tags = $study->all_tags;
+				$revise_all   = $study->revise_all;
+				$no_to_revise = $study->no_to_revise;
+
+				if ( ! $add_all_tags ) {
+					$tags = $study->tags->pluck( 'id' );
+				}
+
+				/**
+				 * Get all cards
+				 * In "card groups" in the "deck" in the "study"
+				 * Next due date is <= today midnight + timezone
+				 * Distinct by card_id
+				 * Only cards that have been answered before (not in cards revised today , except "agiain")
+				 * Grade is hold
+				 */
+
+				/*** Get all cards revised today answered today (To exclude them later if "false === $study->no_to_revise") ***/
+				$query_revised_today                 = Answered::where( 'study_id', '=', $study_id )
+					->where( 'created_at', '>', $user_timezone_today_midnight )
+					->whereNotIn( 'grade', [ 'again' ] )
+					->where( 'study_id', '=', $study_id )
+					->where( 'answered_as_revised', '=', true );
+				$card_ids_revised_today              = $query_revised_today->pluck( 'card_id' );
+				$count_revised_today                 = $card_ids_revised_today->count();
+				$no_of_new_remaining_to_revise_today = $no_to_revise - $count_revised_today;
+
+//				Common::send_error( [
+//					'sql'                                  => $query_revised_today->toSql(),
+//					'getBindings'                          => $query_revised_today->getBindings(),
+//					'$card_ids_revised_today'              => $card_ids_revised_today,
+//					'$no_of_new_remaining_to_revise_today' => $no_of_new_remaining_to_revise_today,
+//				] );
+
+				/*** Prepare basic query ***/
+				$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
+					->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
+					->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
+					->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
+					->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
+					->where( 'tg.taggable_type', '=', CardGroup::class )
+					->select(
+						'c.id as card_id'
+					);
+
+				/*** Add just a few tags? ***/
+				if ( ! $add_all_tags ) {
+					$cards_query = $cards_query->whereIn( 't.id', $tags );
+				}
+
+				/*** Revise a few cards? ***/
+				if ( ! $revise_all ) {
+					$cards_query = $cards_query->limit( $no_of_new_remaining_to_revise_today );
+				}
+
+				/*** Return only those answered before (Not in cards revised today) and grade = hold ***/
+				$cards_query = $cards_query
+					->whereIn( 'c.id', function ( $q ) use (
+						$user_timezone_today_midnight,
+						$card_ids_revised_today,
+						$study_id
+					) {
+						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED )
+							->whereNotIn( 'card_id', $card_ids_revised_today )
+							->whereIn( 'grade', [ 'hold' ] )
+							->where( 'study_id', $study_id )
+							->where( 'next_due_at', '<=', $user_timezone_today_midnight )
+							->distinct();
+//						dd( $q->toSql(), $q->getBindings(),$q->get() );
+					} );
+//				dd( $cards_query->toSql(), $cards_query->getBindings(),$cards_query->get() );
+
+				/*** Group by c.id "To prevent duplicate results being returned" **/
+				$cards_query = $cards_query->where( 'd.id', '=', $deck_id )
+					->groupBy( 'c.id' );
+//				dd( $cards_query->toSql(), $cards_query->getBindings(),$cards_query->get() );
+
+				$card_ids = $cards_query->pluck( 'card_id' );
+
+				/*** Get the cards ***/
+				$all_cards = Card::with( 'card_group', 'card_group.deck' )
+					->whereIn( 'id', $card_ids );
+//				dd(
+//					$card_ids,
+//					$all_cards->toSql(),
+//					$all_cards->getBindings(),
+//					$all_cards->get(),
+//					$cards_query->toSql(),
+//					$cards_query->getBindings(),
+//					$cards_query->get()
+//				);
+
+
+//				Common::send_error( [
+//					__METHOD__,
+//					'$all_cards toSql'       => $all_cards->toSql(),
+//					'$all_cards'             => $all_cards->get(),
+//					'$study'                 => $study,
+//					'$card_ids'                 => $card_ids,
+//					'$tags'                  => $tags,
+//					'$add_all_tags'          => $add_all_tags,
+//					'card_get'               => $cards_query->get(),
+//					'card_query_sql'         => $cards_query->toSql(),
+////					'$cards'                 => $cards,
+//					'Manager::getQueryLog()' => Manager::getQueryLog(),
+//					'study_id'               => $study_id,
+//				] );
+
+
+				return [
+					'cards' => $all_cards->get(),
+				];
+
+			} catch ( ItemNotFoundException $e ) {
+				//todo handle later
+				return [
+					'cards' => [],
+				];
+			} catch ( ModelNotFoundException $e ) {
+				//todo handle later
+				return [
+					'cards' => [],
+				];
+			}
+
+
+		}
+
 		public static function get_user_cards_to_revise( $study_id, $user_id ) {
 
 			try {
@@ -501,11 +637,12 @@
 		public static function get_study_due_summary( $study_id, $user_id ) {
 			$new_cards       = self::get_user_cards_new( $study_id, $user_id )['cards'];
 			$cards_to_revise = self::get_user_cards_to_revise( $study_id, $user_id )['cards'];
+			$cards_on_hold   = self::get_user_cards_on_hold( $study_id, $user_id )['cards'];
 
 			return [
 				'new'              => count( $new_cards ),
 				'revision'         => count( $cards_to_revise ),
-				'previously_false' => 0,
+				'previously_false' => count( $cards_on_hold ), // todo on hold is used instead of previously false. Clarify later from client
 				'new_cards'        => $new_cards, //todo remove after testing
 			];
 		}

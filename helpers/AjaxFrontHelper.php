@@ -287,16 +287,21 @@
 
 			$all_cards = [];
 
-			$user_cards_new    = Study::get_user_cards_new( $study->id, $user_id );
-			$user_cards_revise = Study::get_user_cards_to_revise( $study->id, $user_id );
+			$user_cards_new     = Study::get_user_cards_new( $study->id, $user_id );
+			$user_cards_revise  = Study::get_user_cards_to_revise( $study->id, $user_id );
+			$user_cards_on_hold = Study::get_user_cards_on_hold( $study->id, $user_id );
 
 			foreach ( $user_cards_new['cards'] as $one ) {
-				$one->answering_type = 'New';
-				$all_cards[] = $one;
+				$one->answering_type = 'New Card';
+				$all_cards[]         = $one;
 			}
 			foreach ( $user_cards_revise['cards'] as $one ) {
-				$one->answering_type = 'Revising';
-				$all_cards[] = $one;
+				$one->answering_type = 'Revising Card';
+				$all_cards[]         = $one;
+			}
+			foreach ( $user_cards_on_hold['cards'] as $one ) {
+				$one->answering_type = 'Previously On hold';
+				$all_cards[]         = $one;
 			}
 
 //			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
@@ -310,6 +315,7 @@
 //				'$all_cards'             => $all_cards,
 //				'$user_cards_new'        => $user_cards_new,
 //				'$user_cards_revise'     => $user_cards_revise,
+//				'$user_cards_on_hold'    => $user_cards_on_hold,
 //				'$study'                 => $study,
 //				'$tags'                  => $tags,
 //				'$no_of_new'             => $no_of_new,
