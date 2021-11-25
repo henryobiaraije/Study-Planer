@@ -99,15 +99,15 @@
 							<div class="status-title text-center font-bold" >Number of cards due for revision</div >
 							<div class="to-study flex" >
 								<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
-									<div class="study-title whitespace-nowrap" >Previously false</div >
+									<div class="study-title whitespace-nowrap whitespace-no-wrap" >On hold</div >
 									<div class="study-number font-bold fs-4" >{{item2.due_summary['previously_false']}}</div >
 								</div >
 								<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
-									<div class="study-title whitespace-nowrap" >Revision</div >
+									<div class="study-title whitespace-nowrap whitespace-no-wrap" >Revision</div >
 									<div class="study-number font-bold fs-4" >{{item2.due_summary['revision']}}</div >
 								</div >
 								<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
-									<div class="study-title whitespace-nowrap" >New cards</div >
+									<div class="study-title whitespace-nowrap whitespace-no-wrap" >New cards</div >
 									<div class="study-number font-bold fs-4" >{{item2.due_summary['new']}}</div >
 								</div >
 							</div >

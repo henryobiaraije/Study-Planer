@@ -2,7 +2,6 @@
 ?>
 
 
-
 <div class="modal fade" id="modal-new" style="z-index:99999999;display: none" tabindex="-1" aria-labelledby="exampleModalEdit" aria-hidden="true" >
 	<div class="modal-dialog" >
 		<form v-if="null !== studyToEdit" @submit.prevent="userDash.startStudy" class="modal-content" >
@@ -65,7 +64,7 @@
 					</div >
 				</div >
 				<div class="sp-study-input shadow p-2 rounded fs-5 mb-4 sp-study-input" >
-					<div class="my-1" >Number of new cards |
+					<div class="my-1" >Number of cards on hold |
 						<label class="cursor-pointer pl-4 bg-gray-200   hover:bg-gray-300 py-1 px-2 rounded" >
 							<span class="pr-2" > All :</span >
 							<input v-model="studyToEdit.study_all_on_hold"

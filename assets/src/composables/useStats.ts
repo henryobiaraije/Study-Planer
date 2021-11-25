@@ -7,34 +7,37 @@ import {Store} from "../static/store";
 declare var bootstrap;
 
 export default function (status = 'publish') {
-  const ajax         = ref<_Ajax>({
+  const ajax          = ref<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
-  const ajaxForecast = reactive<_Ajax>({
+  const ajaxForecast  = reactive<_Ajax>({
     sending       : false,
     error         : false,
     errorMessage  : '',
     success       : false,
     successMessage: '',
   });
+  const statsForecast = ref(null);
+  let forecastSpan    = ref('one_month');
+
+  const _loadAllStats = () => {
+    if (null === statsForecast.value) {
+      xhrLoadForecast();
+    }
+  }
 
   const xhrLoadForecast = () => {
-    const handleAjax: HandleAjax = new HandleAjax(ajaxForecast.value);
+    const handleAjax: HandleAjax = new HandleAjax(ajaxForecast);
     return new Promise((resolve, reject) => {
       new Server().send_online({
         data: [
           Store.nonce,
           {
-            params: {
-              per_page      : 1000,
-              page          : 1,
-              search_keyword: '',
-              status        : 'publish',
-            },
+            span: forecastSpan.value,
           }
         ],
         what: "admin_sp_ajax_front_load_stats_forecast",
@@ -53,7 +56,9 @@ export default function (status = 'publish') {
   };
 
   return {
-    ajax,
+    ajax, ajaxForecast,
+    _loadAllStats,
+    forecastSpan,
   };
 
 }

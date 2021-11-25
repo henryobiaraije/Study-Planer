@@ -100,6 +100,8 @@ const mGeneral         = {
     if (null !== menu && menu.length > 3) this.menu = menu;
     if (menu === 'settings') {
       dis(this).timezones.loadTimezones();
+    } else if (menu === 'stats') {
+      dis(this).stats._loadAllStats();
     }
   },
   getNewAjax(): _Ajax {
@@ -128,6 +130,8 @@ const mMethods    = {
     this.insertUrlParam('dashboard-page', menu);
     if (menu === 'settings') {
       dis(this).timezones.loadTimezones();
+    } else if (menu === 'stats') {
+      dis(this).stats._loadAllStats();
     }
   },
   toggle(elemClass) {
@@ -440,7 +444,7 @@ function setup(props) {
     searchTags: useTagSearch(),
     userDash  : useUserDashboard(),
     timezones : useTimezones(),
-    userStats : userStats(),
+    stats  : userStats(),
   };
 }
 

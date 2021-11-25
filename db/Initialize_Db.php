@@ -203,6 +203,7 @@
 			}
 
 			// Answered
+
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_ANSWERED ) ) {
 				Capsule::schema()->create( SP_TABLE_ANSWERED, function ( Blueprint $table ) {
 					global $wpdb;
@@ -216,10 +217,16 @@
 					$table->dateTime( 'next_due_at' );
 					$table->boolean( 'next_due_answered' );
 					$table->boolean( 'answered_as_new' );
+
 					$table->integer( 'next_interval' );
 					$table->dateTime( 'rejected_at' );
 					$table->softDeletes();
 					$table->timestamps();
+				} );
+			}
+			if ( ! $this->schema_builder->hasColumn( SP_TABLE_ANSWERED, 'answered_as_revised' ) ) {
+				Capsule::schema()->table( SP_TABLE_ANSWERED, function ( Blueprint $table ) {
+					$table->boolean( 'answered_as_revised' )->after( 'answered_as_new' );
 				} );
 			}
 		}

@@ -68,54 +68,23 @@
 		/*** <editor-fold desc="Chart Stats"> **/
 		public function ajax_front_load_stats_forecast( $post ) : void {
 			Initializer::verify_post( $post );
+//			Common::send_error( [
+//				'ajax_front_load_stats_forecast',
+//				'post' => $post,
+//			] );
+
+			$all    = $post[ Common::VAR_2 ];
+			$span   = sanitize_text_field( $all['span'] );
+			$length = 30;
+
 			Common::send_error( [
-				__METHOD__,
-				'post' => $post,
+				'ajax_front_load_stats_forecast',
+				'post'  => $post,
+				'$span' => $span,
 			] );
 
-			$all        = $post[ Common::VAR_2 ];
-			$study_id   = (int) sanitize_text_field( $all['study_id'] );
-			$card_id    = (int) sanitize_text_field( $all['card_id'] );
-			$answer     = $all['answer'];
-			$all_grades = get_all_card_grades();
 
-			$study = Study::find( $study_id );
-			if ( empty( $study ) ) {
-				Common::send_error( 'Invalid study plan' );
-			}
-			$card = Card::find( $card_id );
-			if ( empty( $card ) ) {
-				Common::send_error( 'Invalid card.' );
-			}
-
-			Manager::beginTransaction();
-
-			$_tomorro_datetime = new DateTime( Common::getDateTime( 1 ) );
-			$next_due_date     = $_tomorro_datetime->setTime( 0, 0, 0 )->format( 'Y-m-d H:i:s' );
-
-			$answer = Answered::create( [
-				'study_id'    => $study_id,
-				'card_id'     => $card_id,
-				'answer'      => '',
-				'grade'       => 'hold',
-				'next_due_at' => $next_due_date,
-			] );
-			Manager::commit();
 			Common::send_success( 'On hold marked' );
-//			$answer = Answered::create( [
-//				'study_id'    => $study_id,
-//				'card_id'     => $card_id,
-//				'answer'      => $answer,
-//				'grade'       => $grade,
-//				'next_due_at' => Common::getDateTime( - 4 ),
-//			] );
-//			$answer = Answered::create( [
-//				'study_id'    => $study_id,
-//				'card_id'     => $card_id,
-//				'answer'      => $answer,
-//				'grade'       => $grade,
-//				'next_due_at' => Common::getDateTime(-1),
-//			] );
 
 
 		}
@@ -316,15 +285,31 @@
 			$study_all_on_hold = $study->study_all_on_hold;
 			$user_id           = get_current_user_id();
 
-			$user_cards = Study::get_user_cards_new( $study->id, $user_id );
+			$all_cards = [];
+
+			$user_cards_new    = Study::get_user_cards_new( $study->id, $user_id );
+			$user_cards_revise = Study::get_user_cards_to_revise( $study->id, $user_id );
+
+			foreach ( $user_cards_new['cards'] as $one ) {
+				$one->answering_type = 'New';
+				$all_cards[] = $one;
+			}
+			foreach ( $user_cards_revise['cards'] as $one ) {
+				$one->answering_type = 'Revising';
+				$all_cards[] = $one;
+			}
+
+//			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
 
 
 //			Common::send_error( [
 //				'ajax_front_create_study',
 //				'post'                   => $post,
-//				'$user_cards'            => $user_cards->get(),
 //				'Manager::getQueryLog()' => Manager::getQueryLog(),
 //				'$study_id'              => $study_id,
+//				'$all_cards'             => $all_cards,
+//				'$user_cards_new'        => $user_cards_new,
+//				'$user_cards_revise'     => $user_cards_revise,
 //				'$study'                 => $study,
 //				'$tags'                  => $tags,
 //				'$no_of_new'             => $no_of_new,
@@ -338,7 +323,9 @@
 
 
 			Common::send_success( 'Cards loaded.', [
-				'user_cards' => $user_cards,
+				'user_cards' => [
+					'cards' => $all_cards,
+				],
 			] );
 
 		}
