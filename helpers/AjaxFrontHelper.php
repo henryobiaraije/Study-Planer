@@ -61,11 +61,67 @@
 			add_action( 'admin_sp_ajax_admin_update_user_timezone', array( $this, 'ajax_admin_update_user_timezone' ) );
 			add_action( 'admin_sp_ajax_front_mark_answer', array( $this, 'ajax_front_mark_answer' ) );
 			add_action( 'admin_sp_ajax_front_mark_answer_on_hold', array( $this, 'ajax_front_mark_answer_on_hold' ) );
+			add_action( 'admin_sp_ajax_front_load_stats_forecast', array( $this, 'ajax_front_load_stats_forecast' ) );
 		}
 
 
-		// <editor-fold desc="Gap Cards">
+		/*** <editor-fold desc="Chart Stats"> **/
+		public function ajax_front_load_stats_forecast( $post ) : void {
+			Initializer::verify_post( $post );
+			Common::send_error( [
+				__METHOD__,
+				'post' => $post,
+			] );
 
+			$all        = $post[ Common::VAR_2 ];
+			$study_id   = (int) sanitize_text_field( $all['study_id'] );
+			$card_id    = (int) sanitize_text_field( $all['card_id'] );
+			$answer     = $all['answer'];
+			$all_grades = get_all_card_grades();
+
+			$study = Study::find( $study_id );
+			if ( empty( $study ) ) {
+				Common::send_error( 'Invalid study plan' );
+			}
+			$card = Card::find( $card_id );
+			if ( empty( $card ) ) {
+				Common::send_error( 'Invalid card.' );
+			}
+
+			Manager::beginTransaction();
+
+			$_tomorro_datetime = new DateTime( Common::getDateTime( 1 ) );
+			$next_due_date     = $_tomorro_datetime->setTime( 0, 0, 0 )->format( 'Y-m-d H:i:s' );
+
+			$answer = Answered::create( [
+				'study_id'    => $study_id,
+				'card_id'     => $card_id,
+				'answer'      => '',
+				'grade'       => 'hold',
+				'next_due_at' => $next_due_date,
+			] );
+			Manager::commit();
+			Common::send_success( 'On hold marked' );
+//			$answer = Answered::create( [
+//				'study_id'    => $study_id,
+//				'card_id'     => $card_id,
+//				'answer'      => $answer,
+//				'grade'       => $grade,
+//				'next_due_at' => Common::getDateTime( - 4 ),
+//			] );
+//			$answer = Answered::create( [
+//				'study_id'    => $study_id,
+//				'card_id'     => $card_id,
+//				'answer'      => $answer,
+//				'grade'       => $grade,
+//				'next_due_at' => Common::getDateTime(-1),
+//			] );
+
+
+		}
+		/*** </editor-fold desc="Chart Stats"> **/
+
+		// <editor-fold desc="Gap Cards">
 
 		public function ajax_front_mark_answer_on_hold( $post ) : void {
 			Initializer::verify_post( $post );
@@ -78,7 +134,6 @@
 			$study_id   = (int) sanitize_text_field( $all['study_id'] );
 			$card_id    = (int) sanitize_text_field( $all['card_id'] );
 			$answer     = $all['answer'];
-			$grade      = sanitize_text_field( $all['grade'] );
 			$all_grades = get_all_card_grades();
 
 			$study = Study::find( $study_id );
@@ -90,23 +145,20 @@
 				Common::send_error( 'Invalid card.' );
 			}
 
-			if ( ! in_array( $grade, $all_grades ) ) {
-				Common::send_error( 'Invalid grade.' );
-			}
-
 			Manager::beginTransaction();
 
-			$_tomorro_datetime = new DateTime( Common::getDateTime(1) );
-			$next_due_date = $_tomorro_datetime->setTime( 0, 0, 0 )->format( 'Y-m-d H:i:s' );
+			$_tomorro_datetime = new DateTime( Common::getDateTime( 1 ) );
+			$next_due_date     = $_tomorro_datetime->setTime( 0, 0, 0 )->format( 'Y-m-d H:i:s' );
 
 			$answer = Answered::create( [
 				'study_id'    => $study_id,
 				'card_id'     => $card_id,
-				'answer'      => $answer,
-				'grade'       => $grade,
+				'answer'      => '',
+				'grade'       => 'hold',
 				'next_due_at' => $next_due_date,
 			] );
 			Manager::commit();
+			Common::send_success( 'On hold marked' );
 //			$answer = Answered::create( [
 //				'study_id'    => $study_id,
 //				'card_id'     => $card_id,
@@ -152,13 +204,34 @@
 				Common::send_error( 'Invalid grade.' );
 			}
 
+
+			$answered_before  = true;
+			$_answered_before = Answered::where( 'card_id', '=', $card_id )->first();
+			if ( empty( $_answered_before ) ) {
+				$answered_before = false;
+			}
+
+
+//			Common::send_error( [
+//				'ajax_front_get_question',
+//				'post'             => $post,
+//				'$study_id'        => $study_id,
+//				'$study'           => $study,
+//				'$grade'           => $grade,
+//				'$card'            => $card,
+//				'$all_grades'      => $all_grades,
+//				'$answer'          => $answer,
+//				'$answered_before' => $answered_before,
+//			] );
+
 			Manager::beginTransaction();
 
 			$answer = Answered::create( [
-				'study_id'    => $study_id,
-				'card_id'     => $card_id,
-				'answer'      => $answer,
-				'grade'       => $grade,
+				'study_id'        => $study_id,
+				'card_id'         => $card_id,
+				'answer'          => $answer,
+				'grade'           => $grade,
+				'answered_as_new' => $answered_before,
 //				'next_due_at' => Common::getDateTime( - 7 ),
 			] );
 //			$answer = Answered::create( [
@@ -183,9 +256,11 @@
 					'study_id' => $study_id,
 				] );
 
-				$next_due_date         = $next_due->get_next_due_date();
-				$answer->next_due_at = $next_due_date['next_due_date_morning'];
-				$answer->next_interval = $next_due_date['next_interval'];
+				$next_due_date           = $next_due->get_next_due_date();
+				$answer->next_due_at     = $next_due_date['next_due_date_morning'];
+				$answer->next_interval   = $next_due_date['next_interval'];
+				$answer->ease_factor     = $next_due_date['ease_factor'];
+				$answer->answered_as_new = ! $answered_before;
 				$answer->save();
 				Manager::commit();
 
@@ -207,10 +282,6 @@
 			} catch ( \Exception $e ) {
 				Common::send_error( 'Error: ' . $e->getMessage() );
 			}
-
-
-
-
 
 
 		}

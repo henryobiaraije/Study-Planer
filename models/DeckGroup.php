@@ -94,10 +94,13 @@
 				$deck_groups = DeckGroup::with( [
 					'tags',
 					'decks',
-//					'decks.studies' => function ( $query ) use ( $user_id ) {
-//						return $query->where( 'user_id', '=', $user_id );
-//					},
+					'decks.studies' => function ( $q ) use ( $user_id ) {
+						$q->where( 'user_id', '=', $user_id );
+//						 $query->select( SP_TABLE_STUDY.' as st')
+//						->where('user_id', '=', $user_id );
+					},
 				] );
+//				dd(Manager::getQueryLog());
 			}
 			$deck_groups = $deck_groups
 				->where( 'name', 'like', "%{$args['search']}%" );
@@ -115,8 +118,37 @@
 //			Common::send_error( [
 //				'ajax_admin_load_deck_group',
 //				'$args'        => $args,
-//				'$deck_groups' => $deck_groups->toSql(),
-//				'getQuery'     => $deck_groups->getQuery(),
+//				'$deck_groups' => $deck_groups,
+//			] );
+			$all_deck_groups = [];
+			foreach ( $deck_groups as $dg ) {
+				$decks          = $dg->decks;
+				$dg_due_summary = [
+					'new'              => 0,
+					'revision'         => 0,
+					'previously_false' => 0,
+				];
+				foreach ( $decks as $_deck ) {
+					$_study              = $_deck->studies->first();
+					$_deck->_study_first = $_study;
+					if ( empty( $_study ) ) {
+						$_deck->due_summary = Study::get_study_due_summary( 0, $user_id );
+					} else {
+						$_deck->due_summary = Study::get_study_due_summary( $_study->id, $user_id );
+					}
+					$dg_due_summary['new'] = $dg_due_summary['new'] + $_deck->due_summary['new'];
+					$dg_due_summary['revision'] = $dg_due_summary['revision'] + $_deck->due_summary['revision'];
+					$dg_due_summary['previously_false'] = $dg_due_summary['previously_false'] + $_deck->due_summary['previously_false'];
+				}
+				$dg->due_summary = $dg_due_summary;
+			}
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'$args'            => $args,
+//				'$all_deck_groups' => $all_deck_groups,
+//				'$deck_groups'     => $deck_groups,
+////				'$deck_groups'     => $deck_groups->toSql(),
+////				'getQuery'         => $deck_groups->getQuery(),
 //			] );
 
 			return [

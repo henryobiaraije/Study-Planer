@@ -10,6 +10,7 @@
 	use DateTime;
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
+	use Illuminate\Database\Eloquent\ModelNotFoundException;
 	use Illuminate\Database\Eloquent\SoftDeletes;
 	use Illuminate\Support\ItemNotFoundException;
 	use PDOException;
@@ -224,7 +225,7 @@
 			try {
 				$user_timezone_today_midnight = get_user_timezone_date_midnight_today( $user_id );
 
-				$study         = Study::with( 'tags' )->find( $study_id );
+				$study         = Study::with( 'tags' )->findOrFail( $study_id );
 				$deck_id       = $study->deck_id;
 				$tags          = [];
 				$add_all_tags  = $study->all_tags;
@@ -238,12 +239,19 @@
 				/*** Get all new cards answered today "Only those answered once and today are truly new" ***/
 				$query_new_answered_today     = Answered::where( 'study_id', '=', $study_id )
 					->where( 'created_at', '>', $user_timezone_today_midnight )
+					->where( 'grade', '!=', 'again' )
 					->where( 'answered_as_new', '=', true );
 				$new_card_ids_answered_today  = $query_new_answered_today->pluck( 'card_id' );
 				$count_new_studied_today      = $new_card_ids_answered_today->count();
 				$no_of_new_remaining_to_study = $no_of_new - $count_new_studied_today;
 
-//				dd( $query_new_answered_today->toSql(), $query_new_answered_today->getBindings(), $new_answered_today );
+//				Common::send_error( [
+//					'sql'                           => $query_new_answered_today->toSql(),
+//					'getBindings'                   => $query_new_answered_today->getBindings(),
+//					'$count_new_studied_today'      => $count_new_studied_today,
+//					'$no_of_new_remaining_to_study' => $no_of_new_remaining_to_study,
+//					'$new_card_ids_answered_today'  => $new_card_ids_answered_today,
+//				] );
 
 				/*** Prepare basic query ***/
 				$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
@@ -252,11 +260,11 @@
 					->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
 					->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
 					->where( 'tg.taggable_type', '=', CardGroup::class )
-					->whereNotIn( 'c.id', function ( $q ) use ( $study_id ) {
-						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED . ' as a' )
-							->where( 'study_id', '=', $study_id )
-							->distinct();
-					} )
+//					->whereNotIn( 'c.id', function ( $q ) use ( $study_id ) {
+//						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED . ' as a' )
+//							->where( 'study_id', '=', $study_id )
+//							->distinct();
+//					} )
 					->select(
 						'c.id as card_id'
 					);
@@ -271,9 +279,23 @@
 					$cards_query = $cards_query->limit( $no_of_new_remaining_to_study );
 				}
 
-				/*** Filter out new cards answered today ***/
+				/*** Filter out new cards answered today "Except those with grade as 'again' " ***/
 				$cards_query = $cards_query
 					->whereNotIn( 'c.id', $new_card_ids_answered_today );
+
+				/*** Filter out cards answerd today with grade not "again" ***/
+				$cards_query = $cards_query
+					->whereNotIn( 'c.id', function ( $q ) use ( $user_timezone_today_midnight ) {
+						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED )
+							->where( 'grade', '!=', 'again' );
+					} );
+
+				/*** Filter out cards answerd before today ***/
+				$cards_query = $cards_query
+					->whereNotIn( 'c.id', function ( $q ) use ( $user_timezone_today_midnight ) {
+						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED )
+							->where( 'created_at', '<', $user_timezone_today_midnight );
+					} );
 
 				/*** Group by c.id "To prevent duplicate results being returned" **/
 				$cards_query = $cards_query->where( 'd.id', '=', $deck_id )
@@ -297,6 +319,7 @@
 
 //				Common::send_error( [
 //					__METHOD__,
+//					'$all_cards toSql'       => $all_cards->toSql(),
 //					'$all_cards'             => $all_cards->get(),
 //					'$study'                 => $study,
 //					'$tags'                  => $tags,
@@ -318,10 +341,27 @@
 				return [
 					'cards' => [],
 				];
+			} catch ( ModelNotFoundException $e ) {
+				//todo handle later
+				return [
+					'cards' => [],
+				];
 			}
 
 
 		}
+
+		public static function get_study_due_summary( $study_id, $user_id ) {
+			$new_cards = self::get_user_cards_new( $study_id, $user_id )['cards'];
+
+			return [
+				'new'              => count( $new_cards ),
+				'revision'         => 0,
+				'previously_false' => 0,
+				'new_cards'        => $new_cards, //todo remove after testing
+			];
+		}
+
 
 		public static function get_user_cards2( $study_id, $user_id ) {
 

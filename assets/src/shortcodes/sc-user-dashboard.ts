@@ -19,6 +19,7 @@ import useUserDashboard from "../composables/useUserDashboard";
 import {_DeckGroup} from "../interfaces/inter-sp";
 import useTagSearch from "../composables/useTagSearch";
 import useTimezones from "../composables/useTimezones";
+import userStats from "../composables/useStats";
 
 
 declare var jQuery: any;
@@ -439,6 +440,7 @@ function setup(props) {
     searchTags: useTagSearch(),
     userDash  : useUserDashboard(),
     timezones : useTimezones(),
+    userStats : userStats(),
   };
 }
 

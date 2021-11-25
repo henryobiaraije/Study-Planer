@@ -171,6 +171,7 @@
 				'next_due_date_morning' => $next_due_date_morning,
 				'debug_display'         => $debug_display,
 				'next_interval'         => $next_interval,
+				'ease_factor'           => $f,
 			];
 
 //			Common::send_error( [

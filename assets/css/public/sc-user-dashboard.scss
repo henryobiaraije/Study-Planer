@@ -29,3 +29,23 @@
 #wpcontent {
   background: #f0f0f0;
 }
+
+.ld-lesson-navigation.ld-lesson-items{
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  -webkit-display: flex;
+  -moz-display: flex;
+  -ms-display: flex;
+  -o-display: flex;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ld-lesson-navigation.ld-lesson-items .ld-lesson-items{
+  -webkit-box-flex: 4;
+  -ms-flex: 4;
+  flex: 4;
+  min-width: 100px;
+}

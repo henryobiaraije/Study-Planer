@@ -83,6 +83,7 @@ export default function (status = 'publish') {
       openQuestionModal();
       return xhrGetTodayQuestionsInStudy(studyToEdit.value);
     }).then((res) => {
+      currentQuestionIndex.value = -1;
       _nextQuestion();
     });
   }
@@ -95,7 +96,7 @@ export default function (status = 'publish') {
     }
   }
   const _getQuestions      = () => {
-    xhrGetTodayQuestionsInStudy(studyToEdit.value);
+    // xhrGetTodayQuestionsInStudy(studyToEdit.value);
   }
   const getStudyForDeck    = (deck: _Deck) => {
     let study = studies.value.find((s: _Study) => deck.id === s.deck.id);
@@ -123,6 +124,14 @@ export default function (status = 'publish') {
   }
   const _markAnswer        = (grade: string) => {
     xhrMarkAnswer(studyToEdit.value, currentQuestion.value, grade, currentQuestion.value.answer);
+    setTimeout(() => {
+      showCurrentAnswer.value = false;
+      showGrade.value         = false;
+      _nextQuestion();
+    }, 200);
+  }
+  const _hold              = (grade: string) => {
+    xhrMarkAnswerOnHold(studyToEdit.value, currentQuestion.value, grade, currentQuestion.value.answer);
     setTimeout(() => {
       showCurrentAnswer.value = false;
       showGrade.value         = false;
@@ -184,7 +193,7 @@ export default function (status = 'publish') {
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
           console.log(done);
-          allQuestions.value = done.data.user_cards.cards;
+          allQuestions.value  = done.data.user_cards.cards;
           // studyToEdit.value = done.data;
           resolve(0);
         },
@@ -274,11 +283,11 @@ export default function (status = 'publish') {
         },
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
-          lastAnsweredDebugData.value = done.data.debug_display;
-          const nextInterval: number  = done.data.next_interval;
-          if (1 > nextInterval) {
-            allQuestions.value.push(card);
-          }
+          // lastAnsweredDebugData.value = done.data.debug_display;
+          // const nextInterval: number  = done.data.next_interval;
+          // if (1 > nextInterval) {
+          //   allQuestions.value.push(card);
+          // }
           // studyToEdit.value = done.data;
           resolve(0);
         },
@@ -299,7 +308,7 @@ export default function (status = 'publish') {
     deckGroups, studyToEdit, startStudy, _getQuestions,
     load, openStudyModal, closeStudyModal, allQuestions,
     currentQuestion, answeredCount,
-    showCurrentAnswer, showGrade,
+    showCurrentAnswer, showGrade, _hold,
     _showAnswer, _markAnswer, lastAnsweredDebugData,
   };
 

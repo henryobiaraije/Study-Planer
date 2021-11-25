@@ -66,15 +66,15 @@
 					<div class="to-study flex" >
 						<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
 							<div class="study-title whitespace-nowrap" >Previously false</div >
-							<div class="study-number font-bold fs-4" >0</div >
+							<div class="study-number font-bold fs-4" >{{item.due_summary['previously_false']}}</div >
 						</div >
 						<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
 							<div class="study-title whitespace-nowrap" >Revision</div >
-							<div class="study-number font-bold fs-4" >0</div >
+							<div class="study-number font-bold fs-4" >{{item.due_summary['revision']}}</div >
 						</div >
 						<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
 							<div class="study-title whitespace-nowrap" >New cards</div >
-							<div class="study-number font-bold fs-4" >{{item.id === 5 ? 20 : 0}}</div >
+							<div class="study-number font-bold fs-4" >{{item.due_summary['new']}}</div >
 						</div >
 					</div >
 				</div >
@@ -100,15 +100,15 @@
 							<div class="to-study flex" >
 								<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
 									<div class="study-title whitespace-nowrap" >Previously false</div >
-									<div class="study-number font-bold fs-4" >0</div >
+									<div class="study-number font-bold fs-4" >{{item2.due_summary['previously_false']}}</div >
 								</div >
 								<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
 									<div class="study-title whitespace-nowrap" >Revision</div >
-									<div class="study-number font-bold fs-4" >0</div >
+									<div class="study-number font-bold fs-4" >{{item2.due_summary['revision']}}</div >
 								</div >
 								<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
 									<div class="study-title whitespace-nowrap" >New cards</div >
-									<div class="study-number font-bold fs-4" >4</div >
+									<div class="study-number font-bold fs-4" >{{item2.due_summary['new']}}</div >
 								</div >
 							</div >
 						</div >

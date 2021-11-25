@@ -32,6 +32,7 @@
 			<div class="modal-footer justify-center" >
 				<div v-if="!userDash.showGrade.value" class="show-answer m-2" >
 					<button @click="userDash._showAnswer()" type="button" class="sp-action-button" >Show Answer</button >
+					<button @click="userDash._hold()" type="button" class="sp-action-button" >Hold</button >
 				</div >
 				<div v-if="userDash.showGrade.value" class="show-grade flex justify-center" >
 					<div class="one-grade flex-initial px-2 mx-2" >
@@ -51,15 +52,15 @@
 						<button @click="userDash._markAnswer('easy')" type="button" class="sp-action-button" >Easy</button >
 					</div >
 				</div >
-				<div v-if="showExtra > 5" >
-					<ajax-action-not-form
-							button-text="Load question"
-							@click="userDash._getQuestions"
-							css-classes="button"
-							icon="fa fa-redo"
-							:ajax="userDash.ajaxSaveStudy.value" >
-					</ajax-action-not-form >
-				</div >
+<!--				<div v-if="showExtra > 5" >-->
+<!--					<ajax-action-not-form-->
+<!--							button-text="Load question"-->
+<!--							@click="userDash._getQuestions"-->
+<!--							css-classes="button"-->
+<!--							icon="fa fa-redo"-->
+<!--							:ajax="userDash.ajaxSaveStudy.value" >-->
+<!--					</ajax-action-not-form >-->
+<!--				</div >-->
 			</div >
 			<?php /** Debug Section */ ?>
 			<section v-if="showExtra && null !== userDash.lastAnsweredDebugData.value" class="debug-section p-2" >

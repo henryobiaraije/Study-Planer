@@ -148,8 +148,8 @@
 			self::$general_localize[ $key ] = $value;
 		}
 
-		public static function get_admin_url($slug) : string {
-			return $url = get_admin_url().'admin.php?page='.$slug;
+		public static function get_admin_url( $slug ) : string {
+			return $url = get_admin_url() . 'admin.php?page=' . $slug;
 		}
 
 		public static function get_from_localize( $key, $value ) {
@@ -240,7 +240,7 @@
 				$action = sanitize_title( $post[ Common::VAR_0 ] );
 				do_action( $action, $post );
 
-				die( 'Bad Admin Ajax:  Search bar endpoint. Action = ' . $action );
+				die( 'Bad Admin Ajax:  Sp. Action = ' . $action );
 			} );
 
 			$prefix = "wp_ajax_nopriv_";
@@ -250,7 +250,7 @@
 				$action = sanitize_title( $post[ Common::VAR_0 ] );
 				do_action( $action, $post );
 
-				die( 'Bad Public Ajax: Search bar endpoint. Action = ' . $action );
+				die( 'Bad Public Ajax: Sp. Action = ' . $action );
 			} );
 		}
 
@@ -311,8 +311,8 @@
 			$css_general = Initializer::$css_url . '/general.css';
 			wp_enqueue_style( 'sp-general', $css_general, [], Initializer::$script_version );
 
-			wp_enqueue_style('dashboard');
-			wp_enqueue_script('dashboard');
+			wp_enqueue_style( 'dashboard' );
+			wp_enqueue_script( 'dashboard' );
 
 			add_action( 'sp_enqueue_default_admin_scripts', function () use ( $base ) {
 //    wp_enqueue_script($base.'vue');
@@ -363,7 +363,7 @@
 			add_action( 'sp_enqueue_default_frontend_scripts', function () use ( $base ) {
 //    wp_enqueue_script($base.'vue');
 //					wp_enqueue_script( $base . 'popper' );
-					wp_enqueue_script( $base . 'bootstrap' );
+				wp_enqueue_script( $base . 'bootstrap' );
 //					wp_enqueue_script( $base . 'fontawesome' );
 //					wp_enqueue_style( $base . 'animated' );
 //					wp_enqueue_style( $base . 'bootstrap' );

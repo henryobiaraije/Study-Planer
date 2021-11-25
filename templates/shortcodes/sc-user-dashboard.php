@@ -6,6 +6,7 @@
 	$current_url = home_url( $wp->request );
 
 	$url_dg       = $current_url . '?' . http_build_query( array_merge( $_GET, array( "dashboard-page" => "deck-groups" ) ) );
+	$url_stats    = $current_url . '?' . http_build_query( array_merge( $_GET, array( "dashboard-page" => "stats" ) ) );
 	$url_profile  = $current_url . '?' . http_build_query( array_merge( $_GET, array( "dashboard-page" => "profile" ) ) );
 	$url_settings = $current_url . '?' . http_build_query( array_merge( $_GET, array( "dashboard-page" => "settings" ) ) );
 
@@ -27,6 +28,12 @@
 		<div class="sp-one-tab " >
 			<a href="<?php echo esc_url_raw( $url_settings ); ?>"
 			   class=" text-sp-800 px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 :hover:text-white cursor-pointer text-decoration-none bg-sp-200"
+			   @click.prevent="gotoMenu('stats')"
+			   :class="{'font-bold bg-sp-500 text-white ' : menu === 'stats'}" >Stats</a >
+		</div >
+		<div class="sp-one-tab " >
+			<a href="<?php echo esc_url_raw( $url_settings ); ?>"
+			   class=" text-sp-800 px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 :hover:text-white cursor-pointer text-decoration-none bg-sp-200"
 			   @click.prevent="gotoMenu('settings')"
 			   :class="{'font-bold bg-sp-500 text-white ' : menu === 'settings'}" >Settings</a >
 		</div >
@@ -44,6 +51,9 @@
 		<?php /** Deck groups */ ?>
 		<div v-if="menu === 'deck-groups'" class="section-deck-groups" >
 			<?php \StudyPlanner\load_template( 'shortcodes/dashboard/deck-groups' ); ?>
+		</div >
+		<div v-if="menu === 'stats'" class="section-stats" >
+			<?php \StudyPlanner\load_template( 'shortcodes/dashboard/stats' ); ?>
 		</div >
 		<div v-if="menu === 'settings'" class="section-settings" >
 			<?php \StudyPlanner\load_template( 'shortcodes/dashboard/settings' ); ?>
