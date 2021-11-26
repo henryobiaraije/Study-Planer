@@ -15,6 +15,7 @@
 	use StudyPlanner\Pages\Admin_Basic_Card;
 	use StudyPlanner\Pages\Admin_All_Cards;
 	use StudyPlanner\Pages\Admin_Gap_Card;
+	use StudyPlanner\Pages\Admin_Table_Card;
 	use StudyPlanner\Pages\Admin_Tags;
 	use StudyPlanner\Pages\AdminDeck;
 	use StudyPlanner\Pages\AdminDeckGroups;
@@ -94,6 +95,7 @@
 			Admin_All_Cards::get_instance();
 			Admin_Basic_Card::get_instance();
 			Admin_Gap_Card::get_instance();
+			Admin_Table_Card::get_instance();
 			Short_User_Dashboard::get_instance();
 
 			// Localize all added general object

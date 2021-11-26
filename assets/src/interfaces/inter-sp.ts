@@ -1,3 +1,6 @@
+export type  _TableItem = Array<_Row>;
+export type _Row = Array<string>;
+
 export interface _DeckGroup {
   id: string;
   name: string;

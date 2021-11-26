@@ -20,6 +20,8 @@
 		public const SLUG_ALL_CARDS   = 'study-planner-deck-cards';
 		public const SLUG_BASIC_CARD   = 'study-planner-basic-card';
 		public const SLUG_GAP_CARD   = 'study-planner-gap-card';
+		public const SLUG_TABLE_CARD   = 'study-planner-table-card';
+		public const SLUG_IMAGE_CARD   = 'study-planner-image-card';
 
 		// Post types
 		public const POST_TYPE_SEARCH_ENDPOINT = 'sbe_search_endpoint';

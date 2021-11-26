@@ -1,8 +1,8 @@
 <template >
   <!--  <div :id="divId" style="height: 50px" v-html="newContent" ></div >-->
-  <div>
+  <div style="background-color: #fff;" >
     <div :id="divId" style="min-height: 30px" v-html="value" >{{ value }}</div >
-  </div>
+  </div >
   <!--  <div >-->
   <!--    Some content {{ media }} {{ value.length }} {{ value }}-->
   <!--  </div >-->
@@ -15,7 +15,9 @@ import Component from "vue-class-component";
 
 declare var tinymce;
 declare var wp;
-@Component
+@Component({
+  name : "InputEditor"
+})
 export default class InputEditor extends Vue {
 
   public divId: string      = '';

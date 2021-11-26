@@ -1,0 +1,30 @@
+@import "../admin-default";
+.admin-table-card {
+  table.gap-table {
+    thead {
+      background-color: var(--sp-color-accent);
+      tr {
+        background-color: var(--sp-color-accent);
+        th {
+          background-color: var(--sp-color-accent);
+        }
+      }
+    }
+    tbody {
+      tr:nth-child(odd) {
+        background-color: var(--sp-color-accent-light);
+      }
+    }
+  }
+  .table-action {
+    ul {
+      li {
+        @apply m-0 px-2 py-1 border-b-2 border-gray-200 cursor-pointer hover:bg-sp-100;
+        #popper[data-popper-reference-hidden] {
+          visibility: hidden;
+          pointer-events: none;
+        }
+      }
+    }
+  }
+}

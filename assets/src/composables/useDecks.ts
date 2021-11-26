@@ -134,7 +134,7 @@ export default function (status = 'publish') {
   });
   const modalEditId           = ref('');
   tableData.value.post_status = status;
-  const editedItems           = ref<Array<_Deck>>([]);
+  const editedItemTracker     = ref<{ [key: number]: { editCounter: number } }>({});
   let sendOnline              = null;
   let itemToEdit              = ref<_Deck>(null);
   let total                   = ref<number>(0);
@@ -171,15 +171,15 @@ export default function (status = 'publish') {
   };
   const onEdit                = (item: _Deck) => {
     console.log('edited', {item});
-    if (undefined === editedItems.value[item.id]) {
-      editedItems.value[item.id] = {
+    if (undefined === editedItemTracker.value[item.id]) {
+      editedItemTracker.value[item.id] = {
         editCounter: 0,
       };
     }
-    editedItems.value[item.id].editCounter++;
+    editedItemTracker.value[item.id].editCounter++;
     setTimeout(() => {
-      editedItems.value[item.id].editCounter--;
-      if (editedItems.value[item.id].editCounter === 0) {
+      editedItemTracker.value[item.id].editCounter--;
+      if (editedItemTracker.value[item.id].editCounter === 0) {
         xhrUpdateBatch([item]);
       }
     }, 500);
@@ -219,14 +219,14 @@ export default function (status = 'publish') {
 
     });
     modalElement.addEventListener('hidden.bs.modal', function () {
-      editedItems.value = null;
+      editedItemTracker.value = null;
     });
   }
   const closeEditModal        = () => {
     const modalElement = jQuery(modalEditId.value)[0];
     const myModal      = new bootstrap.Modal(modalElement);
     myModal.hide();
-    editedItems.value = null;
+    editedItemTracker.value = null;
   };
   const tt                    = () => tableData.value;
 
@@ -405,7 +405,7 @@ export default function (status = 'publish') {
 
   return {
     ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch,
-    total, create, itemToEdit, editedItems, tableData, load, newItem,
+    total, create, itemToEdit, editedItemTracker, tableData, load, newItem,
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
     onSortChange, onColumnFilter, updateEditing,
     batchUpdate, batchDelete, batchTrash,
