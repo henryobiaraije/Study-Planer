@@ -14,7 +14,7 @@
 
 
 <div class="admin-table-card" >
-
+	<span class="reset-vue" @click="resetVue()" ></span >
 	<div class="all-loaded" style="display: none;" >
 		<form v-if="showMain" @submit.prevent="useTableCard.createOrUpdate()"
 		      class="md:p-4  gap-4 flex flex-wrap"

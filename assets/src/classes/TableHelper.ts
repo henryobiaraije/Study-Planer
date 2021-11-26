@@ -9,18 +9,21 @@ export default class TableHelper {
         table.push(['']);
       } else {
         table.forEach((row, i) => {
-          row.push('');
+          row.unshift('');
         });
         console.log('column added');
       }
     } else {
       table.forEach((row, i) => {
-        row = [
+        const newRow = [
           ...row.slice(0, i),
           '',
           ...row.slice(i),
-        ]
+        ];
+        table[i]     = newRow;
+        console.log('col >', {newRow, index, table})
       });
+
     }
     console.log({table});
     return table;

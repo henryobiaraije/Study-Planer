@@ -72,16 +72,15 @@ export default function (cardGroupId = 0) {
   const _tAddColumn           = (index = 0) => {
     tableItem.value = TableHelper.addColumn(tableItem.value, index);
     console.log('column added');
+    jQuery('.reset-vue').trigger('click');
   }
   const _tAddRow              = (index = 0) => {
     tableItem.value = TableHelper.addRow(tableItem.value, index);
     console.log('column added ', {index}, currentTableData.value);
   }
-  const _insertRowBefore      = () => {
-    _tAddRow(currentTableData.value.row);
-  }
+  const _insertRowBefore      = () => {_tAddRow(currentTableData.value.row);}
   const _insertRowAfter       = () => {_tAddRow((currentTableData.value.row + 1));}
-  const _insertColumnBefore   = () => {}
+  const _insertColumnBefore   = () => {_tAddColumn(currentTableData.value.col)}
   const _insertColumnAfter    = () => {}
   const _deleteColumn         = () => {}
   const _deleteRow            = () => {}

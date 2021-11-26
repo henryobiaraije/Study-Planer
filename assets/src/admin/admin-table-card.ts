@@ -165,6 +165,10 @@ const mGeneral         = {
       successMessage: '',
     };
   },
+  resetVue(){
+    this.$forceUpdate();
+    console.log('now reset');
+  }
 };
 const mComputedGeneral = {
   ajax() {
