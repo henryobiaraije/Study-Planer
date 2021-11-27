@@ -246,10 +246,10 @@
 				 */
 
 				/*** Get all cards revised today answered today (To exclude them later if "false === $study->no_to_revise") ***/
-				$query_revised_today                 = Answered::where( 'study_id', '=', $study_id )
+				$query_revised_today                 = Answered
+					::where( 'study_id', '=', $study_id )
 					->where( 'created_at', '>', $user_timezone_today_midnight )
-					->whereNotIn( 'grade', [ 'again' ] )
-					->where( 'study_id', '=', $study_id )
+//					->whereNotIn( 'grade', [ 'again' ] )
 					->where( 'answered_as_revised', '=', true );
 				$card_ids_revised_today              = $query_revised_today->pluck( 'card_id' );
 				$count_revised_today                 = $card_ids_revised_today->count();
@@ -260,6 +260,7 @@
 //					'getBindings'                          => $query_revised_today->getBindings(),
 //					'$card_ids_revised_today'              => $card_ids_revised_today,
 //					'$no_of_new_remaining_to_revise_today' => $no_of_new_remaining_to_revise_today,
+//					'$user_timezone_today_midnight'        => $user_timezone_today_midnight,
 //				] );
 
 				/*** Prepare basic query ***/
@@ -292,11 +293,11 @@
 					) {
 						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED )
 							->whereNotIn( 'card_id', $card_ids_revised_today )
-							->whereIn( 'grade', [ 'hold' ] )
+//							->whereIn( 'grade', [ 'hold' ] )
 							->where( 'study_id', $study_id )
 							->where( 'next_due_at', '<=', $user_timezone_today_midnight )
 							->distinct();
-//						dd( $q->toSql(), $q->getBindings(),$q->get() );
+//						dd( $q->toSql(), $q->getBindings(), $q->get() );
 					} );
 //				dd( $cards_query->toSql(), $cards_query->getBindings(),$cards_query->get() );
 
@@ -321,20 +322,20 @@
 //				);
 
 
-//				Common::send_error( [
-//					__METHOD__,
-//					'$all_cards toSql'       => $all_cards->toSql(),
-//					'$all_cards'             => $all_cards->get(),
-//					'$study'                 => $study,
-//					'$card_ids'                 => $card_ids,
-//					'$tags'                  => $tags,
-//					'$add_all_tags'          => $add_all_tags,
-//					'card_get'               => $cards_query->get(),
-//					'card_query_sql'         => $cards_query->toSql(),
-////					'$cards'                 => $cards,
-//					'Manager::getQueryLog()' => Manager::getQueryLog(),
-//					'study_id'               => $study_id,
-//				] );
+				Common::send_error( [
+					__METHOD__,
+					'$all_cards toSql'       => $all_cards->toSql(),
+					'$all_cards'             => $all_cards->get(),
+					'$study'                 => $study,
+					'$card_ids'                 => $card_ids,
+					'$tags'                  => $tags,
+					'$add_all_tags'          => $add_all_tags,
+					'card_get'               => $cards_query->get(),
+					'card_query_sql'         => $cards_query->toSql(),
+//					'$cards'                 => $cards,
+					'Manager::getQueryLog()' => Manager::getQueryLog(),
+					'study_id'               => $study_id,
+				] );
 
 
 				return [

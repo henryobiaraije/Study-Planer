@@ -26,6 +26,7 @@
 			'grade',
 			'ease_factor',
 			'answered_as_new',
+			'answered_as_revised',
 			'next_due_answered',
 			'next_interval',
 			'next_due_at',

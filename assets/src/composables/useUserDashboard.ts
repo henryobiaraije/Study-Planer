@@ -3,6 +3,7 @@ import {InterFuncSuccess, Server} from "../static/server";
 import {ref, onMounted, computed} from "@vue/composition-api";
 import {_Card, _Deck, _DeckGroup, _Study, _Tag} from "../interfaces/inter-sp";
 import {Store} from "../static/store";
+import Vue from "vue";
 
 declare var bootstrap;
 
@@ -43,10 +44,10 @@ export default function (status = 'publish') {
    * Returns the study belonging to a deck or return a new study
    * @param deck
    */
-  const load               = () => {
+  const load                    = () => {
     return xhrLoad();
   }
-  const openStudyModal     = (deck: _Deck) => {
+  const openStudyModal          = (deck: _Deck) => {
     studyToEdit.value  = getStudyForDeck(deck);
     const modalElement = jQuery('#modal-new')[0];
     const myModal      = new bootstrap.Modal(modalElement);
@@ -58,10 +59,10 @@ export default function (status = 'publish') {
 
     });
   };
-  const closeStudyModal    = () => {
+  const closeStudyModal         = () => {
     jQuery('#hide-modal-new').trigger('click');
   };
-  const openQuestionModal  = () => {
+  const openQuestionModal       = () => {
     const modalElement = jQuery('#modal-questions')[0];
     const myModal      = new bootstrap.Modal(modalElement);
     myModal.show();
@@ -69,15 +70,30 @@ export default function (status = 'publish') {
 
     });
     modalElement.addEventListener('hidden.bs.modal', function () {
-
+      xhrGetSingleDeckGroup(currentQuestion.value.card_group.deck.id)
     });
   };
-  const closeQuestionModal = () => {
+  const closeQuestionModal      = () => {
     const modalElement = jQuery('#modal-questions')[0];
     const myModal      = new bootstrap.Modal(modalElement);
     myModal.hide();
   };
-  const startStudy         = () => {
+  const openStudyCompleteModal  = (show = true) => {
+    const modalElement = jQuery('#modal-study-complete')[0];
+    const myModal      = new bootstrap.Modal(modalElement);
+    if (show) {
+      myModal.show();
+      modalElement.addEventListener('shown.bs.modal', function () {
+
+      });
+      modalElement.addEventListener('hidden.bs.modal', function () {});
+    }
+    return myModal;
+  };
+  const closeStudyCompleteModal = () => {
+    openStudyCompleteModal().hide(false);
+  };
+  const startStudy              = () => {
     xhrCreateOrUpdateStudy(studyToEdit.value).then(() => {
       closeStudyModal();
       openQuestionModal();
@@ -87,18 +103,22 @@ export default function (status = 'publish') {
       _nextQuestion();
     });
   }
-  const _nextQuestion      = () => {
-    currentQuestionIndex.value++;
-    if (currentQuestionIndex.value < (allQuestions.value.length)) {
+  const _nextQuestion           = () => {
+
+    if (currentQuestionIndex.value + 1 < (allQuestions.value.length)) {
       if (allQuestions.value.length > 0) {
+        currentQuestionIndex.value++;
         currentQuestion.value = allQuestions.value[currentQuestionIndex.value];
       }
+    } else {
+      closeQuestionModal();
+      openStudyCompleteModal();
     }
   }
-  const _getQuestions      = () => {
+  const _getQuestions           = () => {
     // xhrGetTodayQuestionsInStudy(studyToEdit.value);
   }
-  const getStudyForDeck    = (deck: _Deck) => {
+  const getStudyForDeck         = (deck: _Deck) => {
     let study = studies.value.find((s: _Study) => deck.id === s.deck.id);
     if (undefined === study) {
       study = {
@@ -117,20 +137,25 @@ export default function (status = 'publish') {
     console.log({study});
     return study;
   }
-  const _showAnswer        = () => {
+  const _showAnswer             = () => {
     showCurrentAnswer.value = true;
     showGrade.value         = true;
     // console.log('show curr', showCurrentAnswer.value, showGrade.value);
   }
-  const _markAnswer        = (grade: string) => {
+  const _markAnswer             = (grade: string) => {
     xhrMarkAnswer(studyToEdit.value, currentQuestion.value, grade, currentQuestion.value.answer);
     setTimeout(() => {
       showCurrentAnswer.value = false;
       showGrade.value         = false;
+      if ('again' === grade) {
+        // Answer it again
+        currentQuestion.value.answering_type = 'Revising Card'
+        allQuestions.value.push(currentQuestion.value);
+      }
       _nextQuestion();
     }, 200);
   }
-  const _hold              = (grade: string) => {
+  const _hold                   = (grade: string) => {
     xhrMarkAnswerOnHold(studyToEdit.value, currentQuestion.value, grade, currentQuestion.value.answer);
     setTimeout(() => {
       showCurrentAnswer.value = false;
@@ -138,7 +163,6 @@ export default function (status = 'publish') {
       _nextQuestion();
     }, 200);
   }
-
   //
 
   const xhrLoad                     = () => {
@@ -165,7 +189,7 @@ export default function (status = 'publish') {
           handleAjax.stop();
           const groups     = done.data.details.deck_groups;
           const allStudies = done.data.studies.studies;
-          console.log({groups, allStudies});
+          // console.log({groups, allStudies});
           deckGroups.value = groups;
           studies.value    = allStudies;
           resolve(0);
@@ -193,7 +217,7 @@ export default function (status = 'publish') {
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
           console.log(done);
-          allQuestions.value  = done.data.user_cards.cards;
+          allQuestions.value = done.data.user_cards.cards;
           // studyToEdit.value = done.data;
           resolve(0);
         },
@@ -250,10 +274,10 @@ export default function (status = 'publish') {
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
           lastAnsweredDebugData.value = done.data.debug_display;
-          const nextInterval: number  = done.data.next_interval;
-          if (1 > nextInterval) {
-            allQuestions.value.push(card);
-          }
+          // const nextInterval: number  = done.data.next_interval;
+          // if (1 > nextInterval) {
+          //   allQuestions.value.push(card);
+          // }
           // studyToEdit.value = done.data;
           resolve(0);
         },
@@ -283,6 +307,47 @@ export default function (status = 'publish') {
         },
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
+          // lastAnsweredDebugData.value = done.data.debug_display;
+          // const nextInterval: number  = done.data.next_interval;
+          // if (1 > nextInterval) {
+          //   allQuestions.value.push(card);
+          // }
+          // studyToEdit.value = done.data;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
+  const xhrGetSingleDeckGroup       = (deckId: number) => {
+    const dis                    = this;
+    const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
+    return new Promise((resolve, reject) => {
+      sendOnline = new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            deck_id: deckId,
+          }
+        ],
+        what: "admin_sp_ajax_front_get_single_deck_group",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          const _deckGroup: _DeckGroup = done.data;
+
+          const index = deckGroups.value.findIndex(d => d.id === _deckGroup.id);
+
+          if (index > -1) {
+            deckGroups.value[index] = _deckGroup;
+          }
+          console.log({_deckGroup, index});
+          jQuery('.reset-vue').trigger('click');
           // lastAnsweredDebugData.value = done.data.debug_display;
           // const nextInterval: number  = done.data.next_interval;
           // if (1 > nextInterval) {

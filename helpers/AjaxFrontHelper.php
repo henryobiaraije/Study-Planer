@@ -62,6 +62,7 @@
 			add_action( 'admin_sp_ajax_front_mark_answer', array( $this, 'ajax_front_mark_answer' ) );
 			add_action( 'admin_sp_ajax_front_mark_answer_on_hold', array( $this, 'ajax_front_mark_answer_on_hold' ) );
 			add_action( 'admin_sp_ajax_front_load_stats_forecast', array( $this, 'ajax_front_load_stats_forecast' ) );
+			add_action( 'admin_sp_ajax_front_get_single_deck_group', array( $this, 'ajax_front_get_single_deck_group' ) );
 		}
 
 
@@ -114,17 +115,29 @@
 				Common::send_error( 'Invalid card.' );
 			}
 
+			$answered_as_new     = false;
+			$answered_as_revised = false;
+
+			$_answered_before = Answered::where( 'card_id', '=', $card_id )->first();
+			if ( empty( $_answered_before ) ) {
+				$answered_as_new = true;
+			} else {
+				$answered_as_revised = true;
+			}
+
 			Manager::beginTransaction();
 
 			$_tomorro_datetime = new DateTime( Common::getDateTime( 1 ) );
 			$next_due_date     = $_tomorro_datetime->setTime( 0, 0, 0 )->format( 'Y-m-d H:i:s' );
 
 			$answer = Answered::create( [
-				'study_id'    => $study_id,
-				'card_id'     => $card_id,
-				'answer'      => '',
-				'grade'       => 'hold',
-				'next_due_at' => $next_due_date,
+				'study_id'            => $study_id,
+				'card_id'             => $card_id,
+				'answer'              => '',
+				'grade'               => 'hold',
+				'next_due_at'         => $next_due_date,
+				'answered_as_new'     => $answered_as_new,
+				'answered_as_revised' => $answered_as_revised,
 			] );
 			Manager::commit();
 			Common::send_success( 'On hold marked' );
@@ -174,33 +187,39 @@
 			}
 
 
-			$answered_before  = true;
+			$answered_as_new     = false;
+			$answered_as_revised = false;
+
 			$_answered_before = Answered::where( 'card_id', '=', $card_id )->first();
 			if ( empty( $_answered_before ) ) {
-				$answered_before = false;
+				$answered_as_new = true;
+			} else {
+				$answered_as_revised = true;
 			}
 
 
 //			Common::send_error( [
 //				'ajax_front_get_question',
-//				'post'             => $post,
-//				'$study_id'        => $study_id,
-//				'$study'           => $study,
-//				'$grade'           => $grade,
-//				'$card'            => $card,
-//				'$all_grades'      => $all_grades,
-//				'$answer'          => $answer,
-//				'$answered_before' => $answered_before,
+//				'post'                 => $post,
+//				'$study_id'            => $study_id,
+//				'$study'               => $study,
+//				'$grade'               => $grade,
+//				'$card'                => $card,
+//				'$all_grades'          => $all_grades,
+//				'$answer'              => $answer,
+//				'$answered_as_revised' => $answered_as_revised,
+//				'$answered_as_revised' => $answered_as_revised,
 //			] );
 
 			Manager::beginTransaction();
 
 			$answer = Answered::create( [
-				'study_id'        => $study_id,
-				'card_id'         => $card_id,
-				'answer'          => $answer,
-				'grade'           => $grade,
-				'answered_as_new' => $answered_before,
+				'study_id'            => $study_id,
+				'card_id'             => $card_id,
+				'answer'              => $answer,
+				'grade'               => $grade,
+				'answered_as_new'     => $answered_as_new,
+				'answered_as_revised' => $answered_as_revised,
 //				'next_due_at' => Common::getDateTime( - 7 ),
 			] );
 //			$answer = Answered::create( [
@@ -225,11 +244,10 @@
 					'study_id' => $study_id,
 				] );
 
-				$next_due_date           = $next_due->get_next_due_date();
-				$answer->next_due_at     = $next_due_date['next_due_date_morning'];
-				$answer->next_interval   = $next_due_date['next_interval'];
-				$answer->ease_factor     = $next_due_date['ease_factor'];
-				$answer->answered_as_new = ! $answered_before;
+				$next_due_date         = $next_due->get_next_due_date();
+				$answer->next_due_at   = $next_due_date['next_due_date_morning'];
+				$answer->next_interval = $next_due_date['next_interval'];
+				$answer->ease_factor   = $next_due_date['ease_factor'];
 				$answer->save();
 				Manager::commit();
 
@@ -266,6 +284,7 @@
 
 			$study = Study::with( 'tags', 'deck' )->find( $study_id );
 			if ( empty( $study ) ) {
+				dd( $study, $study_id, $post );
 				Common::send_error( 'Invalid study plan' );
 			}
 
@@ -295,14 +314,15 @@
 				$one->answering_type = 'New Card';
 				$all_cards[]         = $one;
 			}
-			foreach ( $user_cards_revise['cards'] as $one ) {
-				$one->answering_type = 'Revising Card';
-				$all_cards[]         = $one;
-			}
 			foreach ( $user_cards_on_hold['cards'] as $one ) {
 				$one->answering_type = 'Previously On hold';
 				$all_cards[]         = $one;
 			}
+			foreach ( $user_cards_revise['cards'] as $one ) {
+				$one->answering_type = 'Revising Card';
+				$all_cards[]         = $one;
+			}
+
 
 //			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
 
@@ -363,6 +383,7 @@
 			$study = null;
 			if ( ! empty( $study_id ) ) {
 				$study = Study::find( $study_id );
+
 				if ( empty( $study ) ) {
 					Common::send_error( 'Invalid study plan' );
 				}
@@ -436,6 +457,38 @@
 //			] );
 
 			Common::send_success( 'Saved.', $new_study );
+
+		}
+
+		public function ajax_front_get_single_deck_group( $post ) : void {
+
+//			Common::send_error( [
+//				'ajax_front_get_single_deck_group',
+//				'post' => $post,
+//			] );
+
+			$all     = $post[ Common::VAR_2 ];
+			$deck_id = $all['deck_id'];
+			$deck    = Deck::with( 'deck_group' )->find( $deck_id );
+			if ( empty( $deck ) ) {
+				Common::send_error( 'Invalid deck' );
+			}
+			$deck_group = $deck->deck_group;
+			if ( empty( $deck_group ) ) {
+				Common::send_error( 'Invalid deck group' );
+			}
+
+			$deck_group = DeckGroup::get_deck_groups_front_end_one( $deck_group->id );
+
+//			Common::send_error( [
+//				'ajax_admin_load_deck_group',
+//				'post'        => $post,
+//				'$deck_id'    => $deck_id,
+//				'$deck'       => $deck,
+//				'$deck_group' => $deck_group,
+//			] );
+
+			Common::send_success( 'Deck group loaded.', $deck_group );
 
 		}
 

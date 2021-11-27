@@ -20,13 +20,12 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button >
 			</div >
 			<div class="modal-body" >
-
 				<div v-if="null !== currentQuestion" class="sp-question" >
 					<div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question" >
 						Basic card
 					</div >
 					<div v-else-if="'gap' === currentQuestion.card_group.card_type" class="sp-gap-question " >
-						<div v-html="currentQuestion.question" class="shadow p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto" ></div >
+						<div @click="userDash._showAnswer()" v-html="currentQuestion.question" class="shadow p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto" ></div >
 						<div v-show="userDash.showCurrentAnswer.value" v-html="currentQuestion.answer" class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center" ></div >
 					</div >
 				</div >

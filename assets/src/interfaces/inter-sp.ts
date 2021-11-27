@@ -8,7 +8,7 @@ export interface _DeckGroup {
 }
 
 export interface _Deck {
-  id: string;
+  id: number;
   name: string;
   trashed: boolean;
   deck_group: _DeckGroup,
@@ -55,6 +55,7 @@ export interface _Card extends _TimeStamps {
   c_number: string;
   x_position?: number;
   y_position?: number;
+  answering_type?: string;
 }
 
 export interface _CardGroup extends _TimeStamps {

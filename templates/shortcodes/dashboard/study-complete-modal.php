@@ -14,7 +14,7 @@
 			</div >
 			<div class="modal-body" >
 				<div class="p-4 m-2 rounded text-bold bg-green-100 text-green-400-shadow" >
-					Congratulations. You have completed today's study.
+					Congratulations. You have completed today's study for this deck.
 				</div >
 			</div >
 			<div class="modal-footer justify-center" >
@@ -22,7 +22,7 @@
 						button-text="Okay"
 						@click="userDash._getQuestions"
 						css-classes="button"
-						icon="fa fa-redo"
+						icon="fa "
 						:ajax="userDash.ajaxSaveStudy.value" >
 				</ajax-action-not-form >
 			</div >

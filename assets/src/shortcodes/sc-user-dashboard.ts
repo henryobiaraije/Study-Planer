@@ -116,6 +116,10 @@ const mGeneral         = {
   incrShowExtra() {
     this.showExtra++;
   },
+  resetVue(){
+    this.$forceUpdate();
+    console.log('now reset');
+  }
 };
 const mComputedGeneral = {
   ajax() {
@@ -471,6 +475,15 @@ function dis(context): ReturnType<typeof setup> {
         jQuery(elem).css("display", "block");
         this.initUnhide();
         this.init();
+
+        const event = document.createEvent('Event');
+        event.initEvent('resetVue', true, true);
+        document.addEventListener('resetVue', function (e) {
+          console.log('Now triggered');
+          this.$forceUpdate();
+        }, false);
+
+
 
         console.log('Created');
       },

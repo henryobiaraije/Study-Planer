@@ -217,7 +217,6 @@
 					$table->dateTime( 'next_due_at' );
 					$table->boolean( 'next_due_answered' );
 					$table->boolean( 'answered_as_new' );
-
 					$table->integer( 'next_interval' );
 					$table->dateTime( 'rejected_at' );
 					$table->softDeletes();

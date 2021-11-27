@@ -15,7 +15,7 @@
 
 
 <div class="sp-sc-ud" >
-
+	<span class="reset-vue" @click="resetVue()" ></span >
 	<?php /*** Tabs **/ ?>
 	<div class="sp-tab flex gap-2 justify-content-center my-4 all-loaded" style="display: none" >
 		<div class="sp-one-tab " >
@@ -68,6 +68,9 @@
 
 	<?php /** Question display modal */ ?>
 	<?php \StudyPlanner\load_template( 'shortcodes/dashboard/question-modal' ); ?>
+
+	<?php /** Question display modal */ ?>
+	<?php \StudyPlanner\load_template( 'shortcodes/dashboard/study-complete-modal' ); ?>
 
 	<?php /***** Notifications ***/ ?>
 	<hover-notifications ></hover-notifications >

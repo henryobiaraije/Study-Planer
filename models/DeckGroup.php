@@ -136,8 +136,8 @@
 					} else {
 						$_deck->due_summary = Study::get_study_due_summary( $_study->id, $user_id );
 					}
-					$dg_due_summary['new'] = $dg_due_summary['new'] + $_deck->due_summary['new'];
-					$dg_due_summary['revision'] = $dg_due_summary['revision'] + $_deck->due_summary['revision'];
+					$dg_due_summary['new']              = $dg_due_summary['new'] + $_deck->due_summary['new'];
+					$dg_due_summary['revision']         = $dg_due_summary['revision'] + $_deck->due_summary['revision'];
 					$dg_due_summary['previously_false'] = $dg_due_summary['previously_false'] + $_deck->due_summary['previously_false'];
 				}
 				$dg->due_summary = $dg_due_summary;
@@ -155,6 +155,40 @@
 				'total'       => $total,
 				'deck_groups' => $deck_groups->all(),
 			];
+		}
+
+		public static function get_deck_groups_front_end_one( $deck_group_id ) {
+			$user_id = get_current_user_id();
+
+			$deck_group = DeckGroup::with( [
+				'tags',
+				'decks',
+				'decks.studies',
+			] )->find( $deck_group_id );
+
+			$dg             = $deck_group;
+			$decks          = $dg->decks;
+			$dg_due_summary = [
+				'new'              => 0,
+				'revision'         => 0,
+				'previously_false' => 0,
+			];
+			foreach ( $decks as $_deck ) {
+				$_study              = $_deck->studies->first();
+				$_deck->_study_first = $_study;
+				if ( empty( $_study ) ) {
+					$_deck->due_summary = Study::get_study_due_summary( 0, $user_id );
+				} else {
+					$_deck->due_summary = Study::get_study_due_summary( $_study->id, $user_id );
+				}
+				$dg_due_summary['new']              = $dg_due_summary['new'] + $_deck->due_summary['new'];
+				$dg_due_summary['revision']         = $dg_due_summary['revision'] + $_deck->due_summary['revision'];
+				$dg_due_summary['previously_false'] = $dg_due_summary['previously_false'] + $_deck->due_summary['previously_false'];
+			}
+			$dg->due_summary = $dg_due_summary;
+
+
+			return $dg;
 		}
 
 		public static function get_deck_groups_simple( $args ) : array {

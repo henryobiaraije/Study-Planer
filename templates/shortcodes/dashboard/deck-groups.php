@@ -86,9 +86,8 @@
 				<li v-for="(item2,itemIndex2) in item.decks"
 				    :key="item2.id"
 				    class="pl-4 mt-2" >
-					<div class="sp-d-header cursor-pointer  flex gap-2" >
-						<div @click="userDash.openStudyModal(item2)"
-						     class="sp-header-title flex bg-gray-100 hover:bg-gray-200  px-3 py-3 flex-1" >
+					<div @click="userDash.openStudyModal(item2)"  class="sp-d-header cursor-pointer  flex gap-2" >
+						<div class="sp-header-title flex bg-gray-100 hover:bg-gray-200  px-3 py-3 flex-1" >
 							<div class="sp-name text-2xl px-10 py-2  flex-1 font-medium
 									text-2xl px-10 py-2  flex-1 font-medium
 									items-center flex flex-1 font-medium items-center justify-center px-10 py-2 sp-name text-2xl text-center" >{{item2.name}}
