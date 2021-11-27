@@ -81,9 +81,15 @@ export default function (cardGroupId = 0) {
   const _insertRowBefore      = () => {_tAddRow(currentTableData.value.row);}
   const _insertRowAfter       = () => {_tAddRow((currentTableData.value.row + 1));}
   const _insertColumnBefore   = () => {_tAddColumn(currentTableData.value.col)}
-  const _insertColumnAfter    = () => {}
-  const _deleteColumn         = () => {}
-  const _deleteRow            = () => {}
+  const _insertColumnAfter    = () => {_tAddColumn((currentTableData.value.col + 1))}
+  const _deleteColumn         = () => {
+    tableItem.value = TableHelper.deleteColumns(tableItem.value, currentTableData.value.col);
+    jQuery('.reset-vue').trigger('click');
+  }
+  const _deleteRow            = () => {
+    tableItem.value = TableHelper.deleteRow(tableItem.value, currentTableData.value.row);
+    jQuery('.reset-vue').trigger('click');
+  }
   const _openTableActionModal = (col: number, row: number, show = true) => {
     console.log('_openTableActionModal', {col, row, show});
     currentTableData.value.row = row;

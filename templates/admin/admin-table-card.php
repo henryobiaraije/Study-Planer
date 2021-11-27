@@ -21,25 +21,30 @@
 		      style="margin: auto" >
 			<div class="flex-1 " >
 				<div class="action-buttons mb-2" >
-					<button @click="useTableCard._tAddColumn()" type="button" class="button" >Add Column</button >
-					<button @click="useTableCard._tAddRow()" type="button" class="button" >Add Row</button >
+					<button @click="useTableCard._tAddColumn(null)" type="button" class="button" >Add Column</button >
+					<button @click="useTableCard._tAddRow(null)" type="button" class="button" >Add Row</button >
 				</div >
-				<ul >
-					<li v-for="(item,itemIndex) in useTableCard.tableItem.value" >
-						{{item}}
-					</li >
-				</ul >
+				<!--				<ul >-->
+				<!--					<li v-for="(item,itemIndex) in useTableCard.tableItem.value" >-->
+				<!--						{{item}}-->
+				<!--					</li >-->
+				<!--				</ul >-->
 				<?php /**** Table display ***/ ?>
 				<div class="bg-gray-300 shadow rounded sm:p-2 md:p-4 mb-4" >
 					<table v-if="useTableCard.tableItem.value.length > 0" class="table gap-table shadow p-2 bg-gray-100 rounded" >
 						<thead >
 						<tr >
-							<th v-for="(item,itemIndex) in useTableCard.tableItem.value[0]" class="table-cell border-1 border-gray-200" >
+							<th v-for="(item,itemIndex) in useTableCard.tableItem.value[0]"
+							    @dblclick="useTableCard._openTableActionModal(itemIndex,0)"
+							    class="table-cell border-1 border-gray-200" >
 								<input-editor
 										:allow-empty="true"
 										:value="item"
 										v-model="useTableCard.tableItem.value[0][itemIndex]" >
 								</input-editor >
+								<div class="position-relative" >
+									<span :id="'table-col-row-' + itemIndex  + '-' + 0" class="position-absolute top-0 right-0" ></span >
+								</div >
 							</th >
 						</tr >
 						</thead >

@@ -2,48 +2,60 @@ import {_TableItem} from "../interfaces/inter-sp";
 
 export default class TableHelper {
 
-  public static addColumn(table: _TableItem, index: number): _TableItem {
+  public static addColumn(table: _TableItem, index: number = null): _TableItem {
     const noRowsYet = table.length < 1;
-    if (0 === index) {
+    console.log('Add column',{index});
+    if (null === index) {
       if (noRowsYet) {
         table.push(['']);
       } else {
         table.forEach((row, i) => {
-          row.unshift('');
+          row.push('');
         });
-        console.log('column added');
       }
+    } else if (0 === index) {
+      table.forEach((row, i) => {
+        row.unshift('');
+      });
+      console.log('column added');
     } else {
       table.forEach((row, i) => {
         const newRow = [
-          ...row.slice(0, i),
+          ...row.slice(0, index),
           '',
-          ...row.slice(i),
+          ...row.slice(index),
         ];
         table[i]     = newRow;
         console.log('col >', {newRow, index, table})
       });
-
     }
     console.log({table});
     return table;
   }
 
-  public static addRow(table: _TableItem, index: number): _TableItem {
+  public static addRow(table: _TableItem, index: number = null): _TableItem {
+    console.log('addRow', index);
     const noRowsYet = table.length < 1;
-    if (0 === index) {
-      if (noRowsYet) {
+    if (null === index) {
+      if(noRowsYet){
         table.push(['']);
-      } else {
+      }else{
         const columnCount = table[0].length;
         const row         = [];
         for (let a = 0; a < columnCount; a++) {
           row.push('');
         }
         table.push(row);
-        console.log('row added');
       }
-    } else {
+    } else if (0 === index) {
+      const columnCount = table[0].length;
+      const row         = [];
+      for (let a = 0; a < columnCount; a++) {
+        row.unshift('');
+      }
+      table.unshift(row);
+      console.log('row added');
+    } else if (null !== index) {
       const columnCount = table[0].length;
       const newRow      = [];
       for (let a = 0; a < columnCount; a++) {
@@ -57,6 +69,20 @@ export default class TableHelper {
       console.log('adding > 0', {table, index});
     }
     console.log({table, index});
+    return table;
+  }
+
+  public static deleteRow(table: _TableItem, index: number): _TableItem {
+    console.log('delete row', {index});
+    table.splice(index, 1);
+    return table;
+  }
+
+  public static deleteColumns(table: _TableItem, index: number): _TableItem {
+    console.log('delete columns', {index});
+    table.forEach((row, i) => {
+      row.splice(index, 1);
+    });
     return table;
   }
 
