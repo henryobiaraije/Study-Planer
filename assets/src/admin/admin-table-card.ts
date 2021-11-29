@@ -342,7 +342,7 @@ const m_init = {
     this.listner_init();
     this.nn();
     this.generalInit();
-    dis(this).useTableCard.load().then(() => {
+    dis(this).useTableCard._load().then(() => {
       jQuery('.all-loading').hide();
       jQuery('.all-loaded').show();
       vdata.showMain = true;

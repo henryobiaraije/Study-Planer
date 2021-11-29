@@ -1,6 +1,6 @@
 <template >
   <!--  <div :id="divId" style="height: 50px" v-html="newContent" ></div >-->
-  <div style="background-color: #fff;" >
+  <div style="background-color: #fff;padding: 2px;" >
     <div :id="divId" style="min-height: 30px" v-html="value" >{{ value }}</div >
   </div >
   <!--  <div >-->
@@ -33,14 +33,14 @@ export default class InputEditor extends Vue {
   public created2() {
     setTimeout(() => {
       const original = this.value;
-      console.log('value = ' + this.value.length, {original})
+      // console.log('value = ' + this.value.length, {original})
     }, 2000);
   }
 
   public created() {
     setTimeout(() => {
       const original = this.value;
-      console.log('value = ' + this.value, {original})
+      // console.log('value = ' + this.value, {original})
       let content: string = this.value;
       content             = content.replace('/(?:\\r\\n|\\r|\\n)/g', '');
       content             = content.replace(/>n</g, '><');

@@ -62,8 +62,11 @@ export default function (cardGroupId = 0) {
   });
   let setBgAsDefault = ref(false);
 
-
-  let tableItem          = ref<_TableItem>([]);
+  let tableItem          = ref<_TableItem>([
+    ["<p>Words</p>", "<p>Comparative</p>", "<p>Superlative</p>"], ["<p>A {{c1:: big }} orange is {{c2:: here}} and this {{c1::right here}}</p>", "<p>A {{c2:: bigger }} orange</p>", "<p><span style=\"color: #3366ff;\">The {{c3:: biggest}}orange</span></p>"],
+    ["<p>The  {{c4:: tall }} <strong><span style=\"color: #ff9900;\">building</span></strong></p>", "<p>The {{c5:: taller }} building</p>", "<p>The {{c6:: tallest }} building</p>"],
+    ["<p>The {{c1:: fast }} computer</p>", "<p>The {{c2:: faster }}  <strong><span style=\"color: #99cc00;\">computer</span></strong></p>", "<p>The {{c3:: fastest }} computer</p>"]
+  ]);
   const currentTableData = ref({
     row: 0,
     col: 0,
@@ -101,15 +104,14 @@ export default function (cardGroupId = 0) {
     console.log({target, tooltip, targetId});
     const popperInstance = createPopper(target, tooltip as HTMLElement);
   };
-
-  const createOrUpdate = () => {
+  const _createOrUpdate       = () => {
     if (cardGroupId > 0) {
       xhrUpdate();
     } else {
       xhrCreate();
     }
   }
-  const load           = () => {
+  const _load                 = () => {
     return new Promise((resolve, reject) => {
       if (cardGroupId > 0) {
         xhrLoad().then((res) => {
@@ -121,6 +123,9 @@ export default function (cardGroupId = 0) {
         resolve(0);
       }
     });
+  }
+  const _refreshPreview       = () => {
+    items.value = TableHelper.getItemsFromTable(tableItem.value);
   }
 
   const xhrCreate = () => {
@@ -219,19 +224,13 @@ export default function (cardGroupId = 0) {
     });
   };
 
-  watch(cardGroup.value, (current, old) => {
-    const wholeQuestion = cardGroup.value.whole_question;
-    const cards         = RegexHelper.getItemsFromGapWholeQuestion(wholeQuestion, items.value);
-    console.log({items});
-    items.value = cards;
-  })
 
   return {
     ajaxCreate, ajax, ajaxUpdate, ajaxDelete, ajaxTrash,
-    createOrUpdate, cardGroup, load,
+    _createOrUpdate, cardGroup, _load,
     _tAddColumn, _tAddRow, _openTableActionModal,
     _insertRowBefore, _insertRowAfter, _insertColumnBefore, _insertColumnAfter,
-    _deleteColumn, _deleteRow,
+    _deleteColumn, _deleteRow, _refreshPreview,
     tableItem,
     items, setBgAsDefault,
   };

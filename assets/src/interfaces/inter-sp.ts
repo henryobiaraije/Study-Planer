@@ -52,9 +52,9 @@ export interface _Study {
 export interface _Card extends _TimeStamps {
   id?: number;
   hash: string,
-  question: string;
+  question: string | _TableItem;
   card_group?: _CardGroup,
-  answer: string;
+  answer: any; //string | _TableItem;
   c_number: string;
   x_position?: number;
   y_position?: number;
