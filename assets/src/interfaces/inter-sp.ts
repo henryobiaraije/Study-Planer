@@ -69,7 +69,7 @@ export interface _CardGroup extends _TimeStamps {
   tags: Array<_Tag>;
   cards: Array<_Card>,
   name: string,
-  whole_question: string,
+  whole_question: any,
   scheduled_at: string,
   reverse: boolean;
   cards_count?: number;

@@ -16,10 +16,17 @@
 <div class="admin-table-card" >
 	<span class="reset-vue" @click="resetVue()" ></span >
 	<div class="all-loaded" style="display: none;" >
-		<form v-if="showMain" @submit.prevent="useTableCard.createOrUpdate()"
+		<form v-if="showMain" @submit.prevent="useTableCard._createOrUpdate()"
 		      class="md:p-4  gap-4 flex flex-wrap"
 		      style="margin: auto" >
 			<div class="flex-1 " >
+				<?php /**** Name ***/ ?>
+				<div class="bg-sp-50 shadow rounded sm:p-2 md:p-4 mb-4" >
+					<label class="my-2 bg-white my-2 p-2 rounded shadow" >
+						<span class="" >Name</span >
+						<input v-model="tableCardGroup.name" name="card_name" required type="text" >
+					</label >
+				</div >
 				<div class="action-buttons mb-2" >
 					<button @click="useTableCard._tAddColumn(null)" type="button" class="button" >Add Column</button >
 					<button @click="useTableCard._tAddRow(null)" type="button" class="button" >Add Row</button >
@@ -174,6 +181,7 @@
 					<vue-mulitiselect
 							v-model="tableCardGroup.deck" :options="decks.searchResults.value"
 							:multiple="false" :loading="decks.ajaxSearch.value.sending"
+							required
 							:searchable="true" :allowEmpty="false" :close-on-select="true"
 							:taggable="false" :createTag="false" @search-change="decks.search"
 							placeholder="Deck" label="name" track-by="id"

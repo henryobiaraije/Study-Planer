@@ -57,16 +57,17 @@ export default function (cardGroupId = 0) {
     bg_image_id   : 0,
     name          : '',
     group_type    : '',
-    whole_question: '',
+    whole_question: null,
     scheduled_at  : '',
   });
   let setBgAsDefault = ref(false);
 
-  let tableItem          = ref<_TableItem>([
-    ["<p>Words</p>", "<p>Comparative</p>", "<p>Superlative</p>"], ["<p>A {{c1:: big }} orange is {{c2:: here}} and this {{c1::right here}}</p>", "<p>A {{c2:: bigger }} orange</p>", "<p><span style=\"color: #3366ff;\">The {{c3:: biggest}}orange</span></p>"],
-    ["<p>The  {{c4:: tall }} <strong><span style=\"color: #ff9900;\">building</span></strong></p>", "<p>The {{c5:: taller }} building</p>", "<p>The {{c6:: tallest }} building</p>"],
-    ["<p>The {{c1:: fast }} computer</p>", "<p>The {{c2:: faster }}  <strong><span style=\"color: #99cc00;\">computer</span></strong></p>", "<p>The {{c3:: fastest }} computer</p>"]
-  ]);
+  // let tableItem          = ref<_TableItem>([
+  //   ["<p>Words</p>", "<p>Comparative</p>", "<p>Superlative</p>"], ["<p>A {{c1:: big }} orange is {{c2:: here}} and this {{c1::right here}}</p>", "<p>A {{c2:: bigger }} orange</p>", "<p><span style=\"color: #3366ff;\">The {{c3:: biggest}}orange</span></p>"],
+  //   ["<p>The  {{c4:: tall }} <strong><span style=\"color: #ff9900;\">building</span></strong></p>", "<p>The {{c5:: taller }} building</p>", "<p>The {{c6:: tallest }} building</p>"],
+  //   ["<p>The {{c1:: fast }} computer</p>", "<p>The {{c2:: faster }}  <strong><span style=\"color: #99cc00;\">computer</span></strong></p>", "<p>The {{c3:: fastest }} computer</p>"]
+  // ]);
+  let tableItem          = ref<_TableItem>([]);
   const currentTableData = ref({
     row: 0,
     col: 0,
@@ -129,7 +130,8 @@ export default function (cardGroupId = 0) {
   }
 
   const xhrCreate = () => {
-    const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
+    cardGroup.value.whole_question = tableItem.value;
+    const handleAjax: HandleAjax   = new HandleAjax(ajaxCreate.value);
     new Server().send_online({
       data: [
         Store.nonce,
@@ -139,7 +141,7 @@ export default function (cardGroupId = 0) {
           set_bg_as_default: setBgAsDefault.value,
         }
       ],
-      what: "admin_sp_ajax_admin_create_new_gap_card",
+      what: "admin_sp_ajax_admin_create_new_table_card",
       funcBefore() {
         handleAjax.start();
       },
@@ -154,6 +156,7 @@ export default function (cardGroupId = 0) {
   };
   const xhrUpdate = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
+    cardGroup.value.whole_question = tableItem.value;
     new Server().send_online({
       data: [
         Store.nonce,
@@ -163,7 +166,7 @@ export default function (cardGroupId = 0) {
           set_bg_as_default: setBgAsDefault.value,
         }
       ],
-      what: "admin_sp_ajax_admin_update_gap_card",
+      what: "admin_sp_ajax_admin_update_table_card",
       funcBefore() {
         handleAjax.start();
       },
@@ -186,7 +189,7 @@ export default function (cardGroupId = 0) {
             card_group_id: cardGroupId,
           }
         ],
-        what: "admin_sp_ajax_admin_load_table_card",
+        what: "admin_sp_ajax_admin_load_basic_card",
         funcBefore() {
           handleAjax.start();
         },
@@ -198,6 +201,7 @@ export default function (cardGroupId = 0) {
           }
           // cardGroup.value = hold;
           cardGroup.value.whole_question      = hold.whole_question;
+          tableItem.value                     = hold.whole_question;
           cardGroup.value.cards               = hold.cards;
           cardGroup.value.name                = hold.name;
           cardGroup.value.created_at          = hold.created_at;

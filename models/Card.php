@@ -28,6 +28,10 @@
 			'y_position',
 		];
 
+		protected $casts = [
+
+		];
+
 		public function answered() {
 			return $this->hasMany( Answered::class );
 		}
