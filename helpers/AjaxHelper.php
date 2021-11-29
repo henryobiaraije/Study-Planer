@@ -143,7 +143,7 @@
 			Manager::beginTransaction();
 			$card_group                 = new CardGroup();
 			$card_group->whole_question = $whole_question;
-			$card_group->card_type      = 'image';
+			$card_group->card_type      = 'table';
 			$card_group->scheduled_at   = $schedule_at;
 			$card_group->bg_image_id    = $bg_image_id;
 			$card_group->name           = $cg_name;
@@ -920,7 +920,7 @@
 			if ( empty( $card_group ) ) {
 				Common::send_error( 'Invalid card group' );
 			}
-			if ( 'image' === $card_group->card_type ) {
+			if ( 'table' === $card_group->card_type ) {
 				$card_group->whole_question = json_decode( $card_group->whole_question );
 				foreach ( $card_group->cards as $card ) {
 					$card->question = json_decode( $card->question );

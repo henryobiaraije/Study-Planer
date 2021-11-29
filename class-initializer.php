@@ -15,6 +15,7 @@
 	use StudyPlanner\Pages\Admin_Basic_Card;
 	use StudyPlanner\Pages\Admin_All_Cards;
 	use StudyPlanner\Pages\Admin_Gap_Card;
+	use StudyPlanner\Pages\Admin_Image_Card;
 	use StudyPlanner\Pages\Admin_Table_Card;
 	use StudyPlanner\Pages\Admin_Tags;
 	use StudyPlanner\Pages\AdminDeck;
@@ -97,6 +98,7 @@
 			Admin_Gap_Card::get_instance();
 			Admin_Table_Card::get_instance();
 			Short_User_Dashboard::get_instance();
+			Admin_Image_Card::get_instance();
 
 			// Localize all added general object
 			add_action( 'wp_footer', array( $this, 'output_localized' ), 10 );

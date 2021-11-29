@@ -89,6 +89,9 @@
 			wp_register_script( 'sp-admin-gap-card', $js, [ 'jquery' ], Initializer::$script_version, true );
 			wp_enqueue_editor();
 			wp_enqueue_media();
+
+
+
 			// enqueue the scripts
 			add_action( 'sp_enqueue_default_admin_gap_card', function () use ( $dis ) {
 				do_action( 'sp_enqueue_default_admin_scripts' );
