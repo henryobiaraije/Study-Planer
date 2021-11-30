@@ -330,7 +330,7 @@ const m_listner = {
       try {
         let contains = document.querySelector(".table-cell").contains(e.target);
         if (!contains) {
-          jQuery('.table-action').hide();
+          jQuery('#image-menu-action').hide();
         }
       } catch (e) {
         // console.error(e);

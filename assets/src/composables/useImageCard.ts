@@ -7,6 +7,8 @@ import useDeckGroupLists from "./useDeckGroupLists";
 import RegexHelper from "../classes/RegexHelper";
 import TableHelper from "../classes/TableHelper";
 import Common from "../classes/Common";
+import useBgImage from "./useBgImage";
+import {createPopper} from "@popperjs/core";
 
 declare var bootstrap;
 
@@ -60,6 +62,8 @@ export default function (cardGroupId = 0) {
     scheduled_at  : '',
   });
   let setBgAsDefault = ref(false);
+  const rotateParams = {}
+  let currentBox     = ref(null);
 
   interface _ImageItem {
     w: number;
@@ -69,11 +73,12 @@ export default function (cardGroupId = 0) {
   }
 
   interface _ImageBox {
-    x: number;
-    y: number;
+    top: number;
+    left: number;
     h: number;
     w: number;
-    text: string;
+    angle: number;
+    imageUrl: string;
     hash: string;
   }
 
@@ -90,16 +95,28 @@ export default function (cardGroupId = 0) {
   });
 
   const _AddImage = () => {
-
+    useBgImage().pickImage('Pick', 'Select Medical Image').then((res) => {
+      imageItem.value.boxes.push({
+        top     : 0,
+        left    : 0,
+        w       : 100,
+        h       : 100,
+        hash    : Common.getRandomString(),
+        imageUrl: res.url,
+        angle   : 0,
+      });
+      _addBoxEvents();
+    });
   }
   const _AddBox   = () => {
     imageItem.value.boxes.push({
-      x   : 0,
-      y   : 0,
-      w   : 100,
-      h   : 30,
-      text: '',
-      hash: Common.getRandomString(),
+      top     : 0,
+      left    : 0,
+      w       : 100,
+      h       : 30,
+      hash    : Common.getRandomString(),
+      imageUrl: '',
+      angle   : 0,
     });
     _addBoxEvents();
   }
@@ -133,8 +150,9 @@ export default function (cardGroupId = 0) {
         #${id}{
           height: ${box.h}px;
           width: ${box.w}px;
-          border: 1px solid #fadecc;
-          background: #fadecc;
+          top: ${box.top};
+          left : ${box.left};
+          transform : 'rotate(${box.angle}rad)';
         }
       </style>
     `;
@@ -144,18 +162,150 @@ export default function (cardGroupId = 0) {
     });
   }
 
+  const _bringToFront = () => {
+    _closeActionMenu();
+    const oldBoxes = imageItem.value.boxes;
+    const index    = oldBoxes.findIndex((box: _ImageBox) => {
+      const isSame = box.hash === currentBox.value.hash;
+      // console.log(box.hash, currentBox.value.hash, {isSame});
+      return isSame;
+    });
+
+    // console.log('bring to front', {index, current: currentBox.value, oldBoxes});
+    // if (index >= (imageItem.value.boxes.length - 1)) {
+    //   return;
+    // }
+    const newBoxes = [];
+    let flagSet    = false;
+    oldBoxes.forEach((box: _ImageBox, i) => {
+      console.log('count ' + i);
+      if (i < index) {
+        newBoxes.push(box);
+        console.log('Less than', {i, index, newBoxes, len: newBoxes.length, box, oldBoxes});
+      } else if (i === index) {
+        console.log('Equals ', {i, index, newBoxes, box, oldBoxes});
+        // if(index > oldBoxes.length - 1 ){
+        //
+        // }
+      } else {
+
+        if (!flagSet) {
+          newBoxes.push(imageItem.value.boxes[index]);
+          flagSet = true;
+        }
+        console.log('Greater than ', {i, index, newBoxes, oldBoxes, flagSet, box});
+        newBoxes.push(box);
+      }
+    });
+    console.log('bring to front', {index, current: currentBox.value, oldBoxes});
+    imageItem.value.boxes = newBoxes;
+    _addBoxEvents();
+  };
+  const _sendToBack   = () => {};
+  const _delete       = () => {
+    _closeActionMenu();
+    // if (!confirm('Are you sure you want to delete this?')) {
+    //   return;
+    // }
+    const oldBoxes = imageItem.value.boxes;
+    const index    = oldBoxes.findIndex((box: _ImageBox) => {
+      const isSame = box.hash === currentBox.value.hash;
+      // console.log(box.hash, currentBox.value.hash, {isSame});
+      return isSame;
+    });
+    if (index > -1) {
+      imageItem.value.boxes.splice(index, 1);
+    }
+    _addBoxEvents();
+  };
+
   const _addBoxEvents = () => {
     setTimeout(() => {
       imageItem.value.boxes.forEach((box: _ImageBox, i) => {
         const hash = box.hash;
         const id   = 'sp-box-' + hash;
+        try {
+          // @ts-ignore
+          jQuery('#' + id).resizable('destroy');
+          // @ts-ignore
+          jQuery('#' + id).draggable('destroy');
+          // @ts-ignore
+          jQuery('#' + id).rotatable('destroy');
+        } catch (e) {
+          console.error('Cant destroy', {e});
+        }
         // @ts-ignore
-        jQuery('#' + id).resizable().draggable().rotatable();
+        jQuery('#' + id).resizable({
+          containment: "parent",
+          stop       : (event, ui) => {
+            const width  = ui.size.width;
+            const height = ui.size.height;
+            console.log('box stop resize', {event, ui, width, height});
+            _boxDropped({
+              hash: hash,
+              w   : width,
+              h   : height,
+            });
+          }
+        }).draggable({
+          containment: "parent",
+          cursor     : "pointer",
+          stop       : (event, ui) => {
+            const target = jQuery(event.target);
+            const hash   = target.attr('data-hash');
+            const top    = ui.position.top;
+            const left   = ui.position.left;
+            console.log('box stop', {event, ui, target, hash, top, left});
+            _boxDropped({
+              hash: hash,
+              top,
+              left,
+            });
+          }
+        }).rotatable({
+          angle               : false,
+          degrees             : false,
+          handle              : false,
+          handleOffset        : {
+            top : 0,
+            left: 0
+          },
+          radians             : false,
+          rotationCenterOffset: {
+            top : 0,
+            left: 0
+          },
+          snap                : false,
+          step                : 22.5,
+          transforms          : null,
+          wheelRotate         : false,
+          rotate              : function (event, ui) {
+          },
+          start               : function (event, ui) {
+          },
+          stop                : function (event, ui) {
+            console.log('rotation stop', {event, ui});
+            const angle = ui.angle.current;
+            // const height = ui.size.height;
+            console.log('box stop rotate', {event, ui, angle});
+            _boxDropped({
+              hash : hash,
+              angle: angle,
+            });
+          },
+        });
       });
       applyCss();
-    }, 1000);
+    }, 500);
   }
   const _addEvents    = () => {
+    console.log('Creating new event');
+    try {
+      // @ts-ignore
+      jQuery('.image-area-inner').resizable("destroy");
+    } catch (e) {
+      console.error('Cant destroy main', {e});
+    }
     // @ts-ignore
     jQuery('.image-area-inner').resizable({
       autoHide: true,
@@ -164,19 +314,23 @@ export default function (cardGroupId = 0) {
         const width  = ui.size.width;
         const height = ui.size.height;
         _mainDropped(width, height);
+        _addEvents();
       },
+      create  : function (event, ui) {
+        _addBoxEvents();
+      }
     });
     applyCss();
   }
 
-  const _createOrUpdate = () => {
+  const _createOrUpdate  = () => {
     if (cardGroupId > 0) {
       xhrUpdate();
     } else {
       xhrCreate();
     }
   }
-  const _load           = () => {
+  const _load            = () => {
     return new Promise((resolve, reject) => {
       if (cardGroupId > 0) {
         xhrLoad().then((res) => {
@@ -189,10 +343,40 @@ export default function (cardGroupId = 0) {
       }
     });
   }
+  const _closeActionMenu = () => {
+    jQuery('#image-menu-action').hide();
+  }
+  const _openActionMenu  = (box: _ImageBox) => {
+    console.log('_openActionMenu', {box});
+    // currentTableData.value.row = row;
+    // currentTableData.value.col = col;
+    currentBox.value = box;
+    jQuery('#image-menu-action').show();
+    const targetId = '#action-box-' + box.hash;
+    const target   = document.querySelector(targetId);
+    const tooltip  = document.querySelector('#image-menu-action');
+    console.log({target, tooltip, targetId});
+    const popperInstance = createPopper(target, tooltip as HTMLElement);
+  };
 
   const _mainDropped    = (w: number, h: number) => {
     imageItem.value.w = w;
     imageItem.value.h = h;
+    applyCss();
+  }
+  const _boxDropped     = (args: { hash: string; w?: number; h?: number; top?: number; left?: number, angle?: number }) => {
+    const boxIndex = imageItem.value.boxes.findIndex((box: _ImageBox) => {
+      return box.hash === args.hash;
+    });
+    if (!(undefined === boxIndex)) {
+      const box = imageItem.value.boxes[boxIndex];
+      box.w     = args?.w || box.w;
+      box.h     = args?.h || box.h;
+      box.top   = args?.top || box.top;
+      box.left  = args?.left || box.left;
+      box.angle = args?.angle || box.angle;
+      console.log('_boxDropped', {imageItem, box});
+    }
     applyCss();
   }
   const _refreshPreview = () => {
@@ -307,15 +491,19 @@ export default function (cardGroupId = 0) {
 
   const _cssBox = computed((box: _ImageBox) => {
     return {
-      width : box.x,
-      height: box.y,
+      width    : box.w,
+      height   : box.h,
+      top      : box.top,
+      left     : box.left,
+      transform: box.angle,
     };
   })
 
   return {
     ajaxCreate, ajax, ajaxUpdate, ajaxDelete, ajaxTrash,
     _createOrUpdate, cardGroup, _load, _refreshPreview,
-    imageItem, _AddBox,
-    items, setBgAsDefault, _addEvents,
+    imageItem, _AddBox, _AddImage,
+    _bringToFront, _sendToBack, _delete,
+    items, setBgAsDefault, _addEvents, _openActionMenu,
   };
 }

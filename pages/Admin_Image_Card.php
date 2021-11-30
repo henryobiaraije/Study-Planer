@@ -6,6 +6,7 @@
 	namespace StudyPlanner\Pages;
 
 	use StudyPlanner\Initializer;
+	use StudyPlanner\Libs\Common;
 	use StudyPlanner\Libs\Settings;
 
 	/**
@@ -37,7 +38,24 @@
 		public function initialize() : void {
 			add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
 			add_action( 'init', array( $this, 'init' ) );
-
+			add_action( 'admin_head', function () {
+				$url = Initializer::$image_url . '/rotate.png';
+//				Common::in_script( [
+//					'url' => $url,
+//				] );
+				echo "
+				<style>
+          .ui-rotatable-handle {
+            height: 16px;
+            width: 16px;
+            cursor: pointer;
+            background-image: url('" . $url . "');
+            background-size: 100%;
+            left: 2px;
+            bottom: 2px;
+        } 
+				</style>";
+			} );
 		}
 
 		public function init() : void {

@@ -14,7 +14,7 @@ export default function () {
     successMessage: '',
   });
 
-  const pickImage      = (button_text: any, header_text: any): Promise<{ id: number, url: number }> => {
+  const pickImage      = (button_text: any, header_text: any): Promise<{ id: number, url: string }> => {
     return new Promise((resolve, reject) => {
       let frame = wp.media({
         title   : header_text,

@@ -18,7 +18,6 @@
 		<form v-if="showMain" @submit.prevent="useImageCard._createOrUpdate()"
 		      class="md:p-4  gap-4 flex flex-wrap"
 		      style="margin: auto" >
-			
 			<div class="flex-1 " >
 				<?php /**** Name ***/ ?>
 				<div class="bg-sp-50 shadow rounded sm:p-2 md:p-4 mb-4" >
@@ -28,20 +27,32 @@
 					</label >
 				</div >
 				<div class="action-buttons mb-2" >
-					<button @click="useImageCard._tAddColumn(null)" type="button" class="button" >Add Image</button >
-					<button @click="useImageCard._tAddRow(null)" type="button" class="button" >Add Arrow</button >
+					<button @click="useImageCard._AddImage()" type="button" class="button" >Add Image</button >
+					<!--					<button @click="useImageCard._tAddRow(null)" type="button" class="button" >Add Arrow</button >-->
 					<button @click="useImageCard._AddBox()" type="button" class="button" >Add Box</button >
 				</div >
-				<?php /**** Table display ***/ ?>
+				<?php /**** Image display ***/ ?>
 				<div class="bg-white shadow rounded sm:p-2 md:p-4 mb-4" >
 					<div class="image-area" >
 						<div :id="'main-'+imageCardItem.hash" class="image-area-inner image-card-view " >
-							some draggable
-							<div :id="'sp-box-'+item.hash" v-for="(item,itemIndex) in imageCardItem.boxes"
-							     class="sp-boxes" >
-
-							</div >
+							<span :id="'sp-box-'+item.hash"
+							      :data-hash="item.hash" v-for="(item,itemIndex) in imageCardItem.boxes"
+							      @dblclick="useImageCard._openActionMenu(item)"
+							      :key="item.hash"
+							      class="sp-boxes" >
+								<img v-if="item.imageUrl.length > 0" :src="item.imageUrl" alt="" >
+								<div class="position-relative" >
+									<span :id="'action-box-' + item.hash " class="position-absolute top-0 right-0" ></span >
+								</div >
+							</span >
 						</div >
+					</div >
+					<div class="image-menu-action action-menu" id="image-menu-action" style="display: none; z-index:2147483647" >
+						<ul class="m-0 p-0 shadow rounded overflow-hidden bg-white" style="max-width: 180px;font-size: 14px;" >
+							<!--							<li @click="useImageCard._bringToFront" class="" >Bring to front</li >-->
+							<!--							<li @click="useImageCard._sendToBack" class="" >Send to back</li >-->
+							<li @click="useImageCard._delete" class="" >Delete</li >
+						</ul >
 					</div >
 				</div >
 				<?php /**** Cards formed ***/ ?>

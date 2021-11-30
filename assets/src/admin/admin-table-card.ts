@@ -322,7 +322,7 @@ const m_listner = {
     // Hide table action when not clicked on td
     window.addEventListener("click", function (e: any) {
       try {
-        let contains = document.querySelector(".table-cell").contains(e.target);
+        let contains = document.querySelector(".sp-boxes").contains(e.target);
         if (!contains) {
           jQuery('.table-action').hide();
         }
