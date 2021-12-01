@@ -1,6 +1,6 @@
 import {ref, computed, watch} from "@vue/composition-api";
 import {_Ajax, HandleAjax} from "../classes/HandleAjax";
-import {_Deck, _Tag, _CardGroup, _Card, _TableItem} from "../interfaces/inter-sp";
+import {_Deck, _Tag, _CardGroup, _Card, _TableItem, _ImageItem, _ImageBox, IMAGE_DISPLAY_TYPE} from "../interfaces/inter-sp";
 import {InterFuncSuccess, Server} from "../static/server";
 import {Store} from "../static/store";
 import useDeckGroupLists from "./useDeckGroupLists";
@@ -9,6 +9,7 @@ import TableHelper from "../classes/TableHelper";
 import Common from "../classes/Common";
 import useBgImage from "./useBgImage";
 import {createPopper} from "@popperjs/core";
+import ImageHelper from "../classes/ImageHelper";
 
 declare var bootstrap;
 
@@ -58,29 +59,13 @@ export default function (cardGroupId = 0) {
     bg_image_id   : 0,
     name          : '',
     group_type    : '',
+    image_type    : '' as IMAGE_DISPLAY_TYPE,
     whole_question: null,
     scheduled_at  : '',
   });
   let setBgAsDefault = ref(false);
   const rotateParams = {}
   let currentBox     = ref(null);
-
-  interface _ImageItem {
-    w: number;
-    h: number;
-    boxes: Array<_ImageBox>;
-    hash: string;
-  }
-
-  interface _ImageBox {
-    top: number;
-    left: number;
-    h: number;
-    w: number;
-    angle: number;
-    imageUrl: string;
-    hash: string;
-  }
 
   let imageItem = ref<_ImageItem>({
     w    : 300,
@@ -104,6 +89,8 @@ export default function (cardGroupId = 0) {
         hash    : Common.getRandomString(),
         imageUrl: res.url,
         angle   : 0,
+        show    : false,
+        asked    : false,
       });
       _addBoxEvents();
     });
@@ -117,15 +104,17 @@ export default function (cardGroupId = 0) {
       hash    : Common.getRandomString(),
       imageUrl: '',
       angle   : 0,
+      show    : false,
+      asked    : false,
     });
     _addBoxEvents();
   }
 
-  const applyCss      = () => {
+  const applyCss             = () => {
     applyMainCss();
     applyBoxesCss();
   }
-  const applyMainCss  = () => {
+  const applyMainCss         = () => {
     const mainHash = imageItem.value.hash;
     const mainId   = 'main-' + mainHash;
     const styleId  = 'main-style-' + mainHash;
@@ -140,7 +129,7 @@ export default function (cardGroupId = 0) {
     jQuery('head').find('#' + styleId).remove();
     jQuery('head').append(css);
   }
-  const applyBoxesCss = () => {
+  const applyBoxesCss        = () => {
     imageItem.value.boxes.forEach((box: _ImageBox) => {
       const hash    = box.hash;
       const id      = 'sp-box-' + hash;
@@ -156,7 +145,43 @@ export default function (cardGroupId = 0) {
         }
       </style>
     `;
-      console.log('box', {hash, css});
+      // console.log('box', {hash, css});
+      jQuery('head').find('#' + styleId).remove();
+      jQuery('head').append(css);
+    });
+  }
+  const applyPreviewCss      = (_imageItem: _ImageItem) => {
+    const mainHash = _imageItem.hash;
+    const mainId   = 'main-preview-' + mainHash;
+    const styleId  = 'main-preview-style-' + mainHash;
+    const css      = `
+      <style id="${styleId}">
+        #${mainId}{
+          height: ${_imageItem.h}px;
+          width: ${_imageItem.w}px;
+        }
+      </style>
+    `;
+    jQuery('head').find('#' + styleId).remove();
+    jQuery('head').append(css);
+  }
+  const applyBoxesPreviewCss = (boxes: Array<_ImageBox>) => {
+    boxes.forEach((box: _ImageBox) => {
+      const hash    = box.hash;
+      const id      = 'sp-box-preview-' + hash;
+      const styleId = 'sp-box-preview-style-' + id;
+      const css     = `
+      <style id="${styleId}">
+        #${id}{
+          height: ${box.h}px;
+          width: ${box.w}px;
+          top: ${box.top}px;
+          left : ${box.left}px;
+          transform : rotate(${box.angle}rad);
+        }
+      </style>
+    `;
+      // console.log('box', {hash, css});
       jQuery('head').find('#' + styleId).remove();
       jQuery('head').append(css);
     });
@@ -380,7 +405,17 @@ export default function (cardGroupId = 0) {
     applyCss();
   }
   const _refreshPreview = () => {
-    // items.value = TableHelper.getItemsFromTable(tableItem.value);
+    console.log('refresh now');
+    items.value = ImageHelper.getCardsFromImageItem(imageItem.value, cardGroup.value);
+    items.value.forEach((_card: _Card) => {
+      const question: _ImageItem = _card.question as _ImageItem;
+      const answer: _ImageItem   = _card.answer as _ImageItem;
+      console.log('preview', {question, answer});
+      applyPreviewCss(question);
+      applyPreviewCss(answer);
+      applyBoxesPreviewCss(question.boxes);
+      applyBoxesPreviewCss(answer.boxes);
+    });
   }
 
   const xhrCreate = () => {

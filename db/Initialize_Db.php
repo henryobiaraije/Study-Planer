@@ -166,6 +166,11 @@
 					$table->timestamps();
 				} );
 			}
+			if ( ! $this->schema_builder->hasColumn( SP_TABLE_CARD_GROUPS, 'image_type' ) ) {
+				Capsule::schema()->table( SP_TABLE_CARD_GROUPS, function ( Blueprint $table ) {
+					$table->boolean( 'image_type' )->after( 'reverse' );
+				} );
+			}
 
 			// Card
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_CARDS ) ) {

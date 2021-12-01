@@ -1,14 +1,18 @@
+import sha256 from 'crypto-js/sha256';
+
 export default class Common {
 
   private static generatedRandom = [];
 
   public static getRandomString() {
-    let rand = Common.rand();
-    while (Common.generatedRandom.indexOf(rand) > -1) {
-      rand = Common.rand();
-      console.log('Looping');
-    }
-    Common.generatedRandom.push(rand);
+    let rand1 = Common.rand();
+    let rand2 = Common.rand();
+    // while (Common.generatedRandom.indexOf(rand) > -1) {
+    //   rand = Common.rand();
+    //   console.log('Looping');
+    // }
+    // Common.generatedRandom.push(rand);
+    const rand = sha256(rand2 + rand1).toString();
     return rand;
   }
 

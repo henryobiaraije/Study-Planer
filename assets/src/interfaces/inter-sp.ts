@@ -48,17 +48,25 @@ export interface _Study {
   study_all_on_hold: boolean,
 }
 
+export type _QuestionType = string | _TableItem | _ImageItem;
 
 export interface _Card extends _TimeStamps {
   id?: number;
   hash: string,
-  question: string | _TableItem;
+  question: _QuestionType;
   card_group?: _CardGroup,
   answer: any; //string | _TableItem;
   c_number: string;
   x_position?: number;
   y_position?: number;
   answering_type?: string;
+}
+
+
+export enum IMAGE_DISPLAY_TYPE {
+  HIDE_ALL_ASK_ONE = 'hide_all_ask_one',
+  HIDE_ALL_ASK_ALL = 'hide_all_ask_all',
+  HIDE_ONE_ASK_ONE = 'hide_one_ask_one'
 }
 
 export interface _CardGroup extends _TimeStamps {
@@ -69,9 +77,29 @@ export interface _CardGroup extends _TimeStamps {
   tags: Array<_Tag>;
   cards: Array<_Card>,
   name: string,
+  image_type?: IMAGE_DISPLAY_TYPE,
   whole_question: any,
   scheduled_at: string,
   reverse: boolean;
   cards_count?: number;
   card_group_edit_url?: string;
+}
+
+export interface _ImageItem {
+  w: number;
+  h: number;
+  boxes: Array<_ImageBox>;
+  hash: string;
+}
+
+export interface _ImageBox {
+  top: number;
+  left: number;
+  h: number;
+  w: number;
+  show: boolean;
+  asked: boolean;
+  angle: number;
+  imageUrl: string;
+  hash: string;
 }
