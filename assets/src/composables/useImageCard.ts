@@ -90,6 +90,7 @@ export default function (cardGroupId = 0) {
         imageUrl: res.url,
         angle   : 0,
         show    : false,
+        hide    : false,
         asked    : false,
       });
       _addBoxEvents();
@@ -105,6 +106,7 @@ export default function (cardGroupId = 0) {
       imageUrl: '',
       angle   : 0,
       show    : false,
+      hide    : false,
       asked    : false,
     });
     _addBoxEvents();

@@ -9,7 +9,7 @@
         position: absolute;
         display: inline-block;
         border: 2px solid #8e8e8e;
-        background-color: #fadecc;
+        background-color: #feeca2;
         cusor: pointer;
         &:hover {
           background-color: transparent;
@@ -27,22 +27,24 @@
           height: 100%;
         }
       }
-
     }
-    .image-area-inner-preview{
+    .image-area-inner-preview {
       padding: 5px;
       position: relative;
       .sp-box-preview {
         position: absolute;
         display: inline-block;
         border: 2px solid #8e8e8e;
-        background-color: #fadecc;
+        background-color: #feeca2;
         cursor: pointer;
         &.show-box {
           background-color: transparent;
         }
         &.asked-box {
-          background-color: #fbb3af;
+          background-color: #ff7d7a;
+        }
+        &.hide-box {
+          visibility: hidden;
         }
         img {
           width: 100%;

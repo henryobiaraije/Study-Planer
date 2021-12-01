@@ -99,6 +99,7 @@ export interface _ImageBox {
   w: number;
   show: boolean;
   asked: boolean;
+  hide: boolean;
   angle: number;
   imageUrl: string;
   hash: string;
