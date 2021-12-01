@@ -91,7 +91,7 @@ export default function (cardGroupId = 0) {
         angle   : 0,
         show    : false,
         hide    : false,
-        asked    : false,
+        asked   : false,
       });
       _addBoxEvents();
     });
@@ -107,7 +107,7 @@ export default function (cardGroupId = 0) {
       angle   : 0,
       show    : false,
       hide    : false,
-      asked    : false,
+      asked   : false,
     });
     _addBoxEvents();
   }
@@ -141,8 +141,8 @@ export default function (cardGroupId = 0) {
         #${id}{
           height: ${box.h}px;
           width: ${box.w}px;
-          top: ${box.top};
-          left : ${box.left};
+          top: ${box.top}px;
+          left : ${box.left}px;
           transform : 'rotate(${box.angle}rad)';
         }
       </style>
@@ -406,9 +406,11 @@ export default function (cardGroupId = 0) {
     }
     applyCss();
   }
-  const _refreshPreview = () => {
-    console.log('refresh now');
-    items.value = ImageHelper.getCardsFromImageItem(imageItem.value, cardGroup.value);
+  const _refreshPreview = (initial = false) => {
+    // console.log('refresh now', {initial});
+    if (!initial) {
+      items.value = ImageHelper.getCardsFromImageItem(imageItem.value, cardGroup.value, items.value);
+    }
     items.value.forEach((_card: _Card) => {
       const question: _ImageItem = _card.question as _ImageItem;
       const answer: _ImageItem   = _card.answer as _ImageItem;
@@ -498,6 +500,7 @@ export default function (cardGroupId = 0) {
           cardGroup.value.created_at          = hold.created_at;
           cardGroup.value.updated_at          = hold.updated_at;
           cardGroup.value.tags                = hold.tags;
+          cardGroup.value.image_type          = hold.image_type;
           cardGroup.value.cards_count         = hold.cards_count;
           cardGroup.value.deck                = hold.deck;
           cardGroup.value.bg_image_id         = hold.bg_image_id;
@@ -509,6 +512,8 @@ export default function (cardGroupId = 0) {
           cardGroup.value.scheduled_at        = hold.scheduled_at;
           items.value                         = hold.cards;
           // console.log({hold})
+          _addEvents();
+          _refreshPreview(true);
           resolve(done.data);
         },
         funcFailue(done) {

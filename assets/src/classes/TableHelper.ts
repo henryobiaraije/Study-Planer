@@ -102,7 +102,7 @@ export default class TableHelper {
     return table;
   }
 
-  public static getItemsFromTable(table: _TableItem): Array<_Card> {
+  public static getItemsFromTable(table: _TableItem, existingItems: Array<_Card>): Array<_Card> {
     const cardsFormed: Array<_Card> = [];
     console.groupCollapsed('getItemsFromTable');
     const cDetails = this.getCDetails(table);
@@ -168,12 +168,26 @@ export default class TableHelper {
         tableQuestion.push(_questionRow);
         tableAnswer.push(_answerRow);
       });
-      cardsFormed.push({
-        c_number: key,
-        hash    : Common.getRandomString(),
-        question: tableQuestion,
-        answer  : tableAnswer,
+      const cExists = existingItems.findIndex((_card, b) => {
+        return key === _card.c_number;
       });
+      if (cExists > -1) {
+        const _existingItem = existingItems[cExists];
+        cardsFormed.push({
+          ..._existingItem,
+          question: tableQuestion,
+          answer  : tableAnswer,
+        });
+      } else {
+        cardsFormed.push({
+          id : 0,
+          question: tableQuestion,
+          answer  : tableAnswer,
+          c_number: key,
+          hash    : Common.getRandomString(),
+        });
+      }
+
       console.log({_cDetail, key, tableQuestion, cardsFormed, tableAnswer});
     }
 

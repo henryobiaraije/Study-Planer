@@ -29,7 +29,7 @@
 				<div class="action-buttons mb-2" >
 					<button @click="useImageCard._AddImage()" type="button" class="button" >Add Image</button >
 					<button @click="useImageCard._AddBox()" type="button" class="button" >Add Box</button >
-					<select @change="useImageCard._refreshPreview" v-model="imageCardGroup.image_type" >
+					<select @change="useImageCard._refreshPreview()" v-model="imageCardGroup.image_type" required >
 						<option value="" >Display Type</option >
 						<option value="hide_all_ask_one" >Hide All - Ask One</option >
 						<option value="hide_all_ask_all" >Hide All - Ask All</option >
@@ -63,7 +63,7 @@
 				<?php /**** Cards formed ***/ ?>
 				<div class="card-preview rounded-3 p-2 bg-white border-1 border-sp-200" >
 					<h3 class="font-bold fs-5  my-2" >Cards formed ({{useImageCard.items.value.length}})
-						<i @click="useImageCard._refreshPreview" class="fa fa-redo fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer" ></i ></h3 >
+						<i @click="useImageCard._refreshPreview()" class="fa fa-redo fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer" ></i ></h3 >
 					<ul >
 						<li v-for="(item,itemIndex) in useImageCard.items.value"
 						    :data-hash="item.hash" style="max-width: 90vw;"

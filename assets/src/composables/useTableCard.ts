@@ -126,7 +126,7 @@ export default function (cardGroupId = 0) {
     });
   }
   const _refreshPreview       = () => {
-    items.value = TableHelper.getItemsFromTable(tableItem.value);
+    items.value = TableHelper.getItemsFromTable(tableItem.value,items.value);
   }
 
   const xhrCreate = () => {

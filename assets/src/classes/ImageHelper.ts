@@ -4,8 +4,9 @@ import Common from "./Common";
 
 export default class ImageHelper {
 
-  public static getCardsFromImageItem(imageItem: _ImageItem, cardGroup: _CardGroup): Array<_Card> {
+  public static getCardsFromImageItem(imageItem: _ImageItem, cardGroup: _CardGroup, existingItems: Array<_Card>): Array<_Card> {
     const foundCards: Array<_Card> = [];
+    console.groupCollapsed('getCardsFromImageItem');
 
     if (cardGroup.image_type === IMAGE_DISPLAY_TYPE.HIDE_ALL_ASK_ALL) {
       const question: _ImageItem = JSON.parse(JSON.stringify(imageItem));
@@ -22,13 +23,25 @@ export default class ImageHelper {
         box.show = true;
         box.hash = Common.getRandomString();
       });
-      foundCards.push({
-        id      : 0,
-        question: question,
-        hash    : Common.getRandomString(),
-        c_number: 'c1',
-        answer  : answer,
+      const cExists = existingItems.findIndex((_card, b) => {
+        return 'c1' === _card.c_number;
       });
+      if (cExists > -1) {
+        const _existingItem = existingItems[cExists];
+        foundCards.push({
+          ..._existingItem,
+          question: question,
+          answer  : answer,
+        });
+      } else {
+        foundCards.push({
+          id : 0,
+          question: question,
+          answer  : answer,
+          c_number: 'c1' ,
+          hash    : Common.getRandomString(),
+        });
+      }
     } else if (cardGroup.image_type === IMAGE_DISPLAY_TYPE.HIDE_ALL_ASK_ONE) {
       let cId = 0;
       imageItem.boxes.forEach((box, i) => {
@@ -55,13 +68,25 @@ export default class ImageHelper {
           box2.hash = Common.getRandomString();
         });
 
-        foundCards.push({
-          id      : 0,
-          question: question,
-          hash    : Common.getRandomString(),
-          c_number: 'c' + cId,
-          answer  : answer,
+        const cExists = existingItems.findIndex((_card, b) => {
+          return 'c'+cId === _card.c_number;
         });
+        if (cExists > -1) {
+          const _existingItem = existingItems[cExists];
+          foundCards.push({
+            ..._existingItem,
+            question: question,
+            answer  : answer,
+          });
+        } else {
+          foundCards.push({
+            id : 0,
+            question: question,
+            answer  : answer,
+            c_number: 'c' + cId,
+            hash    : Common.getRandomString(),
+          });
+        }
       });
     } else if (cardGroup.image_type === IMAGE_DISPLAY_TYPE.HIDE_ONE_ASK_ONE) {
       let cId = 0;
@@ -91,16 +116,29 @@ export default class ImageHelper {
           box2.hide = i !== i2;
         });
 
-        foundCards.push({
-          id      : 0,
-          question: question,
-          hash    : Common.getRandomString(),
-          c_number: 'c' + cId,
-          answer  : answer,
+        const cExists = existingItems.findIndex((_card, b) => {
+          return 'c'+cId === _card.c_number;
         });
+        if (cExists > -1) {
+          const _existingItem = existingItems[cExists];
+          foundCards.push({
+            ..._existingItem,
+            question: question,
+            answer  : answer,
+          });
+        } else {
+          foundCards.push({
+            id : 0,
+            question: question,
+            answer  : answer,
+            c_number: 'c' + cId,
+            hash    : Common.getRandomString(),
+          });
+        }
       });
     }
-
+    console.log({foundCards, imageItem, cardGroup});
+    console.groupEnd();
     return foundCards;
   }
 

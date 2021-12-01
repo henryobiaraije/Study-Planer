@@ -87,6 +87,10 @@
 			$slug      = Settings::SLUG_BASIC_CARD;
 			if ( 'gap' === $card_type ) {
 				$slug = Settings::SLUG_GAP_CARD;
+			} elseif ( 'table' === $card_type ) {
+				$slug = Settings::SLUG_TABLE_CARD;
+			} elseif ( 'image' === $card_type ) {
+				$slug = Settings::SLUG_IMAGE_CARD;
 			}
 			$card_url = Initializer::get_admin_url( $slug )
 			            . '&card-group=' . $this->id;

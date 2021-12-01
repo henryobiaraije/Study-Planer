@@ -73,3 +73,13 @@
 
 		return $the_date;
 	}
+
+	function get_default_image_display_type() {
+		$default = [
+			'hide_all_ask_one',
+			'hide_all_ask_all',
+			'hide_one_ask_one',
+		];
+
+		return \apply_filters( 'sp_default_image_display_type', $default );
+	}
