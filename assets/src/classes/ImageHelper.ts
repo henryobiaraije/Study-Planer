@@ -26,14 +26,16 @@ export default class ImageHelper {
         id      : 0,
         question: question,
         hash    : Common.getRandomString(),
-        c_number: '',
+        c_number: 'c1',
         answer  : answer,
       });
     } else if (cardGroup.image_type === IMAGE_DISPLAY_TYPE.HIDE_ALL_ASK_ONE) {
+      let cId = 0;
       imageItem.boxes.forEach((box, i) => {
         if (box.imageUrl.length > 0) {
           return;
         }
+        cId++;
         const question: _ImageItem = JSON.parse(JSON.stringify(imageItem));
         const answer: _ImageItem   = JSON.parse(JSON.stringify(imageItem));
         question.hash              = Common.getRandomString();
@@ -49,23 +51,25 @@ export default class ImageHelper {
           if (box.imageUrl.length > 0) {
             return;
           }
-          box2.show  = i === i2;
-          box2.hash  = Common.getRandomString();
+          box2.show = i === i2;
+          box2.hash = Common.getRandomString();
         });
 
         foundCards.push({
           id      : 0,
           question: question,
           hash    : Common.getRandomString(),
-          c_number: '',
+          c_number: 'c' + cId,
           answer  : answer,
         });
       });
-    }else if (cardGroup.image_type === IMAGE_DISPLAY_TYPE.HIDE_ONE_ASK_ONE) {
+    } else if (cardGroup.image_type === IMAGE_DISPLAY_TYPE.HIDE_ONE_ASK_ONE) {
+      let cId = 0;
       imageItem.boxes.forEach((box, i) => {
         if (box.imageUrl.length > 0) {
           return;
         }
+        cId++;
         const question: _ImageItem = JSON.parse(JSON.stringify(imageItem));
         const answer: _ImageItem   = JSON.parse(JSON.stringify(imageItem));
         question.hash              = Common.getRandomString();
@@ -76,14 +80,14 @@ export default class ImageHelper {
           }
           box2.hash  = Common.getRandomString();
           box2.asked = i === i2;
-          box2.hide = i !== i2;
+          box2.hide  = i !== i2;
         });
         answer.boxes.forEach((box2, i2) => {
           if (box2.imageUrl.length > 0) {
             return;
           }
-          box2.show  = i === i2;
-          box2.hash  = Common.getRandomString();
+          box2.show = i === i2;
+          box2.hash = Common.getRandomString();
           box2.hide = i !== i2;
         });
 
@@ -91,7 +95,7 @@ export default class ImageHelper {
           id      : 0,
           question: question,
           hash    : Common.getRandomString(),
-          c_number: '',
+          c_number: 'c' + cId,
           answer  : answer,
         });
       });

@@ -66,7 +66,7 @@
 						<i @click="useImageCard._refreshPreview" class="fa fa-redo fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer" ></i ></h3 >
 					<ul >
 						<li v-for="(item,itemIndex) in useImageCard.items.value"
-						    :data-hash="item.hash" style="max-width: 96vw;"
+						    :data-hash="item.hash" style="max-width: 90vw;"
 						    class="bg-white p-2 rounded-3 overflow-x-auto" >
 							<ul class="flex " >
 								<li ><b >Question:</b >
@@ -75,6 +75,7 @@
 											<span v-for="(item2,itemIndex2) in item.question.boxes" :id="'sp-box-preview-'+item2.hash"
 											      :class="{'show-box': item2.show, 'asked-box' : item2.asked, 'hide-box' : item2.hide }"
 											      :key="item2.hash" class="sp-box-preview" >
+												<span v-if="item2.imageUrl.length < 2" >{{item.c_number}}</span >
 												<img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl" alt="" >
 											</span >
 										</div >
@@ -86,6 +87,7 @@
 											<span v-for="(item2,itemIndex2) in item.answer.boxes" :id="'sp-box-preview-'+item2.hash"
 											      :class="{'show-box': item2.show, 'hide-box' : item2.hide }"
 											      :key="item2.hash" class="sp-box-preview" >
+												<span v-if="item2.imageUrl.length < 2" >{{item.c_number}}</span >
 												<img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl" alt=""
 												     :style="{width : item2.w+'px', height : item2.h+'px'}" >
 											</span >
