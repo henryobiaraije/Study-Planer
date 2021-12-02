@@ -322,20 +322,20 @@
 //				);
 
 
-				Common::send_error( [
-					__METHOD__,
-					'$all_cards toSql'       => $all_cards->toSql(),
-					'$all_cards'             => $all_cards->get(),
-					'$study'                 => $study,
-					'$card_ids'                 => $card_ids,
-					'$tags'                  => $tags,
-					'$add_all_tags'          => $add_all_tags,
-					'card_get'               => $cards_query->get(),
-					'card_query_sql'         => $cards_query->toSql(),
-//					'$cards'                 => $cards,
-					'Manager::getQueryLog()' => Manager::getQueryLog(),
-					'study_id'               => $study_id,
-				] );
+//				Common::send_error( [
+//					__METHOD__,
+//					'$all_cards toSql'       => $all_cards->toSql(),
+//					'$all_cards'             => $all_cards->get(),
+//					'$study'                 => $study,
+//					'$card_ids'                 => $card_ids,
+//					'$tags'                  => $tags,
+//					'$add_all_tags'          => $add_all_tags,
+//					'card_get'               => $cards_query->get(),
+//					'card_query_sql'         => $cards_query->toSql(),
+////					'$cards'                 => $cards,
+//					'Manager::getQueryLog()' => Manager::getQueryLog(),
+//					'study_id'               => $study_id,
+//				] );
 
 
 				return [

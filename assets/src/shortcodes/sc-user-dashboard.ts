@@ -1,22 +1,22 @@
 "use strict";
-import {Store} from "../static/store";
-import {InterFuncSuccess, InterSendOnline, InterSendOnlineFileFormat, Server} from "../static/server";
+import { Store } from "../static/store";
+import { InterFuncSuccess, InterSendOnline, InterSendOnlineFileFormat, Server } from "../static/server";
 import AjaxAction from "../vue-component/AjaxAction.vue";
 import LoadingButton from "../vue-component/LoadingButton.vue";
 import HoverNotifications from "../vue-component/HoverNotifications.vue";
-import {_Ajax, HandleAjax} from "../classes/HandleAjax";
-import {MpSortTable} from "../static/table-sort";
+import { _Ajax, HandleAjax } from "../classes/HandleAjax";
+import { MpSortTable } from "../static/table-sort";
 import Vue from "vue";
-import {_HoverNotification} from "../vue-component/enums";
+import { _HoverNotification } from "../vue-component/enums";
 import AjaxActionNotForm from "../vue-component/AjaxActionNotForm.vue";
 import TimeComp from "../vue-component/TimeComp.vue";
-import {_Endpoint} from "../interfaces/inter-sbe";
+import { _Endpoint } from "../interfaces/inter-sbe";
 import Multiselect from 'vue-multiselect'
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import "../../css/public/sc-user-dashboard.scss";
 import "../admin/install-composition-api";
 import useUserDashboard from "../composables/useUserDashboard";
-import {_DeckGroup} from "../interfaces/inter-sp";
+import { _DeckGroup } from "../interfaces/inter-sp";
 import useTagSearch from "../composables/useTagSearch";
 import useTimezones from "../composables/useTimezones";
 import userStats from "../composables/useStats";
@@ -30,9 +30,9 @@ declare var ClassicEditor: any;
 declare var pereere_dot_com_sp_general_localize_4736: any;
 const localize = pereere_dot_com_sp_general_localize_4736;
 Store.initAdmin({
-  serverUrl   : localize.ajax_url,
+  serverUrl: localize.ajax_url,
   actionString: localize.ajax_action,
-  nonce       : localize.nonce,
+  nonce: localize.nonce,
 });
 
 export const vdata = {
@@ -40,83 +40,83 @@ export const vdata = {
   localize: localize,
   //
   zajax: {
-    load   : {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+    load: {
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
-    update : {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+    update: {
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
-    delete : {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+    delete: {
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
-    create : {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+    create: {
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
     overlay: {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
   },
   //
-  menu           : 'deck-groups',
-  showExtra      : 0,
-  debug          : false,
-  page           : 1,
-  languageIndex  : 1,
+  menu: 'deck-groups',
+  showExtra: 0,
+  debug: false,
+  page: 1,
+  languageIndex: 1,
   something_value: false,
-  screen_width   : 0,
+  screen_width: 0,
 };
 
-const mGeneral         = {
+const mGeneral = {
   generalInit() {
-    const key          = 'dashboard-page';
-    const url          = new URL(window.location.href);
+    const key = 'dashboard-page';
+    const url = new URL(window.location.href);
     const searchParams = new URLSearchParams(url.search);
-    const menu         = searchParams.get(key);
+    const menu = searchParams.get(key);
     if (null !== menu && menu.length > 3) this.menu = menu;
     if (menu === 'settings') {
       dis(this).timezones.loadTimezones();
     } else if (menu === 'stats') {
-      dis(this).stats._loadAllStats();
+      dis(this).useStats._loadAllStats();
     }
   },
   getNewAjax(): _Ajax {
     return {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
     };
   },
   incrShowExtra() {
     this.showExtra++;
   },
-  resetVue(){
+  resetVue() {
     this.$forceUpdate();
     console.log('now reset');
   }
@@ -127,15 +127,15 @@ const mComputedGeneral = {
   },
 };
 
-const mMethods    = {
+const mMethods = {
   gotoMenu(menu) {
     this.menu = menu;
-    console.log({menu})
+    console.log({ menu })
     this.insertUrlParam('dashboard-page', menu);
     if (menu === 'settings') {
       dis(this).timezones.loadTimezones();
     } else if (menu === 'stats') {
-      dis(this).stats._loadAllStats();
+      dis(this).useStats._loadAllStats();
     }
   },
   toggle(elemClass) {
@@ -146,7 +146,7 @@ const mMethods    = {
       let searchParams = new URLSearchParams(window.location.search);
       searchParams.set(key, value);
       let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + searchParams.toString();
-      window.history.pushState({path: newurl}, '', newurl);
+      window.history.pushState({ path: newurl }, '', newurl);
     }
   },
 };
@@ -162,8 +162,8 @@ const mComMethods = {
   },
 };
 
-const v_method   = {...mMethods, ...mGeneral};
-const v_computed = {...mComMethods, ...mComputedGeneral,};
+const v_method = { ...mMethods, ...mGeneral };
+const v_computed = { ...mComMethods, ...mComputedGeneral, };
 
 const xhr = {};
 
@@ -222,15 +222,15 @@ const m_listner = {
 
 const m_init = {
   init() {
-    vdis  = this;
+    vdis = this;
     vComp = this;
     // @ts-ignore
     this.listner_init();
     this.nn();
-    this.generalInit();
     dis(this).userDash.load().then(() => {
       jQuery('.all-loading').hide();
       jQuery('.all-loaded').show();
+      this.generalInit();
     });
     // vdis.xhrLoadEndpoints();
   },
@@ -242,10 +242,10 @@ const m_init = {
 let vmethods = {
   ...mGeneral, ...v_method,
   blobToFile(theBlob: Blob, fileName: string): File {
-    let b: any         = theBlob;
+    let b: any = theBlob;
     //A Blob() is almost a File() - it's just missing the two properties below which we will add
     b.lastModifiedDate = new Date();
-    b.name             = fileName;
+    b.name = fileName;
 
     //Cast to a File() type
     return <File>theBlob;
@@ -262,25 +262,25 @@ let vmethods = {
   rootNewTable(details, perPage) {
     const dis = this;  //eslint-disable-line
     return new MpSortTable({
-      vue          : dis,
-      all          : details,
-      allToUse     : details,
-      holdDisplay  : [],
-      perPage      : perPage,
-      pageNow      : 0,
-      sortAscended : [],
+      vue: dis,
+      all: details,
+      allToUse: details,
+      holdDisplay: [],
+      perPage: perPage,
+      pageNow: 0,
+      sortAscended: [],
       pagination222: [],
-      pageNow222   : 0,
-      searchPage   : "this",
-      search       : "",
-      pagination   : [],
-      pageStart    : 0,
-      pageStop     : 0, // set on init to per_page
-      disableRight : false,
-      disableLeft  : false,
-      dis_class    : null,
-      showing_text : "",
-      filterParams : []
+      pageNow222: 0,
+      searchPage: "this",
+      search: "",
+      pagination: [],
+      pageStart: 0,
+      pageStop: 0, // set on init to per_page
+      disableRight: false,
+      disableLeft: false,
+      dis_class: null,
+      showing_text: "",
+      filterParams: []
     })
   },
   root_wp_editor_get_value(tetarea_id) {
@@ -302,13 +302,13 @@ let vmethods = {
   root_add_wp_editor(tetarea_id, add_media = true) {
     wp.editor.initialize(tetarea_id, {
       mediaButtons: add_media,
-      tinymce     : {
-        wpautop : true,
-        plugins : 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
+      tinymce: {
+        wpautop: true,
+        plugins: 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
         toolbar1: 'bold italic underline strikethrough | bullist numlist | blockquote hr wp_more | alignleft aligncenter alignright | link unlink | fullscreen | wp_adv',
         toolbar2: 'formatselect alignjustify forecolor | pastetext removeformat charmap | outdent indent | undo redo | wp_help'
       },
-      quicktags   : true,
+      quicktags: true,
     });
   },
   /**
@@ -321,8 +321,8 @@ let vmethods = {
    */
   root_pick_image_from_media(select_button_text: any, select_head_text: any, function_gotten: any) {
     let frame = wp.media({
-      title   : select_head_text,
-      button  : {
+      title: select_head_text,
+      button: {
         text: select_button_text
       },
       multiple: false  // Set to true to allow multiple files to be selected
@@ -330,10 +330,10 @@ let vmethods = {
     frame.open();
     frame.on("select", function () {
       let attachment = frame.state().get("selection").first().toJSON();
-      let img_url    = attachment.url;
+      let img_url = attachment.url;
       let img_att_id = attachment.id;
-      let result     = {
-        id : img_att_id,
+      let result = {
+        id: img_att_id,
         url: img_url
       };
       function_gotten(result);
@@ -393,7 +393,7 @@ let vmethods = {
       alignment: {
         options: ['left', 'right']
       },
-      toolbar  : [
+      toolbar: [
         "undo", "redo", "bold", "italic", "blockQuote", "ckfinder", "imageTextAlternative", "imageUpload", "heading", "imageStyle:full", "imageStyle:side", "indent", "outdent", "link", "numberedList", "bulletedList", "mediaEmbed", "insertTable", "tableColumn", "tableRow", "mergeTableCells"
       ]
     }).then(editor => {
@@ -406,7 +406,7 @@ let vmethods = {
     });
   },
   change_page(page) {
-    let dis  = this;
+    let dis = this;
     dis.page = page;
     this.pageChanged(page);
   },
@@ -420,14 +420,14 @@ let vmethods = {
     setTimeout(() => {
       ClassicEditor
         .create(document.querySelector(selector), {}).then(editor => {
-        editor.editing.view.document.on("keyup", function (event, data) {
-          let gt = editor.getData();
+          editor.editing.view.document.on("keyup", function (event, data) {
+            let gt = editor.getData();
 
-          func_keyup(gt);
+            func_keyup(gt);
+          });
+        }).catch(error => {
+          console.log(error);
         });
-      }).catch(error => {
-        console.log(error);
-      });
     }, 10);
   },
 
@@ -436,7 +436,7 @@ let vmethods = {
 
 };
 
-var vdis: typeof vmethods    = null;
+var vdis: typeof vmethods = null;
 var vComp: typeof v_computed = null;
 
 function setup(props) {
@@ -446,9 +446,9 @@ function setup(props) {
   // console.log('in setup', {url, searchParams, status});
   return {
     searchTags: useTagSearch(),
-    userDash  : useUserDashboard(),
-    timezones : useTimezones(),
-    stats  : userStats(),
+    userDash: useUserDashboard(),
+    timezones: useTimezones(),
+    useStats: userStats(),
   };
 }
 
@@ -461,13 +461,13 @@ function dis(context): ReturnType<typeof setup> {
   let elem = ".sp-sc-ud";
 
   let exist1 = jQuery(elem).length;
-  console.log({exist1}, elem);
+  console.log({ exist1 }, elem);
   let loadCount = 0;
 
   function loadInstance1() {
     new Vue({
-      el     : elem,
-      data   : vdata,
+      el: elem,
+      data: vdata,
       methods: vmethods,
       setup,
       created: function () {
@@ -484,18 +484,17 @@ function dis(context): ReturnType<typeof setup> {
         }, false);
 
 
-
         console.log('Created');
       },
       //@ts-ignore
-      computed  : v_computed,
+      computed: v_computed,
       components: {
         TimeComp,
-        'ajax-action'         : AjaxAction,
+        'ajax-action': AjaxAction,
         'ajax-action-not-form': AjaxActionNotForm,
         LoadingButton,
         HoverNotifications,
-        'vue-mulitiselect'    : Multiselect,
+        'vue-mulitiselect': Multiselect,
       },
     });
   }
@@ -503,7 +502,7 @@ function dis(context): ReturnType<typeof setup> {
   if (exist1) {
     loadInstance1();
   } else {
-    console.log({exist1});
+    console.log({ exist1 });
   }
 
 })();

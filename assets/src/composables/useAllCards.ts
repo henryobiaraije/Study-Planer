@@ -335,10 +335,10 @@ export default function (status = 'publish') {
       data: [
         Store.nonce,
         {
-          decks: items,
+          card_groups: items,
         }
       ],
-      what: "admin_sp_ajax_admin_trash_decks",
+      what: "admin_sp_ajax_admin_trash_cards",
       funcBefore() {
         handleAjax.start();
       },
@@ -360,10 +360,10 @@ export default function (status = 'publish') {
       data: [
         Store.nonce,
         {
-          decks: items,
+          card_groups: items,
         }
       ],
-      what: "admin_sp_ajax_admin_delete_decks",
+      what: "admin_sp_ajax_admin_delete_card_group",
       funcBefore() {
         handleAjax.start();
       },

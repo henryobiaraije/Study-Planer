@@ -558,7 +558,7 @@ function setup(props) {
     // decks     : useDecks(status),
     // searchTags: useTagSearch(),
     // deckGroups: useDeckGroupLists(),
-    allCards: useAllCards(),
+    allCards: useAllCards(status),
   };
 }
 

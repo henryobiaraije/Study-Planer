@@ -87,7 +87,7 @@
 											<span v-for="(item2,itemIndex2) in item.answer.boxes" :id="'sp-box-preview-'+item2.hash"
 											      :class="{'show-box': item2.show, 'hide-box' : item2.hide }"
 											      :key="item2.hash" class="sp-box-preview" >
-												<span v-if="item2.imageUrl.length < 2" >{{item.c_number}}</span >
+<!--												<span v-if="item2.imageUrl.length < 2" >{{item.c_number}}</span >-->
 												<img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl" alt=""
 												     :style="{width : item2.w+'px', height : item2.h+'px'}" >
 											</span >

@@ -9,7 +9,7 @@
 		<?php /**** Deck group header ***/ ?>
 		<div class="sp-deck-group cursor-pointer shadow  gap-2" >
 			<div class="flex sp-deck-group-header" >
-				<div @click="toggle('.decks-'+item.id)" class="sp-header-title flex bg-gray-100 hover:bg-gray-200  px-3 py-3 flex-1" >
+				<div @click="toggle('.decks-'+item.id)" class="sp-header-title flex bg-sp-100 hover:bg-sp-200  px-3 py-3 flex-1" >
 					<div class="sp-icon flex-initial items-center flex" >
 						<svg xmlns="http://www.w3.org/2000/svg"
 						     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -61,7 +61,7 @@
 					</div >
 					<div class="sp-deck-count flex-initial flex items-center" >{{item.decks.length}} decks</div >
 				</div >
-				<div class="sp-header-stats rounded py-2 px-4 flex-initial bg-gray-100" >
+				<div class="sp-header-stats rounded py-2 px-4 flex-initial bg-sp-100" >
 					<div class="status-title text-center font-bold" >Number of cards due for revision</div >
 					<div class="to-study flex" >
 						<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >
@@ -87,14 +87,14 @@
 				    :key="item2.id"
 				    class="pl-4 mt-2" >
 					<div @click="userDash.openStudyModal(item2)"  class="sp-d-header cursor-pointer  flex gap-2" >
-						<div class="sp-header-title flex bg-gray-100 hover:bg-gray-200  px-3 py-3 flex-1" >
+						<div class="sp-header-title flex bg-sp-100 hover:bg-sp-200  px-3 py-3 flex-1" >
 							<div class="sp-name text-2xl px-10 py-2  flex-1 font-medium
 									text-2xl px-10 py-2  flex-1 font-medium
 									items-center flex flex-1 font-medium items-center justify-center px-10 py-2 sp-name text-2xl text-center" >{{item2.name}}
 							</div >
 							<div class="sp-deck-count flex-initial flex items-center" ></div >
 						</div >
-						<div class="sp-header-stats rounded py-2 flex-initial bg-gray-100" >
+						<div class="sp-header-stats rounded py-2 flex-initial bg-sp-100" >
 							<div class="status-title text-center font-bold" >Number of cards due for revision</div >
 							<div class="to-study flex" >
 								<div class="one-study flex-1 shadow p-2 m-2 text-center rounded" >

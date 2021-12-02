@@ -67,6 +67,8 @@
 			add_action( 'admin_sp_ajax_admin_create_new_basic_card', array( $this, 'ajax_admin_create_new_basic_card' ) );
 			add_action( 'admin_sp_ajax_admin_load_image_attachment', array( $this, 'ajax_admin_load_image_attachment' ) );
 			add_action( 'admin_sp_ajax_admin_load_basic_card', array( $this, 'ajax_admin_load_basic_card' ) );
+			add_action( 'admin_sp_ajax_admin_trash_cards', array( $this, 'ajax_admin_trash_cards' ) );
+			add_action( 'admin_sp_ajax_admin_delete_card_group', array( $this, 'ajax_admin_delete_card_group' ) );
 			add_action( 'admin_sp_ajax_admin_update_basic_card', array( $this, 'admin_update_basic_card' ) );
 			add_action( 'admin_sp_ajax_admin_load_cards_groups', array( $this, 'ajax_admin_load_cards_groups' ) );
 			add_action( 'admin_sp_ajax_admin_create_new_gap_card', array( $this, 'ajax_admin_create_new_gap_card' ) );
@@ -1027,6 +1029,79 @@
 		// </editor-fold desc="Gap Cards">
 
 		// <editor-fold desc="Basic Cards">
+		public function ajax_admin_delete_card_group( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_trash_cards',
+//				'post' => $post,
+//			] );
+
+			$all  = $post[ Common::VAR_2 ];
+			$args = wp_parse_args(
+				$all,
+				[
+					'card_groups' => [],
+				] );
+			Manager::beginTransaction();
+			foreach ( $args['card_groups'] as $card_group ) {
+				$id    = (int) sanitize_text_field( $card_group['id'] );
+				$group = CardGroup::with( 'cards', 'tags' )->withTrashed()->find( $id );
+				$group->tags()->detach();
+				$group->cards()->withTrashed()->forceDelete();
+				$group->forceDelete();
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'        => $post,
+//					'$card_group' => $card_group,
+//					'$cards'      => $cards,
+//					'$all'        => $all,
+//					'$id'         => $id,
+//					'$args'       => $args,
+//					'$group'      => $group,
+//				] );
+			}
+
+			Manager::commit();
+
+			Common::send_success( 'Deleted successfully.' );
+
+		}
+
+		public function ajax_admin_trash_cards( $post ) : void {
+//			Common::send_error( [
+//				'ajax_admin_trash_cards',
+//				'post' => $post,
+//			] );
+
+			$all  = $post[ Common::VAR_2 ];
+			$args = wp_parse_args(
+				$all,
+				[
+					'card_groups' => [],
+				] );
+			Manager::beginTransaction();
+			foreach ( $args['card_groups'] as $card_group ) {
+				$id    = (int) sanitize_text_field( $card_group['id'] );
+				$group = CardGroup::with( 'cards' )->find( $id );
+				$group->delete();
+				$group->cards()->delete();
+//				Deck::query()->where( 'id', '=', $id )->delete();
+//				Common::send_error( [
+//					'ajax_admin_create_new_deck_group',
+//					'post'  => $post,
+//					'$card_group'  => $card_group,
+//					'$all'  => $all,
+//					'$id'   => $id,
+//					'$args' => $args,
+//					'$group' => $group,
+//				] );
+			}
+
+			Manager::commit();
+
+			Common::send_success( 'Trashed successfully.' );
+
+		}
+
 		public function admin_update_basic_card( $post ) : void {
 //			Common::send_error( [
 //				'admin_update_basic_card',
@@ -1460,6 +1535,7 @@
 		// </editor-fold desc="Tags">
 
 		// <editor-fold desc="Deck">
+
 		public function ajax_admin_trash_decks( $post ) : void {
 //			Common::send_error( [
 //				'ajax_admin_trash_deck_group',
