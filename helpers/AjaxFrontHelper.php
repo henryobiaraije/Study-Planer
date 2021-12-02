@@ -67,6 +67,7 @@
 
 
 		/*** <editor-fold desc="Chart Stats"> **/
+
 		public function ajax_front_load_stats_forecast( $post ) : void {
 			Initializer::verify_post( $post );
 //			Common::send_error( [
@@ -74,10 +75,12 @@
 //				'post' => $post,
 //			] );
 
-			$all    = $post[ Common::VAR_2 ];
-			$span   = sanitize_text_field( $all['span'] );
-			$length = 30;
+			$all     = $post[ Common::VAR_2 ];
+			$span    = sanitize_text_field( $all['span'] );
+			$length  = 30;
+			$user_id = get_current_user_id();
 
+			$forecast = Study::get_user_card_forecast( $user_id );
 			Common::send_error( [
 				'ajax_front_load_stats_forecast',
 				'post'  => $post,
@@ -89,6 +92,7 @@
 
 
 		}
+
 		/*** </editor-fold desc="Chart Stats"> **/
 
 		// <editor-fold desc="Gap Cards">
@@ -284,7 +288,7 @@
 
 			$study = Study::with( 'tags', 'deck' )->find( $study_id );
 			if ( empty( $study ) ) {
-				dd( $study, $study_id, $post );
+//				dd( $study, $study_id, $post );
 				Common::send_error( 'Invalid study plan' );
 			}
 
@@ -304,24 +308,7 @@
 			$study_all_on_hold = $study->study_all_on_hold;
 			$user_id           = get_current_user_id();
 
-			$all_cards = [];
-
-			$user_cards_new     = Study::get_user_cards_new( $study->id, $user_id );
-			$user_cards_revise  = Study::get_user_cards_to_revise( $study->id, $user_id );
-			$user_cards_on_hold = Study::get_user_cards_on_hold( $study->id, $user_id );
-
-			foreach ( $user_cards_new['cards'] as $one ) {
-				$one->answering_type = 'New Card';
-				$all_cards[]         = $one;
-			}
-			foreach ( $user_cards_on_hold['cards'] as $one ) {
-				$one->answering_type = 'Previously On hold';
-				$all_cards[]         = $one;
-			}
-			foreach ( $user_cards_revise['cards'] as $one ) {
-				$one->answering_type = 'Revising Card';
-				$all_cards[]         = $one;
-			}
+			$all_cards = $study::get_user_cards_to_study( $study->id, $user_id );
 
 
 //			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
@@ -409,8 +396,10 @@
 //				'$study_all_on_hold' => $study_all_on_hold,
 //			] );
 
+			$creating_new = false;
 			if ( empty( $study ) ) {
-				$study = new Study();
+				$study        = new Study();
+				$creating_new = true;
 			}
 			$study->no_to_revise      = $no_to_revise;
 			$study->no_of_new         = $no_of_new;
@@ -427,7 +416,11 @@
 //				'$study_id'          => $study_id,
 //				'$study'             => $study,
 //			]);
-			$study->update();
+			if ( $creating_new ) {
+				$study->save();
+			} else {
+				$study->update();
+			}
 
 			$study->tags()->detach();
 			foreach ( $tags as $one ) {

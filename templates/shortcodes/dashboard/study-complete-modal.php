@@ -14,17 +14,18 @@
 			</div >
 			<div class="modal-body" >
 				<div class="p-4 m-2 rounded text-bold bg-green-100 text-green-400-shadow" >
-					Congratulations. You have completed today's study for this deck.
+					Congratulations! You have studied all
+					cards of this deck that were due today! Keep it up!
 				</div >
 			</div >
 			<div class="modal-footer justify-center" >
-				<ajax-action-not-form
-						button-text="Okay"
-						@click="userDash._getQuestions"
-						css-classes="button"
-						icon="fa "
-						:ajax="userDash.ajaxSaveStudy.value" >
-				</ajax-action-not-form >
+<!--				<ajax-action-not-form-->
+<!--						button-text="Okay"-->
+<!--						@click="userDash._getQuestions"-->
+<!--						css-classes="button"-->
+<!--						icon="fa "-->
+<!--						:ajax="userDash.ajaxSaveStudy.value" >-->
+<!--				</ajax-action-not-form >-->
 			</div >
 		</form >
 	</div >

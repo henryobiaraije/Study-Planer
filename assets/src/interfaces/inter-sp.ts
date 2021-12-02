@@ -53,7 +53,7 @@ export type _QuestionType = string | _TableItem | _ImageItem;
 export interface _Card extends _TimeStamps {
   id?: number;
   hash: string,
-  question: _QuestionType;
+  question: any;
   card_group?: _CardGroup,
   answer: any; //string | _TableItem;
   c_number: string;
@@ -74,6 +74,7 @@ export interface _CardGroup extends _TimeStamps {
   bg_image_id: number;
   deck: _Deck,
   group_type: string;
+  card_type?: string;
   tags: Array<_Tag>;
   cards: Array<_Card>,
   name: string,

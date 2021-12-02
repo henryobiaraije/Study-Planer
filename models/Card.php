@@ -29,7 +29,8 @@
 		];
 
 		protected $casts = [
-
+			'question' => 'array',
+			'answer'   => 'array',
 		];
 
 		public function answered() {
@@ -40,5 +41,17 @@
 			return $this->belongsTo( CardGroup::class );
 		}
 
+		protected function getCastType( $key ) {
+			$card_type             = $this->card_group->card_type;
+			$is_question_or_answer = in_array( $key, [ 'question', 'answer' ] );
+			$is_table_or_image     = in_array( $card_type, [ 'image', 'table' ] );
+			$make_array            = $is_question_or_answer && $is_table_or_image;
+
+			if ( $make_array ) {
+				return parent::getCastType( $key );
+			} else {
+				return $this->type;
+			}
+		}
 
 	}

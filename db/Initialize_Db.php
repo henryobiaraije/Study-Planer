@@ -68,6 +68,7 @@
 			define( 'SP_TABLE_CARDS', SP_DB_PREFIX . 'cards' );
 			define( 'SP_TABLE_STUDY', SP_DB_PREFIX . 'study' );
 			define( 'SP_TABLE_ANSWERED', SP_DB_PREFIX . 'answered' );
+			define( 'SP_TABLE_USERS', $wpdb->prefix . 'users' );
 		}
 
 		private function create_default_rows() {

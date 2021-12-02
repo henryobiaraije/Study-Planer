@@ -112,6 +112,26 @@
 			return Study::with( 'tags', 'deck' )->find( $study_id );
 		}
 
+		public static function get_user_card_forecast( $user_id ) {
+			$mature_card_days = 1;
+
+			/*** Prepare basic query ***/
+			$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
+				->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
+				->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
+				->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
+				->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
+				->where( 'tg.taggable_type', '=', CardGroup::class )
+				->select(
+					'c.id as card_id'
+				);
+
+			$user_studies = User::find( $user_id )->studies()->get();
+			Common::send_error( [
+				'user' => $user_studies,
+			] );
+		}
+
 		public static function get_user_cards( $study_id, $user_id ) {
 
 			try {
@@ -164,13 +184,13 @@
 				$cards_query = $cards_query->where( 'd.id', '=', $deck_id )
 					->groupBy( 'c.id' );
 //				->where( 'tb.taggable_type', '=', CardGroup::class )
-				dd(
-					$cards_query->toSql(),
-					$cards_query->getBindings(),
-					$date_today, $user_timezone,
-					$timezones[ $user_timezone ],
-					$timezones
-				);
+//				dd(
+//					$cards_query->toSql(),
+//					$cards_query->getBindings(),
+//					$date_today, $user_timezone,
+//					$timezones[ $user_timezone ],
+//					$timezones
+//				);
 //				dd( $cards_query->toSql() );
 				// In this deck
 				// In those tags
@@ -635,6 +655,38 @@
 
 		}
 
+		public static function get_user_cards_to_study( $study_id, $user_id ) {
+			$all_cards = [];
+
+			$user_cards_new     = Study::get_user_cards_new( $study_id, $user_id );
+			$user_cards_revise  = Study::get_user_cards_to_revise( $study_id, $user_id );
+			$user_cards_on_hold = Study::get_user_cards_on_hold( $study_id, $user_id );
+
+			foreach ( $user_cards_new['cards'] as $one ) {
+				$one->answering_type = 'New Card';
+				$all_cards[]         = $one;
+			}
+			foreach ( $user_cards_on_hold['cards'] as $one ) {
+				$one->answering_type = 'Previously On hold';
+				$all_cards[]         = $one;
+			}
+			foreach ( $user_cards_revise['cards'] as $one ) {
+				$one->answering_type = 'Revising Card';
+				$all_cards[]         = $one;
+			}
+//			foreach ( $all_cards as $card ) {
+//				if ( 'table' === $card->card_group->card_type ) {
+////					$card->question = json_decode( $card->question );
+//					$card->answer   = json_decode( $card->answer );
+//				} elseif ( 'image' === $card->card_group->card_type ) {
+//					$card->question = json_decode( $card->question );
+//					$card->answer   = json_decode( $card->answer );
+//				}
+//			}
+
+			return $all_cards;
+		}
+
 		public static function get_study_due_summary( $study_id, $user_id ) {
 			$new_cards       = self::get_user_cards_new( $study_id, $user_id )['cards'];
 			$cards_to_revise = self::get_user_cards_to_revise( $study_id, $user_id )['cards'];
@@ -646,91 +698,6 @@
 				'previously_false' => count( $cards_on_hold ), // todo on hold is used instead of previously false. Clarify later from client
 				'new_cards'        => $new_cards, //todo remove after testing
 			];
-		}
-
-
-		public static function get_user_cards2( $study_id, $user_id ) {
-
-			try {
-				$date_today    = Common::getDateTime();
-				$user_timezone = get_option( Settings::UM_USER_TIMEZONE, null );
-				if ( empty( $user_timezone ) ) {
-
-				}
-//				$study = Study::with( [
-//					'deck.cards',
-//					'deck.cards.card_group',
-//					'answers' => function ( $query ) use ( $date_today ) {
-////						$query->where( 'next_due_at', '<', $date_today );
-//						 $query->where( 'id', '>', 14 );
-////						dd( $query->toSql() );
-//					},
-//				] )
-//					->where( 'id', '=', $study_id )
-//					->where( 'user_id', '=', $user_id );
-
-				$study        = Study::with( 'tags' )->find( $study_id );
-				$deck_id      = $study->deck_id;
-				$tags         = [];
-				$add_all_tags = $study->all_tags;
-
-				$cards_query = Card::with( 'card_group.deck' );
-
-				if ( ! $add_all_tags ) {
-					$tags        = $study->tags->pluck( 'id' );
-					$cards_query = $cards_query->with( [
-						'card_group.tags' => function ( $query ) use ( $tags ) {
-							$query->where( SP_TABLE_TAGS . '.id', 'IN', $tags );
-						},
-					] );
-				}
-//				dd( $cards_query->toSql() );
-				// In this deck
-				// In those tags
-				//
-
-
-//				$study = Study::with( [
-//					'deck.cards',
-//					'deck.cards.card_group',
-//					'answers' => function ( $query ) use ( $date_today ) {
-////						$query->where( 'next_due_at', '<', $date_today );
-//						$query->where( 'id', '>', 14 );
-////						dd( $query->toSql() );
-//					},
-//				] )
-//					->where( 'id', '=', $study_id )
-//					->where( 'user_id', '=', $user_id );
-
-
-//				$study = $study->get()->firstOrFail();
-//				$cards = $study->deck->cards;
-
-				Common::send_error( [
-					__METHOD__,
-					'$study'                 => $study,
-					'$tags'                  => $tags,
-					'$add_all_tags'          => $add_all_tags,
-					'card_get'               => $cards_query->get(),
-					'card_query_sql'         => $cards_query->toSql(),
-//					'$cards'                 => $cards,
-					'Manager::getQueryLog()' => Manager::getQueryLog(),
-					'study_id'               => $study_id,
-				] );
-
-
-				return [
-					'cards' => $cards,
-				];
-
-			} catch ( ItemNotFoundException $e ) {
-				//todo handle later
-				return [
-					'cards' => [],
-				];
-			}
-
-
 		}
 
 

@@ -4,6 +4,7 @@ import {ref, onMounted, computed} from "@vue/composition-api";
 import {_Card, _Deck, _DeckGroup, _Study, _Tag} from "../interfaces/inter-sp";
 import {Store} from "../static/store";
 import Vue from "vue";
+import useImageCard from "./useImageCard";
 
 declare var bootstrap;
 
@@ -109,6 +110,12 @@ export default function (status = 'publish') {
       if (allQuestions.value.length > 0) {
         currentQuestionIndex.value++;
         currentQuestion.value = allQuestions.value[currentQuestionIndex.value];
+        if (currentQuestion.value.card_group.card_type === 'image') {
+          useImageCard().applyPreviewCss(currentQuestion.value.question);
+          useImageCard().applyPreviewCss(currentQuestion.value.answer);
+          useImageCard().applyBoxesPreviewCss(currentQuestion.value.question.boxes);
+          useImageCard().applyBoxesPreviewCss(currentQuestion.value.answer.boxes);
+        }
       }
     } else {
       closeQuestionModal();

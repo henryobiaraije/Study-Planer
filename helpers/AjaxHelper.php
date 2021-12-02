@@ -1241,6 +1241,12 @@
 			if ( empty( $answer ) ) {
 				Common::send_error( 'Please provide an answer' );
 			}
+			if ( empty( $bg_image_id ) ) {
+				$bg_image_id = get_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, 0 );
+				if ( empty( $bg_image_id ) ) {
+					Common::send_error( 'Please select a background image.' );
+				}
+			}
 
 			$e_deck_id = $e_card_group['deck']['id'];
 			$e_tags    = $e_card_group['tags'];
@@ -1248,6 +1254,22 @@
 			if ( empty( $deck ) ) {
 				Common::send_error( 'Invalid deck' );
 			}
+
+//			Common::send_error( [
+//				'ajax_admin_create_new_basic_card',
+//				'post'                 => $post,
+//				'$e_card'              => $e_card,
+//				'$reverse'             => $reverse,
+//				'$e_card_group'        => $e_card_group,
+//				'$question'            => $question,
+//				'$e_set_bg_as_default' => $e_set_bg_as_default,
+//				'$bg_image_id'         => $bg_image_id,
+//				'$answer'              => $answer,
+//				'$deck'                => $deck,
+//				'$cg_name'             => $cg_name,
+//				'$e_tags'              => $e_tags,
+//				'$schedule_at'         => $schedule_at,
+//			] );
 
 			Manager::beginTransaction();
 			$card_group                 = new CardGroup();

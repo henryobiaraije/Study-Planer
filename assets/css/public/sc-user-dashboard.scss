@@ -25,6 +25,30 @@
       background: #eee;
     }
   }
+  .image-area-inner-preview {
+    padding: 5px;
+    position: relative;
+    .sp-box-preview {
+      position: absolute;
+      display: inline-block;
+      border: 2px solid #8e8e8e;
+      background-color: #feeca2;
+      cursor: pointer;
+      &.show-box {
+        background-color: transparent;
+      }
+      &.asked-box {
+        background-color: #ff7d7a;
+      }
+      &.hide-box {
+        visibility: hidden;
+      }
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
 }
 #wpcontent {
   background: #f0f0f0;

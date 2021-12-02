@@ -28,54 +28,120 @@
 						<div @click="userDash._showAnswer()" v-html="currentQuestion.question" class="shadow p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto" ></div >
 						<div v-show="userDash.showCurrentAnswer.value" v-html="currentQuestion.answer" class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center" ></div >
 					</div >
+					<?php /*** Table Card ***/ ?>
+					<div v-else-if="'table' === currentQuestion.card_group.card_type" class="sp-table-question " >
+						<table @click="userDash._showAnswer()" v-if="currentQuestion.question.length > 0" class="table gap-table shadow p-2 bg-sp-100 rounded" >
+							<thead >
+							<tr >
+								<th v-for="(item2,itemIndex2) in currentQuestion.question[0]"
+								    class="table-cell border-1 border-sp-200" >
+									<div v-html="item2" ></div >
+								</th >
+							</tr >
+							</thead >
+							<tbody >
+							<tr v-for="(item2,itemIndex2) in currentQuestion.question"
+							    :class="{'bg-gray-100' : (itemIndex2 / 2 > 0)}"
+							    v-if="itemIndex2 !== 0" >
+								<td v-for="(item3,itemIndex3) in item2" class="table-cell border-1 border-sp-200" >
+									<div v-html="item3" ></div >
+								</td >
+							</tr >
+							</tbody >
+						</table >
+						<table v-if="currentQuestion.answer.length > 0 && userDash.showCurrentAnswer.value" class="table gap-table shadow p-2 bg-sp-100 rounded" >
+							<thead >
+							<tr >
+								<th v-for="(item2,itemIndex2) in currentQuestion.answer[0]"
+								    class="table-cell border-1 border-sp-200" >
+									<div v-html="item2" ></div >
+								</th >
+							</tr >
+							</thead >
+							<tbody >
+							<tr v-for="(item2,itemIndex2) in currentQuestion.answer"
+							    :class="{'bg-gray-100' : (itemIndex2 / 2 > 0)}"
+							    v-if="itemIndex2 !== 0" >
+								<td v-for="(item3,itemIndex3) in item2" class="table-cell border-1 border-sp-200" >
+									<div v-html="item3" ></div >
+								</td >
+							</tr >
+							</tbody >
+						</table >
+					</div >
+					<?php /*** Image Card ***/ ?>
+					<div v-else-if="'image' === currentQuestion.card_group.card_type" >
+						<div class="sp-image-question m-auto" >
+							<div class="image-area" :style="{height: currentQuestion.h+'px' }" >
+								<div :id="'main-preview-'+currentQuestion.hash" class="image-area-inner-preview image-card-view " >
+									<span v-for="(item2,itemIndex2) in currentQuestion.question.boxes" :id="'sp-box-preview-'+item2.hash"
+									      :class="{'show-box': item2.show, 'asked-box' : item2.asked, 'hide-box' : item2.hide }"
+									      :key="item2.hash" class="sp-box-preview " >
+										<span v-if="item2.imageUrl.length < 2" ></span >
+										<img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl" alt="" >
+									</span >
+								</div >
+							</div >
+						</div >
+						<div  v-show="userDash.showCurrentAnswer.value" class="sp-image-question m-auto" >
+							<div class="image-area" :style="{height: currentQuestion.h+'px' }" >
+								<div :id="'main-preview-'+currentQuestion.hash" class="image-area-inner-preview image-card-view " >
+									<span v-for="(item2,itemIndex2) in currentQuestion.answer.boxes" :id="'sp-box-preview-'+item2.hash"
+									      :class="{'show-box': item2.show, 'hide-box' : item2.hide, 'hide-box' : item2.hide }"
+									      :key="item2.hash" class="sp-box-preview" >
+										<span v-if="item2.imageUrl.length < 2" ></span >
+										<img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl" alt="" >
+									</span >
+								</div >
+							</div >
+						</div >
+					</div >
+					<div v-if="userDash.ajaxLoadingCard.sending" style="text-align: center;flex: 12;font-size: 50px;" ><i class="fa fa-spin fa-spinner" ></i ></div >
 				</div >
-
-				<div v-if="userDash.ajaxLoadingCard.sending" style="text-align: center;flex: 12;font-size: 50px;" ><i class="fa fa-spin fa-spinner" ></i ></div >
-			</div >
-			<div class="modal-footer justify-center" >
-				<div v-if="!userDash.showGrade.value" class="show-answer m-2" >
-					<button @click="userDash._showAnswer()" type="button" class="sp-action-button" >Show Answer</button >
-					<button @click="userDash._hold()" type="button" class="sp-action-button" >Hold</button >
+				<div class="modal-footer justify-center" >
+					<div v-if="!userDash.showGrade.value" class="show-answer m-2" >
+						<button @click="userDash._showAnswer()" type="button" class="sp-action-button" >Show Answer</button >
+						<button @click="userDash._hold()" type="button" class="sp-action-button" >Hold</button >
+					</div >
+					<div v-if="userDash.showGrade.value" class="show-grade flex justify-center" >
+						<div class="one-grade flex-initial px-2 mx-2" >
+							<span class="grade-time block text-center" ></span >
+							<button @click="userDash._markAnswer('again')" class="sp-action-button" type="button" >Again</button >
+						</div >
+						<div class="one-grade flex-initial mx-2" >
+							<span class="grade-time block text-center" ></span >
+							<button @click="userDash._markAnswer('hard')" type="button" class="sp-action-button" >Hard</button >
+						</div >
+						<div class="one-grade flex-initial mx-2" >
+							<span class="grade-time block text-center" ></span >
+							<button @click="userDash._markAnswer('good')" type="button" class="sp-action-button" >Good</button >
+						</div >
+						<div class="one-grade flex-initial mx-2" >
+							<span class="grade-time block text-center" ></span >
+							<button @click="userDash._markAnswer('easy')" type="button" class="sp-action-button" >Easy</button >
+						</div >
+					</div >
+					<!--				<div v-if="showExtra > 5" >-->
+					<!--					<ajax-action-not-form-->
+					<!--							button-text="Load question"-->
+					<!--							@click="userDash._getQuestions"-->
+					<!--							css-classes="button"-->
+					<!--							icon="fa fa-redo"-->
+					<!--							:ajax="userDash.ajaxSaveStudy.value" >-->
+					<!--					</ajax-action-not-form >-->
+					<!--				</div >-->
 				</div >
-				<div v-if="userDash.showGrade.value" class="show-grade flex justify-center" >
-					<div class="one-grade flex-initial px-2 mx-2" >
-						<span class="grade-time block text-center" ></span >
-						<button @click="userDash._markAnswer('again')" class="sp-action-button" type="button" >Again</button >
-					</div >
-					<div class="one-grade flex-initial mx-2" >
-						<span class="grade-time block text-center" ></span >
-						<button @click="userDash._markAnswer('hard')" type="button" class="sp-action-button" >Hard</button >
-					</div >
-					<div class="one-grade flex-initial mx-2" >
-						<span class="grade-time block text-center" ></span >
-						<button @click="userDash._markAnswer('good')" type="button" class="sp-action-button" >Good</button >
-					</div >
-					<div class="one-grade flex-initial mx-2" >
-						<span class="grade-time block text-center" ></span >
-						<button @click="userDash._markAnswer('easy')" type="button" class="sp-action-button" >Easy</button >
-					</div >
-				</div >
-				<!--				<div v-if="showExtra > 5" >-->
-				<!--					<ajax-action-not-form-->
-				<!--							button-text="Load question"-->
-				<!--							@click="userDash._getQuestions"-->
-				<!--							css-classes="button"-->
-				<!--							icon="fa fa-redo"-->
-				<!--							:ajax="userDash.ajaxSaveStudy.value" >-->
-				<!--					</ajax-action-not-form >-->
-				<!--				</div >-->
-			</div >
-			<?php /** Debug Section */ ?>
-			<section v-if="showExtra && null !== userDash.lastAnsweredDebugData.value" class="debug-section p-2" >
-				<table class="table shadow rounded" >
-					<tbody >
-					<tr v-for="(value,key) in userDash.lastAnsweredDebugData.value" >
-						<td >{{key}}</td >
-						<td >{{value}}</td >
-					</tr >
-					</tbody >
-				</table >
-			</section >
+				<?php /** Debug Section */ ?>
+				<section v-if="showExtra && null !== userDash.lastAnsweredDebugData.value" class="debug-section p-2" >
+					<table class="table shadow rounded" >
+						<tbody >
+						<tr v-for="(value,key) in userDash.lastAnsweredDebugData.value" >
+							<td >{{key}}</td >
+							<td >{{value}}</td >
+						</tr >
+						</tbody >
+					</table >
+				</section >
 		</form >
 	</div >
 </div >

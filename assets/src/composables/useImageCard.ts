@@ -158,7 +158,7 @@ export default function (cardGroupId = 0) {
     const styleId  = 'main-preview-style-' + mainHash;
     const css      = `
       <style id="${styleId}">
-        #${mainId}{
+        #${mainId}, .sp-image-question {
           height: ${_imageItem.h}px;
           width: ${_imageItem.w}px;
         }
@@ -547,5 +547,6 @@ export default function (cardGroupId = 0) {
     imageItem, _AddBox, _AddImage,
     _bringToFront, _sendToBack, _delete,
     items, setBgAsDefault, _addEvents, _openActionMenu,
+    applyPreviewCss, applyBoxesPreviewCss,
   };
 }
