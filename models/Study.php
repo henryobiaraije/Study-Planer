@@ -12,6 +12,7 @@
 	use Illuminate\Database\Eloquent\Model;
 	use Illuminate\Database\Eloquent\ModelNotFoundException;
 	use Illuminate\Database\Eloquent\SoftDeletes;
+	use Illuminate\Support\Facades\DB;
 	use Illuminate\Support\ItemNotFoundException;
 	use PDOException;
 	use Staudenmeir\EloquentHasManyDeep\HasRelationships;
@@ -72,7 +73,7 @@
 		}
 
 		public function cardsGroups() {
-
+			return $this->hasManyThrough( CardGroup::class, Deck::class );
 		}
 
 		public static function get_user_studies( $args ) : array {
@@ -112,25 +113,267 @@
 			return Study::with( 'tags', 'deck' )->find( $study_id );
 		}
 
-		public static function get_user_card_forecast( $user_id ) {
-			$mature_card_days = 1;
+
+		public static function get_user_card_forecast2( $user_id, $span ) {
+			$mature_card_days             = Settings::MATURE_CARD_DAYS;
+			$end_date                     = null;
+			$user_timezone_today_midnight = get_user_timezone_date_midnight_today( $user_id );
+			if ( 'one_month' === $span ) {
+				$_date = new DateTime( $user_timezone_today_midnight );
+				$_date->add( new DateInterval( 'P30D' ) );
+				$end_date = $_date->format( 'Y-m-d H:i:s' );
+			}
 
 			/*** Prepare basic query ***/
-			$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
-				->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
-				->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
-				->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
-				->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
-				->where( 'tg.taggable_type', '=', CardGroup::class )
-				->select(
-					'c.id as card_id'
-				);
 
 			$user_studies = User::find( $user_id )->studies()->get();
-			Common::send_error( [
-				'user' => $user_studies,
-			] );
+
+			foreach ( $user_studies as $study ) {
+				$study_id      = $study->id;
+				$cards_on_hold = self::get_user_cards_on_hold( $study_id, $user_id );
+
+				$sq = Manager::table( SP_TABLE_ANSWERED )
+					->select( 'id', 'created_at', Manager::raw( 'MIN(created_at) as min_create_date' ) )
+					->groupBy( 'id' );
+
+				$query_mature = Manager
+					::table( SP_TABLE_ANSWERED . ' as a1' )
+//					->join( SP_TABLE_ANSWERED . ' as a2', 'a2.id', '=', 'a1.id',function($join){
+					->joinSub( $sq, 'a2', function ( $join ) {
+						$join->on( 'a2.id', '=', 'a1.id' );
+					} )
+					->where( 'a1.study_id', '=', $study_id )
+//					->having( 'day_interval', '>', 0 )
+//					->where( 'a1.card_id', '=', 45 )
+					->select(
+						'a1.id',
+						'a1.next_due_at',
+						'a1.created_at',
+						'a1.card_id',
+//						'a2.created_at',
+						Manager::raw( 'NULLIF(DATE(a1.created_at) - DATE(a2.created_at), 0) day_interval' )
+					);
+//					->where( Manager::raw( 'DATE_SUB(CURDATE(),INTERVAL 1 DAY)' ), '<=', 'DATE(next_due_at)' );
+
+//				$query_mature = Manager::table( SP_TABLE_ANSWERED );
+
+				Common::send_error( [
+					'$query_mature'          => $query_mature->toSql(),
+					'Manager::getQueryLog()' => Manager::getQueryLog(),
+					'$get'                   => $query_mature->get(),
+					'getBindings'            => $query_mature->getBindings(),
+					'$study_id'              => $study_id,
+					'$sq sql'                => $sq->toSql(),
+					'$sq get'                => $sq->get(),
+				] );
+
+			}
 		}
+
+
+		public static function get_user_card_forecast( $user_id, $span ) {
+			$matured_cards = self::get_user_matured_card_ids( $user_id );
+
+			$end_date                     = null;
+			$user_timezone_today_midnight = get_user_timezone_date_midnight_today( $user_id );
+			$_date                        = new DateTime( $user_timezone_today_midnight );
+			if ( 'one_month' === $span ) {
+				$_date->add( new DateInterval( 'P30D' ) );
+			} elseif ( 'three_month' === $span ) {
+				$_date->add( new DateInterval( 'P3M' ) );
+			} elseif ( 'one_year' === $span ) {
+				$_date->add( new DateInterval( 'P1Y' ) );
+			}
+			if ( 'all' !== $span ) {
+				$end_date = $_date->format( 'Y-m-d H:i:s' );
+			}
+
+
+			Common::send_error( [
+				'matured_cards' => $matured_cards,
+				'$end_date'     => $end_date,
+				'$span'         => $span,
+			] );
+
+		}
+
+		public static function get_user_card_forecast3( $user_id, $span ) {
+			$matured_cards = self::get_user_matured_card_ids( $user_id );
+			Common::send_error( [
+				'matured_cards' => $matured_cards,
+			] );
+			$mature_card_days             = Settings::MATURE_CARD_DAYS;
+			$end_date                     = null;
+			$user_timezone_today_midnight = get_user_timezone_date_midnight_today( $user_id );
+			if ( 'one_month' === $span ) {
+				$_date = new DateTime( $user_timezone_today_midnight );
+				$_date->add( new DateInterval( 'P30D' ) );
+				$end_date = $_date->format( 'Y-m-d H:i:s' );
+			}
+
+			/*** Prepare basic query ***/
+			$user_studies = User::find( $user_id )->studies()->get();
+
+			foreach ( $user_studies as $study ) {
+				$study_id      = $study->id;
+				$cards_on_hold = self::get_user_cards_on_hold( $study_id, $user_id );
+
+				$query_mature = Manager
+					::table( SP_TABLE_ANSWERED . ' as a1' )
+					->where( 'a1.study_id', '=', $study_id )
+					->select(
+						'a1.id',
+						'a1.next_due_at',
+						'a1.created_at',
+						'a1.card_id',
+						Manager::raw( 'DATEDIFF(DATE(a1.next_due_at),DATE(a1.created_at)) next_due_interval' ),
+						Manager::raw( 'DATE(a1.created_at)' )
+					)
+					->groupBy( 'a1.card_id' )
+					->having( 'next_due_interval', '>=', 2 )
+					->orderBy( 'a1.id', 'desc' );
+
+
+				Common::send_error( [
+					'$query_mature'          => $query_mature->toSql(),
+					'Manager::getQueryLog()' => Manager::getQueryLog(),
+					'$get'                   => $query_mature->get(),
+					'getBindings'            => $query_mature->getBindings(),
+					'$study_id'              => $study_id,
+				] );
+
+			}
+		}
+
+		/**
+		 * Returns cards whose next due date of the last answer is >= Settings::MATURE_CARD_DAYS
+		 *
+		 * @param $user_id
+		 */
+		public static function get_user_matured_card_ids( $user_id ) {
+			$mature_card_days = Settings::MATURE_CARD_DAYS;
+			$all              = [];
+			$all_card_ids     = [];
+			/*** Prepare basic query ***/
+			$user_studies = User::find( $user_id )->studies()->get();
+
+			foreach ( $user_studies as $study ) {
+				$study_id = $study->id;
+
+				$matured_answers = Answered::with( 'card', 'study' )
+					->where( 'study_id', '=', $study_id )
+					->select(
+						'id',
+						'next_due_at',
+						'created_at',
+						'card_id',
+						Manager::raw( 'DATEDIFF(DATE(next_due_at),DATE(created_at)) next_due_interval' ),
+						Manager::raw( 'DATE(created_at)' )
+					)->groupBy( 'card_id' )
+					->having( 'next_due_interval', '>=', $mature_card_days )
+					->orderBy( 'id', 'desc' );
+
+//				$query_mature = Manager
+//					::table( SP_TABLE_ANSWERED . ' as a1' )
+//					->where( 'a1.study_id', '=', $study_id )
+//					->select(
+//						'a1.id',
+//						'a1.next_due_at',
+//						'a1.created_at',
+//						'a1.card_id',
+//						Manager::raw( 'DATEDIFF(DATE(a1.next_due_at),DATE(a1.created_at)) next_due_interval' ),
+//						Manager::raw( 'DATE(a1.created_at)' )
+//					)
+//					->groupBy( 'a1.card_id' )
+//					->having( 'next_due_interval', '>=', $mature_card_days )
+//					->orderBy( 'a1.id', 'desc' );
+
+				$get = $matured_answers->get();
+				foreach ( $get as $answer ) {
+					$all_card_ids[] = $answer->card->id;
+					$all[]          = [
+						'card_id' => $answer->card->id,
+						'answer'  => $answer,
+						'study'   => $study,
+						'deck'    => $study->deck,
+					];
+				}
+//				Common::send_error( [
+//					'$matured_answers'       => $matured_answers->toSql(),
+//					'$matured_answers get'   => $matured_answers->get(),
+////					'$query_mature'          => $query_mature->toSql(),
+//					'Manager::getQueryLog()' => Manager::getQueryLog(),
+////					'$get'                   => $query_mature->get(),
+////					'getBindings'            => $query_mature->getBindings(),
+//					'$study_id'              => $study_id,
+//				] );
+
+			}
+
+			return [
+				'card_ids' => $all_card_ids,
+				'all'      => $all,
+			];
+		}
+
+		public static function get_user_card_forecast____diff_between_last_2( $user_id, $span ) {
+			$mature_card_days             = Settings::MATURE_CARD_DAYS;
+			$end_date                     = null;
+			$user_timezone_today_midnight = get_user_timezone_date_midnight_today( $user_id );
+			if ( 'one_month' === $span ) {
+				$_date = new DateTime( $user_timezone_today_midnight );
+				$_date->add( new DateInterval( 'P30D' ) );
+				$end_date = $_date->format( 'Y-m-d H:i:s' );
+			}
+
+			/*** Prepare basic query ***/
+
+			$user_studies = User::find( $user_id )->studies()->get();
+
+			foreach ( $user_studies as $study ) {
+				$study_id      = $study->id;
+				$cards_on_hold = self::get_user_cards_on_hold( $study_id, $user_id );
+
+				$sq = Manager::table( SP_TABLE_ANSWERED )
+					->select( 'id', 'created_at', Manager::raw( 'MIN(created_at) as min_create_date' ) )
+					->groupBy( 'id' );
+
+				$query_mature = Manager
+					::table( SP_TABLE_ANSWERED . ' as a1' )
+					->where( 'a1.study_id', '=', $study_id )
+					->join( SP_TABLE_ANSWERED . ' as a2', 'a2.id', '=', Manager::raw( '(a1.id + 1)' ) )
+//					->having( 'day_interval', '>', 0 )
+//					->where( 'a1.card_id', '=', 45 )
+					->select(
+						'a1.id',
+						'a1.next_due_at',
+						'a1.created_at',
+						'a1.card_id',
+						'a2.id as a2_id',
+						Manager::raw( 'DATEDIFF(a2.created_at,a1.created_at) ' ),
+						Manager::raw( 'a2.id - a1.id' ),
+						Manager::raw( '(a1.id + 1) as plus_1' ),
+						Manager::raw( 'DATE(a2.created_at)' )
+//						'a2.created_at',
+//						Manager::raw( 'NULLIF(DATE(a1.created_at) - DATE(a2.created_at), 0) day_interval' )
+					);
+//					->where( Manager::raw( 'DATE_SUB(CURDATE(),INTERVAL 1 DAY)' ), '<=', 'DATE(next_due_at)' );
+
+//				$query_mature = Manager::table( SP_TABLE_ANSWERED );
+
+				Common::send_error( [
+					'$query_mature'          => $query_mature->toSql(),
+					'Manager::getQueryLog()' => Manager::getQueryLog(),
+					'$get'                   => $query_mature->get(),
+					'getBindings'            => $query_mature->getBindings(),
+					'$study_id'              => $study_id,
+					'$sq sql'                => $sq->toSql(),
+					'$sq get'                => $sq->get(),
+				] );
+
+			}
+		}
+
 
 		public static function get_user_cards( $study_id, $user_id ) {
 
@@ -240,7 +483,7 @@
 
 		}
 
-		public static function get_user_cards_on_hold( $study_id, $user_id ) {
+		public static function get_user_cards_on_hold( $study_id, $user_id, $particular_date = null ) {
 
 			try {
 				$user_timezone_today_midnight = get_user_timezone_date_midnight_today( $user_id );

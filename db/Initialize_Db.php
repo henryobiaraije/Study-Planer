@@ -19,6 +19,7 @@
 		private        $capsule;
 		private        $schema_builder;
 
+
 		public static function get_instance() {
 			if ( self::$instance ) {
 				return self::$instance;

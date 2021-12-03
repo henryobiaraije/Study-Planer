@@ -80,7 +80,7 @@
 			$length  = 30;
 			$user_id = get_current_user_id();
 
-			$forecast = Study::get_user_card_forecast( $user_id );
+			$forecast = Study::get_user_card_forecast( $user_id, $span );
 			Common::send_error( [
 				'ajax_front_load_stats_forecast',
 				'post'  => $post,

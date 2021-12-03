@@ -34,13 +34,19 @@
 		];
 
 		protected $casts = [
-			'next_due_at' => 'datetime:Y-m-d H:i:s',
-			'rejected_at' => 'datetime:Y-m-d H:i:s',
-			'created_at'  => 'datetime:Y-m-d H:i:s',
-			'updated_at'  => 'datetime:Y-m-d H:i:s',
-			'next_due_answered'  => 'boolean',
+			'next_due_at'       => 'datetime:Y-m-d H:i:s',
+			'rejected_at'       => 'datetime:Y-m-d H:i:s',
+			'created_at'        => 'datetime:Y-m-d H:i:s',
+			'updated_at'        => 'datetime:Y-m-d H:i:s',
+			'next_due_answered' => 'boolean',
 		];
 
+		public  function card() {
+			return $this->belongsTo( Card::class );
+		}
+		public  function study() {
+			return $this->belongsTo( Study::class );
+		}
 
 		public static function get_() {
 
