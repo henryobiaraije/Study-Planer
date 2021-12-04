@@ -48,6 +48,8 @@
 			$make_array            = $is_question_or_answer && $is_table_or_image;
 
 			if ( $make_array ) {
+//				dd($key,$card_type,parent::getCastType( $key ));
+//				$this->type;
 				return parent::getCastType( $key );
 			} else {
 				return $this->type;

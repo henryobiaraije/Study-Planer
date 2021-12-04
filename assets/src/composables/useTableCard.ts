@@ -73,26 +73,46 @@ export default function (cardGroupId = 0) {
     col: 0,
   });
 
+  const _hideActionMenu       = () => {
+    jQuery('.table-action').hide();
+    console.log('hide menu'); //
+  }
   const _tAddColumn           = (index = 0) => {
     tableItem.value = TableHelper.addColumn(tableItem.value, index);
     console.log('column added');
     jQuery('.reset-vue').trigger('click');
+    _hideActionMenu();
   }
   const _tAddRow              = (index = 0) => {
     tableItem.value = TableHelper.addRow(tableItem.value, index);
     console.log('column added ', {index}, currentTableData.value);
+    _hideActionMenu();
   }
-  const _insertRowBefore      = () => {_tAddRow(currentTableData.value.row);}
-  const _insertRowAfter       = () => {_tAddRow((currentTableData.value.row + 1));}
-  const _insertColumnBefore   = () => {_tAddColumn(currentTableData.value.col)}
-  const _insertColumnAfter    = () => {_tAddColumn((currentTableData.value.col + 1))}
+  const _insertRowBefore      = () => {
+    _tAddRow(currentTableData.value.row);
+    _hideActionMenu();
+  }
+  const _insertRowAfter       = () => {
+    _tAddRow((currentTableData.value.row + 1));
+    _hideActionMenu();
+  }
+  const _insertColumnBefore   = () => {
+    _tAddColumn(currentTableData.value.col);
+    _hideActionMenu();
+  }
+  const _insertColumnAfter    = () => {
+    _tAddColumn((currentTableData.value.col + 1));
+    _hideActionMenu();
+  }
   const _deleteColumn         = () => {
     tableItem.value = TableHelper.deleteColumns(tableItem.value, currentTableData.value.col);
     jQuery('.reset-vue').trigger('click');
+    _hideActionMenu();
   }
   const _deleteRow            = () => {
     tableItem.value = TableHelper.deleteRow(tableItem.value, currentTableData.value.row);
     jQuery('.reset-vue').trigger('click');
+    _hideActionMenu();
   }
   const _openTableActionModal = (col: number, row: number, show = true) => {
     console.log('_openTableActionModal', {col, row, show});
@@ -126,7 +146,7 @@ export default function (cardGroupId = 0) {
     });
   }
   const _refreshPreview       = () => {
-    items.value = TableHelper.getItemsFromTable(tableItem.value,items.value);
+    items.value = TableHelper.getItemsFromTable(tableItem.value, items.value);
   }
 
   const xhrCreate = () => {
@@ -155,7 +175,7 @@ export default function (cardGroupId = 0) {
     });
   };
   const xhrUpdate = () => {
-    const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
+    const handleAjax: HandleAjax   = new HandleAjax(ajaxCreate.value);
     cardGroup.value.whole_question = tableItem.value;
     new Server().send_online({
       data: [

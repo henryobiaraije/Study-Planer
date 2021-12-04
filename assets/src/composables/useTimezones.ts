@@ -33,7 +33,7 @@ export default function () {
         vdata.localize.nonce,
         {}
       ],
-      what: "admin_sp_ajax_admin_get_timezones",
+      what: "front_sp_ajax_admin_get_timezones",
       funcBefore() {
         handleAjax.start();
       },
@@ -57,7 +57,7 @@ export default function () {
           timezone: userTimeZone.value,
         }
       ],
-      what: "admin_sp_ajax_admin_update_user_timezone",
+      what: "front_sp_ajax_admin_update_user_timezone",
       funcBefore() {
         handleAjax.start();
       },

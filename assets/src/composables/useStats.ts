@@ -255,7 +255,7 @@ export default function (status = 'publish') {
             span: forecastSpan.value,
           }
         ],
-        what: "admin_sp_ajax_front_load_stats_forecast",
+        what: "front_sp_ajax_front_load_stats_forecast",
         funcBefore() {
           handleAjax.start();
         },
@@ -309,7 +309,7 @@ export default function (status = 'publish') {
             span: forecastSpan.value,
           }
         ],
-        what: "admin_sp_ajax_front_load_stats_forecast",
+        what: "front_sp_ajax_front_load_stats_forecast",
         funcBefore() {
           handleAjax.start();
         },

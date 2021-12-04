@@ -1341,19 +1341,19 @@
 			if ( empty( $card_group ) ) {
 				Common::send_error( 'Invalid card group' );
 			}
-			if ( 'table' === $card_group->card_type ) {
-				$card_group->whole_question = json_decode( $card_group->whole_question );
-				foreach ( $card_group->cards as $card ) {
-					$card->question = json_decode( $card->question );
-					$card->answer   = json_decode( $card->answer );
-				}
-			} elseif ( 'image' === $card_group->card_type ) {
-				$card_group->whole_question = json_decode( $card_group->whole_question );
-				foreach ( $card_group->cards as $card ) {
-					$card->question = json_decode( $card->question );
-					$card->answer   = json_decode( $card->answer );
-				}
-			}
+//			if ( 'table' === $card_group->card_type ) {
+//				$card_group->whole_question = json_decode( $card_group->whole_question );
+//				foreach ( $card_group->cards as $card ) {
+//					$card->question = json_decode( $card->question );
+//					$card->answer   = json_decode( $card->answer );
+//				}
+//			} elseif ( 'image' === $card_group->card_type ) {
+//				$card_group->whole_question = json_decode( $card_group->whole_question );
+//				foreach ( $card_group->cards as $card ) {
+//					$card->question = json_decode( $card->question );
+//					$card->answer   = json_decode( $card->answer );
+//				}
+//			}
 
 //			$cards = $card_group->cards;
 //			Common::send_error( [

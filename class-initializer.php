@@ -8,6 +8,7 @@
 
 	use Illuminate\Database\Capsule\Manager;
 	use Model\DeckGroup;
+	use StudyPlanner\Db\Initialize_Db;
 	use StudyPlanner\Helpers\AjaxFrontHelper;
 	use StudyPlanner\Helpers\AjaxHelper;
 	use StudyPlanner\Libs\Common;
@@ -240,7 +241,7 @@
 			$prefix     = "wp_ajax_";
 			add_action( $prefix . $ajax_admin, function () {
 				$post = Common::getPost();
-				self::verify_post( $post, true, true );
+				self::verify_post( $post, true );
 				$action = sanitize_title( $post[ Common::VAR_0 ] );
 				do_action( $action, $post );
 
@@ -415,6 +416,8 @@
 
 		public function on_activate() {
 			//
+			Initialize_Db::get_instance()->create_tables();
+			Initialize_Db::get_instance()->create_default_rows();
 		}
 
 		public function on_deactivate() {

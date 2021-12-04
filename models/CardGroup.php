@@ -29,6 +29,10 @@
 		];
 		protected $appends  = [ 'card_group_edit_url' ];
 
+		protected $casts = [
+			'whole_question' => 'array',
+		];
+
 
 		public function cards() : \Illuminate\Database\Eloquent\Relations\HasMany {
 			return $this->hasMany( Card::class );
@@ -122,4 +126,20 @@
 
 			return $all;
 		}
+
+		protected function getCastType( $key ) {
+			$card_type             = $this->card_type;
+			$is_question_or_answer = in_array( $key, [ 'whole_question' ] );
+			$is_table_or_image     = in_array( $card_type, [ 'image', 'table' ] );
+			$make_array            = $is_question_or_answer && $is_table_or_image;
+
+			if ( $make_array ) {
+//				dd($key,$card_type,parent::getCastType( $key ));
+//				$this->type;
+				return parent::getCastType( $key );
+			} else {
+				return $this->type;
+			}
+		}
+
 	}

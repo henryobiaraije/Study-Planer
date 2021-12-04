@@ -32,8 +32,8 @@
 		private function __construct() {
 			$this->initialize();
 			$this->define_prefixes();
-			$this->create_tables();
-			$this->create_default_rows();
+//			$this->create_tables();
+//			$this->create_default_rows();
 //			add_action( 'admin_init', [$this,'create_default_rows']);
 		}
 
@@ -72,7 +72,7 @@
 			define( 'SP_TABLE_USERS', $wpdb->prefix . 'users' );
 		}
 
-		private function create_default_rows() {
+		public function create_default_rows() {
 
 			$this->crete_default_deck_group();
 
@@ -108,7 +108,7 @@
 			}
 		}
 
-		private function create_tables() {
+		public function create_tables() {
 
 			// Deck groups
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_DECK_GROUPS ) ) {
@@ -139,6 +139,12 @@
 					$table->timestamps();
 				} );
 			}
+			if ( ! $this->schema_builder->hasColumn( SP_TABLE_TAGS, 'testubg' ) ) {
+				Capsule::schema()->table( SP_TABLE_TAGS, function ( Blueprint $table ) {
+					$table->string( 'testubg' )->after( 'name' );
+				} );
+			}
+
 
 			// Taggables
 			if ( ! $this->schema_builder->hasTable( SP_TABLE_TAGGABLES ) ) {

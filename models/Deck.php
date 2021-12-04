@@ -44,6 +44,9 @@
 		public function card_group() {
 			return $this->hasMany( CardGroup::class, 'deck_id' );
 		}
+		public function card_groups() {
+			return $this->hasMany( CardGroup::class, 'deck_id' );
+		}
 
 		public static function get_deck_simple( $args ) : array {
 			$default = [
