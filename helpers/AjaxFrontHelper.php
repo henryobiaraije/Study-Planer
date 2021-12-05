@@ -398,20 +398,20 @@ class AjaxFrontHelper
         Manager::beginTransaction();
 
 
-        Common::send_error([
-            'ajax_front_create_study',
-            'post' => $post,
-            '$study_id' => $study_id,
-            '$study' => $study,
-            '$deck_id' => $deck_id,
-            '$tags' => $tags,
-            '$no_of_new' => $no_of_new,
-            '$no_on_hold' => $no_on_hold,
-            '$no_to_revise' => $no_to_revise,
-            '$revise_all' => $revise_all,
-            '$study_all_new' => $study_all_new,
-            '$study_all_on_hold' => $study_all_on_hold,
-        ]);
+//        Common::send_error([
+//            'ajax_front_create_study',
+//            'post' => $post,
+//            '$study_id' => $study_id,
+//            '$study' => $study,
+//            '$deck_id' => $deck_id,
+//            '$tags' => $tags,
+//            '$no_of_new' => $no_of_new,
+//            '$no_on_hold' => $no_on_hold,
+//            '$no_to_revise' => $no_to_revise,
+//            '$revise_all' => $revise_all,
+//            '$study_all_new' => $study_all_new,
+//            '$study_all_on_hold' => $study_all_on_hold,
+//        ]);
 
         $creating_new = false;
         if (empty($study)) {
@@ -445,26 +445,26 @@ class AjaxFrontHelper
             $study->tags()->save($tag);
         }
 
-//			Manager::commit();
+			Manager::commit();
         $new_study = Study::get_user_study_by_id($study->id);
 //			$new_study = Study::with( 'tags', 'deck' )->find( $study->id );;
 
 
-        Common::send_error([
-            'ajax_front_create_study',
-            'post' => $post,
-            '$study_id' => $study_id,
-            '$new_study' => $new_study,
-            '$study' => $study,
-            '$deck_id' => $deck_id,
-            '$tags' => $tags,
-            '$no_of_new' => $no_of_new,
-            '$no_on_hold' => $no_on_hold,
-            '$no_to_revise' => $no_to_revise,
-            '$revise_all' => $revise_all,
-            '$study_all_new' => $study_all_new,
-            '$study_all_on_hold' => $study_all_on_hold,
-        ]);
+//        Common::send_error([
+//            'ajax_front_create_study',
+//            'post' => $post,
+//            '$study_id' => $study_id,
+//            '$new_study' => $new_study,
+//            '$study' => $study,
+//            '$deck_id' => $deck_id,
+//            '$tags' => $tags,
+//            '$no_of_new' => $no_of_new,
+//            '$no_on_hold' => $no_on_hold,
+//            '$no_to_revise' => $no_to_revise,
+//            '$revise_all' => $revise_all,
+//            '$study_all_new' => $study_all_new,
+//            '$study_all_on_hold' => $study_all_on_hold,
+//        ]);
 
         Common::send_success('Saved.', $new_study);
 
@@ -530,18 +530,18 @@ class AjaxFrontHelper
             'only_trashed' => false,//( 'trash' === $status ) ? true : false,
         ]);
 
-        Common::send_error([
-            'ajax_admin_load_deck_group',
-            'post' => $post,
-            '$user_id' => $user_id,
-            '$params' => $params,
-            '$studies' => $studies,
-            '$per_page' => $per_page,
-            '$page' => $page,
-            '$search_keyword' => $search_keyword,
-            '$deck_groups' => $deck_groups,
-            '$status' => $status,
-        ]);
+//        Common::send_error([
+//            'ajax_admin_load_deck_group',
+//            'post' => $post,
+//            '$user_id' => $user_id,
+//            '$params' => $params,
+//            '$studies' => $studies,
+//            '$per_page' => $per_page,
+//            '$page' => $page,
+//            '$search_keyword' => $search_keyword,
+//            '$deck_groups' => $deck_groups,
+//            '$status' => $status,
+//        ]);
 
 
         Common::send_success('Deck group loaded.', [
