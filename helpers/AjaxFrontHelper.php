@@ -19,6 +19,7 @@ use Model\CardGroups;
 use Model\Deck;
 use Model\DeckGroup;
 use Model\Study;
+use Model\StudyLog;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
 use StudyPlanner\Initializer;
@@ -60,35 +61,129 @@ class AjaxFrontHelper
     {
         add_action('front_sp_ajax_front_get_deck_groups', array($this, 'ajax_front_get_deck_groups'));
         add_action('front_sp_ajax_front_create_study', array($this, 'ajax_front_create_study'));
-        add_action('front_sp_ajax_front_get_today_questions_in_study', array($this, 'ajax_front_get_today_questions_in_study'));
+        add_action('front_sp_ajax_front_get_today_questions_in_study',
+            array($this, 'ajax_front_get_today_questions_in_study'));
         add_action('front_sp_ajax_admin_get_timezones', array($this, 'ajax_admin_get_timezones'));
         add_action('front_sp_ajax_admin_update_user_timezone', array($this, 'ajax_admin_update_user_timezone'));
         add_action('front_sp_ajax_front_mark_answer', array($this, 'ajax_front_mark_answer'));
         add_action('front_sp_ajax_front_mark_answer_on_hold', array($this, 'ajax_front_mark_answer_on_hold'));
         add_action('front_sp_ajax_front_load_stats_forecast', array($this, 'ajax_front_load_stats_forecast'));
+        add_action('front_sp_ajax_front_load_stats_review_time', array($this, 'ajax_front_load_stats_forecast'));
         add_action('front_sp_ajax_front_get_single_deck_group', array($this, 'ajax_front_get_single_deck_group'));
+        add_action('front_sp_ajax_front_record_study_log', array($this, 'ajax_front_record_study_log'));
     }
 
 
     /*** <editor-fold desc="Chart Stats"> **/
 
+    public function ajax_front_record_study_log($post): void
+    {
+        Initializer::verify_post($post, true);
+//        Common::send_error([
+//            'ajax_front_record_study_log',
+//            'post' => $post,
+//        ]);
+
+        $all      = $post[Common::VAR_2];
+        $study_id = (int) sanitize_text_field($all['study_id']);
+        $card_id  = (int) sanitize_text_field($all['card_id']);
+        $action   = sanitize_text_field($all['action']);
+        if (!in_array($action, ['start', 'stop'])) {
+            Common::send_error('Invalid action');
+        }
+        $study = Study::find($study_id);
+        if (empty($study)) {
+            Common::send_error('Invalid study');
+        }
+        $card = Card::find($card_id);
+        if (empty($card)) {
+            Common::send_error('Invalid card.');
+        }
+
+        $last_log = StudyLog
+            ::where('card_id', '=', $card_id)
+            ->where('study_id', '=', $study_id)
+            ->limit(1)
+            ->orderByDesc('id')->get()->first();
+
+        if (!empty($last_log)) {
+            if ('start' === $action) {
+                if ('start' === $last_log->action) {
+                    $last_log->forceDelete();
+                }
+            }
+            if ('stop' === $action) {
+                if ('stop' === $last_log->action) {
+                    Common::send_error("Ignore. Cant record 2 stops straight.");
+                }
+            }
+        }
+
+        $new_study_log = StudyLog::create([
+            'study_id' => $study_id,
+            'card_id'  => $card_id,
+            'action'   => $action
+        ]);
+
+        Common::send_error([
+            'ajax_front_load_stats_forecast',
+            'post'           => $post,
+            '$new_study_log' => $new_study_log,
+            '$last_log'      => $last_log,
+            '$study'         => $study,
+            '$card'          => $card,
+            '$action'        => $action,
+        ]);
+
+
+        Common::send_success('On hold marked');
+
+
+    }
+
     public function ajax_front_load_stats_forecast($post): void
     {
-        Initializer::verify_post($post);
+        Initializer::verify_post($post, true);
 //			Common::send_error( [
 //				'ajax_front_load_stats_forecast',
 //				'post' => $post,
 //			] );
 
-        $all = $post[Common::VAR_2];
-        $span = sanitize_text_field($all['span']);
-        $length = 30;
+        $all     = $post[Common::VAR_2];
+        $span    = sanitize_text_field($all['span']);
+        $length  = 30;
         $user_id = get_current_user_id();
 
         $forecast = Study::get_user_card_forecast($user_id, $span);
         Common::send_error([
             'ajax_front_load_stats_forecast',
+            'post'  => $post,
+            '$span' => $span,
+        ]);
+
+
+        Common::send_success('On hold marked');
+
+
+    }
+
+    public function ajax_front_load_stats_review_time($post): void
+    {
+        Initializer::verify_post($post, true);
+        Common::send_error([
+            'ajax_front_load_stats_review_time',
             'post' => $post,
+        ]);
+
+        $all     = $post[Common::VAR_2];
+        $span    = sanitize_text_field($all['span']);
+        $length  = 30;
+        $user_id = get_current_user_id();
+
+        $forecast = Study::get_user_card_forecast($user_id, $span);
+        Common::send_error([
+            'ajax_front_load_stats_forecast',
+            'post'  => $post,
             '$span' => $span,
         ]);
 
@@ -110,10 +205,10 @@ class AjaxFrontHelper
 //				'post' => $post,
 //			] );
 
-        $all = $post[Common::VAR_2];
-        $study_id = (int)sanitize_text_field($all['study_id']);
-        $card_id = (int)sanitize_text_field($all['card_id']);
-        $answer = $all['answer'];
+        $all        = $post[Common::VAR_2];
+        $study_id   = (int) sanitize_text_field($all['study_id']);
+        $card_id    = (int) sanitize_text_field($all['card_id']);
+        $answer     = $all['answer'];
         $all_grades = get_all_card_grades();
 
         $study = Study::find($study_id);
@@ -125,7 +220,7 @@ class AjaxFrontHelper
             Common::send_error('Invalid card.');
         }
 
-        $answered_as_new = false;
+        $answered_as_new     = false;
         $answered_as_revised = false;
 
         $_answered_before = Answered::where('card_id', '=', $card_id)->first();
@@ -138,15 +233,15 @@ class AjaxFrontHelper
         Manager::beginTransaction();
 
         $_tomorro_datetime = new DateTime(Common::getDateTime(1));
-        $next_due_date = $_tomorro_datetime->setTime(0, 0, 0)->format('Y-m-d H:i:s');
+        $next_due_date     = $_tomorro_datetime->setTime(0, 0, 0)->format('Y-m-d H:i:s');
 
         $answer = Answered::create([
-            'study_id' => $study_id,
-            'card_id' => $card_id,
-            'answer' => '',
-            'grade' => 'hold',
-            'next_due_at' => $next_due_date,
-            'answered_as_new' => $answered_as_new,
+            'study_id'            => $study_id,
+            'card_id'             => $card_id,
+            'answer'              => '',
+            'grade'               => 'hold',
+            'next_due_at'         => $next_due_date,
+            'answered_as_new'     => $answered_as_new,
             'answered_as_revised' => $answered_as_revised,
         ]);
         Manager::commit();
@@ -177,11 +272,11 @@ class AjaxFrontHelper
 //				'post' => $post,
 //			] );
 
-        $all = $post[Common::VAR_2];
-        $study_id = (int)sanitize_text_field($all['study_id']);
-        $card_id = (int)sanitize_text_field($all['card_id']);
-        $answer = $all['answer'];
-        $grade = sanitize_text_field($all['grade']);
+        $all        = $post[Common::VAR_2];
+        $study_id   = (int) sanitize_text_field($all['study_id']);
+        $card_id    = (int) sanitize_text_field($all['card_id']);
+        $answer     = $all['answer'];
+        $grade      = sanitize_text_field($all['grade']);
         $all_grades = get_all_card_grades();
 
         $study = Study::with('deck.card_group')->find($study_id);
@@ -206,7 +301,7 @@ class AjaxFrontHelper
         }
 
 
-        $answered_as_new = false;
+        $answered_as_new     = false;
         $answered_as_revised = false;
 
         $_answered_before = Answered::where('card_id', '=', $card_id)->first();
@@ -233,13 +328,13 @@ class AjaxFrontHelper
         Manager::beginTransaction();
 
         $answer = Answered::create([
-            'study_id' => $study_id,
-            'card_id' => $card_id,
-            'answer' => $answer,
-            'grade' => $grade,
-            'answered_as_new' => $answered_as_new,
+            'study_id'            => $study_id,
+            'card_id'             => $card_id,
+            'answer'              => $answer,
+            'grade'               => $grade,
+            'answered_as_new'     => $answered_as_new,
             'answered_as_revised' => $answered_as_revised,
-//				'next_due_at' => Common::getDateTime( - 7 ),
+            //				'next_due_at' => Common::getDateTime( - 7 ),
         ]);
 //			$answer = Answered::create( [
 //				'study_id'    => $study_id,
@@ -259,14 +354,14 @@ class AjaxFrontHelper
 
         try {
             $next_due = new Card_Due_Date_Service([
-                'card_id' => $card_id,
+                'card_id'  => $card_id,
                 'study_id' => $study_id,
             ]);
 
-            $next_due_date = $next_due->get_next_due_date();
-            $answer->next_due_at = $next_due_date['next_due_date_morning'];
+            $next_due_date         = $next_due->get_next_due_date();
+            $answer->next_due_at   = $next_due_date['next_due_date_morning'];
             $answer->next_interval = $next_due_date['next_interval'];
-            $answer->ease_factor = $next_due_date['ease_factor'];
+            $answer->ease_factor   = $next_due_date['ease_factor'];
             $answer->save();
             Manager::commit();
 
@@ -286,7 +381,7 @@ class AjaxFrontHelper
                 'next_interval' => $next_due_date['next_interval'],
             ]);
         } catch (\Exception $e) {
-            Common::send_error('Error: ' . $e->getMessage());
+            Common::send_error('Error: '.$e->getMessage());
         }
 
 
@@ -299,8 +394,8 @@ class AjaxFrontHelper
 //				'post' => $post,
 //			] );
 
-        $all = $post[Common::VAR_2]['study'];
-        $study_id = (int)sanitize_text_field($all['id']);
+        $all      = $post[Common::VAR_2]['study'];
+        $study_id = (int) sanitize_text_field($all['id']);
 
         $study = Study::with('tags', 'deck')->find($study_id);
         if (empty($study)) {
@@ -315,14 +410,14 @@ class AjaxFrontHelper
 //				'$study'    => $study,
 //			] );
 
-        $tags = $study->tags;
-        $no_of_new = $study->no_of_new;
-        $no_on_hold = $study->no_on_hold;
-        $no_to_revise = $study->no_to_revise;
-        $revise_all = $study->revise_all;
-        $study_all_new = $study->study_all_new;
+        $tags              = $study->tags;
+        $no_of_new         = $study->no_of_new;
+        $no_on_hold        = $study->no_on_hold;
+        $no_to_revise      = $study->no_to_revise;
+        $revise_all        = $study->revise_all;
+        $study_all_new     = $study->study_all_new;
         $study_all_on_hold = $study->study_all_on_hold;
-        $user_id = get_current_user_id();
+        $user_id           = get_current_user_id();
 
         $all_cards = $study::get_user_cards_to_study($study->id, $user_id);
 
@@ -366,17 +461,17 @@ class AjaxFrontHelper
 //				'post' => $post,
 //			] );
 
-        $all = $post[Common::VAR_2]['study'];
-        $deck_id = (int)sanitize_text_field($all['deck']['id']);
-        $study_id = (int)sanitize_text_field($all['id']);
-        $tags = $all['tags'];
-        $no_of_new = (int)sanitize_text_field($all['no_of_new']);
-        $no_on_hold = (int)sanitize_text_field($all['no_on_hold']);
-        $no_to_revise = (int)sanitize_text_field($all['no_to_revise']);
-        $revise_all = (bool)sanitize_text_field($all['revise_all']);
-        $study_all_new = (bool)sanitize_text_field($all['study_all_new']);
-        $study_all_on_hold = (bool)sanitize_text_field($all['study_all_on_hold']);
-        $all_tags = (bool)sanitize_text_field($all['all_tags']);
+        $all               = $post[Common::VAR_2]['study'];
+        $deck_id           = (int) sanitize_text_field($all['deck']['id']);
+        $study_id          = (int) sanitize_text_field($all['id']);
+        $tags              = $all['tags'];
+        $no_of_new         = (int) sanitize_text_field($all['no_of_new']);
+        $no_on_hold        = (int) sanitize_text_field($all['no_on_hold']);
+        $no_to_revise      = (int) sanitize_text_field($all['no_to_revise']);
+        $revise_all        = (bool) sanitize_text_field($all['revise_all']);
+        $study_all_new     = (bool) sanitize_text_field($all['study_all_new']);
+        $study_all_on_hold = (bool) sanitize_text_field($all['study_all_on_hold']);
+        $all_tags          = (bool) sanitize_text_field($all['all_tags']);
 
         $deck = Deck::find($deck_id);
         if (empty($deck)) {
@@ -415,18 +510,18 @@ class AjaxFrontHelper
 
         $creating_new = false;
         if (empty($study)) {
-            $study = new Study();
+            $study        = new Study();
             $creating_new = true;
         }
-        $study->no_to_revise = $no_to_revise;
-        $study->no_of_new = $no_of_new;
-        $study->no_on_hold = $no_on_hold;
-        $study->revise_all = $revise_all;
-        $study->study_all_new = $study_all_new;
+        $study->no_to_revise      = $no_to_revise;
+        $study->no_of_new         = $no_of_new;
+        $study->no_on_hold        = $no_on_hold;
+        $study->revise_all        = $revise_all;
+        $study->study_all_new     = $study_all_new;
         $study->study_all_on_hold = $study_all_on_hold;
-        $study->user_id = $user_id;
-        $study->deck_id = $deck_id;
-        $study->all_tags = $all_tags;
+        $study->user_id           = $user_id;
+        $study->deck_id           = $deck_id;
+        $study->all_tags          = $all_tags;
 //			Common::send_error( [
 //				'ajax_front_create_study',
 //				'post'               => $post,
@@ -445,7 +540,7 @@ class AjaxFrontHelper
             $study->tags()->save($tag);
         }
 
-			Manager::commit();
+        Manager::commit();
         $new_study = Study::get_user_study_by_id($study->id);
 //			$new_study = Study::with( 'tags', 'deck' )->find( $study->id );;
 
@@ -478,9 +573,9 @@ class AjaxFrontHelper
 //				'post' => $post,
 //			] );
 
-        $all = $post[Common::VAR_2];
+        $all     = $post[Common::VAR_2];
         $deck_id = $all['deck_id'];
-        $deck = Deck::with('deck_group')->find($deck_id);
+        $deck    = Deck::with('deck_group')->find($deck_id);
         if (empty($deck)) {
             Common::send_error('Invalid deck');
         }
@@ -509,24 +604,24 @@ class AjaxFrontHelper
 //				'ajax_admin_load_deck_group',
 //				'post' => $post,
 //			] );
-        $user_id = get_current_user_id();
-        $params = $post[Common::VAR_2]['params'];
-        $per_page = (int)sanitize_text_field($params['per_page']);
-        $page = (int)sanitize_text_field($params['page']);
+        $user_id        = get_current_user_id();
+        $params         = $post[Common::VAR_2]['params'];
+        $per_page       = (int) sanitize_text_field($params['per_page']);
+        $page           = (int) sanitize_text_field($params['page']);
         $search_keyword = sanitize_text_field($params['search_keyword']);
-        $status = sanitize_text_field($params['status']);
+        $status         = sanitize_text_field($params['status']);
 
         $deck_groups = DeckGroup::get_deck_groups_front_end([
-            'search' => '',//$search_keyword,
-            'page' => 1,//$page,
-            'per_page' => 1000,//$per_page,
+            'search'       => '',//$search_keyword,
+            'page'         => 1,//$page,
+            'per_page'     => 1000,//$per_page,
             'only_trashed' => false,//( 'trash' === $status ) ? true : false,
         ]);
-        $studies = Study::get_user_studies([
-            'user_id' => $user_id,
-            'search' => '',//$search_keyword,
-            'page' => 1,//$page,
-            'per_page' => 1000,//$per_page,
+        $studies     = Study::get_user_studies([
+            'user_id'      => $user_id,
+            'search'       => '',//$search_keyword,
+            'page'         => 1,//$page,
+            'per_page'     => 1000,//$per_page,
             'only_trashed' => false,//( 'trash' === $status ) ? true : false,
         ]);
 
@@ -562,9 +657,9 @@ class AjaxFrontHelper
 //				__METHOD__,
 //				'post' => $post,
 //			] );
-        $all = $post[Common::VAR_2];
+        $all       = $post[Common::VAR_2];
         $time_zone = sanitize_text_field($all['timezone']);
-        $user_id = get_current_user_id();
+        $user_id   = get_current_user_id();
         update_user_meta($user_id, Settings::UM_USER_TIMEZONE, $time_zone);
 //			Common::send_error( [
 //				__METHOD__,
@@ -578,10 +673,10 @@ class AjaxFrontHelper
     public function ajax_admin_get_timezones($post): void
     {
         Initializer::verify_post($post, true);
-        $user_id = get_current_user_id();
+        $user_id       = get_current_user_id();
         $user_timezone = get_user_meta($user_id, Settings::UM_USER_TIMEZONE, true);
         Common::send_success('Timezones loaded.', [
-            'timezones' => Common::get_time_zones(),
+            'timezones'     => Common::get_time_zones(),
             'user_timezone' => $user_timezone,
         ]);
 

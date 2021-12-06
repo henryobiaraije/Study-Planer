@@ -83,3 +83,18 @@
 
 		return \apply_filters( 'sp_default_image_display_type', $default );
 	}
+
+
+    global $wpdb;
+    $prefix = $wpdb->prefix . 'sp_';
+    define( 'SP_DB_PREFIX', $prefix );
+    define( 'SP_TABLE_DECK_GROUPS', SP_DB_PREFIX . 'deck_groups' );
+    define( 'SP_TABLE_TAGS', SP_DB_PREFIX . 'tags' );
+    define( 'SP_TABLE_TAGGABLES', SP_DB_PREFIX . 'taggables' );
+    define( 'SP_TABLE_DECKS', SP_DB_PREFIX . 'decks' );
+    define( 'SP_TABLE_CARD_GROUPS', SP_DB_PREFIX . 'card_groups' );
+    define( 'SP_TABLE_CARDS', SP_DB_PREFIX . 'cards' );
+    define( 'SP_TABLE_STUDY', SP_DB_PREFIX . 'study' );
+    define( 'SP_TABLE_ANSWERED', SP_DB_PREFIX . 'answered' );
+    define( 'SP_TABLE_USERS', $wpdb->prefix . 'users' );
+    define( 'SP_TABLE_STUDY_LOG', SP_DB_PREFIX . 'study_log' );

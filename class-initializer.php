@@ -410,8 +410,6 @@
 					Common::send_error( 'Session Expired. Please reload page.' );
 				}
 			}
-
-
 		}
 
 		public function on_activate() {
