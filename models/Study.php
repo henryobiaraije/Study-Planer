@@ -929,12 +929,15 @@ class Study extends Model
             $tag_ids          = $tags->pluck('id');
             $query_card_group = CardGroup
                 ::with([
-                    'cards' => function ($query) {
+                    'cards' => function ($query) use ($user_id) {
                         $query
-                            ->whereNotIn('id', function ($q) {
+                            ->whereNotIn('id', function ($q) use ($user_id) {
                                 $q
                                     ->select('card_id')
-                                    ->from(SP_TABLE_ANSWERED)
+                                    ->from(SP_TABLE_ANSWERED.' as aaa')
+                                    ->leftJoin(SP_TABLE_STUDY.' as sss', 'sss.id', '=', 'aaa.study_id')
+                                    ->leftJoin(SP_TABLE_USERS.' as uuu', 'uuu.id', '=', 'sss.user_id')
+                                    ->where('uuu.id', '=', $user_id)
                                     ->distinct()//todo improve, limit by study_id or user_id
                                 ;
 //                        Common::send_error([
@@ -946,20 +949,23 @@ class Study extends Model
                             });
                     }, 'deck', 'tags'
                 ])
-                ->whereHas('cards', function ($query) use ($deck) {
+                ->whereHas('cards', function ($query) use ($deck, $user_id) {
                     $query
-                        ->whereNotIn('id', function ($q) {
+                        ->whereNotIn('id', function ($q) use ($user_id) {
                             $q
-                                ->select('card_id')
-                                ->from(SP_TABLE_ANSWERED)
+                                ->select('aaa.card_id')
+                                ->from(SP_TABLE_ANSWERED.' as aaa')
+                                ->leftJoin(SP_TABLE_STUDY.' as sss', 'sss.id', '=', 'aaa.study_id')
+                                ->leftJoin(SP_TABLE_USERS.' as uuu', 'uuu.id', '=', 'sss.user_id')
+                                ->where('uuu.id', '=', $user_id)
                                 ->distinct()//todo improve, limit by study_id or user_id
                             ;
-//                        Common::send_error([
-//                            __METHOD__,
-//                            '$q sql' => $q->toSql(),
-//                            '$q get' => $q->get(),
-//                            '$q' => $q,
-//                        ]);
+//                            Common::send_error([
+//                                __METHOD__,
+//                                '$q sql' => $q->toSql(),
+//                                '$q get' => $q->get(),
+//                                '$q'     => $q,
+//                            ]);
                         });
 //                    Common::send_error([
 //                        __METHOD__,
@@ -1556,17 +1562,30 @@ class Study extends Model
                 ->whereIn('c.id', function ($q) use (
                     $user_timezone_today_midnight,
                     $card_ids_revised_today,
-                    $study_id
+                    $study_id,
+                    $user_id
                 ) {
                     $q->select('card_id')->from(SP_TABLE_ANSWERED)
                         ->whereNotIn('card_id', $card_ids_revised_today)
-//							->whereIn( 'grade', [ 'hold' ] )
+                        ->whereNotIn('card_id', function ($q) use ($user_id) {
+                            $q
+                                ->select('card_id')
+                                ->from(SP_TABLE_ANSWERED.' as aaa')
+                                ->leftJoin(SP_TABLE_STUDY.' as sss', 'sss.id', '=', 'aaa.study_id')
+                                ->leftJoin(SP_TABLE_USERS.' as uuu', 'uuu.id', '=', 'sss.user_id')
+                                ->where('uuu.id', '=', $user_id)
+                                ->where('grade', '!=', 'hold')
+                                ->distinct() //todo improve, limit by study_id or user_id
+                            ;
+//                            dd( $q->toSql(), $q->getBindings(), $q->get() );
+                        })
+                        ->whereIn('grade', ['hold'])
                         ->where('study_id', $study_id)
                         ->where('next_due_at', '<=', $user_timezone_today_midnight)
                         ->distinct();
-//						dd( $q->toSql(), $q->getBindings(), $q->get() );
+//						dd( $q->toSql(), $q->getBindings(),$card_ids_revised_today, $q->get() );
                 });
-//				dd( $cards_query->toSql(), $cards_query->getBindings(),$cards_query->get() );
+//            dd($cards_query->toSql(), $cards_query->getBindings(), $cards_query->get());
 
             /*** Group by c.id "To prevent duplicate results being returned" **/
             $cards_query = $cards_query->where('d.id', '=', $deck_id)
@@ -1578,31 +1597,34 @@ class Study extends Model
             /*** Get the cards ***/
             $all_cards = Card::with('card_group', 'card_group.deck')
                 ->whereIn('id', $card_ids);
-//				dd(
-//					$card_ids,
-//					$all_cards->toSql(),
-//					$all_cards->getBindings(),
-//					$all_cards->get(),
-//					$cards_query->toSql(),
-//					$cards_query->getBindings(),
-//					$cards_query->get()
-//				);
+//            Common::send_error([
+//                'all_cards' => $all_cards,
+//            ]);
+//            dd(
+//                $card_ids,
+//                $all_cards->toSql(),
+//                $all_cards->getBindings(),
+//                $all_cards->get(),
+//                $cards_query->toSql(),
+//                $cards_query->getBindings(),
+//                $cards_query->get()
+//            );
 
 
-//				Common::send_error( [
-//					__METHOD__,
-//					'$all_cards toSql'       => $all_cards->toSql(),
-//					'$all_cards'             => $all_cards->get(),
-//					'$study'                 => $study,
-//					'$card_ids'                 => $card_ids,
-//					'$tags'                  => $tags,
-//					'$add_all_tags'          => $add_all_tags,
-//					'card_get'               => $cards_query->get(),
-//					'card_query_sql'         => $cards_query->toSql(),
-////					'$cards'                 => $cards,
-//					'Manager::getQueryLog()' => Manager::getQueryLog(),
-//					'study_id'               => $study_id,
-//				] );
+//            Common::send_error([
+//                __METHOD__,
+//                '$all_cards toSql'       => $all_cards->toSql(),
+//                '$all_cards'             => $all_cards->get(),
+//                '$study'                 => $study,
+//                '$card_ids'              => $card_ids,
+//                '$tags'                  => $tags,
+//                '$add_all_tags'          => $add_all_tags,
+//                'card_get'               => $cards_query->get(),
+//                'card_query_sql'         => $cards_query->toSql(),
+//                //					'$cards'                 => $cards,
+//                'Manager::getQueryLog()' => Manager::getQueryLog(),
+//                'study_id'               => $study_id,
+//            ]);
 
 
             return [
@@ -1836,19 +1858,41 @@ class Study extends Model
             $cards_query = $cards_query
                 ->whereNotIn('c.id', $new_card_ids_answered_today);
 
-            /*** Filter out cards answerd today with grade not "again" ***/
+            /*** Filter out cards answered today with grade not "again" ***/
             $cards_query = $cards_query
-                ->whereNotIn('c.id', function ($q) use ($user_timezone_today_midnight) {
-                    $q->select('card_id')->from(SP_TABLE_ANSWERED)
-                        ->where('grade', '!=', 'again');
+                ->whereNotIn('c.id', function ($q) use (
+                    $user_timezone_today_midnight,
+                    $user_id
+                ) {
+//                    $q->select('card_id')->from(SP_TABLE_ANSWERED)
+//                        ->where('grade', '!=', 'again');
+                    $q
+                        ->select('card_id')
+                        ->from(SP_TABLE_ANSWERED.' as aaa')
+                        ->leftJoin(SP_TABLE_STUDY.' as sss', 'sss.id', '=', 'aaa.study_id')
+                        ->leftJoin(SP_TABLE_USERS.' as uuu', 'uuu.ID', '=', 'sss.user_id')
+                        ->where('uuu.ID', '=', $user_id)
+                        ->where('aaa.created_at', '>', $user_timezone_today_midnight)
+                        ->distinct();
                 });
 
-            /*** Filter out cards answerd before today ***/
-            $cards_query = $cards_query
-                ->whereNotIn('c.id', function ($q) use ($user_timezone_today_midnight) {
-                    $q->select('card_id')->from(SP_TABLE_ANSWERED)
-                        ->where('created_at', '<', $user_timezone_today_midnight);
-                });
+            /*** Filter out cards answered before today ***/
+            $cards_query->whereNotIn('c.id', function ($q) use ($user_id) {
+                $q
+                    ->select('card_id')
+                    ->from(SP_TABLE_ANSWERED.' as aaa')
+                    ->leftJoin(SP_TABLE_STUDY.' as sss', 'sss.id', '=', 'aaa.study_id')
+                    ->leftJoin(SP_TABLE_USERS.' as uuu', 'uuu.ID', '=', 'sss.user_id')
+                    ->where('uuu.ID', '=', $user_id)
+                    ->distinct();
+//                        Common::send_error([
+//                            __METHOD__,
+//                            '$q sql' => $q->toSql(),
+//                            '$q get' => $q->get(),
+//                            '$q getBindings' => $q->getBindings(),
+//                            '$q' => $q,
+//                        ]);
+            });
 
             /*** Group by c.id "To prevent duplicate results being returned" **/
             $cards_query = $cards_query->where('d.id', '=', $deck_id)
@@ -1859,30 +1903,43 @@ class Study extends Model
             /*** Get the cards ***/
             $all_cards = Card::with('card_group', 'card_group.deck')
                 ->whereIn('id', $card_ids);
-//				dd(
-//					$card_ids,
-//					$all_cards->toSql(),
-//					$all_cards->getBindings(),
-//					$all_cards->get(),
-//					$cards_query->toSql(),
-//					$cards_query->getBindings(),
-//					$cards_query->get()
-//				);
+//            Common::send_error([
+//                '$card_ids'                   => $card_ids,
+//                '$user_timezone_today_midnight'                   => $user_timezone_today_midnight,
+//                '$all_cards->toSql()'         => $all_cards->toSql(),
+//                '$all_cards->getBindings()'   => $all_cards->getBindings(),
+//                '$all_cards->get()'           => $all_cards->get(),
+//                '$cards_query->toSql()'       => $cards_query->toSql(),
+//                '$cards_query->getBindings()' => $cards_query->getBindings(),
+//                '$cards_query->get('          => $cards_query->get(),
+//            ]);
+//            dd(
+//                $card_ids,
+//                $all_cards->toSql(),
+//                $all_cards->getBindings(),
+//                $all_cards->get(),
+//                $cards_query->toSql(),
+//                $cards_query->getBindings(),
+//                $cards_query->get()
+//            );
 
 
-//				Common::send_error( [
-//					__METHOD__,
-//					'$all_cards toSql'       => $all_cards->toSql(),
-//					'$all_cards'             => $all_cards->get(),
-//					'$study'                 => $study,
-//					'$tags'                  => $tags,
-//					'$add_all_tags'          => $add_all_tags,
-//					'card_get'               => $cards_query->get(),
-//					'card_query_sql'         => $cards_query->toSql(),
-////					'$cards'                 => $cards,
-//					'Manager::getQueryLog()' => Manager::getQueryLog(),
-//					'study_id'               => $study_id,
-//				] );
+            if (36 === $study_id) {
+//                Common::send_error([
+//                    __METHOD__,
+//                    '$all_cards toSql'       => $all_cards->toSql(),
+//                    '$all_cards'             => $all_cards->get(),
+//                    '$study'                 => $study,
+//                    '$tags'                  => $tags,
+//                    '$add_all_tags'          => $add_all_tags,
+//                    'card_get'               => $cards_query->get(),
+//                    'card_query_sql'         => $cards_query->toSql(),
+//                    //					'$cards'                 => $cards,
+//                    'Manager::getQueryLog()' => Manager::getQueryLog(),
+//                    'study_id'               => $study_id,
+//                    '$user_id'               => $user_id,
+//                ]);
+            }
 
 
             return [
@@ -1959,12 +2016,15 @@ class Study extends Model
         $debug_info   = [];
         $user         = User
             ::with([
-                'studies.deck.card_groups.cards' => function ($query) {
-                    $query->whereNotIn('id', function ($q) {
+                'studies.deck.card_groups.cards' => function ($query) use ($user_id) {
+                    $query->whereNotIn('id', function ($q) use ($user_id) {
                         $q
                             ->select('card_id')
-                            ->from(SP_TABLE_ANSWERED)
-                            ->distinct()//todo improve, limit by study_id or user_id
+                            ->from(SP_TABLE_ANSWERED.' as aaa')
+                            ->leftJoin(SP_TABLE_STUDY.' as sss', 'sss.id', '=', 'aaa.study_id')
+                            ->leftJoin(SP_TABLE_USERS.' as uuu', 'uuu.id', '=', 'sss.user_id')
+                            ->where('uuu.id', '=', $user_id)
+                            ->distinct() //todo improve, limit by study_id or user_id
                         ;
 //                        Common::send_error([
 //                            __METHOD__,
