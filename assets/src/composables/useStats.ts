@@ -25,6 +25,26 @@ interface _ForecastGraphable {
     };
 }
 
+interface _ReviewGraphable {
+    cumulative: Array<number>;
+    heading: Array<string>;
+    m: Array<number>;
+    y: Array<number>;
+    newly_learned: Array<number>;
+    relearned: Array<number>;
+    average: number,
+    due_tomorrow: number,
+    total_reviews: number,
+    y_debug: {
+        answer: Array<any>;
+        new_cards: Array<any>;
+    };
+    m_debug: {
+        answer: Array<any>;
+        new_cards: Array<any>;
+    };
+}
+
 export default function (status = 'publish') {
     const ajax = ref<_Ajax>({
         sending: false,
@@ -40,9 +60,17 @@ export default function (status = 'publish') {
         success: false,
         successMessage: '',
     });
+    const ajaxReview = reactive<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
     let statsForecast = ref<_ForecastGraphable>(null);
+    let statsReview = ref<_ReviewGraphable>(null);
     let forecastSpan = ref('one_month');
-
+    let reviewCountSpan = ref('one_month');
 
     const _initChartReviewTime = () => {
         setTimeout(() => {
@@ -104,35 +132,40 @@ export default function (status = 'publish') {
             new Chart('sp-chart-review-count', {
                 type: 'bar',
                 data: {
-                    labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+                    // labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+                    labels: statsReview.value.heading,
                     datasets: [
                         {
                             label: 'Young',
-                            data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            // data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            data: statsReview.value.y,
                             backgroundColor: '#9dd99d',
-                            borderColor: '#8cbf8c',
-                            borderWidth: 2,
+                            // borderColor: '#8cbf8c',
+                            // borderWidth: 2,
                         },
                         {
                             label: 'Mature',
-                            data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            // data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            data: statsReview.value.m,
                             backgroundColor: '#489c47',
-                            borderColor: '#2f622e',
-                            borderWidth: 2
+                            // borderColor: '#2f622e',
+                            // borderWidth: 2
                         },
                         {
                             label: 'Relerned',
-                            data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            // data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            data: statsReview.value.relearned,
                             backgroundColor: '#d08357',
-                            borderColor: '#a76946',
-                            borderWidth: 2
+                            // borderColor: '#a76946',
+                            // borderWidth: 2
                         },
                         {
                             label: 'Newly learned',
-                            data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            // data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            data: statsReview.value.newly_learned,
                             backgroundColor: '#4848bf',
-                            borderColor: '#3a3a9d',
-                            borderWidth: 2
+                            // borderColor: '#3a3a9d',
+                            // borderWidth: 2
                         },
                     ],
                 },
@@ -174,18 +207,6 @@ export default function (status = 'publish') {
                             tension: 0.5,
                         },
                         {
-                            label: 'Young',
-                            type: 'bar',
-                            yAxisID: "y-axis-1",
-                            // data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
-                            data: statsForecast.value.y,
-                            backgroundColor: '#9dd99d',
-                            borderColor: '#8cbf8c',
-                            // barThickness: 10,
-                            categoryPercentage: 0.5,
-                            // borderWidth: 2
-                        },
-                        {
                             label: 'Mature',
                             // barThickness: 10,
                             type: 'bar',
@@ -194,6 +215,18 @@ export default function (status = 'publish') {
                             data: statsForecast.value.m,
                             backgroundColor: '#489c47',
                             borderColor: '#2f622e',
+                            // borderWidth: 2
+                        },
+                        {
+                            label: 'Young',
+                            type: 'bar',
+                            yAxisID: "y-axis-1",
+                            // data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+                            data: statsForecast.value.y,
+                            backgroundColor: '#9dd99d',
+                            borderColor: '#8cbf8c',
+                            // barThickness: 10,
+                            // categoryPercentage: 0.5,
                             // borderWidth: 2
                         },
 
@@ -245,6 +278,12 @@ export default function (status = 'publish') {
             _loadForecast();
         }, 400);
     }
+    const _reloadReviewCount = () => {
+        setTimeout(() => {
+            console.log('srat reload');
+            _loadReviewCount();
+        }, 400);
+    }
 
     const _loadForecast = () => {
         // if (null === statsForecast.value) {
@@ -258,22 +297,18 @@ export default function (status = 'publish') {
         });
         // }
     }
-    const _loadReviewTime = () => {
-        // if (null === statsForecast.value) {
-        xhrLoadReviewTime().then((res) => {
-            console.log('Show now');
-            _initChartForecast();
+    const _loadReviewCount = () => {
+        xhrLoadReviewCount().then((res) => {
+            _initChartReviewCount();
         }).catch(() => {
             // todo remove later
-            console.log('Show now');
-            _initChartForecast();
+            _initChartReviewCount();
         });
-        // }
     }
 
     const _loadAllStats = () => {
         _loadForecast();
-        _loadReviewTime();
+        _loadReviewCount();
         // xhrLoadReviewCount().then((res) => {
         //   console.log('Show now');
         //   _initChartReviewCount();
@@ -323,7 +358,7 @@ export default function (status = 'publish') {
     };
 
     const xhrLoadReviewTime = () => {
-        const handleAjax: HandleAjax = new HandleAjax(ajaxForecast);
+        const handleAjax: HandleAjax = new HandleAjax(ajaxReview);
         return new Promise((resolve, reject) => {
             new Server().send_online({
                 data: [
@@ -338,6 +373,7 @@ export default function (status = 'publish') {
                 },
                 funcSuccess(done: InterFuncSuccess) {
                     handleAjax.stop();
+                    statsReview.value = done.data.graphable;
                     resolve(0);
                 },
                 funcFailue(done) {
@@ -348,23 +384,23 @@ export default function (status = 'publish') {
             });
         });
     };
-
     const xhrLoadReviewCount = () => {
-        const handleAjax: HandleAjax = new HandleAjax(ajaxForecast);
+        const handleAjax: HandleAjax = new HandleAjax(ajaxReview);
         return new Promise((resolve, reject) => {
             new Server().send_online({
                 data: [
                     Store.nonce,
                     {
-                        span: forecastSpan.value,
+                        span: reviewCountSpan.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_forecast",
+                what: "front_sp_ajax_front_load_stats_review_time",
                 funcBefore() {
                     handleAjax.start();
                 },
                 funcSuccess(done: InterFuncSuccess) {
                     handleAjax.stop();
+                    statsReview.value = done.data.graphable;
                     resolve(0);
                 },
                 funcFailue(done) {
@@ -379,8 +415,8 @@ export default function (status = 'publish') {
     return {
         ajax, ajaxForecast,
         _loadAllStats, _loadForecast,
-        forecastSpan, _reloadForecast,
-        statsForecast,
+        forecastSpan, _reloadForecast, _reloadReviewCount,
+        statsForecast, ajaxReview, statsReview, reviewCountSpan,
     };
 
 }

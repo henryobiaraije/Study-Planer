@@ -68,11 +68,10 @@ class AjaxFrontHelper
         add_action('front_sp_ajax_front_mark_answer', array($this, 'ajax_front_mark_answer'));
         add_action('front_sp_ajax_front_mark_answer_on_hold', array($this, 'ajax_front_mark_answer_on_hold'));
         add_action('front_sp_ajax_front_load_stats_forecast', array($this, 'ajax_front_load_stats_forecast'));
-        add_action('front_sp_ajax_front_load_stats_review_time', array($this, 'ajax_front_load_stats_forecast'));
+        add_action('front_sp_ajax_front_load_stats_review_time', array($this, 'ajax_front_load_stats_review_time'));
         add_action('front_sp_ajax_front_get_single_deck_group', array($this, 'ajax_front_get_single_deck_group'));
         add_action('front_sp_ajax_front_record_study_log', array($this, 'ajax_front_record_study_log'));
     }
-
 
     /*** <editor-fold desc="Chart Stats"> **/
 
@@ -122,21 +121,21 @@ class AjaxFrontHelper
         $new_study_log = StudyLog::create([
             'study_id' => $study_id,
             'card_id'  => $card_id,
-            'action'   => $action
+            'action'   => $action,
         ]);
 
-        Common::send_error([
-            'ajax_front_load_stats_forecast',
-            'post'           => $post,
-            '$new_study_log' => $new_study_log,
-            '$last_log'      => $last_log,
-            '$study'         => $study,
-            '$card'          => $card,
-            '$action'        => $action,
-        ]);
+//        Common::send_error([
+//            'ajax_front_load_stats_forecast',
+//            'post'           => $post,
+//            '$new_study_log' => $new_study_log,
+//            '$last_log'      => $last_log,
+//            '$study'         => $study,
+//            '$card'          => $card,
+//            '$action'        => $action,
+//        ]);
 
 
-        Common::send_success('On hold marked');
+        Common::send_success('Log recorded');
 
 
     }
@@ -155,40 +154,37 @@ class AjaxFrontHelper
         $user_id = get_current_user_id();
 
         $forecast = Study::get_user_card_forecast($user_id, $span);
-        Common::send_error([
-            'ajax_front_load_stats_forecast',
-            'post'  => $post,
-            '$span' => $span,
-        ]);
+//        Common::send_error([
+//            'ajax_front_load_stats_forecast',
+//            'post'  => $post,
+//            '$span' => $span,
+//        ]);
 
-
-        Common::send_success('On hold marked');
-
+        Common::send_success('Forecast here',$forecast);
 
     }
 
     public function ajax_front_load_stats_review_time($post): void
     {
         Initializer::verify_post($post, true);
-        Common::send_error([
-            'ajax_front_load_stats_review_time',
-            'post' => $post,
-        ]);
+//        Common::send_error([
+//            'ajax_front_load_stats_review_time',
+//            'post' => $post,
+//        ]);
 
         $all     = $post[Common::VAR_2];
         $span    = sanitize_text_field($all['span']);
-        $length  = 30;
+//        $span    = 'one_month';
         $user_id = get_current_user_id();
 
-        $forecast = Study::get_user_card_forecast($user_id, $span);
-        Common::send_error([
-            'ajax_front_load_stats_forecast',
-            'post'  => $post,
-            '$span' => $span,
-        ]);
+        $review = Study::get_user_card_review_count_and_time($user_id, $span);
+//        Common::send_error([
+//            'ajax_front_load_stats_review_time',
+//            'post'  => $post,
+//            '$span' => $span,
+//        ]);
 
-
-        Common::send_success('On hold marked');
+        Common::send_success('Review here',$review);
 
 
     }
@@ -230,6 +226,14 @@ class AjaxFrontHelper
             $answered_as_revised = true;
         }
 
+        $study_log = StudyLog
+            ::where('study_id', '=', $study_id)
+            ->where('card_id', '=', $card_id)
+            ->where('action', '=', 'start')
+            ->limit(1)
+            ->orderByDesc('id')
+            ->get()->first();
+
         Manager::beginTransaction();
 
         $_tomorro_datetime = new DateTime(Common::getDateTime(1));
@@ -243,7 +247,9 @@ class AjaxFrontHelper
             'next_due_at'         => $next_due_date,
             'answered_as_new'     => $answered_as_new,
             'answered_as_revised' => $answered_as_revised,
+            'started_at'          => $study_log->created_at,
         ]);
+        $study_log->forceDelete();
         Manager::commit();
         Common::send_success('On hold marked');
 //			$answer = Answered::create( [
@@ -300,7 +306,6 @@ class AjaxFrontHelper
             Common::send_error('Invalid card group. Probably delete');
         }
 
-
         $answered_as_new     = false;
         $answered_as_revised = false;
 
@@ -311,31 +316,41 @@ class AjaxFrontHelper
             $answered_as_revised = true;
         }
 
+        $study_log = StudyLog
+            ::where('study_id', '=', $study_id)
+            ->where('card_id', '=', $card_id)
+            ->where('action', '=', 'start')
+            ->limit(1)
+            ->orderByDesc('id')
+            ->get()->first();
 
-//			Common::send_error( [
-//				'ajax_front_get_question',
-//				'post'                 => $post,
-//				'$study_id'            => $study_id,
-//				'$study'               => $study,
-//				'$grade'               => $grade,
-//				'$card'                => $card,
-//				'$all_grades'          => $all_grades,
-//				'$answer'              => $answer,
-//				'$card_group'          => $card_group,
-//				'$answered_as_revised' => $answered_as_revised,
-//			] );
+//        Common::send_error([
+//            'ajax_front_get_question',
+//            'post'                 => $post,
+//            '$study_log'           => $study_log,
+//            '$study_id'            => $study_id,
+//            '$study'               => $study,
+//            '$grade'               => $grade,
+//            '$card'                => $card,
+//            '$all_grades'          => $all_grades,
+//            '$answer'              => $answer,
+//            '$card_group'          => $card_group,
+//            '$answered_as_revised' => $answered_as_revised,
+//        ]);
 
         Manager::beginTransaction();
 
-        $answer = Answered::create([
+        $answer                 = Answered::create([
             'study_id'            => $study_id,
             'card_id'             => $card_id,
             'answer'              => $answer,
             'grade'               => $grade,
             'answered_as_new'     => $answered_as_new,
             'answered_as_revised' => $answered_as_revised,
+            'started_at'          => $study_log->created_at,
             //				'next_due_at' => Common::getDateTime( - 7 ),
         ]);
+        $study_log->forceDelete();
 //			$answer = Answered::create( [
 //				'study_id'    => $study_id,
 //				'card_id'     => $card_id,
@@ -363,6 +378,7 @@ class AjaxFrontHelper
             $answer->next_interval = $next_due_date['next_interval'];
             $answer->ease_factor   = $next_due_date['ease_factor'];
             $answer->save();
+
             Manager::commit();
 
 //				Common::send_error( [
@@ -372,6 +388,7 @@ class AjaxFrontHelper
 //					'$study'         => $study,
 //					'$grade'         => $grade,
 //					'$card'          => $card,
+//					'$study_log'          => $study_log,
 //					'$all_grades'    => $all_grades,
 //					'$answer'        => $answer,
 //					'$next_due_date' => $next_due_date,

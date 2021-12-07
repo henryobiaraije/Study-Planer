@@ -220,6 +220,7 @@ class Initialize_Db
                 $table->id();
                 $table->foreignId('study_id')->references('id')->on(SP_TABLE_STUDY);
                 $table->foreignId('card_id')->references('id')->on(SP_TABLE_CARDS);
+                $table->foreignId('answered_id')->nullable()->references('id')->on(SP_TABLE_ANSWERED);
                 $table->string('action');
                 $table->dateTime('created_at');
             });
@@ -249,6 +250,11 @@ class Initialize_Db
         if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'answered_as_revised')) {
             Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
                 $table->boolean('answered_as_revised')->after('answered_as_new');
+            });
+        }
+        if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'started_at')) {
+            Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
+                $table->dateTime('started_at')->after('next_due_at');
             });
         }
     }

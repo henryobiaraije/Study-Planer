@@ -22,6 +22,10 @@ class StudyLog extends Model
         'study_id',
         'card_id',
         'action',
+        'answered_id',
+    ];
+    protected $dates = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function study()

@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
 use PDOException;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use StudyPlanner\Helpers\ChartForecastHelper;
+use StudyPlanner\Helpers\ChartReviewHelper;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
 use StudyPlanner\Models\Tag;
@@ -135,150 +136,6 @@ class Study extends Model
         return Study::with('tags', 'deck')->find($study_id);
     }
 
-    public static function get_user_card_forecast2($user_id, $span)
-    {
-        $mature_card_days             = Settings::MATURE_CARD_DAYS;
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        if ('one_month' === $span) {
-            $_date = new DateTime($user_timezone_today_midnight);
-            $_date->add(new DateInterval('P30D'));
-            $end_date = $_date->format('Y-m-d H:i:s');
-        }
-
-        /*** Prepare basic query ***/
-
-        $user_studies = User::find($user_id)->studies()->get();
-
-        foreach ($user_studies as $study) {
-            $study_id      = $study->id;
-            $cards_on_hold = self::get_user_cards_on_hold($study_id, $user_id);
-
-            $sq = Manager::table(SP_TABLE_ANSWERED)
-                ->select('id', 'created_at', Manager::raw('MIN(created_at) as min_create_date'))
-                ->groupBy('id');
-
-            $query_mature = Manager
-                ::table(SP_TABLE_ANSWERED.' as a1')
-//					->join( SP_TABLE_ANSWERED . ' as a2', 'a2.id', '=', 'a1.id',function($join){
-                ->joinSub($sq, 'a2', function ($join) {
-                    $join->on('a2.id', '=', 'a1.id');
-                })
-                ->where('a1.study_id', '=', $study_id)
-//					->having( 'day_interval', '>', 0 )
-//					->where( 'a1.card_id', '=', 45 )
-                ->select(
-                    'a1.id',
-                    'a1.next_due_at',
-                    'a1.created_at',
-                    'a1.card_id',
-//						'a2.created_at',
-                    Manager::raw('NULLIF(DATE(a1.created_at) - DATE(a2.created_at), 0) day_interval')
-                );
-//					->where( Manager::raw( 'DATE_SUB(CURDATE(),INTERVAL 1 DAY)' ), '<=', 'DATE(next_due_at)' );
-
-//				$query_mature = Manager::table( SP_TABLE_ANSWERED );
-
-            Common::send_error([
-                '$query_mature'          => $query_mature->toSql(),
-                'Manager::getQueryLog()' => Manager::getQueryLog(),
-                '$get'                   => $query_mature->get(),
-                'getBindings'            => $query_mature->getBindings(),
-                '$study_id'              => $study_id,
-                '$sq sql'                => $sq->toSql(),
-                '$sq get'                => $sq->get(),
-            ]);
-
-        }
-    }
-
-    public static function get_user_card_forecast4($user_id, $span)
-    {
-        $matured_cards = self::get_user_matured_card_ids($user_id);
-
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        $start_date                   = $user_timezone_today_midnight;
-        $_date                        = new DateTime($start_date);
-        if ('one_month' === $span) {
-            $_date->add(new DateInterval('P30D'));
-        } elseif ('three_month' === $span) {
-            $_date->add(new DateInterval('P3M'));
-        } elseif ('one_year' === $span) {
-            $_date->add(new DateInterval('P1Y'));
-        }
-        if ('all' !== $span) {
-            $end_date = $_date->format('Y-m-d H:i:s');
-        }
-
-        $forecast_young_cards_on_hold = self::get_forecast_cards_on_hold([
-            'user_id'         => $user_id,
-            "start_date"      => $start_date,
-            'end_date'        => $end_date,
-            'no_date_limit'   => ($end_date === null),
-            'card_ids_not_in' => $matured_cards['card_ids'],
-        ]);
-//        Common::send_error([
-//            __METHOD__,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
-        $forecast_matured_cards_on_hold = self::get_forecast_cards_on_hold([
-            'user_id'       => $user_id,
-            "start_date"    => $start_date,
-            'end_date'      => $end_date,
-            'no_date_limit' => ($end_date === null),
-            'card_ids_in'   => $matured_cards['card_ids'],
-        ]);
-
-        $forecast_young_cards_to_revise   = self::get_forecast_cards_to_revise([
-            'user_id'         => $user_id,
-            "start_date"      => $start_date,
-            'end_date'        => $end_date,
-            'no_date_limit'   => ($end_date === null),
-            'card_ids_not_in' => $matured_cards['card_ids'],
-        ]);
-        $forecast_matured_cards_to_revise = self::get_forecast_cards_to_revise([
-            'user_id'       => $user_id,
-            "start_date"    => $start_date,
-            'end_date'      => $end_date,
-            'no_date_limit' => ($end_date === null),
-            'card_ids_in'   => $matured_cards['card_ids'],
-        ]);
-        $forecast_new_cards_to_study      = self::get_forecast_cards_new([
-            'user_id' => $user_id,
-        ]);
-//        $forecast_cards_to_revise = self::get_forecast_cards_to_revise($user_id, $start_date, $end_date, ($end_date === null));
-
-        $query_answer = Answered::with('study')
-            ->whereIn('card_id', $matured_cards['card_ids'])
-            ->orderByDesc('id')
-            ->groupBy('card_id');
-
-        if (!empty($end_date)) {
-            $query_answer = $query_answer->whereBetween('next_due_at', [$start_date, $end_date]);
-        } else {
-            $query_answer = $query_answer->where('next_due_at', '>', $start_date);
-        }
-//			dd('here');
-//			$a = "[[\"<p>Word<\\/p>\",\"<p>Opposite<\\/p>\"],[\"<p>big<\\/p>\",\"<p><strong>small<\\/strong><\\/p>\"],[\"<p>tall<\\/p>\",\"<p>short<\\/p>\"]]";
-//			dd( json_decode( $a, true ) );
-        Common::send_error([
-            'matured_cards'                     => $matured_cards,
-            '$end_date'                         => $end_date,
-            '$span'                             => $span,
-            '$forecast_new_cards_to_study'      => $forecast_new_cards_to_study,
-            '$forecast_young_cards_on_hold'     => $forecast_young_cards_on_hold,
-            '$forecast_matured_cards_to_revise' => $forecast_matured_cards_to_revise,
-            '$forecast_matured_cards_on_hold'   => $forecast_matured_cards_on_hold,
-            '$forecast_young_cards_to_revise'   => $forecast_young_cards_to_revise,
-            '$answertoSql'                      => $query_answer->toSql(),
-            '$answerto getBindings'             => $query_answer->getBindings(),
-            '$answer'                           => $query_answer->get(),
-            'Manager::getQueryLog()'            => Manager::getQueryLog(),
-        ]);
-
-    }
-
     public static function get_user_card_forecast($user_id, $span)
     {
 //        $matured_cards = self::get_user_matured_card_ids($user_id);
@@ -314,7 +171,12 @@ class Study extends Model
             $newest_answer_query = Answered
                 ::orderByDesc('next_due_at')
                 ->limit(1);
-            $end_date            = $newest_answer_query->get()->first()->next_due_at;
+            if (empty($end_date)) {
+                $_date->add(new DateInterval('P3D'));
+                $end_date = $_date->format('Y-m-d H:i:s');
+            } else {
+                $end_date = $newest_answer_query->get()->first()->next_due_at;
+            }
 //            Common::send_error([
 //                __METHOD__,
 //                '$newest_answer_query sql' => $newest_answer_query->toSql(),
@@ -338,25 +200,14 @@ class Study extends Model
                     'count'     => 0,
                     'answers'   => [],
                     'new_cards' => [],
-                    //                    'studies' => [
-                    //                        '_eg' => [
-                    //                            'hold_count'   => 0,
-                    //                            'revise_count' => 0,
-                    //                        ],
-                    //                    ],
                 ],
                 'm' => [
                     'count'   => 0,
                     'answers' => [],
-                    //                    'studies' => [
-                    //                        '_eg' => [
-                    //                            'hold_count'   => 0,
-                    //                            'revise_count' => 0,
-                    //                        ],
-                    //                    ],
                 ],
             ];
         }
+
 
         $forecast_all_answers_distinct = ChartForecastHelper::get_forecast_all_answers_distinct([
             'user_id'       => $user_id,
@@ -369,6 +220,7 @@ class Study extends Model
             'user_id' => $user_id,
         ])['all'];
 
+        // Form young and matured cards from answered cards
         foreach ($forecast_all_answers_distinct as $answer) {
             $study             = $answer->study;
             $no_on_hold        = $study->no_on_hold;
@@ -405,24 +257,49 @@ class Study extends Model
 //            ]);
         }
 
-        $hold_studies   = [];
-        $_new_day_index = 0;
-        $all_new_cards  = collect($forecast_new_cards_to_study)
-            ->pluck('card_groups')->flatten()
-            ->pluck('cards')->flatten();
-        foreach ($all_new_cards as $key => $new_card) {
-            $study         = $new_card->study;
-            $study_id      = $study->id;
-            $no_of_new     = $study->no_of_new;
-            $study_all_new = $study->study_all_new;
-            if (!array_key_exists($study_id, $hold_studies)) {
-                $hold_studies[$study_id] = [];
-            }
+        // Form young cards from new cards and spread them by no_of_new per study
+        $hold_studies = [];
+        $card_groups  = collect($forecast_new_cards_to_study)
+            ->pluck('card_groups');
+        foreach ($card_groups as $_card_group) {
+            $all_new_cards = $_card_group->pluck('cards')->flatten();
+//            Common::send_error([
+//                '$hold_studies'  => $hold_studies,
+//                '$all_new_cards' => $all_new_cards,
+//            ]);
+            $_new_day_index = 0;
+            foreach ($all_new_cards as $key => $new_card) {
+                $study         = $new_card->study;
+                $study_id      = $study->id;
+                $no_of_new     = $study->no_of_new;
+                $study_all_new = $study->study_all_new;
+                if (!array_key_exists($study_id, $hold_studies)) {
+                    $hold_studies[$study_id] = [];
+                }
+                if (!array_key_exists($_new_day_index, $hold_studies[$study_id])) {
+                    $hold_studies[$study_id][$_new_day_index] = [
+                        'count' => 0,
+                    ];
+                }
 
-            if ($study_all_new) {
-                $days[0]['y']['count']++;
-                $days[0]['y']['new_cards'][] = $new_card;
-            } else {
+                if ($study_all_new) {
+                    if (!array_key_exists(0, $days)) {
+                        $graphable['heading'][] = '0d';
+                        $days[0]                = [
+                            'y' => [
+                                'count'     => 0,
+                                'answers'   => [],
+                                'new_cards' => [],
+                            ],
+                            'm' => [
+                                'count'   => 0,
+                                'answers' => [],
+                            ],
+                        ];
+                    }
+                    $days[0]['y']['count']++;
+                    $days[0]['y']['new_cards'][] = $new_card;
+                } else {
 //                if (1 === $key) {
 //                    Common::send_error([
 //                        __METHOD__,
@@ -434,18 +311,33 @@ class Study extends Model
 //                        'count count'     => $hold_studies[$study_id][$_new_day_index]['count'],
 //                    ]);
 //                }
-                if ($hold_studies[$study_id][$_new_day_index]['count'] >= $no_of_new) {
-                    $_new_day_index++;
+                    if ($hold_studies[$study_id][$_new_day_index]['count'] >= $no_of_new) {
+                        $_new_day_index++;
+                    }
+                    if (!array_key_exists($_new_day_index, $hold_studies[$study_id])) {
+                        $hold_studies[$study_id][$_new_day_index] = [
+                            'count' => 0,
+                        ];
+                    }
+                    $hold_studies[$study_id][$_new_day_index]['count']++;
+
+                    if (!array_key_exists($_new_day_index, $days)) {
+                        $graphable['heading'][] = $_new_day_index.'d';
+                        $days[$_new_day_index]  = [
+                            'y' => [
+                                'count'     => 0,
+                                'answers'   => [],
+                                'new_cards' => [],
+                            ],
+                            'm' => [
+                                'count'   => 0,
+                                'answers' => [],
+                            ],
+                        ];
+                    }
+                    $days[$_new_day_index]['y']['count']++;
+                    $days[$_new_day_index]['y']['new_cards'][] = $new_card;
                 }
-                if (!array_key_exists($_new_day_index, $hold_studies[$study_id])) {
-                    $hold_studies[$study_id][$_new_day_index] = [
-                        'count' => 0,
-                    ];
-                }
-                $hold_studies[$study_id][$_new_day_index]['count']++;
-                $days[$_new_day_index]['y']['count']++;
-                $days[$_new_day_index]['y']['new_cards'][] = $new_card;
-            }
 //            if (3 === $key) {
 //                Common::send_error([
 //                    __METHOD__,
@@ -456,10 +348,23 @@ class Study extends Model
 //                    '$no_of_new'      => $no_of_new,
 //                ]);
 //            }
+            }
         }
+
 
         $cumulative_count = 0;
         foreach ($days as $key => $day) {
+//            if (0 === $key) {
+//                $graphable['y'][]                    = 0;
+//                $graphable['m'][]                    = 0;
+//                $cumulative_count                    += 0;
+//                $graphable['total_reviews']          += 0;
+//                $graphable['cumulative'][]           = $cumulative_count;
+//                $graphable['y_debug']['answers'][]   = $day['m']['answers'];
+//                $graphable['y_debug']['new_cards'][] = $day['y']['new_cards'];
+//                $graphable['m_debug']['answers'][]   = $day['m']['answers'];
+//                continue;
+//            }
             $graphable['y'][]                    = $day['y']['count'];
             $graphable['m'][]                    = $day['m']['count'];
             $cumulative_count                    += ($day['m']['count'] + $day['y']['count']);
@@ -478,6 +383,7 @@ class Study extends Model
 //        Common::send_error([
 //            '$hold_studies'                  => $hold_studies,
 //            '$study_all_new'                 => $study_all_new,
+//            '$card_groups'                   => $card_groups,
 //            '$_new_day_index'                => $_new_day_index,
 //            '$all_new_cards'                 => $all_new_cards,
 //            '$start_date'                    => $start_date,
@@ -491,24 +397,14 @@ class Study extends Model
 //            'Manager::getQueryLog()'         => Manager::getQueryLog(),
 //        ]);
 
-//        Common::send_error([
-//            '$start_date'                    => $start_date,
-//            '$end_date'                      => $end_date,
-//            '$span'                          => $span,
-//            '$no_of_days'                    => $no_of_days,
-//            '$start_date'                    => $start_date,
-//            '$days'                          => $days,
-//            '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
-//            '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
-//            'Manager::getQueryLog()'         => Manager::getQueryLog(),
-//        ]);
-        Common::send_success('Forecast here', [
+        return [
             'graphable' => $graphable
-        ]);
+        ];
+
 
     }
 
-    public static function get_user_card_review_time($user_id, $span)
+    public static function get_user_card_forecast2($user_id, $span)
     {
 //        $matured_cards = self::get_user_matured_card_ids($user_id);
         $graphable                    = [
@@ -636,7 +532,15 @@ class Study extends Model
 
         $hold_studies   = [];
         $_new_day_index = 0;
-        $all_new_cards  = collect($forecast_new_cards_to_study)
+
+        $card_groups = collect($forecast_new_cards_to_study)
+            ->pluck('card_groups');
+
+        foreach ($card_groups as $_card_group) {
+
+        }
+
+        $all_new_cards = collect($forecast_new_cards_to_study)
             ->pluck('card_groups')->flatten()
             ->pluck('cards')->flatten();
         foreach ($all_new_cards as $key => $new_card) {
@@ -689,6 +593,17 @@ class Study extends Model
 
         $cumulative_count = 0;
         foreach ($days as $key => $day) {
+            if (0 === $key) {
+                $graphable['y'][]                    = 0;
+                $graphable['m'][]                    = 0;
+                $cumulative_count                    += 0;
+                $graphable['total_reviews']          += 0;
+                $graphable['cumulative'][]           = $cumulative_count;
+                $graphable['y_debug']['answers'][]   = $day['m']['answers'];
+                $graphable['y_debug']['new_cards'][] = $day['y']['new_cards'];
+                $graphable['m_debug']['answers'][]   = $day['m']['answers'];
+                continue;
+            }
             $graphable['y'][]                    = $day['y']['count'];
             $graphable['m'][]                    = $day['m']['count'];
             $cumulative_count                    += ($day['m']['count'] + $day['y']['count']);
@@ -704,21 +619,22 @@ class Study extends Model
         $graphable['average'] = $graphable['total_reviews'] / $no_of_days;
         $graphable['average'] = number_format($graphable['average'], 2);
 
-//        Common::send_error([
-//            '$hold_studies'                  => $hold_studies,
-//            '$study_all_new'                 => $study_all_new,
-//            '$_new_day_index'                => $_new_day_index,
-//            '$all_new_cards'                 => $all_new_cards,
-//            '$start_date'                    => $start_date,
-//            '$end_date'                      => $end_date,
-//            '$span'                          => $span,
-//            '$graphable'                     => $graphable,
-//            '$no_of_days'                    => $no_of_days,
-//            '$days'                          => $days,
-//            '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
-//            '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
-//            'Manager::getQueryLog()'         => Manager::getQueryLog(),
-//        ]);
+        Common::send_error([
+            '$hold_studies'                  => $hold_studies,
+            '$study_all_new'                 => $study_all_new,
+            '$card_groups'                   => $card_groups,
+            '$_new_day_index'                => $_new_day_index,
+            '$all_new_cards'                 => $all_new_cards,
+            '$start_date'                    => $start_date,
+            '$end_date'                      => $end_date,
+            '$span'                          => $span,
+            '$graphable'                     => $graphable,
+            '$no_of_days'                    => $no_of_days,
+            '$days'                          => $days,
+            '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
+            '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
+            'Manager::getQueryLog()'         => Manager::getQueryLog(),
+        ]);
 
 //        Common::send_error([
 //            '$start_date'                    => $start_date,
@@ -737,303 +653,237 @@ class Study extends Model
 
     }
 
-    /**
-     * Get the card (on hold) forecast between dates
-     *
-     * @param $args
-     *
-     * @return array[]
-     */
-    public static function get_forecast_cards_on_hold___work_on_later($args)
+    public static function get_user_card_review_count_and_time($user_id, $span)
     {
-        $default = [
-            'user_id'         => 0,
-            'start_date'      => null,
-            'end_date'        => null,
-            'no_date_limit'   => false,
-            'card_ids_not_in' => [],
-            'card_ids_in'     => [],
+//        $matured_cards = self::get_user_matured_card_ids($user_id);
+        $graphable                    = [
+            'heading'                  => [],
+            'cumulative'               => [],
+            'y'                        => [],
+            'm'                        => [],
+            'newly_learned'            => [],
+            'relearned'                => [],
+            'y_debug'                  => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'm_debug'                  => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'newly_learned_debug'      => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'relearned_debug'          => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'm_cumulative'             => 0,
+            'y_cumulative'             => 0,
+            'newly_learned_cumulative' => 0,
+            're_learned_cumulative'    => 0,
+            'total_reviews'            => 0,
+            'average'                  => 0,
+            'due_tomorrow'             => 0,
         ];
-        $args    = wp_parse_args($args, $default);
-//			Common::send_error(['user_id' => $args]);
-//			Common::send_error( [
-//				__METHOD__,
-//				'Manager::getQueryLog()' => Manager::getQueryLog(),
-////				'$aaa'                   => $aaa_get,
-//			] );
-//        $_user_query = User::with('studies')->where('ID', '=', $args['user_id']);
-//        $_user_studies = $_user_query->get()->first()->studies;
-//        $study_details = [];
-//        foreach ($_user_studies as $_study) {
-//            $study_details[$_study->id] = $_study->study_all_on_hold;
-//        }
+        $matured_day_no               = Settings::MATURE_CARD_DAYS;
+        $end_date                     = null;
+        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
+//        $start_date                   = $user_timezone_today_midnight;
+        $end_date = $user_timezone_today_midnight;
+        $_date    = new DateTime($user_timezone_today_midnight);
+        if ('one_month' === $span) {
+            $_date->sub(new DateInterval('P30D'));
+        } elseif ('three_month' === $span) {
+            $_date->sub(new DateInterval('P3M'));
+        } elseif ('one_year' === $span) {
+            $_date->sub(new DateInterval('P1Y'));
+        } elseif ('all' === $span) {
+            $newest_answer_query = Answered
+                ::orderBy('next_due_at')
+                ->limit(1);
+            $start_date          = $newest_answer_query->get()->first()->next_due_at;
+//            Common::send_error([
+//                __METHOD__,
+//                '$newest_answer_query sql' => $newest_answer_query->toSql(),
+//                '$_date ' => $_date,
+//                '$newest_answer_query sql getBindings' => $newest_answer_query->getBindings(),
+//                '$newest_answer_query get' => $newest_answer_query->get(),
+//            ]);
+        }
+        if ('all' !== $span) {
+            $start_date = $_date->format('Y-m-d H:i:s');
+        }
+        $_start_date = new DateTime($start_date);
+        $_end_date   = new DateTime($end_date);
+
+        $no_of_days = (int) $_end_date->diff($_start_date)->format("%a"); //3
+        $days       = [];
+        $__a_count  = 0 - $no_of_days + 1;
+        for ($_a = 0; $_a < $no_of_days; $_a++) {
+            $graphable['heading'][] = $__a_count.'d';
+            $__a_count++;
+            $days[] = [
+                'y'             => [
+                    'count'        => 0,
+                    'seconds_took' => 0,
+                    'minutes_took' => 0,
+                    'hours_took'   => 0,
+                    'cumulative'   => 0,
+                    'answers'      => [],
+                ],
+                'm'             => [
+                    'count'        => 0,
+                    'seconds_took' => 0,
+                    'minutes_took' => 0,
+                    'hours_took'   => 0,
+                    'cumulative'   => 0,
+                    'answers'      => [],
+                ],
+                'newly_learned' => [
+                    'count'        => 0,
+                    'seconds_took' => 0,
+                    'minutes_took' => 0,
+                    'hours_took'   => 0,
+                    'cumulative'   => 0,
+                    'answers'      => [],
+                ],
+                're_learned'    => [
+                    'count'        => 0,
+                    'seconds_took' => 0,
+                    'minutes_took' => 0,
+                    'hours_took'   => 0,
+                    'cumulative'   => 0,
+                    'answers'      => [],
+                ],
+            ];
+        }
+
+        $forecast_all_answers_within_a_date = ChartReviewHelper::get_forecast_all_answers_within_a_date([
+            'user_id'       => $user_id,
+            "start_date"    => $start_date,
+            'end_date'      => $end_date,
+            'no_date_limit' => ($end_date === null),
+            //            'card_ids_not_in' => $matured_cards['card_ids'],
+        ])['answers'];
+
+        $_cumulative_m             = 0;
+        $_cumulative_y             = 0;
+        $_cumulative_newly_learned = 0;
+        $_cumulative_re_learned    = 0;
+        foreach ($forecast_all_answers_within_a_date as $answer) {
+            $study             = $answer->study;
+            $no_on_hold        = $study->no_on_hold;
+            $no_to_revise      = $study->no_to_revise;
+            $revise_all        = $study->revise_all;
+            $study_all_on_hold = $study->study_all_on_hold;
+
+            $day_dif        = $answer->day_diff;
+            $day_diff_today = $answer->day_diff_today;
+
+            $is_matured       = $day_dif >= $matured_day_no;
+            $is_young         = $day_dif < $matured_day_no;
+            $is_newly_learned = !empty($answer->answered_as_new);
+            $is_relearned     = !empty($answer->answered_as_revised);
+
+            if ($is_matured) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $_cumulative_m += $answer->time_diff_hours_spent;
+                $days[$day_diff_today]['m']['count']++;
+                $days[$day_diff_today]['m']['seconds_took'] += $answer->time_diff_second_spent;
+                $days[$day_diff_today]['m']['minutes_took'] += $answer->time_diff_minute_spent;
+                $days[$day_diff_today]['m']['hours_took']   += $answer->time_diff_hours_spent;
+                $days[$day_diff_today]['m']['cumulative']   += $_cumulative_m;
+                $days[$day_diff_today]['m']['answers'][]    = $answer;
+            }
+            if ($is_young) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $_cumulative_y += $answer->time_diff_hours_spent;
+                $days[$day_diff_today]['y']['count']++;
+                $days[$day_diff_today]['y']['seconds_took'] += $answer->time_diff_second_spent;
+                $days[$day_diff_today]['y']['minutes_took'] += $answer->time_diff_minute_spent;
+                $days[$day_diff_today]['y']['hours_took']   += $answer->time_diff_hours_spent;
+                $days[$day_diff_today]['y']['cumulative']   += $_cumulative_y;
+                $days[$day_diff_today]['y']['answers'][]    = $answer;
+            }
+            if ($is_newly_learned) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $_cumulative_newly_learned += $answer->time_diff_hours_spent;
+                $days[$day_diff_today]['newly_learned']['count']++;
+                $days[$day_diff_today]['newly_learned']['seconds_took'] += $answer->time_diff_second_spent;
+                $days[$day_diff_today]['newly_learned']['minutes_took'] += $answer->time_diff_minute_spent;
+                $days[$day_diff_today]['newly_learned']['hours_took']   += $answer->time_diff_hours_spent;
+                $days[$day_diff_today]['newly_learned']['cumulative']   += $_cumulative_newly_learned;
+                $days[$day_diff_today]['newly_learned']['answers'][]    = $answer;
+            }
+            if ($is_relearned) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $_cumulative_re_learned += $answer->time_diff_hours_spent;
+                $days[$day_diff_today]['re_learned']['count']++;
+                $days[$day_diff_today]['re_learned']['seconds_took'] += $answer->time_diff_second_spent;
+                $days[$day_diff_today]['re_learned']['minutes_took'] += $answer->time_diff_minute_spent;
+                $days[$day_diff_today]['re_learned']['hours_took']   += $answer->time_diff_hours_spent;
+                $days[$day_diff_today]['re_learned']['cumulative']   += $_cumulative_re_learned;
+                $days[$day_diff_today]['re_learned']['answers'][]    = $answer;
+            }
+
+//            Common::send_error([
+//                '$no_to_revise'                                        => $no_to_revise,
+//                '$answer'                                              => $answer,
+//                '$no_on_hold'                                          => $no_on_hold,
+//                '$revise_all'                                          => $revise_all,
+//                '$study_all_on_hold'                                   => $study_all_on_hold,
+//                '$day_dif'                                             => $day_dif,
+//                '$start_date'                                          => $start_date,
+//                '$end_date'                                            => $end_date,
+//                '$span'                                                => $span,
+//                '$no_of_days'                                          => $no_of_days,
+//                '$days'                                                => $days,
+//                '$forecast_all_answers_distinct_for_matured_and_young' => $forecast_all_answers_distinct_for_matured_and_young,
+//                //                '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
+//                //                '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
+//                'Manager::getQueryLog()'                               => Manager::getQueryLog(),
+//            ]);
+        }
+
+        $cumulative_count = 0;
+//        rsort($days);
+        foreach ($days as $key => $day) {
+            $graphable['y'][]                    = $day['y']['count'];
+            $graphable['m'][]                    = $day['m']['count'];
+            $graphable['newly_learned'][]        = $day['newly_learned']['count'];
+            $graphable['relearned'][]            = $day['re_learned']['count'];
+            $cumulative_count                    += ($day['m']['count'] + $day['y']['count']);
+            $graphable['total_reviews']          += ($day['m']['count'] + $day['y']['count']);
+            $graphable['cumulative'][]           = $cumulative_count;
+            $graphable['y_debug']['answers'][]   = $day['m']['answers'];
+            $graphable['y_debug']['new_cards'][] = $day['y']['new_cards'];
+            $graphable['m_debug']['answers'][]   = $day['m']['answers'];
+            if (1 === $key) {
+                $graphable['due_tomorrow'] = ($day['m']['count'] + $day['y']['count']);
+            }
+        }
+        $graphable['average'] = $graphable['total_reviews'] / $no_of_days;
+        $graphable['average'] = number_format($graphable['average'], 2);
+
 //        Common::send_error([
-//            __METHOD__,
-//            '$query_answer sql' => $_user_query->toSql(),
-//            '$study_details $get' => $study_details,
-//            '$study_details' => $study_details,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
+//            '$start_date'                         => $start_date,
+//            '$end_date'                           => $end_date,
+//            '$span'                               => $span,
+//            '$graphable'                          => $graphable,
+//            '$no_of_days'                         => $no_of_days,
+//            '$days'                               => $days,
+//            '$__a_count'                          => $__a_count,
+//            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+//            'Manager::getQueryLog()'              => Manager::getQueryLog(),
 //        ]);
 
-
-        $user_query_all_onhold = User::with([
-            'studies'         => function ($query) {
-                return $query->where('study_all_on_hold', '=', 1);
-            },
-            'studies.answers' => function ($query_answer) use ($args) {
-                $query_answer
-                    ->where('grade', '=', 'hold')
-                    ->groupBy('card_id')
-                    ->orderByDesc('id');
-
-                if ($args['no_date_limit']) {
-                    $query_answer = $query_answer->where('next_due_at', '>', $args['start_date']);
-                } else {
-                    $query_answer = $query_answer->whereBetween('next_due_at',
-                        [$args['start_date'], $args['end_date']]);
-                }
-
-                if (!empty($args['card_ids_in'])) {
-                    $query_answer = $query_answer->whereIn('card_id', $args['card_ids_in']);
-                }
-                if (!empty($args['card_ids_not_in'])) {
-                    $query_answer = $query_answer->whereNotIn('card_id', $args['card_ids_not_in']);
-                }
-
-//                $query_answer->when('study.study_all_on_hold' !== 1, function ($q) use ($query_answer) {
-//                    $query_answer = $query_answer->limit('study.no_on_hold');
-//                });
-//					if ( ! $study_all_on_hold ) {
-//						$query_answer = $query_answer->limit( 'study.no_on_hold' );
-//					}
-
-//                Common::send_error([
-//                    __METHOD__,
-//                    '$query_answer sql' => $query_answer->toSql(),
-//                    '$query_answer $get' => $query_answer->get(),
-//                    'Manager::getQueryLog()' => Manager::getQueryLog(),
-////				'$aaa'                   => $aaa_get,
-//                ]);
-            },
-        ])
-            ->where('ID', '=', $args['user_id']);
-
-//        $uu = User::with('study')
-//            ->join(SP_TABLE_ANSWERED . ' as a1', 'a1.study_id', '=', 'study.id');
-        $uu = Manager
-            ::table(SP_TABLE_USERS.' as u')
-            ->join(SP_TABLE_STUDY.' as s', 's.user_id', '=', 'u.ID')
-            ->join(SP_TABLE_ANSWERED.' as a1', 'a1.study_id', '=', 's.id')
-            ->where('u.id', '=', $args['user_id'])
-            ->groupBy('u.ID');
-
-        Common::send_error([
-            __METHOD__,
-            '$uu sql'                => $uu->toSql(),
-            '$uu $get'               => $uu->get(),
-            '$uu binding'            => $uu->getBindings(),
-            'Manager::getQueryLog()' => Manager::getQueryLog(),
-        ]);
-
-        $user_query_few_onhold = User::with([
-            'studies' => function ($query) {
-                $query
-                    ->with('answers', function ($q) {
-                        $q
-                            ->select('study.no_on_hold');
-//                            ->limit('study.no_on_hold');
-                    })
-                    ->where('study_all_on_hold', '=', false);
-            },
-            //            'studies.answers' => function ($query_answer) use ($args) {
-            //                $query_answer
-            //                    ->with('study')
-            //                    ->where('grade', '=', 'hold')
-            //                    ->groupBy('card_id')
-            //                    ->orderByDesc('id');
-            //
-            //                if ($args['no_date_limit']) {
-            //                    $query_answer = $query_answer->where('next_due_at', '>', $args['start_date']);
-            //                } else {
-            //                    $query_answer = $query_answer->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
-            //                }
-            //
-            //                if (!empty($args['card_ids_in'])) {
-            //                    $query_answer = $query_answer->whereIn('card_id', $args['card_ids_in']);
-            //                }
-            //                if (!empty($args['card_ids_not_in'])) {
-            //                    $query_answer = $query_answer->whereNotIn('card_id', $args['card_ids_not_in']);
-            //                }
-            //                $query_answer = $query_answer->limit('study.no_on_hold');
-            ////                Common::send_error([
-            ////                    __METHOD__,
-            ////                    '$query_answer sql' => $query_answer->toSql(),
-            ////                    '$study_details $get' => $query_answer->get(),
-            ////                    '$study_details binding' => $query_answer->getBindings(),
-            ////                    '$study_details' => $query_answer,
-            ////                    'Manager::getQueryLog()' => Manager::getQueryLog(),
-            ////                ]);
-            //            },
-        ])
-            ->where('ID', '=', $args['user_id']);
-
-        $user_all_onhold = $user_query_all_onhold->get()->first();
-        $user_few_onhold = $user_query_few_onhold->get()->first();
-        Common::send_error([
-            __METHOD__,
-            '$user_all_onhold'       => $user_all_onhold,
-            '$user_few_onhold $get'  => $user_few_onhold,
-            '$args'                  => $args,
-            'Manager::getQueryLog()' => Manager::getQueryLog(),
-            //				'$aaa'                   => $aaa_get,
-        ]);
-        /*** Prepare basic query ***/
-        $user_studies = $user->studies;
-
-
-        $user         = User::with('studies')
-            ->where('ID', '=', $args['user_id'])
-            ->get()->first();//->studies();//->get();
-        $user_studies = $user->studies;
-
-        $all_card_ids = [];
-        $debug_info   = [];
-        foreach ($user_studies as $key => $study) {
-            $study_id          = $study->id;
-            $study_all_on_hold = $study->study_all_on_hold;
-            $no_on_hold        = $study->no_on_hold;
-            $query_answer      = Answered
-                ::with('study.deck', 'card')
-                ->where('study_id', '=', $study_id)
-                ->where('grade', '=', 'hold')
-                ->groupBy('card_id')
-                ->orderByDesc('id');
-
-            if ($args['no_date_limit']) {
-                $query_answer = $query_answer->where('next_due_at', '>', $args['start_date']);
-            } else {
-                $query_answer = $query_answer->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
-            }
-
-            if (!empty($args['card_ids_in'])) {
-                $query_answer = $query_answer->whereIn('card_id', $args['card_ids_in']);
-            }
-            if (!empty($args['card_ids_not_in'])) {
-                $query_answer = $query_answer->whereNotIn('card_id', $args['card_ids_not_in']);
-            }
-
-            if (!$study_all_on_hold) {
-                $query_answer = $query_answer->limit($no_on_hold);
-            }
-
-            $get = $query_answer->get();
-
-            foreach ($get as $answer) {
-                $all_card_ids[] = $answer->card_id;
-                $debug_info[]   = $answer;
-            }
-//				Common::send_error( [
-//					__METHOD__,
-//					'query sql' => $query_answer->toSql(),
-//					'query get' => $query_answer->get(),
-//					'$study'    => $study,
-//				] );
-
-        }
-
         return [
-            'card_ids'   => $all_card_ids,
-            'debug_info' => $debug_info,
+            'graphable' => $graphable
         ];
+
     }
-
-
-    public static function get_forecast_cards_on_hold2($args)
-    {
-        $default = [
-            'user_id'         => 0,
-            'start_date'      => null,
-            'end_date'        => null,
-            'no_date_limit'   => false,
-            'card_ids_not_in' => [],
-            'card_ids_in'     => [],
-        ];
-        $args    = wp_parse_args($args, $default);
-//			Common::send_error(['user_id' => $args]);
-
-        $user_query = User::with('studies.answers.study.deck.cards')
-            ->where('ID', '=', $args['user_id']);
-        $user       = $user_query->get()->first();
-        $user->studies->transform(function ($study) {
-            if ($study->study_all_on_hold) {
-                $study->answers = $study->answers->take($study->no_on_hold)->values();
-                return $study;
-            } else {
-                return $study;
-            }
-        });
-        Common::send_error([
-            __METHOD__,
-            '$user_query sql'        => $user_query->toSql(),
-            '$user $get'             => $user,
-            'Manager::getQueryLog()' => Manager::getQueryLog(),
-        ]);
-        $user         = User::with('studies.answers.study.deck.cards')
-            ->where('ID', '=', $args['user_id'])
-            ->get()->first();//->studies();//->get();
-        $user_studies = $user->studies;
-
-        $all_card_ids = [];
-        $debug_info   = [];
-        foreach ($user_studies as $key => $study) {
-            $study_id          = $study->id;
-            $study_all_on_hold = $study->study_all_on_hold;
-            $no_on_hold        = $study->no_on_hold;
-            $query_answer      = Answered
-                ::with('study.deck', 'card')
-                ->where('study_id', '=', $study_id)
-                ->where('grade', '=', 'hold')
-                ->groupBy('card_id')
-                ->orderByDesc('id');
-
-            if ($args['no_date_limit']) {
-                $query_answer = $query_answer->where('next_due_at', '>', $args['start_date']);
-            } else {
-                $query_answer = $query_answer->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
-            }
-
-            if (!empty($args['card_ids_in'])) {
-                $query_answer = $query_answer->whereIn('card_id', $args['card_ids_in']);
-            }
-            if (!empty($args['card_ids_not_in'])) {
-                $query_answer = $query_answer->whereNotIn('card_id', $args['card_ids_not_in']);
-            }
-
-            if (!$study_all_on_hold) {
-                $query_answer = $query_answer->limit($no_on_hold);
-            }
-
-            $get = $query_answer->get();
-
-            foreach ($get as $answer) {
-                $all_card_ids[] = $answer->card_id;
-                $debug_info[]   = $answer;
-            }
-//				Common::send_error( [
-//					__METHOD__,
-//					'query sql' => $query_answer->toSql(),
-//					'query get' => $query_answer->get(),
-//					'$study'    => $study,
-//				] );
-
-        }
-
-        return [
-            'card_ids'   => $all_card_ids,
-            'debug_info' => $debug_info,
-        ];
-    }
-
 
     /**
      * Get cards on hold for forecast
@@ -1184,158 +1034,6 @@ class Study extends Model
     }
 
 
-    public static function get_forecast_cards_new2($user_id)
-    {
-        $all_card_ids = [];
-        $all_cards    = [];
-        $debug_info   = [];
-        $ccc          = Card
-            ::with([
-                'study'
-            ])
-            ->whereNotIn('id', function ($q) {
-                $q
-                    ->select('card_id')
-                    ->from(SP_TABLE_ANSWERED)
-                    ->distinct()//todo improve, limit by study_id or user_id
-                ;
-//                        Common::send_error([
-//                            __METHOD__,
-//                            '$q sql' => $q->toSql(),
-//                            '$q get' => $q->get(),
-//                            '$q' => $q,
-//                        ]);
-            });
-        $user         = User
-            ::with([
-                'studies.tags',
-                'studies.deck.card_groups.tags'  => function ($q) {
-
-                },
-                'studies.deck.card_groups.cards' => function ($query) {
-                    $query->whereNotIn('id', function ($q) {
-                        $q
-                            ->select('card_id')
-                            ->from(SP_TABLE_ANSWERED)
-                            ->distinct()//todo improve, limit by study_id or user_id
-                        ;
-//                        Common::send_error([
-//                            __METHOD__,
-//                            '$q sql' => $q->toSql(),
-//                            '$q get' => $q->get(),
-//                            '$q' => $q,
-//                        ]);
-                    });
-                }
-            ])
-            ->where('ID', '=', $user_id);
-        $user_studies = $user->get()->first()->studies;
-
-        Common::send_error([
-            __METHOD__,
-            '$user_id'               => $user_id,
-            '$ccc toSql'             => $ccc->toSql(),
-            '$ccc get'               => $ccc->get(),
-            'user_studies'           => $user_studies,
-            'Manager::getQueryLog()' => Manager::getQueryLog(),
-        ]);
-
-        foreach ($user_studies as $key => $study) {
-            $all_new_cards_in_study = [];
-            $study_id               = $study->id;
-            $no_of_new              = $study->no_of_new;
-            $study_all_new          = $study->study_all_new;
-            $_plucked_card_arr      = $study->deck->card_groups->pluck('cards')->all();
-            $_flatten               = Arr::flatten($_plucked_card_arr);
-            foreach ($_flatten as $card) {
-                $all_new_cards_in_study[] = $card->id;
-                $all_cards[]              = $card;
-                $all_card_ids[]           = $card->id;
-            }
-//            Common::send_error([
-//                __METHOD__,
-//                '$study' => $study,
-//                '$study_id' => $study_id,
-//                '$no_of_new' => $no_of_new,
-//                '$study_all_new' => $study_all_new,
-//                '$all_new_cards_in_study' => $all_new_cards_in_study,
-//                'Manager::getQueryLog()' => Manager::getQueryLog(),
-//            ]);
-
-//            $get = $study->card;
-//            Common::send_error([
-//                __METHOD__,
-//                '$study' => $study,
-//                '$study_all_new' => $study_all_new,
-//                '$no_of_new' => $no_of_new,
-//                'pluck' => $study->deck->card_groups->pluck('cards')->all(),
-//                'Manager::getQueryLog()' => Manager::getQueryLog(),
-//            ]);
-        }
-//        Common::send_error([
-//            __METHOD__,
-//            '$user_studies' => $user_studies,
-//            '$study' => $study,
-//        ]);
-
-        $debug_info['user_studies'] = $user_studies;
-        return [
-            'card_ids'   => $all_card_ids,
-            'cards'      => $all_cards,
-            'debug_info' => $debug_info,
-        ];
-    }
-
-
-    public static function get_user_card_forecast3($user_id, $span)
-    {
-        $matured_cards = self::get_user_matured_card_ids($user_id);
-        Common::send_error([
-            'matured_cards' => $matured_cards,
-        ]);
-        $mature_card_days             = Settings::MATURE_CARD_DAYS;
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        if ('one_month' === $span) {
-            $_date = new DateTime($user_timezone_today_midnight);
-            $_date->add(new DateInterval('P30D'));
-            $end_date = $_date->format('Y-m-d H:i:s');
-        }
-
-        /*** Prepare basic query ***/
-        $user_studies = User::find($user_id)->studies()->get();
-
-        foreach ($user_studies as $study) {
-            $study_id      = $study->id;
-            $cards_on_hold = self::get_user_cards_on_hold($study_id, $user_id);
-
-            $query_mature = Manager
-                ::table(SP_TABLE_ANSWERED.' as a1')
-                ->where('a1.study_id', '=', $study_id)
-                ->select(
-                    'a1.id',
-                    'a1.next_due_at',
-                    'a1.created_at',
-                    'a1.card_id',
-                    Manager::raw('DATEDIFF(DATE(a1.next_due_at),DATE(a1.created_at)) next_due_interval'),
-                    Manager::raw('DATE(a1.created_at)')
-                )
-                ->groupBy('a1.card_id')
-                ->having('next_due_interval', '>=', 2)
-                ->orderBy('a1.id', 'desc');
-
-
-            Common::send_error([
-                '$query_mature'          => $query_mature->toSql(),
-                'Manager::getQueryLog()' => Manager::getQueryLog(),
-                '$get'                   => $query_mature->get(),
-                'getBindings'            => $query_mature->getBindings(),
-                '$study_id'              => $study_id,
-            ]);
-
-        }
-    }
-
     /**
      * Returns cards whose next due date of the last answer is >= Settings::MATURE_CARD_DAYS
      *
@@ -1421,132 +1119,6 @@ class Study extends Model
             'card_ids' => $all_card_ids,
             'all'      => $all,
         ];
-    }
-
-    public static function get_user_matured_card_ids2($user_id)
-    {
-        $mature_card_days = Settings::MATURE_CARD_DAYS;
-        $all              = [];
-        $all_card_ids     = [];
-        /*** Prepare basic query ***/
-        $user_studies = User::find($user_id)->studies()->get();
-
-        foreach ($user_studies as $study) {
-            $study_id = $study->id;
-
-            $matured_answers = Answered::with('card', 'study')
-                ->where('study_id', '=', $study_id)
-                ->select(
-                    'id',
-                    'next_due_at',
-                    'created_at',
-                    'card_id',
-                    Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) next_due_interval'),
-                    Manager::raw('DATE(created_at)')
-                )->groupBy('card_id')
-                ->having('next_due_interval', '>=', $mature_card_days)
-                ->orderBy('id', 'desc');
-
-//				$query_mature = Manager
-//					::table( SP_TABLE_ANSWERED . ' as a1' )
-//					->where( 'a1.study_id', '=', $study_id )
-//					->select(
-//						'a1.id',
-//						'a1.next_due_at',
-//						'a1.created_at',
-//						'a1.card_id',
-//						Manager::raw( 'DATEDIFF(DATE(a1.next_due_at),DATE(a1.created_at)) next_due_interval' ),
-//						Manager::raw( 'DATE(a1.created_at)' )
-//					)
-//					->groupBy( 'a1.card_id' )
-//					->having( 'next_due_interval', '>=', $mature_card_days )
-//					->orderBy( 'a1.id', 'desc' );
-
-            $get = $matured_answers->get();
-            foreach ($get as $answer) {
-                $all_card_ids[] = $answer->card->id;
-                $all[]          = [
-                    'card_id' => $answer->card->id,
-                    'answer'  => $answer,
-                    'study'   => $study,
-                    'deck'    => $study->deck,
-                ];
-            }
-//				Common::send_error( [
-//					'$matured_answers'       => $matured_answers->toSql(),
-//					'$matured_answers get'   => $matured_answers->get(),
-////					'$query_mature'          => $query_mature->toSql(),
-//					'Manager::getQueryLog()' => Manager::getQueryLog(),
-////					'$get'                   => $query_mature->get(),
-////					'getBindings'            => $query_mature->getBindings(),
-//					'$study_id'              => $study_id,
-//				] );
-
-        }
-
-        return [
-            'card_ids' => $all_card_ids,
-            'all'      => $all,
-        ];
-    }
-
-    public static function get_user_card_forecast____diff_between_last_2($user_id, $span)
-    {
-        $mature_card_days             = Settings::MATURE_CARD_DAYS;
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        if ('one_month' === $span) {
-            $_date = new DateTime($user_timezone_today_midnight);
-            $_date->add(new DateInterval('P30D'));
-            $end_date = $_date->format('Y-m-d H:i:s');
-        }
-
-        /*** Prepare basic query ***/
-
-        $user_studies = User::find($user_id)->studies()->get();
-
-        foreach ($user_studies as $study) {
-            $study_id      = $study->id;
-            $cards_on_hold = self::get_user_cards_on_hold($study_id, $user_id);
-
-            $sq = Manager::table(SP_TABLE_ANSWERED)
-                ->select('id', 'created_at', Manager::raw('MIN(created_at) as min_create_date'))
-                ->groupBy('id');
-
-            $query_mature = Manager
-                ::table(SP_TABLE_ANSWERED.' as a1')
-                ->where('a1.study_id', '=', $study_id)
-                ->join(SP_TABLE_ANSWERED.' as a2', 'a2.id', '=', Manager::raw('(a1.id + 1)'))
-//					->having( 'day_interval', '>', 0 )
-//					->where( 'a1.card_id', '=', 45 )
-                ->select(
-                    'a1.id',
-                    'a1.next_due_at',
-                    'a1.created_at',
-                    'a1.card_id',
-                    'a2.id as a2_id',
-                    Manager::raw('DATEDIFF(a2.created_at,a1.created_at) '),
-                    Manager::raw('a2.id - a1.id'),
-                    Manager::raw('(a1.id + 1) as plus_1'),
-                    Manager::raw('DATE(a2.created_at)')
-//						'a2.created_at',
-//						Manager::raw( 'NULLIF(DATE(a1.created_at) - DATE(a2.created_at), 0) day_interval' )
-                );
-//					->where( Manager::raw( 'DATE_SUB(CURDATE(),INTERVAL 1 DAY)' ), '<=', 'DATE(next_due_at)' );
-
-//				$query_mature = Manager::table( SP_TABLE_ANSWERED );
-
-            Common::send_error([
-                '$query_mature'          => $query_mature->toSql(),
-                'Manager::getQueryLog()' => Manager::getQueryLog(),
-                '$get'                   => $query_mature->get(),
-                'getBindings'            => $query_mature->getBindings(),
-                '$study_id'              => $study_id,
-                '$sq sql'                => $sq->toSql(),
-                '$sq get'                => $sq->get(),
-            ]);
-
-        }
     }
 
     public static function get_user_cards($study_id, $user_id)

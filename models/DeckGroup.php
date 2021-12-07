@@ -142,6 +142,7 @@ class DeckGroup extends Model
                 'new'              => 0,
                 'revision'         => 0,
                 'previously_false' => 0,
+                'total'            => 0,
             ];
             foreach ($decks as $_deck) {
 //                $_study              = $_deck->studies->first();
@@ -156,6 +157,11 @@ class DeckGroup extends Model
                 } else {
                     $_deck->due_summary = Study::get_study_due_summary($_study->id, $user_id);
                 }
+                $deck_total_due_cards               = $_deck->due_summary['new']
+                    + $_deck->due_summary['revision']
+                    + $_deck->due_summary['previously_false'];
+                $_deck->deck_total_due_cards        = $deck_total_due_cards;
+                $dg_due_summary['total']            += $deck_total_due_cards;
                 $dg_due_summary['new']              = $dg_due_summary['new'] + $_deck->due_summary['new'];
                 $dg_due_summary['revision']         = $dg_due_summary['revision'] + $_deck->due_summary['revision'];
                 $dg_due_summary['previously_false'] = $dg_due_summary['previously_false'] + $_deck->due_summary['previously_false'];
@@ -176,6 +182,27 @@ class DeckGroup extends Model
 //                    ]);
                 }
             }
+
+            $decks = $decks->all();
+            usort($decks, function ($a, $b) {
+                if ($a["deck_total_due_cards"] == $b["deck_total_due_cards"]) {
+//                    dd($a->deck_total_due_cards);
+                    return 0;
+                }
+                return ($a["deck_total_due_cards"] > $b["deck_total_due_cards"]) ? -1 : 1;
+            });
+//            if (5 === $dg->id) {
+//                Common::send_error([
+//                    'ajax_admin_load_deck_group',
+//                    '$user_id'         => $user_id,
+//                    'gettype'          => gettype($decks),
+//                    '$args'            => $args,
+//                    '$all_deck_groups' => $all_deck_groups,
+//                    '$deck_groups'     => $deck_groups,
+//                    '$decks'           => $decks,
+//                ]);
+//            }
+            $dg->decks       = $decks;
             $dg->due_summary = $dg_due_summary;
         }
 //			Common::send_error( [
@@ -200,7 +227,7 @@ class DeckGroup extends Model
 
         $deck_group = DeckGroup::with([
             'tags',
-            'decks.studies' => function ($query) use ($user_id) {
+            'decks.studies'     => function ($query) use ($user_id) {
                 $query->where('user_id', '=', $user_id);
             },
             'decks'             => function ($query) {

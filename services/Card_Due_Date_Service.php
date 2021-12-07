@@ -147,12 +147,12 @@
 
 			$debug_display = [
 				'previously_answered_at' => $previous_answer ? $previous_answer->created_at : '',
-				'last_answered_at'       => $last_answer->created_at,
+				'last_answered_at'       => @$last_answer->created_at,
 				'next_due_date'          => $next_due_date,
 				'next_due_date_morning'  => $next_due_date_morning,
 				'next_interval'          => $next_interval,
-				'last_button'            => $last_answer->grade,
-				'previous_button'        => $previous_answer->grade,
+				'last_button'            => @$last_answer->grade,
+				'previous_button'        => @$previous_answer->grade,
 				'i'                      => $i,
 				'd'                      => $d,
 				'f'                      => $f,
@@ -229,8 +229,8 @@
 			$this->debug[ __METHOD__ ] = [
 				'$last_answer'           => $last_answer,
 				'$second_to_last_answer' => $second_to_last_answer,
-				'$last_due_at'           => $last_due_at,
-				'$last_answered_at'      => $last_answered_at,
+//				'$last_due_at'           => $last_due_at,
+//				'$last_answered_at'      => $last_answered_at,
 			];
 
 

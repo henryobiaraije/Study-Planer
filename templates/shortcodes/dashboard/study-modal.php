@@ -6,7 +6,7 @@
 	<div class="modal-dialog" >
 		<form v-if="null !== studyToEdit" @submit.prevent="userDash.startStudy" class="modal-content" >
 			<div class="modal-header" >
-				<h5 class="modal-title" id="exampleModalEdit" >Study ({{studyToEdit.deck.name}})</h5 >
+				<h5 class="modal-title" >Study ({{studyToEdit.deck.name}})</h5 >
 				<button id="hide-modal-new" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button >
 			</div >
 			<div class="modal-body" >

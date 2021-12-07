@@ -34,6 +34,7 @@ export default function (status = 'publish') {
     let deckGroups = ref<Array<_DeckGroup>>([]);
     let studies = ref<Array<_Study>>([]);
     let studyToEdit = ref<_Study>(null);
+    let _modalOpenQuestion = ref(null);
     let allQuestions = ref<Array<_Card>>([]);
     let currentQuestionIndex = ref<number>(-1);
     let currentQuestion = ref<_Card>(null);
@@ -67,23 +68,27 @@ export default function (status = 'publish') {
     const openQuestionModal = () => {
         const modalElement = jQuery('#modal-questions')[0];
         const myModal = new bootstrap.Modal(modalElement);
+        _modalOpenQuestion.value = myModal;
         myModal.show();
         modalElement.addEventListener('shown.bs.modal', function () {
-            studyLogIntervalId.value = setInterval(() => {
-
-            }, 5000);
+            // studyLogIntervalId.value = setInterval(() => {
+            //
+            // }, 5000);
         });
         modalElement.addEventListener('hidden.bs.modal', function () {
-            if (currentQuestion.value !== null) {
-                xhrRecordStudyLog(studyToEdit.value, currentQuestion.value, 'stop');
-            }
+            console.log('close question modal');
+            // if (currentQuestion.value !== null) {
+            //     xhrRecordStudyLog(studyToEdit.value, currentQuestion.value, 'stop');
+            // }
             xhrGetSingleDeckGroup(currentQuestion.value.card_group.deck.id)
         });
     };
     const closeQuestionModal = () => {
-        const modalElement = jQuery('#modal-questions')[0];
-        const myModal = new bootstrap.Modal(modalElement);
-        myModal.hide();
+        // const modalElement = jQuery('#modal-questions')[0];
+        // const myModal = new bootstrap.Modal(modalElement);
+        // _modalOpenQuestion.value.hide();
+        jQuery('#hide-question-moadl').trigger('click');
+        // jQuery('#modal-questions').hide();
     };
     const openStudyCompleteModal = (show = true) => {
         const modalElement = jQuery('#modal-study-complete')[0];
@@ -113,9 +118,9 @@ export default function (status = 'publish') {
         });
     }
     const _nextQuestion = () => {
-        if (currentQuestion.value !== null) {
-            xhrRecordStudyLog(studyToEdit.value, currentQuestion.value, 'stop');
-        }
+        // if (currentQuestion.value !== null) {
+        //     xhrRecordStudyLog(studyToEdit.value, currentQuestion.value, 'stop');
+        // }
         const hasMoreQuestions = currentQuestionIndex.value + 1 < (allQuestions.value.length);
         if (hasMoreQuestions) {
             if (allQuestions.value.length > 0) {
@@ -131,12 +136,12 @@ export default function (status = 'publish') {
                 }
             }
         } else {
-            currentQuestionIndex.value = -1;
-            currentQuestion.value = null;
-            showCurrentAnswer.value = false;
-            showGrade.value = false;
+            // currentQuestionIndex.value = -1;
+            // currentQuestion.value = null;
+            // showCurrentAnswer.value = false;
+            // showGrade.value = false;
             closeQuestionModal();
-            openStudyCompleteModal();
+            openStudyCompleteModal(true);
         }
 
     }
