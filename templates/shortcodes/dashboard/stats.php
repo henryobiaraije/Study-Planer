@@ -33,11 +33,11 @@
                     <ul class="slide-in">
                         <li class="flex">
                             <div class="flex-1 text-right">Total:</div>
-                            <div class="flex-1 text-left font-bold pl-2">19839 cards</div>
+                            <div class="flex-1 text-left font-bold pl-2">{{useStats.statsChartAdded.value.total_new_cards}} cards</div>
                         </li>
                         <li class="flex">
                             <div class="flex-1 text-right">Average:</div>
-                            <div class="flex-1 text-left font-bold pl-2">6.0 cards/day</div>
+                            <div class="flex-1 text-left font-bold pl-2">{{useStats.statsChartAdded.value.average_new_cards_per_day}} cards/day</div>
                         </li>
                     </ul>
                 </div>

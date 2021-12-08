@@ -734,7 +734,7 @@ export default function (status = 'publish') {
     _loadAllStats, _loadForecast,
     forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime,
     statsForecast, ajaxReview, statsReview, reviewCountSpan, reviewTimeSpan,
-    statsReviewTime, chartAddedTimeSpan, _reloadChartAdded,
+    statsReviewTime, chartAddedTimeSpan, _reloadChartAdded, statsChartAdded,
   };
 
 }
