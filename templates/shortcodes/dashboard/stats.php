@@ -7,6 +7,67 @@
     <div class="stats-forecast ">
         <div class="stats-body">
 
+            <?php /**** Review Time  *****/ ?>
+            <div class="one-chart  shadow p-2 m-2 mb-4 rounded" style="min-height: 350px">
+                <h4 class="text-center m-0 bold font-bold fs-4">Review Time</h4>
+                <p class="text-center m-0 mb-2">The time taken to answer the questions</p>
+                <div v-if="!useStats.ajaxReviewTime.sending">
+                    <form @submit.prevent="useStats._reloadReviewTime"
+                          class="select-month text-center mb-2 sp-slide-in">
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadReviewTime" v-model="useStats.reviewTimeSpan.value"
+                                   name="forecast_span" value="one_month" type="radio"> <span>1 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadReviewTime" v-model="useStats.reviewTimeSpan.value"
+                                   name="forecast_span" value="three_month" type="radio"> <span>3 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadReviewTime" v-model="useStats.reviewTimeSpan.value"
+                                   name="forecast_span" value="one_year" type="radio"> <span>1 year</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadReviewTime" v-model="useStats.reviewTimeSpan.value"
+                                   name="forecast_span" value="all" type="radio"> <span>All</span></label>
+                    </form>
+                    <div  class="chart-review-time">
+                        <canvas class="m-auto" id="sp-chart-review-time" style="width:100%;max-width:700px"></canvas>
+                    </div>
+                    <ul class="slide-in">
+                        <li class="flex">
+                            <div class="flex-1 text-right">Days studied:</div>
+                            <div class="flex-1 text-left font-bold pl-2">
+                                {{useStats.statsReviewTime.value.days_studied_percent}}%
+                                ({{useStats.statsReviewTime.value.days_studied_count}} of
+                                {{useStats.statsReviewTime.value.total_days}})
+                            </div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex-1 text-right">Total:</div>
+                            <div class="flex-1 text-left font-bold pl-2"> {{useStats.statsReviewTime.value.formed_total_time}}</div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex-1 text-right">Average for day studied:</div>
+                            <div class="flex-1 text-left font-bold pl-2">{{useStats.statsReviewTime.value.average_time_for_days_studied_minutes}}
+                                minutes/day
+                            </div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex-1 text-right">If you studied everyday:</div>
+                            <div class="flex-1 text-left font-bold pl-2">{{useStats.statsReviewTime.value.average_time_if_studied_every_day_minutes}}
+                                minutes/day
+                            </div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex-1 text-right">Average Answer Time:</div>
+                            <div class="flex-1 text-left font-bold pl-2">
+                                {{useStats.statsReviewTime.value.average_answered_cards_per_seconds_time}}s
+                                ({{useStats.statsReviewTime.value.average_answer_cards_per_minute}} cards/minute)
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div v-if="useStats.ajaxReviewTime.sending" style="text-align: center;flex: 12;font-size: 50px;"><i
+                            class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
             <?php /**** Chart Review Count  *****/ ?>
             <div class="one-chart  shadow p-2 m-2 mb-4 rounded" style="min-height: 350px">
                 <h4 class="text-center m-0 bold font-bold fs-4">Review Count</h4>
@@ -33,7 +94,7 @@
                     <div class=" sp-slide-in">
                         <ul>
                             <li class="flex">
-                                <div class="flex-1 text-right">Days of study:</div>
+                                <div class="flex-1 text-right">Days studied:</div>
                                 <div class="flex-1 text-left font-bold pl-2">
                                     {{useStats.statsReview.value.days_studied_percent}}%
                                     ({{useStats.statsReview.value.days_studied_count}} of
@@ -52,7 +113,8 @@
                             </li>
                             <li class="flex">
                                 <div class="flex-1 text-right">If you studied everyday:</div>
-                                <div class="flex-1 text-left font-bold pl-2">{{useStats.statsReview.value.average_if_studied_per_day}} reviews/day</div>
+                                <div class="flex-1 text-left font-bold pl-2">{{useStats.statsReview.value.average_if_studied_per_day}} reviews/day
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -110,37 +172,7 @@
                             class="fa fa-spin fa-spinner"></i></div>
             </div>
 
-            <!--            --><?php ///**** Review Time  *****/ ?>
-            <!--            <div v-if="null !== useStats.statsReview.value" class="one-chart hidden shadow p-2 m-2 mb-4 rounded">-->
-            <!--                <div class="chart-review-time">-->
-            <!--                    <canvas class="m-auto" id="sp-chart-review-time" style="width:100%;max-width:700px"></canvas>-->
-            <!--                </div>-->
-            <!--                <div>-->
-            <!--                    <ul>-->
-            <!--                        <li class="flex">-->
-            <!--                            <div class="flex-1 text-right">Days of study:</div>-->
-            <!--                            <div class="flex-1 text-left font-bold pl-2">88% (23 of 26)</div>-->
-            <!--                        </li>-->
-            <!--                        <li class="flex">-->
-            <!--                            <div class="flex-1 text-right">Total:</div>-->
-            <!--                            <div class="flex-1 text-left font-bold pl-2">9 hours</div>-->
-            <!--                        </li>-->
-            <!--                        <li class="flex">-->
-            <!--                            <div class="flex-1 text-right">Average for day studied:</div>-->
-            <!--                            <div class="flex-1 text-left font-bold pl-2">25.6 minutes/day</div>-->
-            <!--                        </li>-->
-            <!--                        <li class="flex">-->
-            <!--                            <div class="flex-1 text-right">If you studied everyday:</div>-->
-            <!--                            <div class="flex-1 text-left font-bold pl-2">22.6 minutes/day</div>-->
-            <!--                        </li>-->
-            <!--                        <li class="flex">-->
-            <!--                            <div class="flex-1 text-right">Average Answer Time:</div>-->
-            <!--                            <div class="flex-1 text-left font-bold pl-2">123.3 reviews/day</div>-->
-            <!--                        </li>-->
-            <!--                    </ul>-->
-            <!--                </div>-->
-            <!--                <br/> <br/>-->
-            <!--            </div>-->
+
         </div>
     </div>
 </div>

@@ -31,11 +31,19 @@ interface _ReviewGraphable {
   cumulative_y: Array<number>;
   cumulative_newly_learned: Array<number>;
   cumulative_relearned: Array<number>;
+  cumulative_m_time: Array<number>;
+  cumulative_y_time: Array<number>;
+  cumulative_newly_learned_time: Array<number>;
+  cumulative_relearned_time: Array<number>;
   heading: Array<string>;
   m: Array<number>;
   y: Array<number>;
   newly_learned: Array<number>;
   relearned: Array<number>;
+  m_time: Array<number>;
+  y_time: Array<number>;
+  newly_learned_time: Array<number>;
+  relearned_time: Array<number>;
   average: number,
   due_tomorrow: number,
   total_reviews: number,
@@ -71,62 +79,151 @@ export default function (status = 'publish') {
     success: false,
     successMessage: '',
   });
+  const ajaxReviewTime = reactive<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
+    successMessage: '',
+  });
   let statsForecast = ref<_ForecastGraphable>(null);
   let statsReview = ref<_ReviewGraphable>(null);
+  let statsReviewTime = ref<_ReviewGraphable>(null);
   let forecastSpan = ref('one_month');
   let reviewCountSpan = ref('one_month');
+  let reviewTimeSpan = ref('one_month');
 
   const _initChartReviewTime = () => {
     setTimeout(() => {
       new Chart('sp-chart-review-time', {
         type: 'bar',
         data: {
-          labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          // labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          labels: statsReviewTime.value.heading,
           datasets: [
             {
-              label: 'Young',
-              data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
-              backgroundColor: '#9dd99d',
-              borderColor: '#8cbf8c',
+              label: 'Young Cumulative',
+              type: 'line',
+              yAxisID: "y-axis-2",
+              backgroundColor: "#9dd99d",
+              // data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              data: statsReviewTime.value.cumulative_y_time,
+              borderColor: '#9dd99d',
               borderWidth: 2,
+              tension: 0.5,
             },
             {
+              label: 'Mature Cumulative',
+              type: 'line',
+              yAxisID: "y-axis-2",
+              backgroundColor: "#489c47",
+              // data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              data: statsReviewTime.value.cumulative_m_time,
+              borderColor: '#489c47',
+              borderWidth: 2,
+              tension: 0.5,
+            },
+            {
+              label: 'Newly Learned Cumulative',
+              type: 'line',
+              yAxisID: "y-axis-2",
+              backgroundColor: "#4848bf",
+              // data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              data: statsReviewTime.value.cumulative_newly_learned_time,
+              borderColor: '#4848bf',
+              borderWidth: 2,
+              tension: 0.5,
+            },
+            {
+              label: 'Relearned Cumulative',
+              type: 'line',
+              yAxisID: "y-axis-2",
+              backgroundColor: "#d08357", 
+              // data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              data: statsReviewTime.value.cumulative_relearned_time,
+              borderColor: '#d08357',
+              borderWidth: 2,
+              tension: 0.5,
+            },
+            {
+              yAxisID: 'y-axis-1',
+              label: 'Young',
+              data: statsReviewTime.value.y_time,
+              backgroundColor: '#9dd99d',
+            },
+            {
+              yAxisID: 'y-axis-1',
               label: 'Mature',
-              data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+              data: statsReviewTime.value.m_time,
               backgroundColor: '#489c47',
-              borderColor: '#2f622e',
-              borderWidth: 2
             },
             {
+              yAxisID: 'y-axis-1',
               label: 'Relerned',
-              data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+              data: statsReviewTime.value.relearned_time,
               backgroundColor: '#d08357',
-              borderColor: '#a76946',
-              borderWidth: 2
             },
             {
+              yAxisID: 'y-axis-1',
               label: 'Newly learned',
-              data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+              data: statsReviewTime.value.newly_learned_time,
               backgroundColor: '#4848bf',
-              borderColor: '#3a3a9d',
-              borderWidth: 2
             },
           ],
         },
         options: {
+          responsive: true,
+          elements: {
+            point: {
+              radius: 0
+            }
+          },
           scales: {
-            x: {
-              stacked: true
-            },
-            y: {
+            "y-axis-1": {
               stacked: true,
+              position: 'left',
+              type: 'linear',
               title: {
                 display: true,
                 text: 'Hours',
               },
-            }
+              // beginAtZero: true,
+              // stacked: true
+            },
+            "y-axis-2": {
+              position: 'right',
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Cumulative Hours',
+              },
+            },
+            x: {
+              stacked: true
+            },
+            // y: {
+            //   stacked: true,
+            //   title: {
+            //     display: true,
+            //     text: 'Answeres',
+            //   },
           },
-        }
+          plugins: {
+            legend: {
+              labels: {
+                filter: function (legendItem, chartData) {
+                  const noLegend = ['Young Cumulative', 'Newly Learned Cumulative', 'Relearned Cumulative', 'Mature Cumulative'];
+                  return noLegend.findIndex((text => text === legendItem.text)) < 0;
+                  // console.log({legendItem, chartData});
+                  // // if (legendItem.datasetIndex === 0) {
+                  // //   return false;
+                  // // }
+                  // return true;
+                }
+              }
+            },
+          },
+        },
       });
     }, 500);
   }
@@ -363,6 +460,12 @@ export default function (status = 'publish') {
       _loadReviewCount();
     }, 400);
   }
+  const _reloadReviewTime = () => {
+    setTimeout(() => {
+      console.log('srat reload');
+      _loadReviewTime();
+    }, 400);
+  }
 
   const _loadForecast = () => {
     // if (null === statsForecast.value) {
@@ -384,10 +487,19 @@ export default function (status = 'publish') {
       _initChartReviewCount();
     });
   }
+  const _loadReviewTime = () => {
+    xhrLoadReviewTime().then((res) => {
+      _initChartReviewTime();
+    }).catch(() => {
+      // todo remove later
+      _initChartReviewTime();
+    });
+  }
 
   const _loadAllStats = () => {
     _loadForecast();
     _loadReviewCount();
+    _loadReviewTime();
     // xhrLoadReviewCount().then((res) => {
     //   console.log('Show now');
     //   _initChartReviewCount();
@@ -437,13 +549,13 @@ export default function (status = 'publish') {
   };
 
   const xhrLoadReviewTime = () => {
-    const handleAjax: HandleAjax = new HandleAjax(ajaxReview);
+    const handleAjax: HandleAjax = new HandleAjax(ajaxReviewTime);
     return new Promise((resolve, reject) => {
       new Server().send_online({
         data: [
           Store.nonce,
           {
-            span: forecastSpan.value,
+            span: reviewTimeSpan.value,
           }
         ],
         what: "front_sp_ajax_front_load_stats_review_time",
@@ -452,7 +564,7 @@ export default function (status = 'publish') {
         },
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
-          statsReview.value = done.data.graphable;
+          statsReviewTime.value = done.data.graphable;
           resolve(0);
         },
         funcFailue(done) {
@@ -492,10 +604,11 @@ export default function (status = 'publish') {
   };
 
   return {
-    ajax, ajaxForecast,
+    ajax, ajaxForecast, ajaxReviewTime,
     _loadAllStats, _loadForecast,
-    forecastSpan, _reloadForecast, _reloadReviewCount,
-    statsForecast, ajaxReview, statsReview, reviewCountSpan,
+    forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime,
+    statsForecast, ajaxReview, statsReview, reviewCountSpan, reviewTimeSpan,
+    statsReviewTime,
   };
 
 }
