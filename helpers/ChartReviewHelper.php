@@ -71,35 +71,35 @@ class ChartReviewHelper
                     $query->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
                 }
                 $query->orderByDesc('id');
-//                Common::send_error([
-//                    __METHOD__,
-//                    '$query sql'             => $query->toSql(),
-//                    '$query getBindings'     => $query->getBindings(),
-//                    //            '$uuu get'               => $user->get(),
-//                    '$query'                 => $args,
-//                    'Manager::getQueryLog()' => Manager::getQueryLog(),
-//                ]);
+                //                Common::send_error([
+                //                    __METHOD__,
+                //                    '$query sql'             => $query->toSql(),
+                //                    '$query getBindings'     => $query->getBindings(),
+                //                    //            '$uuu get'               => $user->get(),
+                //                    '$query'                 => $args,
+                //                    'Manager::getQueryLog()' => Manager::getQueryLog(),
+                //                ]);
             },
             'studies.answers.study',
             'studies.answers.card'
         ])
             ->where('ID', '=', $args['user_id']);
-//        Common::send_error([
-//            __METHOD__,
-//            '$uuu sql'               => $user->toSql(),
-////            '$uuu get'               => $user->get(),
-//            '$args'                  => $args,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$uuu sql'               => $user->toSql(),
+        ////            '$uuu get'               => $user->get(),
+        //            '$args'                  => $args,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
         $answers = $user->get()->first()->studies->pluck('answers')->flatten();
-//        Common::send_error([
-//            __METHOD__,
-//            '$uuu sql' => $user->toSql(),
-//            '$uuu get' => $user->get(),
-//            '$args' => $args,
-//            '$answers' => $answers,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$uuu sql' => $user->toSql(),
+        //            '$uuu get' => $user->get(),
+        //            '$args' => $args,
+        //            '$answers' => $answers,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
 
 
         return [
@@ -138,39 +138,39 @@ class ChartReviewHelper
                     $query->where('answered_as_new', '=', true);
                     $query->groupBy('card_id');
                     $query->orderByDesc('id');
-//                Common::send_error([
-//                    __METHOD__,
-//                    '$query sql'             => $query->toSql(),
-//                    '$query getBindings'     => $query->getBindings(),
-//                    //            '$uuu get'               => $user->get(),
-//                    '$query'                 => $args,
-//                    'Manager::getQueryLog()' => Manager::getQueryLog(),
-//                ]);
+                    //                Common::send_error([
+                    //                    __METHOD__,
+                    //                    '$query sql'             => $query->toSql(),
+                    //                    '$query getBindings'     => $query->getBindings(),
+                    //                    //            '$uuu get'               => $user->get(),
+                    //                    '$query'                 => $args,
+                    //                    'Manager::getQueryLog()' => Manager::getQueryLog(),
+                    //                ]);
                 },
                 'studies.answers.study',
                 'studies.answers.card'
             ])
-//            ->whereHas('studies.answers', function ($query) {
-//                $query
-//                    ->where('answered_as_new', '=', true);
-//            })
+            //            ->whereHas('studies.answers', function ($query) {
+            //                $query
+            //                    ->where('answered_as_new', '=', true);
+            //            })
             ->where('ID', '=', $args['user_id']);
-//        Common::send_error([
-//            __METHOD__,
-//            '$uuu sql'               => $user->toSql(),
-////            '$uuu get'               => $user->get(),
-//            '$args'                  => $args,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$uuu sql'               => $user->toSql(),
+        ////            '$uuu get'               => $user->get(),
+        //            '$args'                  => $args,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
         $answers = $user->get()->first()->studies->pluck('answers')->flatten();
-//        Common::send_error([
-//            __METHOD__,
-//            '$uuu sql' => $user->toSql(),
-//            '$uuu get' => $user->get(),
-//            '$args' => $args,
-//            '$answers' => $answers,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$uuu sql' => $user->toSql(),
+        //            '$uuu get' => $user->get(),
+        //            '$args' => $args,
+        //            '$answers' => $answers,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
 
 
         return [
@@ -194,50 +194,44 @@ class ChartReviewHelper
             ::with([
                 'studies.answers' => function ($query) use ($args) {
                     $query->select('*',
-                        // If > 21, is matured Else young
-                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
                         // Difference in days from today and due date
-                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
-                        // Time (seconds) it took to study this card (answer)
-                        Manager::raw('TIMESTAMPDIFF(SECOND,TIMESTAMP(started_at),TIMESTAMP(created_at)) as time_diff_second_spent'),
-                        Manager::raw('TIMESTAMPDIFF(SECOND,TIMESTAMP(started_at),TIMESTAMP(created_at)) / 60 as time_diff_minute_spent'),
-                        Manager::raw('TIMESTAMPDIFF(SECOND,TIMESTAMP(started_at),TIMESTAMP(created_at)) / 3600 as time_diff_hours_spent')
-                    );
+                        Manager::raw('DATEDIFF(DATE(created_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
+                       );
                     if ($args['no_date_limit']) {
-                        $query->where('next_due_at', '>=', $args['start_date']);
+                        $query->where('created_at', '>=', $args['start_date']);
                     } else {
-                        $query->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
+                        $query->whereBetween('created_at', [$args['start_date'], $args['end_date']]);
                     }
                     $query->orderByDesc('id');
-//                Common::send_error([
-//                    __METHOD__,
-//                    '$query sql'             => $query->toSql(),
-//                    '$query getBindings'     => $query->getBindings(),
-//                    //            '$uuu get'               => $user->get(),
-//                    '$query'                 => $args,
-//                    'Manager::getQueryLog()' => Manager::getQueryLog(),
-//                ]);
+                    //                Common::send_error([
+                    //                    __METHOD__,
+                    //                    '$query sql'             => $query->toSql(),
+                    //                    '$query getBindings'     => $query->getBindings(),
+                    //                    //            '$uuu get'               => $user->get(),
+                    //                    '$query'                 => $args,
+                    //                    'Manager::getQueryLog()' => Manager::getQueryLog(),
+                    //                ]);
                 },
                 'studies.answers.study',
                 'studies.answers.card'
             ])
             ->where('ID', '=', $args['user_id']);
-//        Common::send_error([
-//            __METHOD__,
-//            '$uuu sql'               => $user->toSql(),
-////            '$uuu get'               => $user->get(),
-//            '$args'                  => $args,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$uuu sql'               => $user->toSql(),
+        ////            '$uuu get'               => $user->get(),
+        //            '$args'                  => $args,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
         $answers = $user->get()->first()->studies->pluck('answers')->flatten();
-//        Common::send_error([
-//            __METHOD__,
-//            '$uuu sql' => $user->toSql(),
-//            '$uuu get' => $user->get(),
-//            '$args' => $args,
-//            '$answers' => $answers,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$uuu sql' => $user->toSql(),
+        //            '$uuu get' => $user->get(),
+        //            '$args' => $args,
+        //            '$answers' => $answers,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
 
 
         return [
@@ -280,12 +274,12 @@ class ChartReviewHelper
                                     ->where('uuu.id', '=', $user_id)
                                     ->distinct()//todo improve, limit by study_id or user_id
                                 ;
-//                        Common::send_error([
-//                            __METHOD__,
-//                            '$q sql' => $q->toSql(),
-//                            '$q get' => $q->get(),
-//                            '$q' => $q,
-//                        ]);
+                                //                        Common::send_error([
+                                //                            __METHOD__,
+                                //                            '$q sql' => $q->toSql(),
+                                //                            '$q get' => $q->get(),
+                                //                            '$q' => $q,
+                                //                        ]);
                             });
                     }, 'deck', 'tags'
                 ])
@@ -300,19 +294,19 @@ class ChartReviewHelper
                                 ->where('uuu.id', '=', $user_id)
                                 ->distinct()//todo improve, limit by study_id or user_id
                             ;
-//                            Common::send_error([
-//                                __METHOD__,
-//                                '$q sql' => $q->toSql(),
-//                                '$q get' => $q->get(),
-//                                '$q'     => $q,
-//                            ]);
+                            //                            Common::send_error([
+                            //                                __METHOD__,
+                            //                                '$q sql' => $q->toSql(),
+                            //                                '$q get' => $q->get(),
+                            //                                '$q'     => $q,
+                            //                            ]);
                         });
-//                    Common::send_error([
-//                        __METHOD__,
-//                        '$query sql' => $query->toSql(),
-////                        '$query get' => $query->get(),
-//                        '$query'     => $query,
-//                    ]);
+                    //                    Common::send_error([
+                    //                        __METHOD__,
+                    //                        '$query sql' => $query->toSql(),
+                    ////                        '$query get' => $query->get(),
+                    //                        '$query'     => $query,
+                    //                    ]);
                 })
                 ->whereHas('deck', function ($query) use ($deck) {
                     $query->where('deck_id', '=', $deck->id);
@@ -320,12 +314,12 @@ class ChartReviewHelper
             if (!$all_tags) {
                 $query_card_group = $query_card_group->whereHas('tags', function ($query) use ($tag_ids) {
                     $query->whereIn(SP_TABLE_TAGS.'.id', $tag_ids);
-//                    Common::send_error([
-//                        __METHOD__,
-//                        '$query sql' => $query->toSql(),
-//                        '$query sql getBindings' => $query->getBindings(),
-//                        '$query get' => $query->get(),
-//                    ]);
+                    //                    Common::send_error([
+                    //                        __METHOD__,
+                    //                        '$query sql' => $query->toSql(),
+                    //                        '$query sql getBindings' => $query->getBindings(),
+                    //                        '$query get' => $query->get(),
+                    //                    ]);
                 });
             }
             $card_groups = $query_card_group->get();
@@ -338,27 +332,27 @@ class ChartReviewHelper
                 'study'       => $study,
                 'card_groups' => $card_groups,
             ];
-//            Common::send_error([
-//                __METHOD__,
-//                '$user_id'                => $user_id,
-//                '$tag_ids'                => $tag_ids,
-//                '$study'                  => $study,
-//                '$query_card_group toSql' => $query_card_group->toSql(),
-//                '$query_card_group get'   => $query_card_group->get(),
-//                '$tags'                   => $tags,
-//                'user_studies'            => $user_studies,
-//                'Manager::getQueryLog()'  => Manager::getQueryLog(),
-//            ]);
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$user_id'                => $user_id,
+            //                '$tag_ids'                => $tag_ids,
+            //                '$study'                  => $study,
+            //                '$query_card_group toSql' => $query_card_group->toSql(),
+            //                '$query_card_group get'   => $query_card_group->get(),
+            //                '$tags'                   => $tags,
+            //                'user_studies'            => $user_studies,
+            //                'Manager::getQueryLog()'  => Manager::getQueryLog(),
+            //            ]);
         }
 
 
-//        Common::send_error([
-//            __METHOD__,
-//            '$user_id' => $user_id,
-//            'user_studies' => $user_studies,
-//            '$all' => $all,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$user_id' => $user_id,
+        //            'user_studies' => $user_studies,
+        //            '$all' => $all,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
         return [
             'all' => $all,
         ];

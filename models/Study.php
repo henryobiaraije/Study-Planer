@@ -18,6 +18,7 @@ use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\Str;
 use PDOException;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use StudyPlanner\Helpers\ChartAddedHelper;
 use StudyPlanner\Helpers\ChartForecastHelper;
 use StudyPlanner\Helpers\ChartReviewHelper;
 use StudyPlanner\Libs\Common;
@@ -661,6 +662,146 @@ class Study extends Model
         Common::send_success('Forecast here', [
             'graphable' => $graphable
         ]);
+
+    }
+
+    public static function get_user_stats_charts_added($user_id, $span)
+    {
+        $measure_start_time = microtime(true);
+        //        $matured_cards = self::get_user_matured_card_ids($user_id);
+        $graphable                    = [
+            'heading'                   => [],
+            'new_cards_added'           => [],
+            'cumulative_new_cards'      => [],
+            'total_new_cards'           => 0,
+            'average_new_cards_per_day' => 0,
+        ];
+        $matured_day_no               = Settings::MATURE_CARD_DAYS;
+        $end_date                     = null;
+        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
+        //        $start_date                   = $user_timezone_today_midnight;
+        $end_date = $user_timezone_today_midnight;
+        $_date    = new DateTime($user_timezone_today_midnight);
+        if ('one_month' === $span) {
+            $_date->sub(new DateInterval('P30D'));
+        } elseif ('three_month' === $span) {
+            $_date->sub(new DateInterval('P3M'));
+        } elseif ('one_year' === $span) {
+            $_date->sub(new DateInterval('P1Y'));
+        } elseif ('all' === $span) {
+            $oldest_answer_query = Answered
+                ::orderBy('next_due_at')
+                ->limit(1);
+            $start_date          = $oldest_answer_query->get()->first()->next_due_at;
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$oldest_answer_query sql' => $oldest_answer_query->toSql(),
+            //                '$_date ' => $_date,
+            //                '$oldest_answer_query sql getBindings' => $oldest_answer_query->getBindings(),
+            //                '$oldest_answer_query get' => $oldest_answer_query->get(),
+            //            ]);
+        }
+        if ('all' !== $span) {
+            $start_date = $_date->format('Y-m-d H:i:s');
+        }
+        $_start_date = new DateTime($start_date);
+        $_end_date   = new DateTime($end_date);
+
+        $total_no_of_days = (int) $_end_date->diff($_start_date)->format("%a"); //3
+        $days             = [];
+        $__a_count        = 0 - $total_no_of_days + 1;
+        for ($_a = 0; $_a < $total_no_of_days; $_a++) {
+            $graphable['heading'][] = $__a_count.'d';
+            $__a_count++;
+            $days[] = [
+                'new_cards_added'      => 0,
+                'new_cards_cumulative' => 0,
+            ];
+        }
+
+        $forecast_all_answers_within_a_date = ChartAddedHelper::get_all_new_cards_added([
+            'user_id'       => $user_id,
+            "start_date"    => $start_date,
+            'end_date'      => $end_date,
+            'no_date_limit' => ($end_date === null),
+            //            'card_ids_not_in' => $matured_cards['card_ids'],
+        ])['answers'];
+
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //        ]);
+
+
+        foreach ($forecast_all_answers_within_a_date as $answer) {
+            $day_diff_today                           = $answer->day_diff_today;
+            $days[$day_diff_today]['new_cards_added'] += 1;
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+            //                '$answer'                             => $answer,
+            //                '$day_diff_today'                     => $day_diff_today,
+            //                '$days'                               => $days,
+            //            ]);
+
+        }
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //            '$answer'                             => $answer,
+        //            '$day_diff_today'                     => $day_diff_today,
+        //            '$days'                               => $days,
+        //        ]);
+
+        $cumulative_new_cards = 0;
+        $days_not_learnt      = 0;
+        foreach ($days as $key => $day) {
+            $cumulative_new_cards                += $day['new_cards_added'];
+            $graphable['new_cards_added'][]      = $day['new_cards_added'];
+            $graphable['cumulative_new_cards'][] = $cumulative_new_cards;
+            if (empty($day['new_cards_added'])) {
+                $days_not_learnt++;
+            }
+        }
+        $total_days_studied                     = $total_no_of_days - $days_not_learnt;
+        $total_new_cards                        = count($forecast_all_answers_within_a_date);
+        $graphable['total_new_cards']           = $total_new_cards;
+        $graphable['average_new_cards_per_day'] = number_format(($total_new_cards / $total_no_of_days), 2);
+
+//        Common::send_error([
+//            __METHOD__,
+//            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+//            '$answer'                             => $answer,
+//            '$day_diff_today'                     => $day_diff_today,
+//            '$days'                               => $days,
+//            '$graphable'                          => $graphable,
+//        ]);
+
+        $measure_end_time                       = microtime(true);
+        $measure_execution_time                 = ($measure_end_time - $measure_start_time);
+        $graphable['zz_measure_execution_time'] = $measure_execution_time;
+        $graphable['zz_debug']                  = self::$sp_debug;
+
+        //        Common::send_error([
+        //            "Answered::orderBy('id')->count()"    => Answered::orderBy('id')->count(),
+        //            '$start_date'                         => $start_date,
+        //            '$end_date'                           => $end_date,
+        //            '$span'                               => $span,
+        //            '$graphable'                          => $graphable,
+        //            '$total_time_hours'                   => $total_time_hours,
+        //            '$no_of_days'                         => $total_no_of_days,
+        //            '$total_answers_count'                => $total_answers_count,
+        //            '$total_days_studied'                 => $total_days_studied,
+        //            '$days'                               => $days,
+        //            '$__a_count'                          => $__a_count,
+        //            '$days_not_learnt'                    => $days_not_learnt,
+        //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //            'Manager::getQueryLog()'              => Manager::getQueryLog(),
+        //        ]);
+
+        return [
+            'graphable' => $graphable
+        ];
 
     }
 

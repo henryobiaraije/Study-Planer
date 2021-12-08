@@ -71,6 +71,7 @@ class AjaxFrontHelper
         add_action('front_sp_ajax_front_load_stats_review_time', array($this, 'ajax_front_load_stats_review_time'));
         add_action('front_sp_ajax_front_get_single_deck_group', array($this, 'ajax_front_get_single_deck_group'));
         add_action('front_sp_ajax_front_record_study_log', array($this, 'ajax_front_record_study_log'));
+        add_action('front_sp_ajax_front_load_stats_chart_added', array($this, 'ajax_front_load_stats_chart_added'));
     }
 
     /*** <editor-fold desc="Chart Stats"> **/
@@ -78,10 +79,10 @@ class AjaxFrontHelper
     public function ajax_front_record_study_log($post): void
     {
         Initializer::verify_post($post, true);
-//        Common::send_error([
-//            'ajax_front_record_study_log',
-//            'post' => $post,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_record_study_log',
+        //            'post' => $post,
+        //        ]);
 
         $all      = $post[Common::VAR_2];
         $study_id = (int) sanitize_text_field($all['study_id']);
@@ -124,15 +125,15 @@ class AjaxFrontHelper
             'action'   => $action,
         ]);
 
-//        Common::send_error([
-//            'ajax_front_load_stats_forecast',
-//            'post'           => $post,
-//            '$new_study_log' => $new_study_log,
-//            '$last_log'      => $last_log,
-//            '$study'         => $study,
-//            '$card'          => $card,
-//            '$action'        => $action,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_forecast',
+        //            'post'           => $post,
+        //            '$new_study_log' => $new_study_log,
+        //            '$last_log'      => $last_log,
+        //            '$study'         => $study,
+        //            '$card'          => $card,
+        //            '$action'        => $action,
+        //        ]);
 
 
         Common::send_success('Log recorded');
@@ -143,10 +144,10 @@ class AjaxFrontHelper
     public function ajax_front_load_stats_forecast($post): void
     {
         Initializer::verify_post($post, true);
-//			Common::send_error( [
-//				'ajax_front_load_stats_forecast',
-//				'post' => $post,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_front_load_stats_forecast',
+        //				'post' => $post,
+        //			] );
 
         $all     = $post[Common::VAR_2];
         $span    = sanitize_text_field($all['span']);
@@ -154,37 +155,62 @@ class AjaxFrontHelper
         $user_id = get_current_user_id();
 
         $forecast = Study::get_user_card_forecast($user_id, $span);
-//        Common::send_error([
-//            'ajax_front_load_stats_forecast',
-//            'post'  => $post,
-//            '$span' => $span,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_forecast',
+        //            'post'  => $post,
+        //            '$span' => $span,
+        //        ]);
 
-        Common::send_success('Forecast here',$forecast);
+        Common::send_success('Forecast here', $forecast);
+
+    }
+
+    public function ajax_front_load_stats_chart_added($post): void
+    {
+        Initializer::verify_post($post, true);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_chart_added',
+        //            'post' => $post,
+        //        ]);
+
+        $all  = $post[Common::VAR_2];
+        $span = sanitize_text_field($all['span']);
+        //        $span    = 'one_month';
+        $user_id = get_current_user_id();
+
+        $all = Study::get_user_stats_charts_added($user_id, $span);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_review_time',
+        //            'post'  => $post,
+        //            '$span' => $span,
+        //        ]);
+
+        Common::send_success('Charts added here', $all);
+
 
     }
 
     public function ajax_front_load_stats_review_time($post): void
     {
         Initializer::verify_post($post, true);
-//        Common::send_error([
-//            'ajax_front_load_stats_review_time',
-//            'post' => $post,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_review_time',
+        //            'post' => $post,
+        //        ]);
 
-        $all     = $post[Common::VAR_2];
-        $span    = sanitize_text_field($all['span']);
-//        $span    = 'one_month';
+        $all  = $post[Common::VAR_2];
+        $span = sanitize_text_field($all['span']);
+        //        $span    = 'one_month';
         $user_id = get_current_user_id();
 
         $review = Study::get_user_card_review_count_and_time($user_id, $span);
-//        Common::send_error([
-//            'ajax_front_load_stats_review_time',
-//            'post'  => $post,
-//            '$span' => $span,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_review_time',
+        //            'post'  => $post,
+        //            '$span' => $span,
+        //        ]);
 
-        Common::send_success('Review here',$review);
+        Common::send_success('Review here', $review);
 
 
     }
@@ -196,10 +222,10 @@ class AjaxFrontHelper
     public function ajax_front_mark_answer_on_hold($post): void
     {
         Initializer::verify_post($post);
-//			Common::send_error( [
-//				__METHOD__,
-//				'post' => $post,
-//			] );
+        //			Common::send_error( [
+        //				__METHOD__,
+        //				'post' => $post,
+        //			] );
 
         $all        = $post[Common::VAR_2];
         $study_id   = (int) sanitize_text_field($all['study_id']);
@@ -252,20 +278,20 @@ class AjaxFrontHelper
         $study_log->forceDelete();
         Manager::commit();
         Common::send_success('On hold marked');
-//			$answer = Answered::create( [
-//				'study_id'    => $study_id,
-//				'card_id'     => $card_id,
-//				'answer'      => $answer,
-//				'grade'       => $grade,
-//				'next_due_at' => Common::getDateTime( - 4 ),
-//			] );
-//			$answer = Answered::create( [
-//				'study_id'    => $study_id,
-//				'card_id'     => $card_id,
-//				'answer'      => $answer,
-//				'grade'       => $grade,
-//				'next_due_at' => Common::getDateTime(-1),
-//			] );
+        //			$answer = Answered::create( [
+        //				'study_id'    => $study_id,
+        //				'card_id'     => $card_id,
+        //				'answer'      => $answer,
+        //				'grade'       => $grade,
+        //				'next_due_at' => Common::getDateTime( - 4 ),
+        //			] );
+        //			$answer = Answered::create( [
+        //				'study_id'    => $study_id,
+        //				'card_id'     => $card_id,
+        //				'answer'      => $answer,
+        //				'grade'       => $grade,
+        //				'next_due_at' => Common::getDateTime(-1),
+        //			] );
 
 
     }
@@ -273,10 +299,10 @@ class AjaxFrontHelper
     public function ajax_front_mark_answer($post): void
     {
         Initializer::verify_post($post);
-//			Common::send_error( [
-//				__METHOD__,
-//				'post' => $post,
-//			] );
+        //			Common::send_error( [
+        //				__METHOD__,
+        //				'post' => $post,
+        //			] );
 
         $all        = $post[Common::VAR_2];
         $study_id   = (int) sanitize_text_field($all['study_id']);
@@ -324,23 +350,23 @@ class AjaxFrontHelper
             ->orderByDesc('id')
             ->get()->first();
 
-//        Common::send_error([
-//            'ajax_front_get_question',
-//            'post'                 => $post,
-//            '$study_log'           => $study_log,
-//            '$study_id'            => $study_id,
-//            '$study'               => $study,
-//            '$grade'               => $grade,
-//            '$card'                => $card,
-//            '$all_grades'          => $all_grades,
-//            '$answer'              => $answer,
-//            '$card_group'          => $card_group,
-//            '$answered_as_revised' => $answered_as_revised,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_get_question',
+        //            'post'                 => $post,
+        //            '$study_log'           => $study_log,
+        //            '$study_id'            => $study_id,
+        //            '$study'               => $study,
+        //            '$grade'               => $grade,
+        //            '$card'                => $card,
+        //            '$all_grades'          => $all_grades,
+        //            '$answer'              => $answer,
+        //            '$card_group'          => $card_group,
+        //            '$answered_as_revised' => $answered_as_revised,
+        //        ]);
 
         Manager::beginTransaction();
 
-        $answer                 = Answered::create([
+        $answer = Answered::create([
             'study_id'            => $study_id,
             'card_id'             => $card_id,
             'answer'              => $answer,
@@ -351,20 +377,20 @@ class AjaxFrontHelper
             //				'next_due_at' => Common::getDateTime( - 7 ),
         ]);
         $study_log->forceDelete();
-//			$answer = Answered::create( [
-//				'study_id'    => $study_id,
-//				'card_id'     => $card_id,
-//				'answer'      => $answer,
-//				'grade'       => $grade,
-//				'next_due_at' => Common::getDateTime( - 4 ),
-//			] );
-//			$answer = Answered::create( [
-//				'study_id'    => $study_id,
-//				'card_id'     => $card_id,
-//				'answer'      => $answer,
-//				'grade'       => $grade,
-//				'next_due_at' => Common::getDateTime(-1),
-//			] );
+        //			$answer = Answered::create( [
+        //				'study_id'    => $study_id,
+        //				'card_id'     => $card_id,
+        //				'answer'      => $answer,
+        //				'grade'       => $grade,
+        //				'next_due_at' => Common::getDateTime( - 4 ),
+        //			] );
+        //			$answer = Answered::create( [
+        //				'study_id'    => $study_id,
+        //				'card_id'     => $card_id,
+        //				'answer'      => $answer,
+        //				'grade'       => $grade,
+        //				'next_due_at' => Common::getDateTime(-1),
+        //			] );
 
 
         try {
@@ -381,18 +407,18 @@ class AjaxFrontHelper
 
             Manager::commit();
 
-//				Common::send_error( [
-//					'ajax_front_get_question',
-//					'post'           => $post,
-//					'$study_id'      => $study_id,
-//					'$study'         => $study,
-//					'$grade'         => $grade,
-//					'$card'          => $card,
-//					'$study_log'          => $study_log,
-//					'$all_grades'    => $all_grades,
-//					'$answer'        => $answer,
-//					'$next_due_date' => $next_due_date,
-//				] );
+            //				Common::send_error( [
+            //					'ajax_front_get_question',
+            //					'post'           => $post,
+            //					'$study_id'      => $study_id,
+            //					'$study'         => $study,
+            //					'$grade'         => $grade,
+            //					'$card'          => $card,
+            //					'$study_log'          => $study_log,
+            //					'$all_grades'    => $all_grades,
+            //					'$answer'        => $answer,
+            //					'$next_due_date' => $next_due_date,
+            //				] );
             Common::send_success('Answered.', [
                 'debug_display' => $next_due_date['debug_display'],
                 'next_interval' => $next_due_date['next_interval'],
@@ -406,26 +432,26 @@ class AjaxFrontHelper
 
     public function ajax_front_get_today_questions_in_study($post): void
     {
-//			Common::send_error( [
-//				'ajax_front_get_question',
-//				'post' => $post,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_front_get_question',
+        //				'post' => $post,
+        //			] );
 
         $all      = $post[Common::VAR_2]['study'];
         $study_id = (int) sanitize_text_field($all['id']);
 
         $study = Study::with('tags', 'deck')->find($study_id);
         if (empty($study)) {
-//				dd( $study, $study_id, $post );
+            //				dd( $study, $study_id, $post );
             Common::send_error('Invalid study plan');
         }
 
-//			Common::send_error( [
-//				'ajax_front_get_question',
-//				'post'      => $post,
-//				'$study_id' => $study_id,
-//				'$study'    => $study,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_front_get_question',
+        //				'post'      => $post,
+        //				'$study_id' => $study_id,
+        //				'$study'    => $study,
+        //			] );
 
         $tags              = $study->tags;
         $no_of_new         = $study->no_of_new;
@@ -439,28 +465,28 @@ class AjaxFrontHelper
         $all_cards = $study::get_user_cards_to_study($study->id, $user_id);
 
 
-//			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
+        //			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
 
 
-//			Common::send_error( [
-//				'ajax_front_create_study',
-//				'post'                   => $post,
-//				'Manager::getQueryLog()' => Manager::getQueryLog(),
-//				'$study_id'              => $study_id,
-//				'$all_cards'             => $all_cards,
-//				'$user_cards_new'        => $user_cards_new,
-//				'$user_cards_revise'     => $user_cards_revise,
-//				'$user_cards_on_hold'    => $user_cards_on_hold,
-//				'$study'                 => $study,
-//				'$tags'                  => $tags,
-//				'$no_of_new'             => $no_of_new,
-//				'$no_on_hold'            => $no_on_hold,
-//				'$no_to_revise'          => $no_to_revise,
-//				'$revise_all'            => $revise_all,
-//				'$study_all_new'         => $study_all_new,
-//				'$study_all_on_hold'     => $study_all_on_hold,
-//				'$user_id'               => $user_id,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_front_create_study',
+        //				'post'                   => $post,
+        //				'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //				'$study_id'              => $study_id,
+        //				'$all_cards'             => $all_cards,
+        //				'$user_cards_new'        => $user_cards_new,
+        //				'$user_cards_revise'     => $user_cards_revise,
+        //				'$user_cards_on_hold'    => $user_cards_on_hold,
+        //				'$study'                 => $study,
+        //				'$tags'                  => $tags,
+        //				'$no_of_new'             => $no_of_new,
+        //				'$no_on_hold'            => $no_on_hold,
+        //				'$no_to_revise'          => $no_to_revise,
+        //				'$revise_all'            => $revise_all,
+        //				'$study_all_new'         => $study_all_new,
+        //				'$study_all_on_hold'     => $study_all_on_hold,
+        //				'$user_id'               => $user_id,
+        //			] );
 
 
         Common::send_success('Cards loaded.', [
@@ -473,10 +499,10 @@ class AjaxFrontHelper
 
     public function ajax_front_create_study($post): void
     {
-//			Common::send_error( [
-//				'ajax_front_create_study',
-//				'post' => $post,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_front_create_study',
+        //				'post' => $post,
+        //			] );
 
         $all               = $post[Common::VAR_2]['study'];
         $deck_id           = (int) sanitize_text_field($all['deck']['id']);
@@ -510,20 +536,20 @@ class AjaxFrontHelper
         Manager::beginTransaction();
 
 
-//        Common::send_error([
-//            'ajax_front_create_study',
-//            'post' => $post,
-//            '$study_id' => $study_id,
-//            '$study' => $study,
-//            '$deck_id' => $deck_id,
-//            '$tags' => $tags,
-//            '$no_of_new' => $no_of_new,
-//            '$no_on_hold' => $no_on_hold,
-//            '$no_to_revise' => $no_to_revise,
-//            '$revise_all' => $revise_all,
-//            '$study_all_new' => $study_all_new,
-//            '$study_all_on_hold' => $study_all_on_hold,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_create_study',
+        //            'post' => $post,
+        //            '$study_id' => $study_id,
+        //            '$study' => $study,
+        //            '$deck_id' => $deck_id,
+        //            '$tags' => $tags,
+        //            '$no_of_new' => $no_of_new,
+        //            '$no_on_hold' => $no_on_hold,
+        //            '$no_to_revise' => $no_to_revise,
+        //            '$revise_all' => $revise_all,
+        //            '$study_all_new' => $study_all_new,
+        //            '$study_all_on_hold' => $study_all_on_hold,
+        //        ]);
 
         $creating_new = false;
         if (empty($study)) {
@@ -539,12 +565,12 @@ class AjaxFrontHelper
         $study->user_id           = $user_id;
         $study->deck_id           = $deck_id;
         $study->all_tags          = $all_tags;
-//			Common::send_error( [
-//				'ajax_front_create_study',
-//				'post'               => $post,
-//				'$study_id'          => $study_id,
-//				'$study'             => $study,
-//			]);
+        //			Common::send_error( [
+        //				'ajax_front_create_study',
+        //				'post'               => $post,
+        //				'$study_id'          => $study_id,
+        //				'$study'             => $study,
+        //			]);
         if ($creating_new) {
             $study->save();
         } else {
@@ -559,24 +585,24 @@ class AjaxFrontHelper
 
         Manager::commit();
         $new_study = Study::get_user_study_by_id($study->id);
-//			$new_study = Study::with( 'tags', 'deck' )->find( $study->id );;
+        //			$new_study = Study::with( 'tags', 'deck' )->find( $study->id );;
 
 
-//        Common::send_error([
-//            'ajax_front_create_study',
-//            'post' => $post,
-//            '$study_id' => $study_id,
-//            '$new_study' => $new_study,
-//            '$study' => $study,
-//            '$deck_id' => $deck_id,
-//            '$tags' => $tags,
-//            '$no_of_new' => $no_of_new,
-//            '$no_on_hold' => $no_on_hold,
-//            '$no_to_revise' => $no_to_revise,
-//            '$revise_all' => $revise_all,
-//            '$study_all_new' => $study_all_new,
-//            '$study_all_on_hold' => $study_all_on_hold,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_create_study',
+        //            'post' => $post,
+        //            '$study_id' => $study_id,
+        //            '$new_study' => $new_study,
+        //            '$study' => $study,
+        //            '$deck_id' => $deck_id,
+        //            '$tags' => $tags,
+        //            '$no_of_new' => $no_of_new,
+        //            '$no_on_hold' => $no_on_hold,
+        //            '$no_to_revise' => $no_to_revise,
+        //            '$revise_all' => $revise_all,
+        //            '$study_all_new' => $study_all_new,
+        //            '$study_all_on_hold' => $study_all_on_hold,
+        //        ]);
 
         Common::send_success('Saved.', $new_study);
 
@@ -585,10 +611,10 @@ class AjaxFrontHelper
     public function ajax_front_get_single_deck_group($post): void
     {
 
-//			Common::send_error( [
-//				'ajax_front_get_single_deck_group',
-//				'post' => $post,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_front_get_single_deck_group',
+        //				'post' => $post,
+        //			] );
 
         $all     = $post[Common::VAR_2];
         $deck_id = $all['deck_id'];
@@ -603,13 +629,13 @@ class AjaxFrontHelper
 
         $deck_group = DeckGroup::get_deck_groups_front_end_one($deck_group->id);
 
-//			Common::send_error( [
-//				'ajax_admin_load_deck_group',
-//				'post'        => $post,
-//				'$deck_id'    => $deck_id,
-//				'$deck'       => $deck,
-//				'$deck_group' => $deck_group,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_admin_load_deck_group',
+        //				'post'        => $post,
+        //				'$deck_id'    => $deck_id,
+        //				'$deck'       => $deck,
+        //				'$deck_group' => $deck_group,
+        //			] );
 
         Common::send_success('Deck group loaded.', $deck_group);
 
@@ -617,10 +643,10 @@ class AjaxFrontHelper
 
     public function ajax_front_get_deck_groups($post): void
     {
-//			Common::send_error( [
-//				'ajax_admin_load_deck_group',
-//				'post' => $post,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_admin_load_deck_group',
+        //				'post' => $post,
+        //			] );
         $user_id        = get_current_user_id();
         $params         = $post[Common::VAR_2]['params'];
         $per_page       = (int) sanitize_text_field($params['per_page']);
@@ -642,18 +668,18 @@ class AjaxFrontHelper
             'only_trashed' => false,//( 'trash' === $status ) ? true : false,
         ]);
 
-//        Common::send_error([
-//            'ajax_admin_load_deck_group',
-//            'post' => $post,
-//            '$user_id' => $user_id,
-//            '$params' => $params,
-//            '$studies' => $studies,
-//            '$per_page' => $per_page,
-//            '$page' => $page,
-//            '$search_keyword' => $search_keyword,
-//            '$deck_groups' => $deck_groups,
-//            '$status' => $status,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_admin_load_deck_group',
+        //            'post' => $post,
+        //            '$user_id' => $user_id,
+        //            '$params' => $params,
+        //            '$studies' => $studies,
+        //            '$per_page' => $per_page,
+        //            '$page' => $page,
+        //            '$search_keyword' => $search_keyword,
+        //            '$deck_groups' => $deck_groups,
+        //            '$status' => $status,
+        //        ]);
 
 
         Common::send_success('Deck group loaded.', [
@@ -670,19 +696,19 @@ class AjaxFrontHelper
     {
         Initializer::verify_post($post, true);
 
-//			Common::send_error( [
-//				__METHOD__,
-//				'post' => $post,
-//			] );
+        //			Common::send_error( [
+        //				__METHOD__,
+        //				'post' => $post,
+        //			] );
         $all       = $post[Common::VAR_2];
         $time_zone = sanitize_text_field($all['timezone']);
         $user_id   = get_current_user_id();
         update_user_meta($user_id, Settings::UM_USER_TIMEZONE, $time_zone);
-//			Common::send_error( [
-//				__METHOD__,
-//				'post' => $post,
-//				'$time_zone' => $time_zone,
-//			] );
+        //			Common::send_error( [
+        //				__METHOD__,
+        //				'post' => $post,
+        //				'$time_zone' => $time_zone,
+        //			] );
         Common::send_success('Timezone saved.');
 
     }

@@ -7,6 +7,44 @@
     <div class="stats-forecast ">
         <div class="stats-body">
 
+            <?php /**** Chart Added  *****/ ?>
+            <div class="one-chart  shadow p-2 m-2 mb-4 rounded" style="min-height: 350px">
+                <h4 class="text-center m-0 bold font-bold fs-4">Added</h4>
+                <p class="text-center m-0 mb-2">The number of new cards you have added</p>
+                <div v-if="!useStats.ajaxChartAdded.sending">
+                    <form @submit.prevent="useStats._reloadChartAdded"
+                          class="select-month text-center mb-2 sp-slide-in">
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadChartAdded" v-model="useStats.chartAddedTimeSpan.value"
+                                   name="forecast_span" value="one_month" type="radio"> <span>1 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadChartAdded" v-model="useStats.chartAddedTimeSpan.value"
+                                   name="forecast_span" value="three_month" type="radio"> <span>3 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadChartAdded" v-model="useStats.chartAddedTimeSpan.value"
+                                   name="forecast_span" value="one_year" type="radio"> <span>1 year</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadChartAdded" v-model="useStats.chartAddedTimeSpan.value"
+                                   name="forecast_span" value="all" type="radio"> <span>All</span></label>
+                    </form>
+                    <div class="chart-review-time">
+                        <canvas class="m-auto" id="sp-chart-chart-added" style="width:100%;max-width:700px"></canvas>
+                    </div>
+                    <ul class="slide-in">
+                        <li class="flex">
+                            <div class="flex-1 text-right">Total:</div>
+                            <div class="flex-1 text-left font-bold pl-2">19839 cards</div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex-1 text-right">Average:</div>
+                            <div class="flex-1 text-left font-bold pl-2">6.0 cards/day</div>
+                        </li>
+                    </ul>
+                </div>
+                <div v-if="useStats.ajaxChartAdded.sending" style="text-align: center;flex: 12;font-size: 50px;"><i
+                            class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
             <?php /**** Review Time  *****/ ?>
             <div class="one-chart  shadow p-2 m-2 mb-4 rounded" style="min-height: 350px">
                 <h4 class="text-center m-0 bold font-bold fs-4">Review Time</h4>
@@ -27,7 +65,7 @@
                             <input @change="useStats._reloadReviewTime" v-model="useStats.reviewTimeSpan.value"
                                    name="forecast_span" value="all" type="radio"> <span>All</span></label>
                     </form>
-                    <div  class="chart-review-time">
+                    <div class="chart-review-time">
                         <canvas class="m-auto" id="sp-chart-review-time" style="width:100%;max-width:700px"></canvas>
                     </div>
                     <ul class="slide-in">

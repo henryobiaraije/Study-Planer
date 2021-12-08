@@ -57,6 +57,14 @@ interface _ReviewGraphable {
   };
 }
 
+interface _ChartAddedGraphable {
+  heading: Array<string>,
+  average_new_cards_per_day: string,
+  cumulative_new_cards: Array<number>,
+  new_cards_added: Array<number>;
+  total_new_cards: Array<number>;
+}
+
 export default function (status = 'publish') {
   const ajax = ref<_Ajax>({
     sending: false,
@@ -86,13 +94,111 @@ export default function (status = 'publish') {
     success: false,
     successMessage: '',
   });
+  const ajaxChartAdded = reactive<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
+    successMessage: '',
+  });
   let statsForecast = ref<_ForecastGraphable>(null);
   let statsReview = ref<_ReviewGraphable>(null);
   let statsReviewTime = ref<_ReviewGraphable>(null);
+  let statsChartAdded = ref<_ChartAddedGraphable>(null);
   let forecastSpan = ref('one_month');
   let reviewCountSpan = ref('one_month');
   let reviewTimeSpan = ref('one_month');
+  let chartAddedTimeSpan = ref('one_month');
 
+  const _initChartAdded = () => {
+    setTimeout(() => {
+      new Chart('sp-chart-chart-added', {
+        type: 'bar',
+        data: {
+          // labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          labels: statsChartAdded.value.heading,
+          datasets: [
+            {
+              label: 'Cards',
+              type: 'line',
+              yAxisID: "y-axis-1",
+              backgroundColor: "#17ac17",
+              // data: [10, 20, 62, 15, 25, 10, 80, 120, 50, 40, 75, 85],
+              data: statsChartAdded.value.new_cards_added,
+              borderColor: '#17ac17',
+              borderWidth: 2,
+              tension: 0.5,
+            },
+            {
+              label: 'Cumulative Card',
+              type: 'line',
+              yAxisID: "y-axis-2",
+              backgroundColor: "#3f22fc",
+              // data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              data: statsChartAdded.value.cumulative_new_cards,
+              borderColor: '#3f22fc',
+              borderWidth: 2,
+              tension: 0.5,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          elements: {
+            point: {
+              radius: 0
+            }
+          },
+          scales: {
+            "y-axis-1": {
+              // stacked: true,
+              position: 'left',
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Cards',
+              },
+              // beginAtZero: true,
+              // stacked: true
+            },
+            "y-axis-2": {
+              position: 'right',
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Cumulative Cards',
+              },
+            },
+            x: {
+              stacked: true
+            },
+            // y: {
+            //   stacked: true,
+            //   title: {
+            //     display: true,
+            //     text: 'Answeres',
+            //   },
+          },
+          plugins: {
+            legend: {
+              labels: {
+                filter: function (legendItem, chartData) {
+                  return true;
+                  // const noLegend = ['Young Cumulative', 'Newly Learned Cumulative', 'Relearned Cumulative', 'Mature Cumulative'];
+                  // return noLegend.findIndex((text => text === legendItem.text)) < 0;
+                  // console.log({legendItem, chartData});
+                  // // if (legendItem.datasetIndex === 0) {
+                  // //   return false;
+                  // // }
+                  // return true;
+                }
+              }
+            },
+          },
+        },
+      });
+    }, 500);
+  }
   const _initChartReviewTime = () => {
     setTimeout(() => {
       new Chart('sp-chart-review-time', {
@@ -138,7 +244,7 @@ export default function (status = 'publish') {
               label: 'Relearned Cumulative',
               type: 'line',
               yAxisID: "y-axis-2",
-              backgroundColor: "#d08357", 
+              backgroundColor: "#d08357",
               // data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
               data: statsReviewTime.value.cumulative_relearned_time,
               borderColor: '#d08357',
@@ -227,7 +333,6 @@ export default function (status = 'publish') {
       });
     }, 500);
   }
-
   const _initChartReviewCount = () => {
     setTimeout(() => {
       new Chart('sp-chart-review-count', {
@@ -362,7 +467,6 @@ export default function (status = 'publish') {
       })
     }, 500);
   };
-
   const _initChartForecast = () => {
     setTimeout(() => {
       new Chart('sp-chart-forecast', {
@@ -466,6 +570,11 @@ export default function (status = 'publish') {
       _loadReviewTime();
     }, 400);
   }
+  const _reloadChartAdded = () => {
+    setTimeout(() => {
+      _loadChartAdded();
+    }, 400);
+  }
 
   const _loadForecast = () => {
     // if (null === statsForecast.value) {
@@ -495,29 +604,20 @@ export default function (status = 'publish') {
       _initChartReviewTime();
     });
   }
+  const _loadChartAdded = () => {
+    xhrLoadChartAdded().then((res) => {
+      _initChartAdded();
+    }).catch(() => {
+      // todo remove later
+      _initChartAdded();
+    });
+  }
 
   const _loadAllStats = () => {
     _loadForecast();
     _loadReviewCount();
     _loadReviewTime();
-    // xhrLoadReviewCount().then((res) => {
-    //   console.log('Show now');
-    //   _initChartReviewCount();
-    // }).catch(() => {
-    //   // todo remove later
-    //   console.log('Show now');
-    //   _initChartReviewCount();
-    // });
-
-    // xhrLoadReviewTime().then((res) => {
-    //   console.log('Show now');
-    //   _initChartReviewTime();
-    // }).catch(() => {
-    //   // todo remove later
-    //   console.log('Show now');
-    //   _initChartReviewTime();
-    // });
-
+    _loadChartAdded();
   }
 
   const xhrLoadForecast = () => {
@@ -547,7 +647,6 @@ export default function (status = 'publish') {
       });
     });
   };
-
   const xhrLoadReviewTime = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxReviewTime);
     return new Promise((resolve, reject) => {
@@ -565,6 +664,33 @@ export default function (status = 'publish') {
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
           statsReviewTime.value = done.data.graphable;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.stop();
+          // handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
+  const xhrLoadChartAdded = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxChartAdded);
+    return new Promise((resolve, reject) => {
+      new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            span: chartAddedTimeSpan.value,
+          }
+        ],
+        what: "front_sp_ajax_front_load_stats_chart_added",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          statsChartAdded.value = done.data.graphable;
           resolve(0);
         },
         funcFailue(done) {
@@ -604,11 +730,11 @@ export default function (status = 'publish') {
   };
 
   return {
-    ajax, ajaxForecast, ajaxReviewTime,
+    ajax, ajaxForecast, ajaxReviewTime, ajaxChartAdded,
     _loadAllStats, _loadForecast,
     forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime,
     statsForecast, ajaxReview, statsReview, reviewCountSpan, reviewTimeSpan,
-    statsReviewTime,
+    statsReviewTime, chartAddedTimeSpan, _reloadChartAdded,
   };
 
 }
