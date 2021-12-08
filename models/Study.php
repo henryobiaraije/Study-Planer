@@ -657,35 +657,44 @@ class Study extends Model
     {
 //        $matured_cards = self::get_user_matured_card_ids($user_id);
         $graphable                    = [
-            'heading'                  => [],
-            'cumulative'               => [],
-            'y'                        => [],
-            'm'                        => [],
-            'newly_learned'            => [],
-            'relearned'                => [],
-            'y_debug'                  => [
+            'heading'                    => [],
+            'cumulative'                 => [],
+            'y'                          => [],
+            'm'                          => [],
+            'newly_learned'              => [],
+            'relearned'                  => [],
+            'cumulative_y'               => [],
+            'cumulative_m'               => [],
+            'cumulative_newly_learned'   => [],
+            'cumulative_relearned'       => [],
+            'y_debug'                    => [
                 'answers'   => [],
                 'new_cards' => [],
             ],
-            'm_debug'                  => [
+            'm_debug'                    => [
                 'answers'   => [],
                 'new_cards' => [],
             ],
-            'newly_learned_debug'      => [
+            'newly_learned_debug'        => [
                 'answers'   => [],
                 'new_cards' => [],
             ],
-            'relearned_debug'          => [
+            'relearned_debug'            => [
                 'answers'   => [],
                 'new_cards' => [],
             ],
-            'm_cumulative'             => 0,
-            'y_cumulative'             => 0,
-            'newly_learned_cumulative' => 0,
-            're_learned_cumulative'    => 0,
-            'total_reviews'            => 0,
-            'average'                  => 0,
-            'due_tomorrow'             => 0,
+            'm_cumulative'               => 0,
+            'y_cumulative'               => 0,
+            'newly_learned_cumulative'   => 0,
+            're_learned_cumulative'      => 0,
+            'total_reviews'              => 0,
+            'average'                    => 0,
+            'average_if_studied_per_day' => 0,
+            'due_tomorrow'               => 0,
+            'total_days'                 => 0,
+            'days_studied_count'         => 0,
+            'days_not_studied_count'     => 0,
+            'days_studied_percent'       => 0,
         ];
         $matured_day_no               = Settings::MATURE_CARD_DAYS;
         $end_date                     = null;
@@ -772,6 +781,7 @@ class Study extends Model
         $_cumulative_y             = 0;
         $_cumulative_newly_learned = 0;
         $_cumulative_re_learned    = 0;
+        $days_not_learnt           = 0;
         foreach ($forecast_all_answers_within_a_date as $answer) {
             $study             = $answer->study;
             $no_on_hold        = $study->no_on_hold;
@@ -786,6 +796,7 @@ class Study extends Model
             $is_young         = $day_dif < $matured_day_no;
             $is_newly_learned = !empty($answer->answered_as_new);
             $is_relearned     = !empty($answer->answered_as_revised);
+
 
             if ($is_matured) {
                 //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
@@ -828,6 +839,7 @@ class Study extends Model
                 $days[$day_diff_today]['re_learned']['answers'][]    = $answer;
             }
 
+
 //            Common::send_error([
 //                '$no_to_revise'                                        => $no_to_revise,
 //                '$answer'                                              => $answer,
@@ -848,14 +860,36 @@ class Study extends Model
         }
 
         $cumulative_count = 0;
+//        $graphable['total_reviews'] = count($forecast_all_answers_within_a_date);
+
 //        rsort($days);
+        $cumulative_y_count             = 0;
+        $cumulative_m_count             = 0;
+        $cumulative_newly_learned_count = 0;
+        $cumulative_re_learned_count    = 0;
         foreach ($days as $key => $day) {
-            $graphable['y'][]                    = $day['y']['count'];
-            $graphable['m'][]                    = $day['m']['count'];
-            $graphable['newly_learned'][]        = $day['newly_learned']['count'];
-            $graphable['relearned'][]            = $day['re_learned']['count'];
-            $cumulative_count                    += ($day['m']['count'] + $day['y']['count']);
-            $graphable['total_reviews']          += ($day['m']['count'] + $day['y']['count']);
+            $cumulative_y_count             += $day['y']['count'];
+            $cumulative_m_count             += $day['m']['count'];
+            $cumulative_newly_learned_count += $day['newly_learned']['count'];
+            $cumulative_re_learned_count    += $day['re_learned']['count'];
+
+            if (empty($cumulative_y_count)
+                && empty($cumulative_m_count)
+                && empty($cumulative_newly_learned_count)
+                && empty($cumulative_re_learned_count)) {
+                $days_not_learnt++;
+            }
+
+            $graphable['y'][]                        = $day['y']['count'];
+            $graphable['m'][]                        = $day['m']['count'];
+            $graphable['newly_learned'][]            = $day['newly_learned']['count'];
+            $graphable['relearned'][]                = $day['re_learned']['count'];
+            $graphable['cumulative_y'][]             = $cumulative_y_count;
+            $graphable['cumulative_m'][]             = $cumulative_m_count;
+            $graphable['cumulative_newly_learned'][] = $cumulative_newly_learned_count;
+            $graphable['cumulative_relearned'][]     = $cumulative_re_learned_count;
+            $cumulative_count                        += ($day['m']['count'] + $day['y']['count']);
+//            $graphable['total_reviews']              += ($day['m']['count'] + $day['y']['count']);
             $graphable['cumulative'][]           = $cumulative_count;
             $graphable['y_debug']['answers'][]   = $day['m']['answers'];
             $graphable['y_debug']['new_cards'][] = $day['y']['new_cards'];
@@ -864,10 +898,20 @@ class Study extends Model
                 $graphable['due_tomorrow'] = ($day['m']['count'] + $day['y']['count']);
             }
         }
-        $graphable['average'] = $graphable['total_reviews'] / $no_of_days;
-        $graphable['average'] = number_format($graphable['average'], 2);
+
+        $total_answers                           = Answered::orderBy('id')->count();
+        $graphable['total_days']                 = $no_of_days;
+        $graphable['days_not_studied_count']     = $days_not_learnt;
+        $graphable['days_studied_count']         = $no_of_days - $days_not_learnt;
+        $graphable['days_studied_percent']       = ($graphable['days_studied_count'] / $no_of_days) * 100;
+        $graphable['total_reviews']              = $total_answers;
+        $graphable['average_if_studied_per_day'] = (float) number_format(($total_answers / $no_of_days), 2);
+        $graphable['average']                    = (float) number_format(($total_answers / ($no_of_days - $days_not_learnt)),
+            2);
+
 
 //        Common::send_error([
+//            "Answered::orderBy('id')->count()"    => Answered::orderBy('id')->count(),
 //            '$start_date'                         => $start_date,
 //            '$end_date'                           => $end_date,
 //            '$span'                               => $span,
@@ -875,6 +919,7 @@ class Study extends Model
 //            '$no_of_days'                         => $no_of_days,
 //            '$days'                               => $days,
 //            '$__a_count'                          => $__a_count,
+//            '$days_not_learnt'                    => $days_not_learnt,
 //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
 //            'Manager::getQueryLog()'              => Manager::getQueryLog(),
 //        ]);
