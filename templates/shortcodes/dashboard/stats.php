@@ -7,6 +7,97 @@
     <div class="stats-forecast ">
         <div class="stats-body">
 
+            <?php /**** Answer Buttons  *****/ ?>
+            <div class="one-chart  shadow p-2 m-2 mb-4 rounded" style="min-height: 350px">
+                <h4 class="text-center m-0 bold font-bold fs-4">Answer Buttons</h4>
+                <p class="text-center m-0 mb-2">The number of times you have pressed each button.</p>
+                <div v-if="!useStats.ajaxChartAnswerButtons.sending">
+                    <form @submit.prevent="useStats._reloadChartAnswerButtons"
+                          class="select-month text-center mb-2 sp-slide-in">
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._loadChartAnswerButtons" v-model="useStats.chartAnswerButtonsTimeSpan.value"
+                                   name="forecast_span" value="one_month" type="radio"> <span>1 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._loadChartAnswerButtons" v-model="useStats.chartAnswerButtonsTimeSpan.value"
+                                   name="forecast_span" value="three_month" type="radio"> <span>3 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._loadChartAnswerButtons" v-model="useStats.chartAnswerButtonsTimeSpan.value"
+                                   name="forecast_span" value="one_year" type="radio"> <span>1 year</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._loadChartAnswerButtons" v-model="useStats.chartAnswerButtonsTimeSpan.value"
+                                   name="forecast_span" value="all" type="radio"> <span>All</span></label>
+                    </form>
+                    <div class="chart-review-time">
+                        <canvas class="m-auto" id="sp-chart-chart-answer-buttons" style="width:100%;max-width:700px"></canvas>
+                    </div>
+                    <ul class="slide-in flex" style="max-width: 80%;margin: auto;">
+                        <li class="slide-in flex-1">
+                            <div class="flex-1 text-center"><span>Correct:</span> <b>{{useStats.statsChartAnserButtons.value.days.learning.correct_percent}}%</b>
+                            </div>
+                            <div class="flex-1 text-center font-bold pl-2">({{useStats.statsChartAnserButtons.value.days.learning.total_correct}} of
+                                {{useStats.statsChartAnserButtons.value.days.learning.total}})
+                            </div>
+                        </li>
+                        <li class="slide-in flex-1">
+                            <div class=" text-center"><span>Correct: </span> <b>{{useStats.statsChartAnserButtons.value.days.y.correct_percent}}%</b>
+                            </div>
+                            <div class="flex-1 text-center font-bold pl-2">({{useStats.statsChartAnserButtons.value.days.y.total_correct}} of
+                                {{useStats.statsChartAnserButtons.value.days.y.total}})
+                            </div>
+                        </li>
+                        <li class="slide-in flex-1">
+                            <div class="flex-1 text-center"><span>Correct: </span> <b>{{useStats.statsChartAnserButtons.value.days.m.correct_percent}}%</b>
+                            </div>
+                            <div class="flex-1 text-center font-bold pl-2">({{useStats.statsChartAnserButtons.value.days.m.total_correct}} of
+                                {{useStats.statsChartAnserButtons.value.days.m.total}})
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div v-if="useStats.ajaxChartAnswerButtons.sending" style="text-align: center;flex: 12;font-size: 50px;"><i
+                            class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
+            <?php /**** Chart Interval  *****/ ?>
+            <div class="one-chart  shadow p-2 m-2 mb-4 rounded" style="min-height: 350px">
+                <h4 class="text-center m-0 bold font-bold fs-4">Intervals</h4>
+                <p class="text-center m-0 mb-2">Delays until reviews are shown again</p>
+                <div v-if="!useStats.ajaxChartAdded.sending">
+                    <form @submit.prevent="useStats._reloadChartInterval"
+                          class="select-month text-center mb-2 sp-slide-in">
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadChartInterval" v-model="useStats.chartIntervalTimeSpan.value"
+                                   name="forecast_span" value="one_month" type="radio"> <span>1 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadChartInterval" v-model="useStats.chartIntervalTimeSpan.value"
+                                   name="forecast_span" value="three_month" type="radio"> <span>3 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadChartInterval" v-model="useStats.chartIntervalTimeSpan.value"
+                                   name="forecast_span" value="one_year" type="radio"> <span>1 year</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadChartInterval" v-model="useStats.chartIntervalTimeSpan.value"
+                                   name="forecast_span" value="all" type="radio"> <span>All</span></label>
+                    </form>
+                    <div class="chart-review-time">
+                        <canvas class="m-auto" id="sp-chart-chart-interval" style="width:100%;max-width:700px"></canvas>
+                    </div>
+                    <ul class="slide-in">
+                        <li class="flex">
+                            <div class="flex-1 text-right">Average Interval:</div>
+                            <!--                            <div class="flex-1 text-left font-bold pl-2">{{useStats.statsChartAdded.value.total_new_cards}} cards</div>-->
+                            <div class="flex-1 text-left font-bold pl-2">22 days</div>
+                        </li>
+                        <li class="flex">
+                            <div class="flex-1 text-right">Longest Interval:</div>
+                            <div class="flex-1 text-left font-bold pl-2">22.2 months</div>
+                            <!--                            <div class="flex-1 text-left font-bold pl-2">{{useStats.statsChartAdded.value.average_new_cards_per_day}} cards/day</div>-->
+                        </li>
+                    </ul>
+                </div>
+                <div v-if="useStats.ajaxChartAdded.sending" style="text-align: center;flex: 12;font-size: 50px;"><i
+                            class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
             <?php /**** Chart Added  *****/ ?>
             <div class="one-chart  shadow p-2 m-2 mb-4 rounded" style="min-height: 350px">
                 <h4 class="text-center m-0 bold font-bold fs-4">Added</h4>

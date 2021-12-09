@@ -65,6 +65,30 @@ interface _ChartAddedGraphable {
   total_new_cards: Array<number>;
 }
 
+interface _ChartAnswerButtons {
+  heading: Array<string>,
+  days: {
+    learning: {
+      correct_percent: number;
+      total: number;
+      total_correct: number;
+    },
+    m: {
+      correct_percent: number;
+      total: number;
+      total_correct: number;
+    },
+    y: {
+      correct_percent: number;
+      total: number;
+      total_correct: number;
+    },
+  },
+  learning: Array<number>;
+  y: Array<number>;
+  m: Array<number>;
+}
+
 export default function (status = 'publish') {
   const ajax = ref<_Ajax>({
     sending: false,
@@ -101,15 +125,311 @@ export default function (status = 'publish') {
     success: false,
     successMessage: '',
   });
+  const ajaxChartInterval = reactive<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
+    successMessage: '',
+  });
+  const ajaxChartAnswerButtons = reactive<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
+    successMessage: '',
+  });
   let statsForecast = ref<_ForecastGraphable>(null);
   let statsReview = ref<_ReviewGraphable>(null);
   let statsReviewTime = ref<_ReviewGraphable>(null);
   let statsChartAdded = ref<_ChartAddedGraphable>(null);
+  let statsChartAnserButtons = ref<_ChartAnswerButtons>(null);
   let forecastSpan = ref('one_month');
   let reviewCountSpan = ref('one_month');
   let reviewTimeSpan = ref('one_month');
   let chartAddedTimeSpan = ref('one_month');
+  let chartIntervalTimeSpan = ref('one_month');
+  let chartAnswerButtonsTimeSpan = ref('one_month');
+  const colorLearning = '#4848bf';
+  const colorYoung = '#9cd89c';
+  const colorMature = '#2f622e';
 
+  const _initChartAnswerButtons = () => {
+    setTimeout(() => {
+      new Chart('sp-chart-chart-answer-buttons', {
+        type: 'bar',
+        data: {
+          // labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          labels: ['', '1', '2', '3', '4',
+            '', '', '1', '2', '3', '4',
+            '', '', '1', '2', '3', '4', ''],
+          // labels: statsChartAdded.value.heading,
+          datasets: [
+            {
+              yAxisID: 'y-axis-1',
+              label: 'Answers',
+              // data: statsReviewTime.value.y_time,
+              // data: [
+              //   0, 30, 62, 100, 43, 0,
+              //   0, 114, 77, 57, 54, 0,
+              //   0, 23, 44, 83, 34, 0
+              // ],
+              data: [
+                0, ...statsChartAnserButtons.value.learning, 0, // learning
+                0, ...statsChartAnserButtons.value.y, 0, // young
+                0, ...statsChartAnserButtons.value.m, 0 // mature
+              ],
+              backgroundColor: [
+                '', colorLearning, colorLearning, colorLearning, colorLearning, '',
+                '', colorYoung, colorYoung, colorYoung, colorYoung, '',
+                '', colorMature, colorMature, colorMature, colorMature, '',
+              ],
+            },
+            {
+              label: 'Learning',
+              'type': 'line',
+              yAxisID: 'y-axis-1',
+              data: [],
+              backgroundColor: colorLearning,
+            },
+            {
+              label: 'Young',
+              'type': 'line',
+              yAxisID: 'y-axis-1',
+              data: [],
+              backgroundColor: colorYoung,
+            },
+            {
+              label: 'Mature',
+              'type': 'line',
+              yAxisID: 'y-axis-1',
+              data: [],
+              backgroundColor: colorMature,
+            }
+          ],
+        },
+        options: {
+          responsive: true,
+          elements: {
+            point: {
+              radius: 0
+            }
+          },
+          scales: {
+            "y-axis-1": {
+              // stacked: true,
+              position: 'left',
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Answers',
+              },
+              // beginAtZero: true,
+              // stacked: true
+            },
+            // "y-axis-2": {
+            //   position: 'right',
+            //   type: 'linear',
+            //   title: {
+            //     display: true,
+            //     text: 'Percentage',
+            //   },
+            // },
+            // x: {
+            //   stacked: true
+            // },
+            // y: {
+            //   stacked: true,
+            //   title: {
+            //     display: true,
+            //     text: 'Answeres',
+            //   },
+          },
+          plugins: {
+            legend: {
+              labels: {
+                filter: function (legendItem, chartData) {
+                  const noLegend = ['Answers'];
+                  // console.log({legendItem, chartData});
+                  return noLegend.findIndex((text => text === legendItem.text)) < 0;
+                }
+              }
+            },
+          },
+        },
+      });
+    }, 500);
+  }
+  const _initChartAnswerButtons2 = () => {
+    setTimeout(() => {
+      new Chart('sp-chart-chart-answer-buttons', {
+        type: 'bar',
+        data: {
+          // labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          labels: ['', '1', '2', '3', '4',
+            '', '', '1', '2', '3', '4',
+            '', '', '1', '2', '3', '4', ''],
+          // labels: statsChartAdded.value.heading,
+          datasets: [
+            {
+              yAxisID: 'y-axis-1',
+              label: 'Cards',
+              // data: statsReviewTime.value.y_time,
+              data: [
+                0, 30, 62, 100, 43, 0,
+                0, 114, 77, 57, 54, 0,
+                0, 23, 44, 83, 34, 0
+              ],
+              backgroundColor: [
+                '', colorLearning, colorLearning, colorLearning, colorLearning, '',
+                '', colorYoung, colorYoung, colorYoung, colorYoung, '',
+                '', colorMature, colorMature, colorMature, colorMature, '',
+              ],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          elements: {
+            point: {
+              radius: 0
+            }
+          },
+          scales: {
+            "y-axis-1": {
+              // stacked: true,
+              position: 'left',
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Answers',
+              },
+              // beginAtZero: true,
+              // stacked: true
+            },
+            // "y-axis-2": {
+            //   position: 'right',
+            //   type: 'linear',
+            //   title: {
+            //     display: true,
+            //     text: 'Percentage',
+            //   },
+            // },
+            // x: {
+            //   stacked: true
+            // },
+            // y: {
+            //   stacked: true,
+            //   title: {
+            //     display: true,
+            //     text: 'Answeres',
+            //   },
+          },
+          plugins: {
+            legend: {
+              labels: {
+                filter: function (legendItem, chartData) {
+                  return true;
+                  // const noLegend = ['Young Cumulative', 'Newly Learned Cumulative', 'Relearned Cumulative', 'Mature Cumulative'];
+                  // return noLegend.findIndex((text => text === legendItem.text)) < 0;
+                  // console.log({legendItem, chartData});
+                  // // if (legendItem.datasetIndex === 0) {
+                  // //   return false;
+                  // // }
+                  // return true;
+                }
+              }
+            },
+          },
+        },
+      });
+    }, 500);
+  }
+  const _initChartInterval = () => {
+    setTimeout(() => {
+      new Chart('sp-chart-chart-interval', {
+        type: 'bar',
+        data: {
+          labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          // labels: statsChartAdded.value.heading,
+          datasets: [
+            {
+              label: 'Percentage',
+              type: 'line',
+              yAxisID: "y-axis-2",
+              backgroundColor: "#000000",
+              data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              // data: statsChartAdded.value.cumulative_new_cards,
+              borderColor: '#000000',
+              borderWidth: 2,
+              tension: 0.5,
+            },
+            {
+              yAxisID: 'y-axis-1',
+              label: 'Cards',
+              // data: statsReviewTime.value.y_time,
+              data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              backgroundColor: '#499c9c',
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          elements: {
+            point: {
+              radius: 0
+            }
+          },
+          scales: {
+            "y-axis-1": {
+              // stacked: true,
+              position: 'left',
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Cards',
+              },
+              // beginAtZero: true,
+              // stacked: true
+            },
+            "y-axis-2": {
+              position: 'right',
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Percentage',
+              },
+            },
+            x: {
+              stacked: true
+            },
+            // y: {
+            //   stacked: true,
+            //   title: {
+            //     display: true,
+            //     text: 'Answeres',
+            //   },
+          },
+          plugins: {
+            legend: {
+              labels: {
+                filter: function (legendItem, chartData) {
+                  return true;
+                  // const noLegend = ['Young Cumulative', 'Newly Learned Cumulative', 'Relearned Cumulative', 'Mature Cumulative'];
+                  // return noLegend.findIndex((text => text === legendItem.text)) < 0;
+                  // console.log({legendItem, chartData});
+                  // // if (legendItem.datasetIndex === 0) {
+                  // //   return false;
+                  // // }
+                  // return true;
+                }
+              }
+            },
+          },
+        },
+      });
+    }, 500);
+  }
   const _initChartAdded = () => {
     setTimeout(() => {
       new Chart('sp-chart-chart-added', {
@@ -575,6 +895,16 @@ export default function (status = 'publish') {
       _loadChartAdded();
     }, 400);
   }
+  const _reloadChartInterval = () => {
+    setTimeout(() => {
+      _loadChartAdded();
+    }, 400);
+  }
+  const _reloadChartAnswerButtons = () => {
+    setTimeout(() => {
+      _loadChartAdded();
+    }, 400);
+  }
 
   const _loadForecast = () => {
     // if (null === statsForecast.value) {
@@ -612,12 +942,30 @@ export default function (status = 'publish') {
       _initChartAdded();
     });
   }
+  const _loadChartIntervals = () => {
+    xhrLoadChartInterval().then((res) => {
+      _initChartInterval();
+    }).catch(() => {
+      // todo remove later
+      _initChartInterval();
+    });
+  }
+  const _loadChartAnswerButtons = () => {
+    xhrLoadAnswerButtons().then((res) => {
+      _initChartAnswerButtons();
+    }).catch(() => {
+      // todo remove later
+      _initChartAnswerButtons();
+    });
+  }
 
   const _loadAllStats = () => {
     _loadForecast();
     _loadReviewCount();
     _loadReviewTime();
     _loadChartAdded();
+    _loadChartIntervals();
+    _loadChartAnswerButtons();
   }
 
   const xhrLoadForecast = () => {
@@ -701,6 +1049,60 @@ export default function (status = 'publish') {
       });
     });
   };
+  const xhrLoadChartInterval = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxChartInterval);
+    return new Promise((resolve, reject) => {
+      new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            span: chartIntervalTimeSpan.value,
+          }
+        ],
+        what: "front_sp_ajax_front_load_stats_chart_interval",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          statsChartAdded.value = done.data.graphable;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.stop();
+          // handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
+  const xhrLoadAnswerButtons = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxChartAnswerButtons);
+    return new Promise((resolve, reject) => {
+      new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            span: chartAnswerButtonsTimeSpan.value,
+          }
+        ],
+        what: "front_sp_ajax_front_load_stats_chart_answer_buttons",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          statsChartAnserButtons.value = done.data.graphable;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.stop();
+          // handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
   const xhrLoadReviewCount = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxReview);
     return new Promise((resolve, reject) => {
@@ -730,11 +1132,14 @@ export default function (status = 'publish') {
   };
 
   return {
-    ajax, ajaxForecast, ajaxReviewTime, ajaxChartAdded,
+    ajax, ajaxForecast, ajaxReviewTime, ajaxChartAdded, ajaxChartInterval,
+    ajaxChartAnswerButtons,
     _loadAllStats, _loadForecast,
-    forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime,
+    forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime, _reloadChartAnswerButtons,
+    _loadChartAnswerButtons,
     statsForecast, ajaxReview, statsReview, reviewCountSpan, reviewTimeSpan,
-    statsReviewTime, chartAddedTimeSpan, _reloadChartAdded, statsChartAdded,
+    statsReviewTime, chartAddedTimeSpan, chartIntervalTimeSpan,statsChartAnserButtons,
+    _reloadChartAdded, _reloadChartInterval, statsChartAdded, chartAnswerButtonsTimeSpan,
   };
 
 }

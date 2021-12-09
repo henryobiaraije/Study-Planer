@@ -7,7 +7,7 @@
 	class Settings {
 
 		// Consts
-		public const MATURE_CARD_DAYS = 2; // todo, change to 21 in production
+		public const MATURE_CARD_DAYS = 5; // todo, change to 21 in production
 
 		// Options
 		public const OP_UNCATEGORIZED_DECK_GROUP_ID = 'sp_uncat_dkgrp_id';

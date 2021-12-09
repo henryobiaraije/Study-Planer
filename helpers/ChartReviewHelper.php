@@ -107,7 +107,7 @@ class ChartReviewHelper
         ];
     }
 
-    public static function get_forecast_all_answers_distinct_for_newly_learned($args)
+    public static function get_all_answers_newly_learned($args)
     {
         $default = [
             'user_id'         => 0,

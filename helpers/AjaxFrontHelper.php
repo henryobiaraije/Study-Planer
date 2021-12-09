@@ -72,6 +72,8 @@ class AjaxFrontHelper
         add_action('front_sp_ajax_front_get_single_deck_group', array($this, 'ajax_front_get_single_deck_group'));
         add_action('front_sp_ajax_front_record_study_log', array($this, 'ajax_front_record_study_log'));
         add_action('front_sp_ajax_front_load_stats_chart_added', array($this, 'ajax_front_load_stats_chart_added'));
+        add_action('front_sp_ajax_front_load_stats_chart_interval', array($this, 'ajax_front_load_stats_chart_interval'));
+        add_action('front_sp_ajax_front_load_stats_chart_answer_buttons', array($this, 'ajax_front_load_stats_chart_answer_buttons'));
     }
 
     /*** <editor-fold desc="Chart Stats"> **/
@@ -172,6 +174,56 @@ class AjaxFrontHelper
         //            'ajax_front_load_stats_chart_added',
         //            'post' => $post,
         //        ]);
+
+        $all  = $post[Common::VAR_2];
+        $span = sanitize_text_field($all['span']);
+        //        $span    = 'one_month';
+        $user_id = get_current_user_id();
+
+        $all = Study::get_user_stats_charts_added($user_id, $span);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_review_time',
+        //            'post'  => $post,
+        //            '$span' => $span,
+        //        ]);
+
+        Common::send_success('Charts added here', $all);
+
+
+    }
+
+    public function ajax_front_load_stats_chart_answer_buttons($post): void
+    {
+        Initializer::verify_post($post, true);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_chart_answer_buttons',
+        //            'post' => $post,
+        //        ]);
+
+        $all  = $post[Common::VAR_2];
+        $span = sanitize_text_field($all['span']);
+        //        $span    = 'one_month';
+        $user_id = get_current_user_id();
+
+        $all = Study::get_user_stats_charts_answer_buttons($user_id, $span);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_review_time',
+        //            'post'  => $post,
+        //            '$span' => $span,
+        //        ]);
+
+        Common::send_success('Charts added here', $all);
+
+
+    }
+
+    public function ajax_front_load_stats_chart_interval($post): void
+    {
+        Initializer::verify_post($post, true);
+        Common::send_error([
+            'ajax_front_load_stats_chart_interval',
+            'post' => $post,
+        ]);
 
         $all  = $post[Common::VAR_2];
         $span = sanitize_text_field($all['span']);
@@ -335,7 +387,14 @@ class AjaxFrontHelper
         $answered_as_new     = false;
         $answered_as_revised = false;
 
-        $_answered_before = Answered::where('card_id', '=', $card_id)->first();
+        //        $_answered_before = Answered
+        //            ::where('card_id', '=', $card_id)
+        //            ->
+        //            ->first();
+        $_answered_before = Answered
+            ::where('card_id', '=', $card_id)
+            ->where('study_id', '=', $study_id)
+            ->first();
         if (empty($_answered_before)) {
             $answered_as_new = true;
         } else {
