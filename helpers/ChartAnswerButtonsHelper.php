@@ -77,6 +77,7 @@ class ChartAnswerButtonsHelper
         //            '$args'                  => $args,
         //            'Manager::getQueryLog()' => Manager::getQueryLog(),
         //        ]);
+
         $answers = $user->get()->first()->studies->pluck('answers')->flatten();
         //        Common::send_error([
         //            __METHOD__,

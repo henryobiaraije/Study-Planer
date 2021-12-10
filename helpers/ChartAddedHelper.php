@@ -57,7 +57,7 @@ class ChartAddedHelper
                         Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
                         // Difference in days from today and due date
                         Manager::raw('DATEDIFF(DATE(next_due_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
-                        );
+                    );
                     $query->where('answered_as_new', '=', true);
                     if ($args['no_date_limit']) {
                         $query->where('next_due_at', '>=', $args['start_date']);
@@ -70,14 +70,20 @@ class ChartAddedHelper
                 $query->where('answered_as_new', '=', true);
             })
             ->where('ID', '=', $args['user_id']);
-        //        Common::send_error([
-        //            __METHOD__,
-        //            '$uuu sql'               => $user->toSql(),
-        //            //            '$uuu get'               => $user->get(),
-        //            '$args'                  => $args,
-        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
-        //        ]);
-        $answers = $user->get()->first()->studies->pluck('answers')->flatten();
+//        Common::send_error([
+//            __METHOD__,
+//            '$uuu sql'               => $user->toSql(),
+//            '$uuu get'               => $user->get(),
+//            'empty get'              => empty($user->get()->all()),
+//            '$args'                  => $args,
+//            'Manager::getQueryLog()' => Manager::getQueryLog(),
+//        ]);
+        if (empty($user->get()->all())) {
+            $answers = [];
+        } else {
+            $answers = $user->get()->first()->studies->pluck('answers')->flatten();
+        }
+
         //        Common::send_error([
         //            __METHOD__,
         //            '$uuu sql' => $user->toSql(),

@@ -61,8 +61,7 @@ class AjaxFrontHelper
     {
         add_action('front_sp_ajax_front_get_deck_groups', array($this, 'ajax_front_get_deck_groups'));
         add_action('front_sp_ajax_front_create_study', array($this, 'ajax_front_create_study'));
-        add_action('front_sp_ajax_front_get_today_questions_in_study',
-            array($this, 'ajax_front_get_today_questions_in_study'));
+        add_action('front_sp_ajax_front_get_today_questions_in_study', array($this, 'ajax_front_get_today_questions_in_study'));
         add_action('front_sp_ajax_admin_get_timezones', array($this, 'ajax_admin_get_timezones'));
         add_action('front_sp_ajax_admin_update_user_timezone', array($this, 'ajax_admin_update_user_timezone'));
         add_action('front_sp_ajax_front_mark_answer', array($this, 'ajax_front_mark_answer'));
@@ -220,17 +219,17 @@ class AjaxFrontHelper
     public function ajax_front_load_stats_chart_interval($post): void
     {
         Initializer::verify_post($post, true);
-        Common::send_error([
-            'ajax_front_load_stats_chart_interval',
-            'post' => $post,
-        ]);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_chart_interval',
+        //            'post' => $post,
+        //        ]);
 
         $all  = $post[Common::VAR_2];
         $span = sanitize_text_field($all['span']);
         //        $span    = 'one_month';
         $user_id = get_current_user_id();
 
-        $all = Study::get_user_stats_charts_added($user_id, $span);
+        $all = Study::get_user_stats_charts_intervals($user_id, $span);
         //        Common::send_error([
         //            'ajax_front_load_stats_review_time',
         //            'post'  => $post,

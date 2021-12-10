@@ -81,7 +81,7 @@ class ChartReviewHelper
                 //                ]);
             },
             'studies.answers.study',
-            'studies.answers.card'
+            'studies.answers.card',
         ])
             ->where('ID', '=', $args['user_id']);
         //        Common::send_error([
@@ -148,7 +148,7 @@ class ChartReviewHelper
                     //                ]);
                 },
                 'studies.answers.study',
-                'studies.answers.card'
+                'studies.answers.card',
             ])
             //            ->whereHas('studies.answers', function ($query) {
             //                $query
@@ -196,7 +196,11 @@ class ChartReviewHelper
                     $query->select('*',
                         // Difference in days from today and due date
                         Manager::raw('DATEDIFF(DATE(created_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
-                       );
+                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
+                        Manager::raw('TIMESTAMPDIFF(SECOND,TIMESTAMP(started_at),TIMESTAMP(created_at)) as time_diff_second_spent'),
+                        Manager::raw('TIMESTAMPDIFF(MINUTE,TIMESTAMP(started_at),TIMESTAMP(created_at)) as time_diff_minute_spent'),
+                        Manager::raw('TIMESTAMPDIFF(HOUR,TIMESTAMP(started_at),TIMESTAMP(created_at)) as time_diff_hours_spent'),
+                    );
                     if ($args['no_date_limit']) {
                         $query->where('created_at', '>=', $args['start_date']);
                     } else {
@@ -213,7 +217,7 @@ class ChartReviewHelper
                     //                ]);
                 },
                 'studies.answers.study',
-                'studies.answers.card'
+                'studies.answers.card',
             ])
             ->where('ID', '=', $args['user_id']);
         //        Common::send_error([
@@ -224,14 +228,14 @@ class ChartReviewHelper
         //            'Manager::getQueryLog()' => Manager::getQueryLog(),
         //        ]);
         $answers = $user->get()->first()->studies->pluck('answers')->flatten();
-        //        Common::send_error([
-        //            __METHOD__,
-        //            '$uuu sql' => $user->toSql(),
-        //            '$uuu get' => $user->get(),
-        //            '$args' => $args,
-        //            '$answers' => $answers,
-        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
-        //        ]);
+//        Common::send_error([
+//            __METHOD__,
+//            '$uuu sql'               => $user->toSql(),
+//            '$uuu get'               => $user->get(),
+//            '$args'                  => $args,
+//            '$answers'               => $answers,
+//            'Manager::getQueryLog()' => Manager::getQueryLog(),
+//        ]);
 
 
         return [
@@ -281,7 +285,7 @@ class ChartReviewHelper
                                 //                            '$q' => $q,
                                 //                        ]);
                             });
-                    }, 'deck', 'tags'
+                    }, 'deck', 'tags',
                 ])
                 ->whereHas('cards', function ($query) use ($deck, $user_id) {
                     $query

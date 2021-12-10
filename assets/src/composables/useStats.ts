@@ -89,6 +89,12 @@ interface _ChartAnswerButtons {
   m: Array<number>;
 }
 
+interface _ChartIntervalGraphable {
+  heading: Array<string>;
+  day_diffs: Array<number>;
+  day_diff_percentages: Array<number>;
+}
+
 export default function (status = 'publish') {
   const ajax = ref<_Ajax>({
     sending: false,
@@ -143,6 +149,7 @@ export default function (status = 'publish') {
   let statsReview = ref<_ReviewGraphable>(null);
   let statsReviewTime = ref<_ReviewGraphable>(null);
   let statsChartAdded = ref<_ChartAddedGraphable>(null);
+  let statsChartInterval = ref<_ChartIntervalGraphable>(null);
   let statsChartAnserButtons = ref<_ChartAnswerButtons>(null);
   let forecastSpan = ref('one_month');
   let reviewCountSpan = ref('one_month');
@@ -350,16 +357,16 @@ export default function (status = 'publish') {
       new Chart('sp-chart-chart-interval', {
         type: 'bar',
         data: {
-          labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
-          // labels: statsChartAdded.value.heading,
+          // labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          labels: statsChartInterval.value.heading,
           datasets: [
             {
               label: 'Percentage',
               type: 'line',
               yAxisID: "y-axis-2",
               backgroundColor: "#000000",
-              data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
-              // data: statsChartAdded.value.cumulative_new_cards,
+              // data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              data: statsChartInterval.value.day_diff_percentages,
               borderColor: '#000000',
               borderWidth: 2,
               tension: 0.5,
@@ -367,8 +374,8 @@ export default function (status = 'publish') {
             {
               yAxisID: 'y-axis-1',
               label: 'Cards',
-              // data: statsReviewTime.value.y_time,
-              data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+              data: statsChartInterval.value.day_diffs,
+              // data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
               backgroundColor: '#499c9c',
             },
           ],
@@ -1065,7 +1072,7 @@ export default function (status = 'publish') {
         },
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
-          statsChartAdded.value = done.data.graphable;
+          statsChartInterval.value = done.data.graphable;
           resolve(0);
         },
         funcFailue(done) {
@@ -1138,7 +1145,7 @@ export default function (status = 'publish') {
     forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime, _reloadChartAnswerButtons,
     _loadChartAnswerButtons,
     statsForecast, ajaxReview, statsReview, reviewCountSpan, reviewTimeSpan,
-    statsReviewTime, chartAddedTimeSpan, chartIntervalTimeSpan,statsChartAnserButtons,
+    statsReviewTime, chartAddedTimeSpan, chartIntervalTimeSpan, statsChartAnserButtons,
     _reloadChartAdded, _reloadChartInterval, statsChartAdded, chartAnswerButtonsTimeSpan,
   };
 

@@ -37,7 +37,7 @@ use function StudyPlanner\get_all_card_grades;
 class ChartIntervalHelper
 {
 
-    public static function get_all_answers_with_($args)
+    public static function get_all_answers_with_next_due_intervals($args)
     {
         $default = [
             'user_id'         => 0,
@@ -54,26 +54,31 @@ class ChartIntervalHelper
                 'studies.answers' => function ($query) use ($args) {
                     $query->select('*',
                         // If > 21, is matured Else young
+                        Manager::raw('COUNT(*) as day_diff_count'),
                         Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
-                        // Difference in days from today and due date
-                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
+                    // Difference in days from today and due date
+                    //                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
                     );
-                    $query->where('answered_as_new', '=', true);
                     if ($args['no_date_limit']) {
                         $query->where('next_due_at', '>=', $args['start_date']);
                     } else {
                         $query->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
                     }
+                    $query->groupBy('day_diff');
+                    //                    Common::send_error([
+                    //                        __METHOD__,
+                    //                        '$query sql'             => $query->toSql(),
+                    //                        '$uuu get'               => $query->get(),
+                    //                        '$query'                 => $query,
+                    //                        'Manager::getQueryLog()' => Manager::getQueryLog(),
+                    //                    ]);
                 },
             ])
-            ->whereHas('studies.answers', function ($query) use ($args) {
-                $query->where('answered_as_new', '=', true);
-            })
             ->where('ID', '=', $args['user_id']);
         //        Common::send_error([
         //            __METHOD__,
-        //            '$uuu sql'               => $user->toSql(),
-        //            //            '$uuu get'               => $user->get(),
+        //            '$user sql'              => $user->toSql(),
+        //            '$user get'              => $user->get(),
         //            '$args'                  => $args,
         //            'Manager::getQueryLog()' => Manager::getQueryLog(),
         //        ]);
