@@ -21,6 +21,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use StudyPlanner\Helpers\ChartAddedHelper;
 use StudyPlanner\Helpers\ChartAnswerButtonsHelper;
 use StudyPlanner\Helpers\ChartForecastHelper;
+use StudyPlanner\Helpers\ChartHourlyBreakDown;
 use StudyPlanner\Helpers\ChartIntervalHelper;
 use StudyPlanner\Helpers\ChartReviewHelper;
 use StudyPlanner\Libs\Common;
@@ -404,6 +405,125 @@ class Study extends Model {
             'graphable' => $graphable,
         ];
 
+
+    }
+
+    public static function get_user_stats_charts_hourly_breakdown($user_id, $date) {
+        $measure_start_time = microtime(true);
+        //        $matured_cards = self::get_user_matured_card_ids($user_id);
+        $graphable = [
+            'heading'  => [],
+            'learning' => [],
+            'y'        => [],
+            'm'        => [],
+        ];
+
+        $forecast_all_answers_within_a_date = ChartHourlyBreakDown::get_all_answers_hourly_break_down([
+            'user_id' => $user_id,
+            'date'    => $date,
+        ])['answers'];
+
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //        ]);
+        $all_is_learning = [];
+        foreach ($forecast_all_answers_within_a_date as $answer) {
+            //            $day_diff_today   = $answer->day_diff_today;
+            $day_dif          = $answer->day_diff;
+            $grade            = $answer->grade;
+            $is_learning_card = in_array($answer->id, $all_learning_answer_ids);
+            $is_matured       = $day_dif >= $matured_day_no;
+
+            $_key = 'm';
+            if ($is_matured) {
+                $_key = 'm';
+            } elseif ($is_learning_card) {
+                $_key = 'learning';
+            } else {
+                // Is young
+                $_key = 'y';
+            }
+
+            $all_is_learning[] = [
+                '$is_learning_card'        => $is_learning_card,
+                '$answer'                  => $answer,
+                '$answer->card_id'         => $answer->card_id,
+                '$all_learning_answer_ids' => $all_learning_answer_ids,
+                '$is_matured'              => $is_matured,
+            ];
+
+            $days[$_key][$grade]++;
+            $days[$_key]['total']++;
+            if (!in_array($answer->grade, ['again', 'hold'])) {
+                $days[$_key]['total_correct']++;
+            }
+
+            //            if ($day_dif >= $matured_day_no) {
+            //                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+            //                $days[$day_diff_today]['m']['1_again']++;
+            //                $days[$day_diff_today]['m']['answers'][] = $answer;
+            //            }
+
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+            //                '$is_learning_card'                   => $is_learning_card,
+            //                '$answer'                             => $answer,
+            //                '$day_diff_today'                     => $day_diff_today,
+            //                '$all_learning_cards'                 => $all_learning_cards_id,
+            //                '$days'                               => $days,
+            //                '$answer->card_id'                    => $answer->card_id,
+            //                'type'                                => gettype($all_learning_cards_id),
+            //                '$grade'                              => $grade,
+            //                '$all_answers_newly_learned'          => $all_answers_newly_learned,
+            //                '$_start_date'                        => $_start_date,
+            //                '$_end_date'                          => $_end_date,
+            //            ]);
+
+        }
+
+        $graphable['learning']               = [
+            $days['learning']['again'],
+            $days['learning']['hard'],
+            $days['learning']['good'],
+            $days['learning']['easy'],
+        ];
+        $graphable['m']                      = [
+            $days['m']['again'],
+            $days['m']['hard'],
+            $days['m']['good'],
+            $days['m']['easy'],
+        ];
+        $graphable['y']                      = [
+            $days['y']['again'],
+            $days['y']['hard'],
+            $days['y']['good'],
+            $days['y']['easy'],
+        ];
+        $days['learning']['correct_percent'] =
+            number_format((($days['learning']['total_correct'] / $days['learning']['total']) * 100), 2);
+        $days['y']['correct_percent']        =
+            number_format((($days['y']['total_correct'] / $days['y']['total']) * 100), 2);
+        $days['m']['correct_percent']        =
+            number_format((($days['m']['total_correct'] / $days['m']['total']) * 100), 2);
+        $graphable['days']                   = $days;
+
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$forecast_all_answers_within_a_date'   => $forecast_all_answers_within_a_date,
+        //            '$days'                                 => $days,
+        //            '$all_learning_answer_ids'              => $all_learning_answer_ids,
+        //            '$all_is_learning'                      => $all_is_learning,
+        //            '$all_answers_newly_learned'            => $all_answers_newly_learned,
+        //            '$matured_day_no'                       => $matured_day_no,
+        //            '$graphable'                            => $graphable,
+        //            '$forecast_all_answers_within_a_date 0' => $forecast_all_answers_within_a_date[0],
+        //        ]);
+
+        return [
+            'graphable' => $graphable,
+        ];
 
     }
 

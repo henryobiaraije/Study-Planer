@@ -34,19 +34,16 @@ use function StudyPlanner\get_all_card_grades;
  *
  * @package StudyPlanner\Helpers
  */
-class AjaxFrontHelper
-{
+class AjaxFrontHelper {
     /**
      * @var self $instance
      */
     private static $instance;
 
-    private function __construct()
-    {
+    private function __construct() {
     }
 
-    public static function get_instance(): self
-    {
+    public static function get_instance(): self {
         if (self::$instance) {
             return self::$instance;
         }
@@ -57,8 +54,7 @@ class AjaxFrontHelper
         return self::$instance;
     }
 
-    private function init_ajax()
-    {
+    private function init_ajax() {
         add_action('front_sp_ajax_front_get_deck_groups', array($this, 'ajax_front_get_deck_groups'));
         add_action('front_sp_ajax_front_create_study', array($this, 'ajax_front_create_study'));
         add_action('front_sp_ajax_front_get_today_questions_in_study', array($this, 'ajax_front_get_today_questions_in_study'));
@@ -73,12 +69,12 @@ class AjaxFrontHelper
         add_action('front_sp_ajax_front_load_stats_chart_added', array($this, 'ajax_front_load_stats_chart_added'));
         add_action('front_sp_ajax_front_load_stats_chart_interval', array($this, 'ajax_front_load_stats_chart_interval'));
         add_action('front_sp_ajax_front_load_stats_chart_answer_buttons', array($this, 'ajax_front_load_stats_chart_answer_buttons'));
+        add_action('front_sp_ajax_front_load_stats_hourly_breakdown', array($this, 'ajax_front_load_stats_hourly_breakdown'));
     }
 
     /*** <editor-fold desc="Chart Stats"> **/
 
-    public function ajax_front_record_study_log($post): void
-    {
+    public function ajax_front_record_study_log($post): void {
         Initializer::verify_post($post, true);
         //        Common::send_error([
         //            'ajax_front_record_study_log',
@@ -142,8 +138,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_load_stats_forecast($post): void
-    {
+    public function ajax_front_load_stats_forecast($post): void {
         Initializer::verify_post($post, true);
         //			Common::send_error( [
         //				'ajax_front_load_stats_forecast',
@@ -166,8 +161,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_load_stats_chart_added($post): void
-    {
+    public function ajax_front_load_stats_chart_added($post): void {
         Initializer::verify_post($post, true);
         //        Common::send_error([
         //            'ajax_front_load_stats_chart_added',
@@ -191,8 +185,31 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_load_stats_chart_answer_buttons($post): void
-    {
+    public function ajax_front_load_stats_hourly_breakdown($post): void {
+        Initializer::verify_post($post, true);
+        //        Common::send_error([
+        //            'front_sp_ajax_front_load_stats_hourly_breakdown',
+        //            'post' => $post,
+        //        ]);
+
+        $all  = $post[Common::VAR_2];
+        $date = sanitize_text_field($all['date']);
+        //        $span    = 'one_month';
+        $user_id = get_current_user_id();
+
+        $all = Study::get_user_stats_charts_hourly_breakdown($user_id, $date);
+        Common::send_error([
+            'ajax_front_load_stats_review_time',
+            'post'  => $post,
+            '$date' => $date,
+        ]);
+
+        Common::send_success('Charts added here', $all);
+
+
+    }
+
+    public function ajax_front_load_stats_chart_answer_buttons($post): void {
         Initializer::verify_post($post, true);
         //        Common::send_error([
         //            'ajax_front_load_stats_chart_answer_buttons',
@@ -216,8 +233,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_load_stats_chart_interval($post): void
-    {
+    public function ajax_front_load_stats_chart_interval($post): void {
         Initializer::verify_post($post, true);
         //        Common::send_error([
         //            'ajax_front_load_stats_chart_interval',
@@ -241,8 +257,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_load_stats_review_time($post): void
-    {
+    public function ajax_front_load_stats_review_time($post): void {
         Initializer::verify_post($post, true);
         //        Common::send_error([
         //            'ajax_front_load_stats_review_time',
@@ -270,8 +285,7 @@ class AjaxFrontHelper
 
     // <editor-fold desc="Gap Cards">
 
-    public function ajax_front_mark_answer_on_hold($post): void
-    {
+    public function ajax_front_mark_answer_on_hold($post): void {
         Initializer::verify_post($post);
         //			Common::send_error( [
         //				__METHOD__,
@@ -347,8 +361,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_mark_answer($post): void
-    {
+    public function ajax_front_mark_answer($post): void {
         Initializer::verify_post($post);
         //			Common::send_error( [
         //				__METHOD__,
@@ -488,8 +501,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_get_today_questions_in_study($post): void
-    {
+    public function ajax_front_get_today_questions_in_study($post): void {
         //			Common::send_error( [
         //				'ajax_front_get_question',
         //				'post' => $post,
@@ -555,8 +567,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_create_study($post): void
-    {
+    public function ajax_front_create_study($post): void {
         //			Common::send_error( [
         //				'ajax_front_create_study',
         //				'post' => $post,
@@ -666,8 +677,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_get_single_deck_group($post): void
-    {
+    public function ajax_front_get_single_deck_group($post): void {
 
         //			Common::send_error( [
         //				'ajax_front_get_single_deck_group',
@@ -699,8 +709,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_front_get_deck_groups($post): void
-    {
+    public function ajax_front_get_deck_groups($post): void {
         //			Common::send_error( [
         //				'ajax_admin_load_deck_group',
         //				'post' => $post,
@@ -750,8 +759,7 @@ class AjaxFrontHelper
     // </editor-fold desc="Gap Cards">
 
     // <editor-fold desc="Others">
-    public function ajax_admin_update_user_timezone($post): void
-    {
+    public function ajax_admin_update_user_timezone($post): void {
         Initializer::verify_post($post, true);
 
         //			Common::send_error( [
@@ -771,8 +779,7 @@ class AjaxFrontHelper
 
     }
 
-    public function ajax_admin_get_timezones($post): void
-    {
+    public function ajax_admin_get_timezones($post): void {
         Initializer::verify_post($post, true);
         $user_id       = get_current_user_id();
         $user_timezone = get_user_meta($user_id, Settings::UM_USER_TIMEZONE, true);

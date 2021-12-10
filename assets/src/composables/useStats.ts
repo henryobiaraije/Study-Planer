@@ -145,22 +145,117 @@ export default function (status = 'publish') {
     success: false,
     successMessage: '',
   });
+  const ajaxHourlyBreakdown = reactive<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
+    successMessage: '',
+  });
   let statsForecast = ref<_ForecastGraphable>(null);
   let statsReview = ref<_ReviewGraphable>(null);
   let statsReviewTime = ref<_ReviewGraphable>(null);
   let statsChartAdded = ref<_ChartAddedGraphable>(null);
   let statsChartInterval = ref<_ChartIntervalGraphable>(null);
   let statsChartAnserButtons = ref<_ChartAnswerButtons>(null);
+  let statsHourlyBreakdown = ref<_ChartAnswerButtons>(null);
   let forecastSpan = ref('one_month');
   let reviewCountSpan = ref('one_month');
   let reviewTimeSpan = ref('one_month');
   let chartAddedTimeSpan = ref('one_month');
   let chartIntervalTimeSpan = ref('one_month');
   let chartAnswerButtonsTimeSpan = ref('one_month');
+  let chartHourlyBreakdownDate = ref('');
   const colorLearning = '#4848bf';
   const colorYoung = '#9cd89c';
   const colorMature = '#2f622e';
+  const colorDack = '#484848';
+  const colorGray = '#a5a5a5';
 
+  const _initChartHourlyBreakdown = () => {
+    setTimeout(() => {
+      new Chart('sp-chart-chart-hourly-breakdown', {
+        type: 'bar',
+        data: {
+          labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          // labels: statsForecast.value.heading,
+          datasets: [
+            // {
+            //   type: 'line',
+            //   label: 'Cummulative',
+            //   yAxisID: "y-axis-2",
+            //   backgroundColor: "#000",
+            //   data: [0, 30, 62, 100, 100, 100, 114, 77, 57, 54, 10, 10],
+            //   // data: statsForecast.value.cumulative,
+            //   borderColor: '#000',
+            //   borderWidth: 2,
+            //   tension: 0.5,
+            // },
+            {
+              label: 'Answers',
+              type: 'bar',
+              yAxisID: "y-axis-1",
+              data: [5, 2, 7, 9, 35, 34, 12, 45, 21, 31, 34, 5],
+              // data: statsForecast.value.y,
+              backgroundColor: colorGray,
+              // borderColor: '#8cbf8c',
+              // barThickness: 10,
+              categoryPercentage: 0.3,
+              // borderWidth: 2
+            },
+            {
+              label: '% Correct',
+              // barThickness: 10,
+              type: 'bar',
+              yAxisID: "y-axis-1",
+              data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+              // data: statsForecast.value.m,
+              backgroundColor: colorDack,
+              // borderColor: '#2f622e',
+              // borderWidth: 2
+            },
+
+          ],
+        },
+        options: {
+          responsive: true,
+          elements: {
+            point: {
+              radius: 0
+            }
+          },
+          scales: {
+            //@ts-ignore
+            "y-axis-1": {
+              position: 'left',
+              type: 'linear',
+              title: {
+                display: true,
+                text: '% Correct',
+              },
+              // beginAtZero: true,
+              // stacked: true
+            },
+            "y-axis-2": {
+              position: 'right',
+              type: 'linear',
+              title: {
+                display: true,
+                text: 'Reviews',
+              },
+            },
+            x: {
+              stacked: true,
+            },
+            // y: {
+            //     // stacked: true,
+            //     beginAtZero: true,
+            // }
+          },
+        }
+      });
+    }, 500);
+  }
   const _initChartAnswerButtons = () => {
     setTimeout(() => {
       new Chart('sp-chart-chart-answer-buttons', {
@@ -965,6 +1060,14 @@ export default function (status = 'publish') {
       _initChartAnswerButtons();
     });
   }
+  const _loadChartHourlyBreakDown = () => {
+    xhrLoadHourlyBreakDown().then((res) => {
+      _initChartHourlyBreakdown();
+    }).catch(() => {
+      // todo remove later
+      _initChartHourlyBreakdown();
+    });
+  }
 
   const _loadAllStats = () => {
     _loadForecast();
@@ -973,6 +1076,7 @@ export default function (status = 'publish') {
     _loadChartAdded();
     _loadChartIntervals();
     _loadChartAnswerButtons();
+    _loadChartHourlyBreakDown();
   }
 
   const xhrLoadForecast = () => {
@@ -1137,16 +1241,45 @@ export default function (status = 'publish') {
       });
     });
   };
+  const xhrLoadHourlyBreakDown = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxHourlyBreakdown);
+    return new Promise((resolve, reject) => {
+      new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            date: chartHourlyBreakdownDate.value,
+          }
+        ],
+        what: "front_sp_ajax_front_load_stats_hourly_breakdown",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          statsHourlyBreakdown.value = done.data.graphable;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.stop();
+          // handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
 
   return {
     ajax, ajaxForecast, ajaxReviewTime, ajaxChartAdded, ajaxChartInterval,
-    ajaxChartAnswerButtons,
+    ajaxChartAnswerButtons, ajaxHourlyBreakdown,
     _loadAllStats, _loadForecast,
     forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime, _reloadChartAnswerButtons,
-    _loadChartAnswerButtons,
+    _loadChartAnswerButtons, _loadChartHourlyBreakDown,
     statsForecast, ajaxReview, statsReview, reviewCountSpan, reviewTimeSpan,
     statsReviewTime, chartAddedTimeSpan, chartIntervalTimeSpan, statsChartAnserButtons,
+    statsHourlyBreakdown,
     _reloadChartAdded, _reloadChartInterval, statsChartAdded, chartAnswerButtonsTimeSpan,
+    chartHourlyBreakdownDate,
   };
 
 }

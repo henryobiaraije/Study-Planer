@@ -7,6 +7,26 @@
     <div class="stats-forecast ">
         <div class="stats-body">
 
+            <?php /**** Hourly breakdown  *****/ ?>
+            <div class="one-chart  shadow p-2 m-2 mb-4 rounded" >
+                <h4 class="text-center m-0 bold font-bold fs-4">Howly Breackdown</h4>
+                <p class="text-center m-0 mb-2">Review success rate for each hour of the day.</p>
+                <div v-if="!useStats.ajaxHourlyBreakdown.sending">
+                    <form @submit.prevent="useStats._reloadChartAnswerButtons" class="select-month text-center mb-2 sp-slide-in">
+                        <label class="m-2 cursor-pointer border-1 border-gray-300 py-2 px-4 rounded">
+                            <span class="font-bold">Select a date:</span>
+                            <input @change="useStats._loadChartHourlyBreakDown" v-model="useStats.chartHourlyBreakdownDate.value"
+                                   class="border-1  px-2 border-gray-500"
+                                   name="forecast_span" value="one_month" type="date"></label>
+                    </form>
+                    <div v-show="useStats.chartHourlyBreakdownDate.value.length > 3" class="chart-review-time" style="min-height: 350px">
+                        <canvas class="m-auto" id="sp-chart-chart-hourly-breakdown" style="width:100%;max-width:700px"></canvas>
+                    </div>
+                </div>
+                <div v-if="useStats.ajaxHourlyBreakdown.sending" style="text-align: center;flex: 12;font-size: 50px;"><i
+                            class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
             <?php /**** Answer Buttons  *****/ ?>
             <div class="one-chart  shadow p-2 m-2 mb-4 rounded" style="min-height: 350px">
                 <h4 class="text-center m-0 bold font-bold fs-4">Answer Buttons</h4>
