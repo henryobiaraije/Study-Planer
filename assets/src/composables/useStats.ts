@@ -95,6 +95,12 @@ interface _ChartIntervalGraphable {
   day_diff_percentages: Array<number>;
 }
 
+interface _ChartHourlyBreakdownGraphable {
+  heading: Array<string>;
+  answers_per_hour: Array<number>;
+  percentage_correct: Array<number>;
+}
+
 export default function (status = 'publish') {
   const ajax = ref<_Ajax>({
     sending: false,
@@ -158,7 +164,7 @@ export default function (status = 'publish') {
   let statsChartAdded = ref<_ChartAddedGraphable>(null);
   let statsChartInterval = ref<_ChartIntervalGraphable>(null);
   let statsChartAnserButtons = ref<_ChartAnswerButtons>(null);
-  let statsHourlyBreakdown = ref<_ChartAnswerButtons>(null);
+  let statsHourlyBreakdown = ref<_ChartHourlyBreakdownGraphable>(null);
   let forecastSpan = ref('one_month');
   let reviewCountSpan = ref('one_month');
   let reviewTimeSpan = ref('one_month');
@@ -174,11 +180,12 @@ export default function (status = 'publish') {
 
   const _initChartHourlyBreakdown = () => {
     setTimeout(() => {
+      console.log('Using _initChartHourlyBreakdown',statsHourlyBreakdown.value.answers_per_hour);
       new Chart('sp-chart-chart-hourly-breakdown', {
         type: 'bar',
         data: {
-          labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
-          // labels: statsForecast.value.heading,
+          // labels: ["13:30", "13:40", "13:50", "14:00", "14:10", "14:20", "14:30", "14:40", "14:50", "15:00", "15:10", "15:20"],
+          labels: statsHourlyBreakdown.value.heading,
           datasets: [
             // {
             //   type: 'line',
@@ -195,8 +202,8 @@ export default function (status = 'publish') {
               label: 'Answers',
               type: 'bar',
               yAxisID: "y-axis-1",
-              data: [5, 2, 7, 9, 35, 34, 12, 45, 21, 31, 34, 5],
-              // data: statsForecast.value.y,
+              // data: [5, 2, 7, 9, 35, 34, 12, 45, 21, 31, 34, 5],
+              data: statsHourlyBreakdown.value.answers_per_hour,
               backgroundColor: colorGray,
               // borderColor: '#8cbf8c',
               // barThickness: 10,
@@ -208,8 +215,8 @@ export default function (status = 'publish') {
               // barThickness: 10,
               type: 'bar',
               yAxisID: "y-axis-1",
-              data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
-              // data: statsForecast.value.m,
+              // data: [2, 0, 3, 7, 11, 13, 8, 44, 35, 3, 46, 1],
+              data: statsHourlyBreakdown.value.percentage_correct,
               backgroundColor: colorDack,
               // borderColor: '#2f622e',
               // borderWidth: 2

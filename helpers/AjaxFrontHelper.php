@@ -198,13 +198,13 @@ class AjaxFrontHelper {
         $user_id = get_current_user_id();
 
         $all = Study::get_user_stats_charts_hourly_breakdown($user_id, $date);
-        Common::send_error([
-            'ajax_front_load_stats_review_time',
-            'post'  => $post,
-            '$date' => $date,
-        ]);
+//        Common::send_error([
+//            'ajax_front_load_stats_review_time',
+//            'post'  => $post,
+//            '$date' => $date,
+//        ]);
 
-        Common::send_success('Charts added here', $all);
+        Common::send_success('Charts hourly breackdown here', $all);
 
 
     }

@@ -50,34 +50,147 @@ class ChartHourlyBreakDown {
             ::with([
                 'studies.answers' => function ($query) use ($args, $midnight) {
                     $query->select('*',
+                        Manager::raw('COUNT(hour(created_at)) as the_hour_count'),
+                        Manager::raw('hour(created_at) as the_hour'),
                         // If > 21, is matured Else young
                         Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
                     );
                     $query->whereBetween('created_at', [$args['date'], $midnight]);
-                    Common::send_error([
-                        __METHOD__,
-                        '$query getBindings'     => $query->getBindings(),
-                        '$query sql'             => $query->toSql(),
-                        '$query get'             => $query->get(),
-                        '$args'                  => $args,
-                        '$midnight'              => $midnight,
-                        'Manager::getQueryLog()' => Manager::getQueryLog(),
-                    ]);
+                    $query->groupBy(Manager::raw('hour(created_at)'));
+                    $query->groupBy(Manager::raw('day(created_at)'));
+                    //                    Common::send_error([
+                    //                        __METHOD__,
+                    //                        '$query getBindings'     => $query->getBindings(),
+                    //                        '$query sql'             => $query->toSql(),
+                    //                        '$query get'             => $query->get(),
+                    //                        '$args'                  => $args,
+                    //                        '$midnight'              => $midnight,
+                    //                        'Manager::getQueryLog()' => Manager::getQueryLog(),
+                    //                    ]);
                 },
             ])
+            ->whereHas('studies', function ($query) use ($args, $midnight) {
+                $query
+                    ->whereHas('answers', function ($query) use ($args, $midnight) {
+                        $query->select('*',
+                            Manager::raw('COUNT(hour(created_at)) as the_hour_count'),
+                            Manager::raw('hour(created_at) as the_hour'),
+                            // If > 21, is matured Else young
+                            Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
+                        );
+                        $query->whereBetween('created_at', [$args['date'], $midnight]);
+                        $query->groupBy(Manager::raw('hour(created_at)'));
+                        $query->groupBy(Manager::raw('day(created_at)'));
+                        //                    Common::send_error([
+                        //                        __METHOD__,
+                        //                        '$query getBindings'     => $query->getBindings(),
+                        //                        '$query sql'             => $query->toSql(),
+                        //                        '$query get'             => $query->get(),
+                        //                        '$args'                  => $args,
+                        //                        '$midnight'              => $midnight,
+                        //                        'Manager::getQueryLog()' => Manager::getQueryLog(),
+                        //                    ]);
+                    });
+            })
             //            ->whereHas('studies.answers', function ($query) use ($args) {
             //
             //            })
             ->where('ID', '=', $args['user_id']);
-        Common::send_error([
-            __METHOD__,
-            '$uuu sql'               => $user->toSql(),
-            '$uuu get'               => $user->get(),
-            '$args'                  => $args,
-            'Manager::getQueryLog()' => Manager::getQueryLog(),
-        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$uuu sql'               => $user->toSql(),
+        //            '$uuu get'               => $user->get(),
+        //            '$args'                  => $args,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
 
-        $answers = $user->get()->first()->studies->pluck('answers')->flatten();
+        if (empty($user->get()->all())) {
+            $answers = [];
+        } else {
+            $answers = $user->get()->first()->studies->pluck('answers')->flatten();
+        }
+
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$uuu sql' => $user->toSql(),
+        //            '$uuu get' => $user->get(),
+        //            '$args' => $args,
+        //            '$answers' => $answers,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
+
+
+        return [
+            'answers' => $answers,
+        ];
+    }
+
+    public static function get_all_answers_hourly_break_down_with_grades($args) {
+        //todo maybe rewrite later and use sql totally
+        $default  = [
+            'user_id' => 0,
+            'date'    => '',
+        ];
+        $args     = wp_parse_args($args, $default);
+        $midnight = new DateTime($args['date']);
+        $midnight->setTime(23, 59, 59);
+        $midnight = $midnight->format('Y-m-d H:i:s');
+        $user     = User
+            ::with([
+                'studies.answers' => function ($query) use ($args, $midnight) {
+                    $query->select('*',
+                        Manager::raw('COUNT(hour(created_at)) as the_hour_count'),
+                        Manager::raw('hour(created_at) as the_hour'),
+                        Manager::raw('COUNT(grade) as grade_count'),
+                        // If > 21, is matured Else young
+                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
+                    );
+                    $query->whereBetween('created_at', [$args['date'], $midnight]);
+                    $query->groupBy(Manager::raw('grade'));
+                    $query->groupBy(Manager::raw('hour(created_at)'));
+                    $query->groupBy(Manager::raw('day(created_at)'));
+                    //                    Common::send_error([
+                    //                        __METHOD__,
+                    //                        '$query getBindings'     => $query->getBindings(),
+                    //                        '$query sql'             => $query->toSql(),
+                    //                        '$query get'             => $query->get(),
+                    //                        '$args'                  => $args,
+                    //                        '$midnight'              => $midnight,
+                    //                        'Manager::getQueryLog()' => Manager::getQueryLog(),
+                    //                    ]);
+                },
+            ])
+            ->whereHas('studies', function ($query) use ($args, $midnight) {
+                $query
+                    ->whereHas('answers', function ($query) use ($args, $midnight) {
+                        $query->select('*',
+                            Manager::raw('COUNT(hour(created_at)) as the_hour_count'),
+                            Manager::raw('hour(created_at) as the_hour'),
+                            Manager::raw('COUNT(grade) as grade_count'),
+                            // If > 21, is matured Else young
+                            Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
+                        );
+                        $query->whereBetween('created_at', [$args['date'], $midnight]);
+                        $query->groupBy(Manager::raw('grade'));
+                        $query->groupBy(Manager::raw('hour(created_at)'));
+                        $query->groupBy(Manager::raw('day(created_at)'));
+                    });
+            })
+            ->where('ID', '=', $args['user_id']);
+        //                Common::send_error([
+        //                    __METHOD__,
+        //                    '$uuu sql'               => $user->toSql(),
+        //                    '$uuu get'               => $user->get(),
+        //                    '$args'                  => $args,
+        //                    'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //                ]);
+
+        if (empty($user->get()->all())) {
+            $answers = [];
+        } else {
+            $answers = $user->get()->first()->studies->pluck('answers')->flatten();
+        }
+
         //        Common::send_error([
         //            __METHOD__,
         //            '$uuu sql' => $user->toSql(),

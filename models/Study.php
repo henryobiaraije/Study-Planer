@@ -412,13 +412,28 @@ class Study extends Model {
         $measure_start_time = microtime(true);
         //        $matured_cards = self::get_user_matured_card_ids($user_id);
         $graphable = [
-            'heading'  => [],
-            'learning' => [],
-            'y'        => [],
-            'm'        => [],
+            'heading'            => [
+                '12am', '1am', '2am', '3am', '4am', '5am', '6am', '7am', '8am', '9am', '10am', '11am', '12pm',
+                '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm',
+            ],
+            'answers_per_hour'   => [],
+            'percentage_correct' => [],
         ];
+        $days      = [];
+        for ($a = 0; $a < 24; $a++) {
+            $days[] = [
+                'hour'               => $a,
+                'count'              => 0,
+                'percentage_correct' => 0,
+            ];
+        }
 
-        $forecast_all_answers_within_a_date = ChartHourlyBreakDown::get_all_answers_hourly_break_down([
+        $all_answers_hourly_break_down = ChartHourlyBreakDown::get_all_answers_hourly_break_down([
+            'user_id' => $user_id,
+            'date'    => $date,
+        ])['answers'];
+
+        $all_answers_hourly_break_down_with_grades = ChartHourlyBreakDown::get_all_answers_hourly_break_down_with_grades([
             'user_id' => $user_id,
             'date'    => $date,
         ])['answers'];
@@ -426,99 +441,46 @@ class Study extends Model {
         //        Common::send_error([
         //            __METHOD__,
         //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //            '$days'                               => $days,
         //        ]);
-        $all_is_learning = [];
-        foreach ($forecast_all_answers_within_a_date as $answer) {
+
+        $total_answers_in_all_hours = 0;
+        $total_correct              = 0;
+        foreach ($all_answers_hourly_break_down as $answer) {
             //            $day_diff_today   = $answer->day_diff_today;
-            $day_dif          = $answer->day_diff;
-            $grade            = $answer->grade;
-            $is_learning_card = in_array($answer->id, $all_learning_answer_ids);
-            $is_matured       = $day_dif >= $matured_day_no;
-
-            $_key = 'm';
-            if ($is_matured) {
-                $_key = 'm';
-            } elseif ($is_learning_card) {
-                $_key = 'learning';
-            } else {
-                // Is young
-                $_key = 'y';
+            $the_hour_count             = $answer->the_hour_count;
+            $grade                      = $answer->grade;
+            $the_hour                   = $answer->the_hour;
+            $total_answers_in_all_hours += $the_hour_count;
+            $days[$the_hour]['hour']    = $the_hour;
+            $days[$the_hour]['count']   = $the_hour_count;
+            if (in_array($grade, ['hard', 'good', 'easy'])) {
+                $total_correct += $the_hour_count;
             }
-
-            $all_is_learning[] = [
-                '$is_learning_card'        => $is_learning_card,
-                '$answer'                  => $answer,
-                '$answer->card_id'         => $answer->card_id,
-                '$all_learning_answer_ids' => $all_learning_answer_ids,
-                '$is_matured'              => $is_matured,
-            ];
-
-            $days[$_key][$grade]++;
-            $days[$_key]['total']++;
-            if (!in_array($answer->grade, ['again', 'hold'])) {
-                $days[$_key]['total_correct']++;
-            }
-
-            //            if ($day_dif >= $matured_day_no) {
-            //                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
-            //                $days[$day_diff_today]['m']['1_again']++;
-            //                $days[$day_diff_today]['m']['answers'][] = $answer;
-            //            }
-
             //            Common::send_error([
             //                __METHOD__,
-            //                '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
-            //                '$is_learning_card'                   => $is_learning_card,
+            //                '$the_hour_count'                     => $the_hour_count,
+            //                '$the_hour'                           => $the_hour,
             //                '$answer'                             => $answer,
-            //                '$day_diff_today'                     => $day_diff_today,
-            //                '$all_learning_cards'                 => $all_learning_cards_id,
-            //                '$days'                               => $days,
-            //                '$answer->card_id'                    => $answer->card_id,
-            //                'type'                                => gettype($all_learning_cards_id),
-            //                '$grade'                              => $grade,
-            //                '$all_answers_newly_learned'          => $all_answers_newly_learned,
-            //                '$_start_date'                        => $_start_date,
-            //                '$_end_date'                          => $_end_date,
+            //                '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
             //            ]);
-
         }
 
-        $graphable['learning']               = [
-            $days['learning']['again'],
-            $days['learning']['hard'],
-            $days['learning']['good'],
-            $days['learning']['easy'],
-        ];
-        $graphable['m']                      = [
-            $days['m']['again'],
-            $days['m']['hard'],
-            $days['m']['good'],
-            $days['m']['easy'],
-        ];
-        $graphable['y']                      = [
-            $days['y']['again'],
-            $days['y']['hard'],
-            $days['y']['good'],
-            $days['y']['easy'],
-        ];
-        $days['learning']['correct_percent'] =
-            number_format((($days['learning']['total_correct'] / $days['learning']['total']) * 100), 2);
-        $days['y']['correct_percent']        =
-            number_format((($days['y']['total_correct'] / $days['y']['total']) * 100), 2);
-        $days['m']['correct_percent']        =
-            number_format((($days['m']['total_correct'] / $days['m']['total']) * 100), 2);
-        $graphable['days']                   = $days;
+        foreach ($days as $key => $value) {
+            $percentage_correct               = ($total_correct < 1) ? 0 : ($value['count'] / $total_correct) * 100;
+            $days[$key]['percentage_correct'] = $percentage_correct;
+        }
+        foreach ($days as $key => $value) {
+            $graphable['answers_per_hour'][]   = $value['count'];
+            $graphable['percentage_correct'][] = $value['percentage_correct'];
+        }
 
         //        Common::send_error([
         //            __METHOD__,
-        //            '$forecast_all_answers_within_a_date'   => $forecast_all_answers_within_a_date,
-        //            '$days'                                 => $days,
-        //            '$all_learning_answer_ids'              => $all_learning_answer_ids,
-        //            '$all_is_learning'                      => $all_is_learning,
-        //            '$all_answers_newly_learned'            => $all_answers_newly_learned,
-        //            '$matured_day_no'                       => $matured_day_no,
-        //            '$graphable'                            => $graphable,
-        //            '$forecast_all_answers_within_a_date 0' => $forecast_all_answers_within_a_date[0],
+        //            '$days'                                      => $days,
+        //            '$all_answers_hourly_break_down'             => $all_answers_hourly_break_down,
+        //            '$all_answers_hourly_break_down_with_grades' => $all_answers_hourly_break_down_with_grades,
+        //            '$graphable'                                 => $graphable,
         //        ]);
 
         return [
@@ -691,12 +653,12 @@ class Study extends Model {
             $days['y']['good'],
             $days['y']['easy'],
         ];
-        $days['learning']['correct_percent'] =
-            number_format((($days['learning']['total_correct'] / $days['learning']['total']) * 100), 2);
-        $days['y']['correct_percent']        =
-            number_format((($days['y']['total_correct'] / $days['y']['total']) * 100), 2);
-        $days['m']['correct_percent']        =
-            number_format((($days['m']['total_correct'] / $days['m']['total']) * 100), 2);
+        $learning_correct_percent            = ($days['learning']['total'] < 1) ? 0 : ($days['learning']['total_correct'] / $days['learning']['total']) * 100;
+        $y_correct_percent                   = ($days['y']['total'] < 1) ? 0 : ($days['y']['total_correct'] / $days['y']['total']) * 100;
+        $m_correct_percent                   = ($days['m']['total'] < 1) ? 0 : ($days['m']['total_correct'] / $days['m']['total']) * 100;
+        $days['learning']['correct_percent'] = number_format(($learning_correct_percent), 2);
+        $days['y']['correct_percent']        = number_format($y_correct_percent, 2);
+        $days['m']['correct_percent']        = number_format($m_correct_percent, 2);
         $graphable['days']                   = $days;
 
         //        Common::send_error([
@@ -1328,7 +1290,7 @@ class Study extends Model {
             '$total_time_hours' => "$total_time_hours",
         ], true);
         $average_if_studied_per_day = ($total_answers_count / $total_no_of_days);
-        $average                    = $total_answers_count / $total_days_studied;
+        $average                    = ($total_days_studied < 1) ? 0 : $total_answers_count / $total_days_studied;
         self::add_debug('Average for days studied', [
             '$total_answers_count / $total_days_studied' =>
                 "($total_answers_count / $total_days_studied)  = $average",
@@ -1337,19 +1299,19 @@ class Study extends Model {
             '($total_answers_count / $total_no_of_days)' =>
                 "($total_answers_count / $total_no_of_days)  = $average_if_studied_per_day",
         ]);
-        $total_answers_per_day = $total_answers_count / $total_days_studied;
+        $total_answers_per_day = ($total_days_studied < 1) ? 0 : $total_answers_count / $total_days_studied;
 
-        $average_time_for_days_studied_hours   = $total_hours_for_days_studied / $total_days_studied; // Correct
-        $average_time_for_days_studied_minutes = ($total_hours_for_days_studied * 60) / $total_days_studied;
-        $average_time_for_days_studied_seconds = ($total_hours_for_days_studied * 3600) / $total_days_studied;
+        $average_time_for_days_studied_hours   = ($total_days_studied < 1) ? 0 : $total_hours_for_days_studied / $total_days_studied; // Correct
+        $average_time_for_days_studied_minutes = ($total_days_studied < 1) ? 0 : ($total_hours_for_days_studied * 60) / $total_days_studied;
+        $average_time_for_days_studied_seconds = ($total_days_studied < 1) ? 0 : ($total_hours_for_days_studied * 3600) / $total_days_studied;
         self::add_debug('Average for days studied (minutes)', [
             '($total_hours_for_days_studied * 60) / $total_days_studied' =>
                 "($total_hours_for_days_studied * 60) / $total_days_studied = $average_time_for_days_studied_minutes",
         ], true);
 
-        $average_time_if_studied_every_day_hours   = $total_hours_for_days_studied / $total_no_of_days; // Correct
-        $average_time_if_studied_every_day_minutes = ($total_hours_for_days_studied / 60) / $total_no_of_days;
-        $average_time_if_studied_every_day_seconds = ($total_hours_for_days_studied / 3600) / $total_no_of_days;
+        $average_time_if_studied_every_day_hours   = ($total_no_of_days < 1) ? 0 : $total_hours_for_days_studied / $total_no_of_days; // Correct
+        $average_time_if_studied_every_day_minutes = ($total_no_of_days < 1) ? 0 : ($total_hours_for_days_studied / 60) / $total_no_of_days;
+        $average_time_if_studied_every_day_seconds = ($total_no_of_days < 1) ? 0 : ($total_hours_for_days_studied / 3600) / $total_no_of_days;
         self::add_debug('If you studied every day (average) (minutes)', [
             '($total_hours_for_days_studied / 60) / $no_of_days' =>
                 "($total_hours_for_days_studied / 60) / $total_no_of_days = $average_time_if_studied_every_day_minutes",
@@ -1373,9 +1335,9 @@ class Study extends Model {
         //        ]);
 
         // You are studying this no of cards per hour (Correct)
-        $average_answered_cards_per_hour         = $total_answers_count / $total_time_hours; // cards per hour
-        $average_answered_cards_per_minute       = $total_answers_count / ($total_time_hours * 60); // cards studied per minute
-        $average_answered_cards_per_seconds_time = 60 / $average_answered_cards_per_minute;
+        $average_answered_cards_per_hour         = ($total_time_hours < 1) ? 0 : $total_answers_count / $total_time_hours; // cards per hour
+        $average_answered_cards_per_minute       = ($total_time_hours < 1) ? 0 : $total_answers_count / ($total_time_hours * 60); // cards studied per minute
+        $average_answered_cards_per_seconds_time = ($average_answered_cards_per_minute < 1) ? 0 : 60 / $average_answered_cards_per_minute;
         self::add_debug('Average answer time (minutes)', [
             '$total_answers_count / $total_time_hours' =>
                 "$total_answers_count / $total_time_hours = $average_answered_cards_per_minute",
