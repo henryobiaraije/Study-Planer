@@ -27,6 +27,7 @@ use StudyPlanner\Helpers\ChartReviewHelper;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
 use StudyPlanner\Models\Tag;
+use function StudyPlanner\get_mature_card_days;
 use function StudyPlanner\get_user_timezone_date_midnight_today;
 use function StudyPlanner\get_user_timezone_minutes_to_add;
 
@@ -160,7 +161,7 @@ class Study extends Model {
             'average'       => 0,
             'due_tomorrow'  => 0,
         ];
-        $matured_day_no               = Settings::MATURE_CARD_DAYS;
+        $matured_day_no               = get_mature_card_days();
         $end_date                     = null;
         $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
         $start_date                   = $user_timezone_today_midnight;
@@ -498,7 +499,7 @@ class Study extends Model {
             'y'        => [],
             'm'        => [],
         ];
-        $matured_day_no               = Settings::MATURE_CARD_DAYS;
+        $matured_day_no               = get_mature_card_days();
         $end_date                     = null;
         $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
         //        $start_date                   = $user_timezone_today_midnight;
@@ -689,7 +690,7 @@ class Study extends Model {
             'total_new_cards'           => 0,
             'average_new_cards_per_day' => 0,
         ];
-        $matured_day_no               = Settings::MATURE_CARD_DAYS;
+        $matured_day_no               = get_mature_card_days();
         $end_date                     = null;
         $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
         //        $start_date                   = $user_timezone_today_midnight;
@@ -829,7 +830,7 @@ class Study extends Model {
             'longest_interval'        => 0,
             'formed_longest_interval' => 0,
         ];
-        $matured_day_no               = Settings::MATURE_CARD_DAYS;
+        $matured_day_no               = get_mature_card_days();
         $end_date                     = null;
         $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
         //        $start_date                   = $user_timezone_today_midnight;
@@ -1036,7 +1037,7 @@ class Study extends Model {
             'days_not_studied__time'        => 0,
             'days_studied_percent_time'     => 0,
         ];
-        $matured_day_no               = Settings::MATURE_CARD_DAYS;
+        $matured_day_no               = get_mature_card_days();
         $end_date                     = null;
         $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
         //        $start_date                   = $user_timezone_today_midnight;
@@ -1585,7 +1586,7 @@ class Study extends Model {
      * @param $user_id
      */
     public static function get_user_matured_card_ids($user_id) {
-        $mature_card_days = Settings::MATURE_CARD_DAYS;
+        $mature_card_days = get_mature_card_days();
         $all              = [];
         $all_card_ids     = [];
 
