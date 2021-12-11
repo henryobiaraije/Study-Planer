@@ -477,6 +477,8 @@ let vmethods = {
   nn() {
     if (Store.jQuery()) {
       this.all = [];
+      dis(this).decks = null;
+      dis(this).deckGroups = null;
       return true;
     }
     return false;

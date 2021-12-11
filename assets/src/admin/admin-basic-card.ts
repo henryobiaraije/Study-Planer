@@ -33,9 +33,9 @@ declare var ClassicEditor: any;
 declare var pereere_dot_com_sp_general_localize_4736: any;
 const localize = pereere_dot_com_sp_general_localize_4736;
 Store.initAdmin({
-  serverUrl   : localize.ajax_url,
+  serverUrl: localize.ajax_url,
   actionString: localize.ajax_action,
-  nonce       : localize.nonce,
+  nonce: localize.nonce,
 });
 
 export const vdata = {
@@ -43,54 +43,54 @@ export const vdata = {
   localize: localize,
   //
   zajax: {
-    load   : {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+    load: {
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
-    update : {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+    update: {
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
-    delete : {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+    delete: {
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
-    create : {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+    create: {
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
     overlay: {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
 
     } as _Ajax,
   },
   // hoverNotifications  : [] as Array<_HoverNotification>,
   sendOnlineDeckGroups: null as Server,
-  tableData           : {
-    columns          : [
+  tableData: {
+    columns: [
       {
-        label  : 'Name',
-        field  : 'name',
+        label: 'Name',
+        field: 'name',
         tooltip: 'Endpoint Name',
       },
       {
@@ -102,66 +102,66 @@ export const vdata = {
         field: 'updated_at',
       },
     ],
-    rows             : [],
-    isLoading        : true,
-    totalRecords     : 0,
-    totalTrashed     : 0,
-    serverParams     : {
+    rows: [],
+    isLoading: true,
+    totalRecords: 0,
+    totalTrashed: 0,
+    serverParams: {
       columnFilters: {},
-      sort         : {
-        created_at : '',
+      sort: {
+        created_at: '',
         modified_at: '',
       },
-      page         : 1,
-      perPage      : 10
+      page: 1,
+      perPage: 10
     },
     paginationOptions: {
-      enabled         : true,
-      mode            : 'page',
-      perPage         : Cookies.get('alfPerPage') ? Number(Cookies.get('alfPerPage')) : 2,
-      position        : 'bottom',
-      perPageDropdown : [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
+      enabled: true,
+      mode: 'page',
+      perPage: Cookies.get('alfPerPage') ? Number(Cookies.get('alfPerPage')) : 2,
+      position: 'bottom',
+      perPageDropdown: [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
       dropdownAllowAll: true,
-      setCurrentPage  : 1,
-      nextLabel       : 'next',
-      prevLabel       : 'prev',
+      setCurrentPage: 1,
+      nextLabel: 'next',
+      prevLabel: 'prev',
       rowsPerPageLabel: 'Rows per page',
-      ofLabel         : 'of',
-      pageLabel       : 'page', // for 'pages' mode
-      allLabel        : 'All',
+      ofLabel: 'of',
+      pageLabel: 'page', // for 'pages' mode
+      allLabel: 'All',
     },
-    searchOptions    : {
-      enabled       : true,
-      trigger       : '', // can be "enter"
+    searchOptions: {
+      enabled: true,
+      trigger: '', // can be "enter"
       skipDiacritics: true,
-      placeholder   : 'Search links',
+      placeholder: 'Search links',
     },
-    sortOption       : {
+    sortOption: {
       enabled: false,
     },
     //
-    post_status         : 'publish',
+    post_status: 'publish',
     selectedRowsToDelete: [] as Array<_Endpoint>,
-    searchKeyword       : '',
+    searchKeyword: '',
   },
   //
-  showMain       : false,
-  debug          : false,
-  page           : 1,
-  languageIndex  : 1,
+  showMain: false,
+  debug: false,
+  page: 1,
+  languageIndex: 1,
   something_value: false,
-  screen_width   : 0,
+  screen_width: 0,
 };
 
-const mGeneral         = {
+const mGeneral = {
   generalInit() {
   },
   getNewAjax(): _Ajax {
     return {
-      sending       : false,
-      error         : false,
-      errorMessage  : '',
-      success       : false,
+      sending: false,
+      error: false,
+      errorMessage: '',
+      success: false,
       successMessage: '',
     };
   },
@@ -172,7 +172,7 @@ const mComputedGeneral = {
   },
 };
 
-const mCard    = {
+const mCard = {
   createDeckGroup() {
     this.newDeckGroup.xhrCreateNewDeckGroup();
   },
@@ -192,14 +192,14 @@ const mComCard = {
   },
 };
 
-const v_method   = {...mCard, ...mGeneral};
+const v_method = {...mCard, ...mGeneral};
 const v_computed = {...mComCard, ...mComputedGeneral,};
 
 const xhr = {
   xhrUpdateEndpoint(endpoint: _Endpoint) {
-    let dis                      = this;
+    let dis = this;
     const handleAjax: HandleAjax = new HandleAjax(vdis.getNewAjax());
-    vdata.sendOnlineDeckGroups   = new Server().send_online({
+    vdata.sendOnlineDeckGroups = new Server().send_online({
       data: [
         vdata.localize.nonce,
         {
@@ -224,9 +224,9 @@ const xhr = {
     if (!confirm("Are you sure you want to delete this endpoint?")) {
       return false;
     }
-    let dis                      = this;
+    let dis = this;
     const handleAjax: HandleAjax = new HandleAjax(vdata.zajax.delete);
-    vdata.sendOnlineDeckGroups   = new Server().send_online({
+    vdata.sendOnlineDeckGroups = new Server().send_online({
       data: [
         vdata.localize.nonce,
         {
@@ -249,9 +249,9 @@ const xhr = {
     });
   },
   xhrCreateEndpoint() {
-    let dis                      = this;
+    let dis = this;
     const handleAjax: HandleAjax = new HandleAjax(vdata.zajax.create);
-    vdata.sendOnlineDeckGroups   = new Server().send_online({
+    vdata.sendOnlineDeckGroups = new Server().send_online({
       data: [
         vdata.localize.nonce,
         {
@@ -338,16 +338,17 @@ const m_listner = {
 
 const m_init = {
   init() {
-    vdis  = this;
+    vdis = this;
     vComp = this;
     // @ts-ignore
     this.listner_init();
-    this.nn();
+    // this.nn();
     this.generalInit();
     this.basicCard.load().then(() => {
       jQuery('.all-loading').hide();
       jQuery('.all-loaded').show();
       vdata.showMain = true;
+      this.nn();
     }).catch(() => {
       jQuery('.all-loading').hide();
       jQuery('.all-error').show();
@@ -362,10 +363,10 @@ const m_init = {
 let vmethods = {
   ...mGeneral, ...v_method,
   blobToFile(theBlob: Blob, fileName: string): File {
-    let b: any         = theBlob;
+    let b: any = theBlob;
     //A Blob() is almost a File() - it's just missing the two properties below which we will add
     b.lastModifiedDate = new Date();
-    b.name             = fileName;
+    b.name = fileName;
 
     //Cast to a File() type
     return <File>theBlob;
@@ -382,25 +383,25 @@ let vmethods = {
   rootNewTable(details, perPage) {
     const dis = this;  //eslint-disable-line
     return new MpSortTable({
-      vue          : dis,
-      all          : details,
-      allToUse     : details,
-      holdDisplay  : [],
-      perPage      : perPage,
-      pageNow      : 0,
-      sortAscended : [],
+      vue: dis,
+      all: details,
+      allToUse: details,
+      holdDisplay: [],
+      perPage: perPage,
+      pageNow: 0,
+      sortAscended: [],
       pagination222: [],
-      pageNow222   : 0,
-      searchPage   : "this",
-      search       : "",
-      pagination   : [],
-      pageStart    : 0,
-      pageStop     : 0, // set on init to per_page
-      disableRight : false,
-      disableLeft  : false,
-      dis_class    : null,
-      showing_text : "",
-      filterParams : []
+      pageNow222: 0,
+      searchPage: "this",
+      search: "",
+      pagination: [],
+      pageStart: 0,
+      pageStop: 0, // set on init to per_page
+      disableRight: false,
+      disableLeft: false,
+      dis_class: null,
+      showing_text: "",
+      filterParams: []
     })
   },
   root_wp_editor_get_value(tetarea_id) {
@@ -422,13 +423,13 @@ let vmethods = {
   root_add_wp_editor(tetarea_id, add_media = true) {
     wp.editor.initialize(tetarea_id, {
       mediaButtons: add_media,
-      tinymce     : {
-        wpautop : true,
-        plugins : 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
+      tinymce: {
+        wpautop: true,
+        plugins: 'charmap colorpicker compat3x directionality fullscreen hr image lists media paste tabfocus textcolor wordpress wpautoresize wpdialogs wpeditimage wpemoji wpgallery wplink wptextpattern wpview',
         toolbar1: 'bold italic underline strikethrough | bullist numlist | blockquote hr wp_more | alignleft aligncenter alignright | link unlink | fullscreen | wp_adv',
         toolbar2: 'formatselect alignjustify forecolor | pastetext removeformat charmap | outdent indent | undo redo | wp_help'
       },
-      quicktags   : true,
+      quicktags: true,
     });
   },
   /**
@@ -441,8 +442,8 @@ let vmethods = {
    */
   root_pick_image_from_media(select_button_text: any, select_head_text: any, function_gotten: any) {
     let frame = wp.media({
-      title   : select_head_text,
-      button  : {
+      title: select_head_text,
+      button: {
         text: select_button_text
       },
       multiple: false  // Set to true to allow multiple files to be selected
@@ -450,10 +451,10 @@ let vmethods = {
     frame.open();
     frame.on("select", function () {
       let attachment = frame.state().get("selection").first().toJSON();
-      let img_url    = attachment.url;
+      let img_url = attachment.url;
       let img_att_id = attachment.id;
-      let result     = {
-        id : img_att_id,
+      let result = {
+        id: img_att_id,
         url: img_url
       };
       function_gotten(result);
@@ -487,6 +488,7 @@ let vmethods = {
   nn() {
     if (Store.jQuery()) {
       this.all = [];
+      dis(this).decks = null;
       return true;
     }
     return false;
@@ -513,7 +515,7 @@ let vmethods = {
       alignment: {
         options: ['left', 'right']
       },
-      toolbar  : [
+      toolbar: [
         "undo", "redo", "bold", "italic", "blockQuote", "ckfinder", "imageTextAlternative", "imageUpload", "heading", "imageStyle:full", "imageStyle:side", "indent", "outdent", "link", "numberedList", "bulletedList", "mediaEmbed", "insertTable", "tableColumn", "tableRow", "mergeTableCells"
       ]
     }).then(editor => {
@@ -526,7 +528,7 @@ let vmethods = {
     });
   },
   change_page(page) {
-    let dis  = this;
+    let dis = this;
     dis.page = page;
     this.pageChanged(page);
   },
@@ -556,21 +558,21 @@ let vmethods = {
 
 };
 
-var vdis: typeof vmethods    = null;
+var vdis: typeof vmethods = null;
 var vComp: typeof v_computed = null;
 
 function setup(props) {
-  const url          = new URL(window.location.href);
+  const url = new URL(window.location.href);
   const searchParams = new URLSearchParams(url.search);
-  const status       = searchParams.get('status');
-  const action       = searchParams.get('action');
-  const cardGroupId  = Number(searchParams.get('card-group'));
+  const status = searchParams.get('status');
+  const action = searchParams.get('action');
+  const cardGroupId = Number(searchParams.get('card-group'));
 
   console.log('in setup', {url, searchParams, status, cardGroupId});
   return {
-    decks     : useDecks(status),
+    decks: useDecks(status),
     searchTags: useTagSearch(),
-    basicCard : useBasicCard(cardGroupId),
+    basicCard: useBasicCard(cardGroupId),
   };
 }
 
@@ -588,11 +590,11 @@ function dis(context): ReturnType<typeof setup> {
 
   function loadInstance1() {
     new Vue({
-      el        : elem,
-      data      : vdata,
-      methods   : vmethods,
+      el: elem,
+      data: vdata,
+      methods: vmethods,
       setup,
-      created   : function () {
+      created: function () {
         // console.clear();
         jQuery(elem).css("display", "block");
         this.initUnhide();
@@ -600,7 +602,7 @@ function dis(context): ReturnType<typeof setup> {
 
         console.log('Created');
       },
-      computed  : v_computed,
+      computed: v_computed,
       components: {
         InputEditor,
         // 'input-editor': InputCk,

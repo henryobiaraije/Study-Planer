@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="https://medabc.eu/" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="greatbigcode.com" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
+      <paths name="greatbigcode.com">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../../wp-admin" web="/" />
+            <mapping deploy="/wp-content/plugins/study-planner" local="$PROJECT_DIR$" web="/" />
+            <mapping local="$PROJECT_DIR$/../../../wp-includes" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/assets/css" />
+            <excludedPath local="true" path="$PROJECT_DIR$/adocs" />
+            <excludedPath local="true" path="$PROJECT_DIR$/assets/src" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
       <paths name="https://medabc.eu/">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$/../../../wp-admin" web="/" />
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/wp-content/plugins/study-planner" local="$PROJECT_DIR$" web="/" />
             <mapping local="$PROJECT_DIR$/../../../wp-includes" web="/" />
           </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/assets/css" />
+            <excludedPath local="true" path="$PROJECT_DIR$/assets/node_modules" />
+            <excludedPath local="true" path="$PROJECT_DIR$/assets/src" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>

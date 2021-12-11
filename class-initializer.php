@@ -317,7 +317,7 @@ class Initializer {
         }
 
         $css_general = Initializer::$css_url.'/general.css';
-        wp_enqueue_style('sp-general', $css_general, [], Initializer::$script_version);
+//        wp_enqueue_style('sp-general', $css_general, [], Initializer::$script_version);
 
         wp_enqueue_style('dashboard');
         wp_enqueue_script('dashboard');
@@ -418,8 +418,8 @@ class Initializer {
 
     public function on_activate() {
         //
-        Initialize_Db::get_instance()->create_tables();
-        Initialize_Db::get_instance()->create_default_rows();
+//        Initialize_Db::get_instance()->create_tables();
+//        Initialize_Db::get_instance()->create_default_rows();
     }
 
     public function on_deactivate() {

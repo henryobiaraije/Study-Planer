@@ -17,7 +17,7 @@
 	<!--	</editor-fold  desc="Header">-->
 
 	<div class="all-loaded" style="display: none;" >
-		<form v-if="showMain" @submit.prevent="basicCard.createOrUpdate()" class="rounded md:p-4 shadow bg-gray-300" style="max-width:1000px; margin: auto" >
+		<form v-if="showMain" @submit.prevent="basicCard.createOrUpdate()" class="rounded md:p-4 shadow bg-sp-300" style="max-width:1000px; margin: auto" >
 			<label class="my-2 bg-white my-2 p-2 rounded shadow" >
 				<span class="" >Name</span >
 				<input v-model="basicCardGroup.name" required type="text" >
@@ -45,7 +45,7 @@
 					</label >
 				</div >
 				<?php if ( $is_editing ): ?>
-					<div class="flex bg-gray-100 rounded " >
+					<div class="flex bg-sp-100 rounded " >
 						<div class="rounded bg-white text-black flex-auto m-2 p-1 text-center md:w-full" >
 							Created:
 							<time-comp :time="basicCardGroup.created_at" ></time-comp >

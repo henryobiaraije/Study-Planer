@@ -11,8 +11,12 @@ use StudyPlanner\Libs\Settings;
     <h1 class="wp-heading-inline">Settings</h1>
     <br/>
     <div class=" all-loaded" style="display: none;">
+
         <form v-if="null !== useSettings.settings.value" @submit.prevent="useSettings._updateSettings" class="bg-sp-200 p-4 rounded-2 margin-auto"
               style="max-width: 500px; margin:auto;">
+            <div class="bg-white p-2 mb-4 rounded">
+                <b>Shortcode: </b> <code>[sp_user_dashboard]</code>
+            </div>
             <label class="bg-white p-2 rounded block mb-2 sp-slide-in">
                 <span class="font-medium block mb-1">Mature card Days (27 by default)</span>
                 <input v-model.number="useSettings.settings.value.mature_card_days"

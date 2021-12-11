@@ -6,6 +6,7 @@ import {Store} from "../static/store";
 import Chart from "chart.js/auto";
 
 declare var bootstrap;
+declare var CalHeatMap;
 
 interface _ForecastGraphable {
   cumulative: Array<number>;
@@ -109,6 +110,13 @@ export default function (status = 'publish') {
     success: false,
     successMessage: '',
   });
+  const ajaxProgressChart = reactive<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
+    successMessage: '',
+  });
   const ajaxForecast = reactive<_Ajax>({
     sending: false,
     error: false,
@@ -158,6 +166,7 @@ export default function (status = 'publish') {
     success: false,
     successMessage: '',
   });
+  let statsProgressChart = ref<_ForecastGraphable>(null);
   let statsForecast = ref<_ForecastGraphable>(null);
   let statsReview = ref<_ReviewGraphable>(null);
   let statsReviewTime = ref<_ReviewGraphable>(null);
@@ -172,6 +181,8 @@ export default function (status = 'publish') {
   let chartIntervalTimeSpan = ref('one_month');
   let chartAnswerButtonsTimeSpan = ref('one_month');
   let chartHourlyBreakdownDate = ref('');
+  let chartProgressChartYear = ref('');
+
   const colorLearning = '#4848bf';
   const colorYoung = '#9cd89c';
   const colorMature = '#2f622e';
@@ -180,7 +191,7 @@ export default function (status = 'publish') {
 
   const _initChartHourlyBreakdown = () => {
     setTimeout(() => {
-      console.log('Using _initChartHourlyBreakdown',statsHourlyBreakdown.value.answers_per_hour);
+      console.log('Using _initChartHourlyBreakdown', statsHourlyBreakdown.value.answers_per_hour);
       new Chart('sp-chart-chart-hourly-breakdown', {
         type: 'bar',
         data: {
@@ -980,6 +991,127 @@ export default function (status = 'publish') {
       })
     }, 500);
   }
+  const _initChartProgressChart = () => {
+    const largeScreen = jQuery(window).width() > 760;
+    setTimeout(() => {
+      const theColors = [
+        'rgb(103,0,31)', 'rgb(178,24,43)', 'rgb(214,96,77)',
+        'rgb(244,165,130)', 'rgb(253,219,199)', 'rgb(224,224,224)',
+        'rgb(186,186,186)', 'rgb(135,135,135)', 'rgb(77,77,77)',
+        'rgb(26,26,26)'
+      ];
+      let css = '';
+      theColors.forEach((d, i) => {
+        // css += ".q" + i + " {fill:" + d + "; background-color: " + d + "}";
+        css += `
+          .q${i}:{
+            fill:${d}; 
+            background-color: ${d}; 
+          }
+        `;
+      })
+
+      jQuery('#sp-heatmap-style').remove();
+      jQuery('head').append(`
+        <style id="sp-heatmap-style">
+        ${css}
+        </style>
+      `);
+
+
+      const id = 'sp-chart-progress-chart';
+      console.log({id});
+      var cal = new CalHeatMap();
+      cal.init({
+        itemSelector: '#' + id,
+        itemName: ["Cluster", "Cluster"],
+        domain: "month",
+        subDomain: "day",
+        domainLabelFormat: "%b-%Y",
+        // data: "data.json",
+        data: {
+          "1420498800": 2,
+          "1420585200": 4,
+          "1420671600": 2,
+          "1420758000": 1,
+          "1421103600": 2,
+          "1421190000": 1,
+          "1421276400": 1,
+          "1421362800": 1,
+          "1421622000": 1,
+          "1421708400": 1,
+          "1422226800": 1,
+          "1422313200": 1,
+          "1422399600": 2,
+          "1422486000": 1,
+          "1422572400": 1,
+          "1423695600": 3,
+          "1424127600": 2,
+          "1424214000": 1,
+          "1424300400": 3,
+          "1424386800": 1,
+          "1424646000": 2,
+          "1424732400": 1,
+          "1424818800": 2,
+          "1424905200": 2,
+          "1424991600": 1,
+          "1425337200": 1,
+          "1425855600": 4,
+          "1426201200": 2,
+          "1426460400": 2,
+          "1426546800": 1,
+          "1426633200": 2,
+          "1426719600": 1,
+          "1426806000": 1,
+          "1427065200": 1,
+          "1427151600": 1,
+          "1427238000": 2,
+          "1427324400": 1,
+          "1427670000": 2,
+          "1428361200": 2,
+          "1428447600": 2,
+          "1428534000": 3,
+          "1428620400": 3,
+          "1428966000": 2,
+          "1429138800": 2,
+          "1429225200": 1,
+          "1429484400": 2,
+          "1429570800": 1,
+          "1429657200": 2,
+          "1429743600": 2,
+          "1429830000": 3
+        },
+        // start: new Date(2012, 02),
+        // maxDate: new Date(2013, 04),
+        cellSize: 16, //
+        range: 12, animationDuration: 1000,
+        subDomainTextFormat: "%d",
+        nextSelector: "#domainDynamicDimension-next",
+        previousSelector: "#domainDynamicDimension-previous",
+        legend: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        legendCellSize: 15,
+      });
+      // cal.init({
+      //   itemSelector: '#' + id,
+      //   domain: "month",
+      //   subDomain: "day",
+      //   cellSize: largeScreen ? 20 : 10,
+      //   tooltip: true,
+      //   // start : '', // todo add start date of the first answer
+      //   // maxDate : '2021-12-27',
+      //   subDomainTextFormat: "%d",
+      //   range: 12,
+      //   displayLegend: true,
+      //   domainGutter: 1,
+      //   legendColors: {
+      //     min: "#b3fea2",
+      //     max: "#1d8f05",
+      //     empty: "#dfe1df"
+      //     // Will use the CSS for the missing keys
+      //   }
+      // });
+    }, 500);
+  }
 
   const _reloadForecast = () => {
     setTimeout(() => {
@@ -1015,6 +1147,18 @@ export default function (status = 'publish') {
     }, 400);
   }
 
+  const _loadProgressChart = () => {
+    // if (null === statsForecast.value) {
+    xhrLoadProgressChart().then((res) => {
+      console.log('Show now');
+      _initChartProgressChart();
+    }).catch(() => {
+      // todo remove later
+      console.log('Show now');
+      _initChartProgressChart();
+    });
+    // }
+  }
   const _loadForecast = () => {
     // if (null === statsForecast.value) {
     xhrLoadForecast().then((res) => {
@@ -1077,6 +1221,7 @@ export default function (status = 'publish') {
   }
 
   const _loadAllStats = () => {
+    _loadProgressChart();
     _loadForecast();
     _loadReviewCount();
     _loadReviewTime();
@@ -1086,6 +1231,33 @@ export default function (status = 'publish') {
     _loadChartHourlyBreakDown();
   }
 
+  const xhrLoadProgressChart = () => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxProgressChart);
+    return new Promise((resolve, reject) => {
+      new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            year: chartProgressChartYear.value,
+          }
+        ],
+        what: "front_sp_ajax_front_load_stats_progress_chart",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          statsProgressChart.value = done.data.graphable;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.stop();
+          // handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
   const xhrLoadForecast = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxForecast);
     return new Promise((resolve, reject) => {
@@ -1277,14 +1449,14 @@ export default function (status = 'publish') {
   };
 
   return {
-    ajax, ajaxForecast, ajaxReviewTime, ajaxChartAdded, ajaxChartInterval,
+    ajax, ajaxProgressChart, ajaxForecast, ajaxReviewTime, ajaxChartAdded, ajaxChartInterval,
     ajaxChartAnswerButtons, ajaxHourlyBreakdown,
-    _loadAllStats, _loadForecast,
+    _loadAllStats, _loadForecast, _loadProgressChart,
     forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime, _reloadChartAnswerButtons,
     _loadChartAnswerButtons, _loadChartHourlyBreakDown,
     statsForecast, ajaxReview, statsReview, reviewCountSpan, reviewTimeSpan,
     statsReviewTime, chartAddedTimeSpan, chartIntervalTimeSpan, statsChartAnserButtons,
-    statsHourlyBreakdown,
+    statsHourlyBreakdown, chartProgressChartYear,
     _reloadChartAdded, _reloadChartInterval, statsChartAdded, chartAnswerButtonsTimeSpan,
     chartHourlyBreakdownDate,
   };

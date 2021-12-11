@@ -486,6 +486,7 @@ let vmethods = {
   nn() {
     if (Store.jQuery()) {
       this.all = [];
+      dis(this).useTableCard = null;
       return true;
     }
     return false;

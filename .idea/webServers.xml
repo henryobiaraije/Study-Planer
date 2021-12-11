@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="17cd8e10-196a-43bb-9ecc-9bb6ca5aecef" name="greatbigcode.com" url="http://ftp.zlu.nxw.mybluehost.me">
+        <fileTransfer host="ftp.zlu.nxw.mybluehost.me" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

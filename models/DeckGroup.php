@@ -13,8 +13,7 @@ use Illuminate\Database\Query\Builder;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Models\Tag;
 
-class DeckGroup extends Model
-{
+class DeckGroup extends Model {
     protected $table = SP_DB_PREFIX.'deck_groups';
 
     use SoftDeletes;
@@ -26,23 +25,19 @@ class DeckGroup extends Model
         'is_admin' => 'boolean',
     ];
 
-    public function tags()
-    {
+    public function tags() {
         return $this->morphToMany(Tag::class, 'taggable', SP_TABLE_TAGGABLES);
     }
 
-    public function decks()
-    {
+    public function decks() {
         return $this->hasMany(Deck::class, 'deck_group_id');
     }
 
-    public function decks_with_study($user_id)
-    {
+    public function decks_with_study($user_id) {
         return $this->hasMany(Deck::class, 'deck_group_id');
     }
 
-    public static function get_deck_groups($args): array
-    {
+    public static function get_deck_groups($args): array {
         $default = [
             'search'       => '',
             'page'         => 1,
@@ -67,12 +62,12 @@ class DeckGroup extends Model
             ->limit($args['per_page'])
             ->orderByDesc('id')->get();
 
-//			Common::send_error( [
-//				'ajax_admin_load_deck_group',
-//				'$args'        => $args,
-//				'$deck_groups' => $deck_groups->toSql(),
-//				'getQuery'     => $deck_groups->getQuery(),
-//			] );
+        //			Common::send_error( [
+        //				'ajax_admin_load_deck_group',
+        //				'$args'        => $args,
+        //				'$deck_groups' => $deck_groups->toSql(),
+        //				'getQuery'     => $deck_groups->getQuery(),
+        //			] );
 
         return [
             'total'       => $total,
@@ -80,24 +75,18 @@ class DeckGroup extends Model
         ];
     }
 
-    public static function get_deck_groups_front_end($args): array
-    {
-        $user_id = get_current_user_id();
-        $default = [
+    public static function get_deck_groups_front_end($args): array {
+        $user_id     = get_current_user_id();
+        $default     = [
             'search'       => '',
             'page'         => 1,
             'per_page'     => 5,
             'with_trashed' => false,
             'only_trashed' => false,
         ];
-        $args    = wp_parse_args($args, $default);
-        if ($args['with_trashed']) {
-//				$deck_groups = DeckGroup::with( 'tags', 'decks' )->withoutTrashed();
-        } elseif ($args['only_trashed']) {
-//				$deck_groups = DeckGroup::with( 'tags', 'decks' )->onlyTrashed();
-        } else {
-//				$deck_groups = DeckGroup::with( 'tags', 'decks_with_study' );
-            $deck_groups = DeckGroup::with([
+        $args        = wp_parse_args($args, $default);
+        $deck_groups = DeckGroup
+            ::with([
                 'tags',
                 'decks'             => function ($query) {
                     $query->withCount('card_groups');
@@ -107,34 +96,28 @@ class DeckGroup extends Model
                 },
                 'decks.studies'     => function ($q) use ($user_id) {
                     $q->where('user_id', '=', $user_id);
-//						 $query->select( SP_TABLE_STUDY.' as st')
-//						->where('user_id', '=', $user_id );
                 },
+            ])
+            ->where('name', 'like', "%{$args['search']}%")
+            ->withCount([
+                'decks',
             ]);
-//				dd(Manager::getQueryLog());
-        }
-        $deck_groups = $deck_groups
-            ->where('name', 'like', "%{$args['search']}%");
-
-        $deck_groups->withCount([
-            'decks'
-        ]);
 
         $total       = $deck_groups->count();
         $offset      = ($args['page'] - 1);
         $deck_groups = $deck_groups->offset($offset)
             ->limit($args['per_page'])
             ->orderByDesc('id');
-//			Common::send_error( [
-//				__METHOD__,
-//				'query' => $deck_groups->toSql(),
-//			] );
+        //			Common::send_error( [
+        //				__METHOD__,
+        //				'query' => $deck_groups->toSql(),
+        //			] );
         $deck_groups = $deck_groups->get();
-//			Common::send_error( [
-//				'ajax_admin_load_deck_group',
-//				'$args'        => $args,
-//				'$deck_groups' => $deck_groups,
-//			] );
+        //			Common::send_error( [
+        //				'ajax_admin_load_deck_group',
+        //				'$args'        => $args,
+        //				'$deck_groups' => $deck_groups,
+        //			] );
         $all_deck_groups = [];
         foreach ($deck_groups as $dg) {
             $decks          = $dg->decks;
@@ -145,7 +128,7 @@ class DeckGroup extends Model
                 'total'            => 0,
             ];
             foreach ($decks as $_deck) {
-//                $_study              = $_deck->studies->first();
+                //                $_study              = $_deck->studies->first();
                 $_study              = Study
                     ::where('deck_id', '=', $_deck->id)
                     ->where('user_id', '=', $user_id)
@@ -168,52 +151,52 @@ class DeckGroup extends Model
                 $card_counts                        = $_deck->card_groups->pluck('cards_count');
                 $_deck->card_count                  = array_sum($card_counts->toArray());
                 if ($_deck->id === 9) {
-//                    Common::send_error([
-//                        'ajax_admin_load_deck_group',
-//                        '$user_id'         => $user_id,
-//                        '$args'            => $args,
-//                        'cg'               => $card_counts,
-////                        'cg sum'           => array_sum($card_counts->toArray()),
-//                        '$all_deck_groups' => $all_deck_groups,
-//                        '$deck_groups'     => $deck_groups,
-//                        '$_deck'           => $_deck,
-//                        //				'$deck_groups'     => $deck_groups->toSql(),
-//                        //				'getQuery'         => $deck_groups->getQuery(),
-//                    ]);
+                    //                    Common::send_error([
+                    //                        'ajax_admin_load_deck_group',
+                    //                        '$user_id'         => $user_id,
+                    //                        '$args'            => $args,
+                    //                        'cg'               => $card_counts,
+                    ////                        'cg sum'           => array_sum($card_counts->toArray()),
+                    //                        '$all_deck_groups' => $all_deck_groups,
+                    //                        '$deck_groups'     => $deck_groups,
+                    //                        '$_deck'           => $_deck,
+                    //                        //				'$deck_groups'     => $deck_groups->toSql(),
+                    //                        //				'getQuery'         => $deck_groups->getQuery(),
+                    //                    ]);
                 }
             }
 
             $decks = $decks->all();
             usort($decks, function ($a, $b) {
                 if ($a["deck_total_due_cards"] == $b["deck_total_due_cards"]) {
-//                    dd($a->deck_total_due_cards);
+                    //                    dd($a->deck_total_due_cards);
                     return 0;
                 }
                 return ($a["deck_total_due_cards"] > $b["deck_total_due_cards"]) ? -1 : 1;
             });
-//            if (5 === $dg->id) {
-//                Common::send_error([
-//                    'ajax_admin_load_deck_group',
-//                    '$user_id'         => $user_id,
-//                    'gettype'          => gettype($decks),
-//                    '$args'            => $args,
-//                    '$all_deck_groups' => $all_deck_groups,
-//                    '$deck_groups'     => $deck_groups,
-//                    '$decks'           => $decks,
-//                ]);
-//            }
+            //            if (5 === $dg->id) {
+            //                Common::send_error([
+            //                    'ajax_admin_load_deck_group',
+            //                    '$user_id'         => $user_id,
+            //                    'gettype'          => gettype($decks),
+            //                    '$args'            => $args,
+            //                    '$all_deck_groups' => $all_deck_groups,
+            //                    '$deck_groups'     => $deck_groups,
+            //                    '$decks'           => $decks,
+            //                ]);
+            //            }
             $dg->decks       = $decks;
             $dg->due_summary = $dg_due_summary;
         }
-//			Common::send_error( [
-//				'ajax_admin_load_deck_group',
-//				'$user_id'            => $user_id,
-//				'$args'            => $args,
-//				'$all_deck_groups' => $all_deck_groups,
-//				'$deck_groups'     => $deck_groups,
-////				'$deck_groups'     => $deck_groups->toSql(),
-////				'getQuery'         => $deck_groups->getQuery(),
-//			] );
+        //			Common::send_error( [
+        //				'ajax_admin_load_deck_group',
+        //				'$user_id'            => $user_id,
+        //				'$args'            => $args,
+        //				'$all_deck_groups' => $all_deck_groups,
+        //				'$deck_groups'     => $deck_groups,
+        ////				'$deck_groups'     => $deck_groups->toSql(),
+        ////				'getQuery'         => $deck_groups->getQuery(),
+        //			] );
 
         return [
             'total'       => $total,
@@ -221,8 +204,7 @@ class DeckGroup extends Model
         ];
     }
 
-    public static function get_deck_groups_front_end_one($deck_group_id)
-    {
+    public static function get_deck_groups_front_end_one($deck_group_id) {
         $user_id = get_current_user_id();
 
         $deck_group = DeckGroup::with([
@@ -246,7 +228,7 @@ class DeckGroup extends Model
             'previously_false' => 0,
         ];
         foreach ($decks as $_deck) {
-//            $_study              = $_deck->studies->first();
+            //            $_study              = $_deck->studies->first();
             $_study              = Study
                 ::where('deck_id', '=', $_deck->id)
                 ->where('user_id', '=', $user_id)
@@ -266,17 +248,16 @@ class DeckGroup extends Model
         }
         $dg->due_summary = $dg_due_summary;
 
-//        Common::send_error([
-//            __METHOD__,
-//            '$decks' => $decks,
-//            '$dg'    => $dg,
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$decks' => $decks,
+        //            '$dg'    => $dg,
+        //        ]);
 
         return $dg;
     }
 
-    public static function get_deck_groups_simple($args): array
-    {
+    public static function get_deck_groups_simple($args): array {
         $default = [
             'search'       => '',
             'page'         => 1,
@@ -302,8 +283,7 @@ class DeckGroup extends Model
         return $deck_groups->all();
     }
 
-    public static function get_totals(): array
-    {
+    public static function get_totals(): array {
         $all     = [
             'active'  => 0,
             'trashed' => 0,
@@ -317,13 +297,13 @@ class DeckGroup extends Model
         $all['active']  = $active[0]['count'];
         $all['trashed'] = $trashed[0]['count'];
 
-//			Common::send_error( [
-//				'query log' => Manager::getQueryLog(),
-////				'active query' => $active->toSql(),
-//				'$active'  => $active,
-//				'$trashed' => $trashed,
-//				'count'    => $active[0]['count'],
-//			] );
+        //			Common::send_error( [
+        //				'query log' => Manager::getQueryLog(),
+        ////				'active query' => $active->toSql(),
+        //				'$active'  => $active,
+        //				'$trashed' => $trashed,
+        //				'count'    => $active[0]['count'],
+        //			] );
 
         return $all;
     }

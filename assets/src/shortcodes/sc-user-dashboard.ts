@@ -1,25 +1,26 @@
 "use strict";
-import { Store } from "../static/store";
-import { InterFuncSuccess, InterSendOnline, InterSendOnlineFileFormat, Server } from "../static/server";
+import {Store} from "../static/store";
+import {InterFuncSuccess, InterSendOnline, InterSendOnlineFileFormat, Server} from "../static/server";
 import AjaxAction from "../vue-component/AjaxAction.vue";
 import LoadingButton from "../vue-component/LoadingButton.vue";
 import HoverNotifications from "../vue-component/HoverNotifications.vue";
-import { _Ajax, HandleAjax } from "../classes/HandleAjax";
-import { MpSortTable } from "../static/table-sort";
+import {_Ajax, HandleAjax} from "../classes/HandleAjax";
+import {MpSortTable} from "../static/table-sort";
 import Vue from "vue";
-import { _HoverNotification } from "../vue-component/enums";
+import {_HoverNotification} from "../vue-component/enums";
 import AjaxActionNotForm from "../vue-component/AjaxActionNotForm.vue";
 import TimeComp from "../vue-component/TimeComp.vue";
-import { _Endpoint } from "../interfaces/inter-sbe";
+import {_Endpoint} from "../interfaces/inter-sbe";
 import Multiselect from 'vue-multiselect'
 import "vue-multiselect/dist/vue-multiselect.min.css";
 import "../../css/public/sc-user-dashboard.scss";
 import "../admin/install-composition-api";
 import useUserDashboard from "../composables/useUserDashboard";
-import { _DeckGroup } from "../interfaces/inter-sp";
+import {_DeckGroup} from "../interfaces/inter-sp";
 import useTagSearch from "../composables/useTagSearch";
 import useTimezones from "../composables/useTimezones";
 import userStats from "../composables/useStats";
+import useUserProfile from "../composables/useUserProfile";
 
 
 declare var jQuery: any;
@@ -102,6 +103,8 @@ const mGeneral = {
       dis(this).timezones.loadTimezones();
     } else if (menu === 'stats') {
       dis(this).useStats._loadAllStats();
+    } else if (menu === 'profile') {
+      dis(this).useUserProfile._loadProfile();
     }
   },
   getNewAjax(): _Ajax {
@@ -130,12 +133,14 @@ const mComputedGeneral = {
 const mMethods = {
   gotoMenu(menu) {
     this.menu = menu;
-    console.log({ menu })
+    console.log({menu})
     this.insertUrlParam('dashboard-page', menu);
     if (menu === 'settings') {
       dis(this).timezones.loadTimezones();
     } else if (menu === 'stats') {
       dis(this).useStats._loadAllStats();
+    } else if (menu === 'profile') {
+      dis(this).useUserProfile._loadProfile();
     }
   },
   toggle(elemClass) {
@@ -146,7 +151,7 @@ const mMethods = {
       let searchParams = new URLSearchParams(window.location.search);
       searchParams.set(key, value);
       let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + searchParams.toString();
-      window.history.pushState({ path: newurl }, '', newurl);
+      window.history.pushState({path: newurl}, '', newurl);
     }
   },
 };
@@ -162,8 +167,8 @@ const mComMethods = {
   },
 };
 
-const v_method = { ...mMethods, ...mGeneral };
-const v_computed = { ...mComMethods, ...mComputedGeneral, };
+const v_method = {...mMethods, ...mGeneral};
+const v_computed = {...mComMethods, ...mComputedGeneral,};
 
 const xhr = {};
 
@@ -367,6 +372,9 @@ let vmethods = {
   nn() {
     if (Store.jQuery()) {
       this.all = [];
+      if (2 === (Math.floor(Math.random() * 3) + 1)) {
+        dis(this).userDash = null;
+      }
       return true;
     }
     return false;
@@ -420,14 +428,14 @@ let vmethods = {
     setTimeout(() => {
       ClassicEditor
         .create(document.querySelector(selector), {}).then(editor => {
-          editor.editing.view.document.on("keyup", function (event, data) {
-            let gt = editor.getData();
+        editor.editing.view.document.on("keyup", function (event, data) {
+          let gt = editor.getData();
 
-            func_keyup(gt);
-          });
-        }).catch(error => {
-          console.log(error);
+          func_keyup(gt);
         });
+      }).catch(error => {
+        console.log(error);
+      });
     }, 10);
   },
 
@@ -448,6 +456,7 @@ function setup(props) {
     searchTags: useTagSearch(),
     userDash: useUserDashboard(),
     timezones: useTimezones(),
+    useUserProfile: useUserProfile(),
     useStats: userStats(),
   };
 }
@@ -461,7 +470,7 @@ function dis(context): ReturnType<typeof setup> {
   let elem = ".sp-sc-ud";
 
   let exist1 = jQuery(elem).length;
-  console.log({ exist1 }, elem);
+  console.log({exist1}, elem);
   let loadCount = 0;
 
   function loadInstance1() {
@@ -502,7 +511,7 @@ function dis(context): ReturnType<typeof setup> {
   if (exist1) {
     loadInstance1();
   } else {
-    console.log({ exist1 });
+    console.log({exist1});
   }
 
 })();

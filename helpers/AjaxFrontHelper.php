@@ -70,9 +70,69 @@ class AjaxFrontHelper {
         add_action('front_sp_ajax_front_load_stats_chart_interval', array($this, 'ajax_front_load_stats_chart_interval'));
         add_action('front_sp_ajax_front_load_stats_chart_answer_buttons', array($this, 'ajax_front_load_stats_chart_answer_buttons'));
         add_action('front_sp_ajax_front_load_stats_hourly_breakdown', array($this, 'ajax_front_load_stats_hourly_breakdown'));
+        add_action('front_sp_ajax_admin_load_user_profile', array($this, 'ajax_admin_load_user_profile'));
+        add_action('front_sp_ajax_front_load_stats_progress_chart', array($this, 'ajax_front_load_stats_progress_chart'));
     }
 
     /*** <editor-fold desc="Chart Stats"> **/
+
+    public function ajax_front_load_stats_progress_chart($post): void {
+        Initializer::verify_post($post, true);
+        Common::send_error([
+            'ajax_front_load_stats_progress_chart',
+            'post' => $post,
+        ]);
+
+        $all        = $post[Common::VAR_2];
+        $user       = get_user_by('ID', get_current_user_id());
+        $user_name  = $user->user_login;
+        $user_email = $user->user_email;
+        $profile    = [
+            'user_email' => $user_email,
+            'user_name'  => $user_name,
+        ];
+
+        //        Common::send_error([
+        //            'ajax_admin_load_user_profile',
+        //            'post'        => $post,
+        //            '$user_name'  => $user_name,
+        //            '$user_email' => $user_email,
+        //        ]);
+
+
+        Common::send_success('Profile loaded', $profile);
+
+
+    }
+
+    public function ajax_admin_load_user_profile($post): void {
+        Initializer::verify_post($post, true);
+        //        Common::send_error([
+        //            'ajax_admin_load_user_profile',
+        //            'post' => $post,
+        //        ]);
+
+        $all        = $post[Common::VAR_2];
+        $user       = get_user_by('ID', get_current_user_id());
+        $user_name  = $user->user_login;
+        $user_email = $user->user_email;
+        $profile    = [
+            'user_email' => $user_email,
+            'user_name'  => $user_name,
+        ];
+
+        //        Common::send_error([
+        //            'ajax_admin_load_user_profile',
+        //            'post'        => $post,
+        //            '$user_name'  => $user_name,
+        //            '$user_email' => $user_email,
+        //        ]);
+
+
+        Common::send_success('Profile loaded', $profile);
+
+
+    }
 
     public function ajax_front_record_study_log($post): void {
         Initializer::verify_post($post, true);
@@ -198,11 +258,11 @@ class AjaxFrontHelper {
         $user_id = get_current_user_id();
 
         $all = Study::get_user_stats_charts_hourly_breakdown($user_id, $date);
-//        Common::send_error([
-//            'ajax_front_load_stats_review_time',
-//            'post'  => $post,
-//            '$date' => $date,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_front_load_stats_review_time',
+        //            'post'  => $post,
+        //            '$date' => $date,
+        //        ]);
 
         Common::send_success('Charts hourly breackdown here', $all);
 

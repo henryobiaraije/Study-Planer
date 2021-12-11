@@ -6,7 +6,7 @@ module.exports = {
     //     './src/**/*.html',
     // ],
     purge: {
-        enabled: false, //pereere.com Do it this way and set it to true because it seems NODE_ENV is not set in production mode
+        enabled: true, //pereere.com Do it this way and set it to true because it seems NODE_ENV is not set in production mode
         content: [
             './src/**/*.html',
             './src/**/*.js',

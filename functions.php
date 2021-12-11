@@ -3,6 +3,7 @@
 namespace StudyPlanner;
 
 use DateTime;
+use StudyPlanner\Db\Initialize_Db;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
 
@@ -90,6 +91,36 @@ function get_mature_card_days() {
         return 27;
     }
     return $option;
+}
+
+function print_log($log) {
+    if (true === WP_DEBUG) {
+        if (is_array($log) || is_object($log)) {
+            error_log(print_r($log, true));
+        } else {
+            error_log($log);
+        }
+    }
+}
+
+function get_uncategorized_deck_group_id() {
+    $id = get_option(Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, 0);
+    if (!empty($id)) {
+        return $id;
+    }
+    Initialize_Db::get_instance()->create_default_rows();
+    $id = get_option(Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, 0);
+    return $id;
+}
+
+function get_uncategorized_deck_id() {
+    $id = get_option(Settings::OP_UNCATEGORIZED_DECK_ID, 0);
+    if (!empty($id)) {
+        return $id;
+    }
+    Initialize_Db::get_instance()->create_default_rows();
+    $id = get_option(Settings::OP_UNCATEGORIZED_DECK_ID, 0);
+    return $id;
 }
 
 

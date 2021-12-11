@@ -25,7 +25,7 @@
 		      style="margin: auto" >
 			<div class="flex-1 " >
 				<?php /**** Name ***/ ?>
-				<div class="bg-gray-300 shadow rounded sm:p-2 md:p-4 mb-4" >
+				<div class="bg-sp-300 shadow rounded sm:p-2 md:p-4 mb-4" >
 					<label class="my-2 bg-white my-2 p-2 rounded shadow" >
 						<span class="" >Name</span >
 						<input v-model="gapCardGroup.name" name="card_name" required type="text" >
@@ -40,7 +40,7 @@
 					</div >
 				</div >
 				<?php /**** Cards formed ***/ ?>
-				<div class="card-preview rounded-3 p-2 bg-gray-300 border-1 border-gray-200" >
+				<div class="card-preview rounded-3 p-2 bg-sp-300 border-1 border-sp-200" >
 					<h3 class="font-bold fs-5  my-2" >Cards formed ({{gapCard.items.value.length}})
 						<i class="fa fa-redo fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer" ></i ></h3 >
 					<ul >
@@ -59,7 +59,7 @@
 					</ul >
 				</div >
 			</div >
-			<div class="sm:flex-1 md:flex-initial bg-gray-300 shadow rounded sm:p-2 md:p-4" style="max-width: 300px" >
+			<div class="sm:flex-1 md:flex-initial bg-sp-300 shadow rounded sm:p-2 md:p-4" style="max-width: 300px" >
 				<ajax-action
 						button-text="<?php echo $is_editing ? 'Update' : 'Create' ?>"
 						css-classes="button"
@@ -76,7 +76,7 @@
 						</label >
 					</div >
 					<?php if ( $is_editing ): ?>
-						<div class="flex flex-wrap bg-gray-100 rounded " >
+						<div class="flex flex-wrap bg-sp-100 rounded " >
 							<div class="rounded bg-white text-black flex-auto m-2 p-1 text-center md:w-full" >
 								Created:
 								<time-comp :time="gapCardGroup.created_at" ></time-comp >

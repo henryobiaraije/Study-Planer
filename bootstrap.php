@@ -89,15 +89,15 @@
 
 
 	// Db defaults
-	try {
-		$uncategorized_deck_groups = DeckGroup::query()->firstOrFail( [ 'name' => 'Uncategorized' ] );
-	} catch ( Exception $e ) {
-		$deck_group = DeckGroup::firstOrCreate( [ 'name', 'Uncategorized' ] );
-		update_option( Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, $deck_group->id );
-	}
-	try {
-		$uncategorized_deck_groups = Deck::query()->firstOrFail( [ 'name' => 'Uncategorized' ] );
-	} catch ( Exception $e ) {
-		$deck_group = Deck::firstOrCreate( [ 'name', 'Uncategorized' ] );
-		update_option( Settings::OP_UNCATEGORIZED_DECK_ID, $deck_group->id );
-	}
+//	try {
+//		$uncategorized_deck_groups = DeckGroup::query()->firstOrFail( [ 'name' => 'Uncategorized' ] );
+//	} catch ( Exception $e ) {
+//		$deck_group = DeckGroup::firstOrCreate( [ 'name', 'Uncategorized' ] );
+//		update_option( Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, $deck_group->id );
+//	}
+//	try {
+//		$uncategorized_deck_groups = Deck::query()->firstOrFail( [ 'name' => 'Uncategorized' ] );
+//	} catch ( Exception $e ) {
+//		$deck_group = Deck::firstOrCreate( [ 'name', 'Uncategorized' ] );
+//		update_option( Settings::OP_UNCATEGORIZED_DECK_ID, $deck_group->id );
+//	}

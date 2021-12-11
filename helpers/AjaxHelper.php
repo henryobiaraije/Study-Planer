@@ -19,6 +19,8 @@ use StudyPlanner\Libs\Settings;
 use StudyPlanner\Models\Tag;
 use function StudyPlanner\get_default_image_display_type;
 use function StudyPlanner\get_mature_card_days;
+use function StudyPlanner\get_uncategorized_deck_group_id;
+use function StudyPlanner\get_uncategorized_deck_id;
 
 class AjaxHelper {
     /**
@@ -1641,11 +1643,21 @@ class AjaxHelper {
             [
                 'decks' => [],
             ]);
+
         foreach ($args['decks'] as $item) {
-            $id   = (int) sanitize_text_field($item['id']);
+            Manager::beginTransaction();
+            $id = (int) sanitize_text_field($item['id']);
+            $uncategorized_deck_id = get_uncategorized_deck_id();
+            CardGroup
+                ::withTrashed()
+                ->where('deck_id', '=', $id)
+                ->update([
+                    'deck_id' => $uncategorized_deck_id,
+                ]);
             $deck = Deck::withTrashed()->find($id);
             $deck->tags()->detach();
             $deck->forceDelete();
+            Manager::commit();
             //				Deck::query()->where( 'id', '=', $id )->delete();
             //				Common::send_error( [
             //					'ajax_admin_create_new_deck_group',
@@ -1771,27 +1783,34 @@ class AjaxHelper {
         }
 
         $deck_group_id = (int) sanitize_text_field($deck_group['id']);
-        $deck_group    = DeckGroup::find($deck_group_id);
-        $deck          = new Deck();
-        $deck->name    = $name;
-        $deck->deck_group()->associate($deck_group);
-        $deck->save();
+        try {
 
-        $deck->tags()->detach();
-        foreach ($tags as $one) {
-            $tag = Tag::find($one['id']);
-            $deck->tags()->save($tag);
-            //				Common::send_error( [
-            //					'ajax_admin_create_new_deck_group',
-            //					'post'           => $post,
-            //					'$deck_group_id' => $deck_group_id,
-            //					'$tags'          => $tags,
-            //					'$name'          => $name,
-            //					'$tag'           => $tag,
-            ////				'$deck_group'      => $deck_group,
-            //				] );
+
+            Manager::beginTransaction();
+            $deck_group = DeckGroup::find($deck_group_id);
+            $deck       = new Deck();
+            $deck->name = $name;
+            $deck->deck_group()->associate($deck_group);
+            $deck->save();
+
+            $deck->tags()->detach();
+            foreach ($tags as $one) {
+                $tag = Tag::find($one['id']);
+                $deck->tags()->save($tag);
+                //				Common::send_error( [
+                //					'ajax_admin_create_new_deck_group',
+                //					'post'           => $post,
+                //					'$deck_group_id' => $deck_group_id,
+                //					'$tags'          => $tags,
+                //					'$name'          => $name,
+                //					'$tag'           => $tag,
+                ////				'$deck_group'      => $deck_group,
+                //				] );
+            }
+            Manager::commit();
+        } catch (PDOException $e) {
+            Common::send_error('Item already exists');
         }
-
         //			Common::send_error( [
         //				'ajax_admin_create_new_deck_group',
         //				'post'           => $post,
@@ -1994,11 +2013,24 @@ class AjaxHelper {
             [
                 'deck_groups' => [],
             ]);
+        Manager::beginTransaction();
         foreach ($args['deck_groups'] as $group) {
-            $id         = (int) sanitize_text_field($group['id']);
+            $id = (int) sanitize_text_field($group['id']);
+
+            // Assign uncategorized deck group to existing decks under this deck group
+            $uncategorized_deck_group_id = get_uncategorized_deck_group_id();
+            if ($uncategorized_deck_group_id) {
+                Deck
+                    ::where('deck_group_id', '=', $id)
+                    ->update([
+                        'deck_group_id' => $uncategorized_deck_group_id,
+                    ]);
+            }
+            // Delete the deck group
             $deck_group = DeckGroup::withTrashed()->find($id);
             $deck_group->tags()->detach();
             $deck_group->forceDelete();
+
             //				DeckGroup::query()->where( 'id', '=', $id )->forceDelete();
             //				Common::send_error( [
             //					'ajax_admin_create_new_deck_group',
@@ -2009,7 +2041,7 @@ class AjaxHelper {
             //					'$args' => $args,
             //				] );
         }
-
+        Manager::commit();
 
         Common::send_success('Deleted.');
 

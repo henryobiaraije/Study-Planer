@@ -8,8 +8,9 @@
         class="mb-4">
         <?php /**** Deck group header ***/ ?>
         <div class="sp-deck-group cursor-pointer shadow  gap-2">
-            <div class="flex sp-deck-group-header">
+            <div class="flex flex-wrap sp-deck-group-header">
                 <div @click="toggle('.decks-'+item.id)"
+                     style="min-width: 300px"
                      class="sp-header-title flex bg-sp-100 hover:bg-sp-200  px-3 py-3 flex-1">
                     <div class="sp-icon flex-initial items-center flex">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -63,19 +64,20 @@
                     </div>
                     <div class="sp-deck-count flex-initial flex items-center">{{item.decks.length}} decks</div>
                 </div>
-                <div class="sp-header-stats rounded py-2 px-4 flex-initial bg-sp-100">
+                <div class="sp-header-stats  py-2 px-4 flex-initial bg-sp-100 w-full md:w-auto"
+                     style="min-width: 300px">
                     <div class="status-title text-center font-bold">Number of cards due for revision</div>
                     <div class="to-study flex">
-                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center rounded">
+                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
                             <div class="study-title whitespace-nowrap">On
                                 hold <?php //todo might change to "Previously false" ?></div>
                             <div class="study-number font-bold fs-4">{{item.due_summary['previously_false']}}</div>
                         </div>
-                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center rounded">
+                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
                             <div class="study-title whitespace-nowrap">Revision</div>
                             <div class="study-number font-bold fs-4">{{item.due_summary['revision']}}</div>
                         </div>
-                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center rounded">
+                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
                             <div class="study-title whitespace-nowrap">New cards</div>
                             <div class="study-number font-bold fs-4">{{item.due_summary['new']}}</div>
                         </div>
@@ -89,29 +91,31 @@
                 <li v-for="(item2,itemIndex2) in item.decks"
                     :key="item2.id"
                     class="pl-4 mt-2">
-                    <div @click="userDash.openStudyModal(item2)" class="sp-d-header cursor-pointer  flex gap-2">
+                    <div @click="userDash.openStudyModal(item2)" class="sp-d-header cursor-pointer  flex flex-wrap gap-0 md:gap-2">
                         <div class="sp-header-title flex bg-sp-100 hover:bg-sp-200  px-3 py-3 flex-1">
-                            <div class="sp-name text-2xl px-10 py-2  flex-1 font-medium
+                            <div style="min-width: 300px;"
+                                 class="sp-name text-2xl px-10 py-2  flex-1 font-medium
 									text-2xl px-10 py-2  flex-1 font-medium
 									items-center flex flex-1 font-medium items-center justify-center px-10 py-2 sp-name text-2xl text-center">
                                 {{item2.name}}
                             </div>
                             <div class="sp-deck-count flex-initial flex items-center">{{item2.card_count}} cards</div>
                         </div>
-                        <div class="sp-header-stats rounded py-2 flex-initial bg-sp-100">
+                        <div class="sp-header-stats  py-2 flex-initial bg-sp-100 w-full md:w-auto"
+                             style="min-width: 300px;">
                             <div class="status-title text-center font-bold">Number of cards due for revision</div>
                             <div class="to-study flex">
-                                <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center rounded">
+                                <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
                                     <div class="study-title whitespace-nowrap whitespace-no-wrap">On
                                         hold <?php //todo might change to "Previously false" ?></div>
                                     <div class="study-number font-bold fs-4">{{item2.due_summary['previously_false']}}
                                     </div>
                                 </div>
-                                <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center rounded">
+                                <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
                                     <div class="study-title whitespace-nowrap whitespace-no-wrap">Revision</div>
                                     <div class="study-number font-bold fs-4">{{item2.due_summary['revision']}}</div>
                                 </div>
-                                <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center rounded">
+                                <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
                                     <div class="study-title whitespace-nowrap whitespace-no-wrap">New cards</div>
                                     <div class="study-number font-bold fs-4">{{item2.due_summary['new']}}</div>
                                 </div>
