@@ -23,6 +23,7 @@ use StudyPlanner\Helpers\ChartAnswerButtonsHelper;
 use StudyPlanner\Helpers\ChartForecastHelper;
 use StudyPlanner\Helpers\ChartHourlyBreakDown;
 use StudyPlanner\Helpers\ChartIntervalHelper;
+use StudyPlanner\Helpers\ChartProgress;
 use StudyPlanner\Helpers\ChartReviewHelper;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
@@ -672,6 +673,133 @@ class Study extends Model {
         //            '$matured_day_no'                       => $matured_day_no,
         //            '$graphable'                            => $graphable,
         //            '$forecast_all_answers_within_a_date 0' => $forecast_all_answers_within_a_date[0],
+        //        ]);
+
+        return [
+            'graphable' => $graphable,
+        ];
+
+    }
+
+    public static function get_user_stats_progress_chart($user_id, $year) {
+        $measure_start_time = microtime(true);
+        //        $matured_cards = self::get_user_matured_card_ids($user_id);
+        $graphable = [
+            'heading'              => [],
+            'days_and_count'       => [],
+            'total_daily_average'  => [],
+            'total_daily_percent'  => [],
+            'total_longest_streak' => [],
+            'total_current_streak' => [],
+        ];
+
+        //        $forecast_all_answers_within_a_date = ChartProgress::get_all_answers_count_by_day([
+        //            'user_id' => $user_id,
+        //            "year"    => $year,
+        //        ])['answers'];
+        $days_learnt_count  = ChartProgress::get_days_learnt_count([
+            'user_id' => $user_id,
+            "year"    => $year,
+        ]);
+        $days_learnt_streak = ChartProgress::get_days_learnt_streak([
+            'user_id' => $user_id,
+            "year"    => $year,
+        ]);
+        // todo calculate streak
+
+        $days_learned = $days_learnt_count['total'];
+
+        $longest_streak = [];
+        $streak_store   = [];
+        $current_streak = [];
+        $previous_date  = 0;
+        foreach ($days_learnt_streak['answers'] as $key => $one) {
+            if (0 === $key) {
+                $current_streak[] = $one;
+                $longest_streak   = $current_streak;
+                $previous_date    = $one->the_date;
+                continue;
+            }
+            $the_date         = $one->the_date;
+            $_date_minus_1day = new DateTime($the_date);
+            $_date_minus_1day->sub(new DateInterval('P1D'));
+            $_date_minus_1day         = $_date_minus_1day->format('Y-m-d');
+            $current_streak_is_broken = ($previous_date !== $_date_minus_1day);
+            $previous_date            = $one->the_date;
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$key'                      => $key,
+            //                '$previous_date'            => $previous_date,
+            //                '$days_learned'             => $days_learned,
+            //                '$days_learnt_count'        => $days_learnt_count,
+            //                '$current_streak_is_broken' => $current_streak_is_broken,
+            //                '$days_learnt_streak'       => $days_learnt_streak,
+            //                '$_date_minus_1day'         => $_date_minus_1day,
+            //            ]);
+            if ($current_streak_is_broken) {
+                $streak_store[] = [
+                    'broken'            => true,
+                    'streak'            => $current_streak,
+                    '$previous_date'    => $previous_date,
+                    '$_date_minus_1day' => $_date_minus_1day,
+                ];
+                if (count($current_streak) > count($longest_streak)) {
+                    $longest_streak = $current_streak;
+                }
+                $current_streak = [];
+            }
+            $current_streak[] = $one;
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$key'                => $key,
+            //                '$day_number'         => $day_number,
+            //                '$days_learned'       => $days_learned,
+            //                //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+            //                '$days_learnt_count'  => $days_learnt_count,
+            //                '$days_learnt_streak' => $days_learnt_streak,
+            //            ]);
+
+        }
+
+        $graphable['days_and_count']       = $days_learnt_count['answers'];
+        $graphable['total_daily_average']  = number_format($days_learnt_count['average'], 2);
+        $graphable['total_daily_percent']  = number_format($days_learnt_count['percentage_days_learnt'], 2);
+        $graphable['total_longest_streak'] = count($longest_streak);
+        $graphable['total_current_streak'] = count($current_streak);
+
+
+//        Common::send_error([
+//            __METHOD__,
+//            '$days_learned'       => $days_learned,
+//            //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+//            '$days_learnt_count'  => $days_learnt_count,
+//            '$days_learnt_streak' => $days_learnt_streak,
+//            '$longest_streak'     => $longest_streak,
+//            '$streak_store'       => $streak_store,
+//            '$current_streak'     => $current_streak,
+//            '$graphable'          => $graphable,
+//        ]);
+
+        $measure_end_time                       = microtime(true);
+        $measure_execution_time                 = ($measure_end_time - $measure_start_time);
+        $graphable['zz_measure_execution_time'] = $measure_execution_time;
+        $graphable['zz_debug']                  = self::$sp_debug;
+
+        //        Common::send_error([
+        //            "Answered::orderBy('id')->count()"    => Answered::orderBy('id')->count(),
+        //            '$start_date'                         => $start_date,
+        //            '$end_date'                           => $end_date,
+        //            '$span'                               => $span,
+        //            '$graphable'                          => $graphable,
+        //            '$total_time_hours'                   => $total_time_hours,
+        //            '$no_of_days'                         => $total_no_of_days,
+        //            '$total_answers_count'                => $total_answers_count,
+        //            '$total_days_studied'                 => $total_days_studied,
+        //            '$days'                               => $days,
+        //            '$__a_count'                          => $__a_count,
+        //            '$days_not_learnt'                    => $days_not_learnt,
+        //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //            'Manager::getQueryLog()'              => Manager::getQueryLog(),
         //        ]);
 
         return [

@@ -203,7 +203,7 @@ export default function (status = 'publish') {
   const onPerPageChange       = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
     tt().paginationOptions.setCurrentPage = params.currentPage;
     tt().paginationOptions.perPage        = params.currentPerPage;
-    // Cookies.set('spPerPage', params.currentPerPage);
+    Cookies.set('spPerPage', params.currentPerPage);
     xhrLoad();
   };
   const loadItems             = () => {

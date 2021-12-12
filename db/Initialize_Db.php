@@ -69,7 +69,7 @@ class Initialize_Db {
 
     public function create_default_rows() {
 
-        $this->crete_default_deck_group();
+//        $this->crete_default_deck_group();
 
     }
 

@@ -1,12 +1,32 @@
 import {_Ajax, HandleAjax} from "../classes/HandleAjax";
 import {InterFuncSuccess, Server} from "../static/server";
-import {ref, onMounted, computed, reactive} from "@vue/composition-api";
+import {ref, watch, onMounted, computed, reactive} from "@vue/composition-api";
 import {_Card, _Deck, _DeckGroup, _Study, _Tag} from "../interfaces/inter-sp";
 import {Store} from "../static/store";
 import Chart from "chart.js/auto";
+import {CalendarHeatmap} from 'vue-calendar-heatmap'
+import 'vue-calendar-heatmap/dist/vue-calendar-heatmap.css'
+import VueCalendarHeatmap from 'vue-calendar-heatmap/dist/vue-calendar-heatmap.common'
+import Vue from "vue";
+import Cookies from 'js-cookie';
 
+Vue.use(VueCalendarHeatmap)
 declare var bootstrap;
-declare var CalHeatMap;
+
+// declare var CalHeatMap;
+
+interface _ProgressChartGraphable {
+  days_and_count: Array<{
+    count: number;
+    date: string;
+    day: string;
+    day_answer_count: number;
+  }>;
+  total_current_streak: number;
+  total_daily_average: string;
+  total_daily_percent: string;
+  total_longest_streak: number;
+}
 
 interface _ForecastGraphable {
   cumulative: Array<number>;
@@ -166,7 +186,13 @@ export default function (status = 'publish') {
     success: false,
     successMessage: '',
   });
-  let statsProgressChart = ref<_ForecastGraphable>(null);
+  let statsProgressChart = ref<_ProgressChartGraphable>({
+    total_current_streak: 0,
+    total_daily_average: '',
+    total_daily_percent: '',
+    total_longest_streak: 0,
+    days_and_count: [],
+  });
   let statsForecast = ref<_ForecastGraphable>(null);
   let statsReview = ref<_ReviewGraphable>(null);
   let statsReviewTime = ref<_ReviewGraphable>(null);
@@ -181,13 +207,55 @@ export default function (status = 'publish') {
   let chartIntervalTimeSpan = ref('one_month');
   let chartAnswerButtonsTimeSpan = ref('one_month');
   let chartHourlyBreakdownDate = ref('');
-  let chartProgressChartYear = ref('');
+  let chartProgressChartYear = ref(new Date().getFullYear());
+  let progressHeatMapColors = ref([
+    {
+      name: 'Green',
+      data: [
+        '#f9fafb', '#dcfce7', '#bbf7d0', '#86efac', '#4ade80',
+        '#22c55e', '#16a34a', '#15803d', '#166534', '#14532d'
+      ],
+    },
+    {
+      name: 'Blue',
+      data: [
+        '#f9fafb', '#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa',
+        '#6b7280', '#2563eb', '#374151', '#1e40af', '#1e3a8a'
+      ],
+    },
+    {
+      name: 'Gray',
+      data: [
+        '#f9fafb', '#f3f4f6', '#e5e7eb', '#d1d5db', '#9ca3af',
+        '#6b7280', '#4b5563', '#374151', '#1f2937', '#111827'
+      ],
+    },
+    {
+      name: 'Red',
+      data: [
+        '#f9fafb', '#fee2e2', '#fecaca', '#fca5a5', '#f87171',
+        '#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d'
+      ],
+    },
+  ]);
+  let progressSelectedColor = ref(Cookies.get('spProgressColor') ? Cookies.get('spProgressColor') : '');
 
   const colorLearning = '#4848bf';
   const colorYoung = '#9cd89c';
   const colorMature = '#2f622e';
   const colorDack = '#484848';
   const colorGray = '#a5a5a5';
+
+  const _getProgressColorLegend = () => {
+    let data = progressHeatMapColors.value[0].data;
+    const selectedColorCookie = Cookies.get('spProgressColor') ? Cookies.get('spProgressColor') : 'Green';
+    const colorLegend = progressHeatMapColors.value.find(color => color.name === selectedColorCookie.toString());
+    if (undefined !== colorLegend) {
+      data = colorLegend.data;
+    }
+    console.log({selectedColorCookie, data});
+    return data;
+  }
 
   const _initChartHourlyBreakdown = () => {
     setTimeout(() => {
@@ -992,105 +1060,179 @@ export default function (status = 'publish') {
     }, 500);
   }
   const _initChartProgressChart = () => {
+
+  }
+
+  const _initChartProgressChart3 = () => {
     const largeScreen = jQuery(window).width() > 760;
+
     setTimeout(() => {
-      const theColors = [
-        'rgb(103,0,31)', 'rgb(178,24,43)', 'rgb(214,96,77)',
-        'rgb(244,165,130)', 'rgb(253,219,199)', 'rgb(224,224,224)',
-        'rgb(186,186,186)', 'rgb(135,135,135)', 'rgb(77,77,77)',
-        'rgb(26,26,26)'
-      ];
-      let css = '';
-      theColors.forEach((d, i) => {
-        // css += ".q" + i + " {fill:" + d + "; background-color: " + d + "}";
-        css += `
-          .q${i}:{
-            fill:${d}; 
-            background-color: ${d}; 
-          }
-        `;
-      })
+      //   const theColors = [
+      //     'rgb(103,0,31)', 'rgb(178,24,43)', 'rgb(214,96,77)',
+      //     'rgb(244,165,130)', 'rgb(253,219,199)', 'rgb(224,224,224)',
+      //     'rgb(186,186,186)', 'rgb(135,135,135)', 'rgb(77,77,77)',
+      //     'rgb(26,26,26)'
+      //   ];
+      //   let css = '';
+      //   theColors.forEach((d, i) => {
+      //     // css += ".q" + i + " {fill:" + d + "; background-color: " + d + "}";
+      //     css += `
+      //       .q${i}:{
+      //         fill:${d};
+      //         background-color: ${d};
+      //       }
+      //     `;
+      //   });
 
-      jQuery('#sp-heatmap-style').remove();
-      jQuery('head').append(`
-        <style id="sp-heatmap-style">
-        ${css}
-        </style>
-      `);
+      // jQuery('#sp-heatmap-style').remove();
+      // jQuery('head').append(`
+      //     <style id="sp-heatmap-style">
+      //     ${css}
+      //     </style>
+      //   `);
 
+      // const id = 'sp-chart-progress-chart';
+      // console.log({id});
+      // var cal = new CalHeatMap();
 
-      const id = 'sp-chart-progress-chart';
-      console.log({id});
-      var cal = new CalHeatMap();
-      cal.init({
-        itemSelector: '#' + id,
-        itemName: ["Cluster", "Cluster"],
-        domain: "month",
-        subDomain: "day",
-        domainLabelFormat: "%b-%Y",
-        // data: "data.json",
-        data: {
-          "1420498800": 2,
-          "1420585200": 4,
-          "1420671600": 2,
-          "1420758000": 1,
-          "1421103600": 2,
-          "1421190000": 1,
-          "1421276400": 1,
-          "1421362800": 1,
-          "1421622000": 1,
-          "1421708400": 1,
-          "1422226800": 1,
-          "1422313200": 1,
-          "1422399600": 2,
-          "1422486000": 1,
-          "1422572400": 1,
-          "1423695600": 3,
-          "1424127600": 2,
-          "1424214000": 1,
-          "1424300400": 3,
-          "1424386800": 1,
-          "1424646000": 2,
-          "1424732400": 1,
-          "1424818800": 2,
-          "1424905200": 2,
-          "1424991600": 1,
-          "1425337200": 1,
-          "1425855600": 4,
-          "1426201200": 2,
-          "1426460400": 2,
-          "1426546800": 1,
-          "1426633200": 2,
-          "1426719600": 1,
-          "1426806000": 1,
-          "1427065200": 1,
-          "1427151600": 1,
-          "1427238000": 2,
-          "1427324400": 1,
-          "1427670000": 2,
-          "1428361200": 2,
-          "1428447600": 2,
-          "1428534000": 3,
-          "1428620400": 3,
-          "1428966000": 2,
-          "1429138800": 2,
-          "1429225200": 1,
-          "1429484400": 2,
-          "1429570800": 1,
-          "1429657200": 2,
-          "1429743600": 2,
-          "1429830000": 3
-        },
-        // start: new Date(2012, 02),
-        // maxDate: new Date(2013, 04),
-        cellSize: 16, //
-        range: 12, animationDuration: 1000,
-        subDomainTextFormat: "%d",
-        nextSelector: "#domainDynamicDimension-next",
-        previousSelector: "#domainDynamicDimension-previous",
-        legend: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-        legendCellSize: 15,
-      });
+      // let style = document.createElement('style');
+      // style.type = 'text/css';
+      // ['rgb(103,0,31)', 'rgb(178,24,43)', 'rgb(214,96,77)', 'rgb(244,165,130)', 'rgb(253,219,199)', 'rgb(224,224,224)', 'rgb(186,186,186)', 'rgb(135,135,135)', 'rgb(77,77,77)', 'rgb(26,26,26)']
+      //   .forEach(function (d, i) {
+      //     style.innerHTML += ".q" + i + " {fill:" + d + "; background-color: " + d + "}";
+      //   });
+      // document.getElementsByTagName('head')[0].appendChild(style);
+
+      // let cal = new CalHeatMap();
+      // cal.init({
+      //   itemSelector: '#' + id,
+      //   range: 10,
+      //   start: new Date(2000, 0, 1, 1),
+      //   // data: "datas-hours.json",
+      //   data: {
+      //     "1420498800": 2,
+      //     "1420585200": 4,
+      //     "1420671600": 2,
+      //     "1420758000": 1,
+      //     "1421103600": 2,
+      //     "1421190000": 1,
+      //     "1421276400": 1,
+      //     "1421362800": 1,
+      //     "1421622000": 1,
+      //     "1421708400": 1,
+      //     "1422226800": 1,
+      //     "1422313200": 1,
+      //     "1422399600": 2,
+      //     "1422486000": 1,
+      //     "1422572400": 1,
+      //     "1423695600": 3,
+      //     "1424127600": 2,
+      //     "1424214000": 1,
+      //     "1424300400": 3,
+      //     "1424386800": 1,
+      //     "1424646000": 2,
+      //     "1424732400": 1,
+      //     "1424818800": 2,
+      //     "1424905200": 2,
+      //     "1424991600": 1,
+      //     "1425337200": 1,
+      //     "1425855600": 4,
+      //     "1426201200": 2,
+      //     "1426460400": 2,
+      //     "1426546800": 1,
+      //     "1426633200": 2,
+      //     "1426719600": 1,
+      //     "1426806000": 1,
+      //     "1427065200": 1,
+      //     "1427151600": 1,
+      //     "1427238000": 2,
+      //     "1427324400": 1,
+      //     "1427670000": 2,
+      //     "1428361200": 2,
+      //     "1428447600": 2,
+      //     "1428534000": 3,
+      //     "1428620400": 3,
+      //     "1428966000": 2,
+      //     "1429138800": 2,
+      //     "1429225200": 1,
+      //     "1429484400": 2,
+      //     "1429570800": 1,
+      //     "1429657200": 2,
+      //     "1429743600": 2,
+      //     "1429830000": 3
+      //   },
+      // });
+
+      // cal.init({
+      //   itemSelector: '#' + id,
+      //   itemName: ["Cluster", "Cluster"],
+      //   domain: "month",
+      //   subDomain: "day",
+      //   domainLabelFormat: "%b-%Y",
+      //   // data: "data.json",
+      //   data: {
+      //     "1420498800": 2,
+      //     "1420585200": 4,
+      //     "1420671600": 2,
+      //     "1420758000": 1,
+      //     "1421103600": 2,
+      //     "1421190000": 1,
+      //     "1421276400": 1,
+      //     "1421362800": 1,
+      //     "1421622000": 1,
+      //     "1421708400": 1,
+      //     "1422226800": 1,
+      //     "1422313200": 1,
+      //     "1422399600": 2,
+      //     "1422486000": 1,
+      //     "1422572400": 1,
+      //     "1423695600": 3,
+      //     "1424127600": 2,
+      //     "1424214000": 1,
+      //     "1424300400": 3,
+      //     "1424386800": 1,
+      //     "1424646000": 2,
+      //     "1424732400": 1,
+      //     "1424818800": 2,
+      //     "1424905200": 2,
+      //     "1424991600": 1,
+      //     "1425337200": 1,
+      //     "1425855600": 4,
+      //     "1426201200": 2,
+      //     "1426460400": 2,
+      //     "1426546800": 1,
+      //     "1426633200": 2,
+      //     "1426719600": 1,
+      //     "1426806000": 1,
+      //     "1427065200": 1,
+      //     "1427151600": 1,
+      //     "1427238000": 2,
+      //     "1427324400": 1,
+      //     "1427670000": 2,
+      //     "1428361200": 2,
+      //     "1428447600": 2,
+      //     "1428534000": 3,
+      //     "1428620400": 3,
+      //     "1428966000": 2,
+      //     "1429138800": 2,
+      //     "1429225200": 1,
+      //     "1429484400": 2,
+      //     "1429570800": 1,
+      //     "1429657200": 2,
+      //     "1429743600": 2,
+      //     "1429830000": 3
+      //   },
+      //   // start: new Date(2012, 02),
+      //   // maxDate: new Date(2013, 04),
+      //   cellSize: 16, //
+      //   range: 12, animationDuration: 1000,
+      //   subDomainTextFormat: "%d",
+      //   nextSelector: "#domainDynamicDimension-next",
+      //   previousSelector: "#domainDynamicDimension-previous",
+      //   legend: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      //   legendCellSize: 15,
+      // });
+
       // cal.init({
       //   itemSelector: '#' + id,
       //   domain: "month",
@@ -1113,6 +1255,11 @@ export default function (status = 'publish') {
     }, 500);
   }
 
+  const _reloadProgressChart = () => {
+    setTimeout(() => {
+      _loadProgressChart();
+    }, 400);
+  }
   const _reloadForecast = () => {
     setTimeout(() => {
       console.log('srat reload');
@@ -1219,7 +1366,6 @@ export default function (status = 'publish') {
       _initChartHourlyBreakdown();
     });
   }
-
   const _loadAllStats = () => {
     _loadProgressChart();
     _loadForecast();
@@ -1230,6 +1376,13 @@ export default function (status = 'publish') {
     _loadChartAnswerButtons();
     _loadChartHourlyBreakDown();
   }
+
+  watch(progressSelectedColor, (current, old) => {
+    console.log({current, old});
+    Cookies.set('spProgressColor', current);
+    progressSelectedColor.value = current;
+    _reloadProgressChart();
+  });
 
   const xhrLoadProgressChart = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxProgressChart);
@@ -1458,7 +1611,8 @@ export default function (status = 'publish') {
     statsReviewTime, chartAddedTimeSpan, chartIntervalTimeSpan, statsChartAnserButtons,
     statsHourlyBreakdown, chartProgressChartYear,
     _reloadChartAdded, _reloadChartInterval, statsChartAdded, chartAnswerButtonsTimeSpan,
-    chartHourlyBreakdownDate,
-  };
+    chartHourlyBreakdownDate, statsProgressChart,
+    progressHeatMapColors, progressSelectedColor, _getProgressColorLegend,
+  }
 
 }

@@ -82,6 +82,18 @@ export const vdata = {
 
     } as _Ajax,
   },
+  dataHeatmap: [
+    {date: '2018-9-22', count: 6},
+    {date: '2018-9-23', count: 7},
+    {date: '2018-9-24', count: 8},
+    {date: '2018-9-25', count: 9},
+    {date: '2018-9-12', count: 0},
+    {date: '2018-9-11', count: 4},
+    {date: '2018-9-26', count: 2},
+    {date: '2018-9-27', count: 3},
+    {date: '2018-9-14', count: 12},
+    {date: '2018-9-15', count: 7},
+  ],
   //
   menu: 'deck-groups',
   showExtra: 0,

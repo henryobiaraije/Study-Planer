@@ -78,29 +78,19 @@ class AjaxFrontHelper {
 
     public function ajax_front_load_stats_progress_chart($post): void {
         Initializer::verify_post($post, true);
-        Common::send_error([
-            'ajax_front_load_stats_progress_chart',
-            'post' => $post,
-        ]);
-
-        $all        = $post[Common::VAR_2];
-        $user       = get_user_by('ID', get_current_user_id());
-        $user_name  = $user->user_login;
-        $user_email = $user->user_email;
-        $profile    = [
-            'user_email' => $user_email,
-            'user_name'  => $user_name,
-        ];
-
         //        Common::send_error([
-        //            'ajax_admin_load_user_profile',
-        //            'post'        => $post,
-        //            '$user_name'  => $user_name,
-        //            '$user_email' => $user_email,
+        //            'ajax_front_load_stats_progress_chart',
+        //            'post' => $post,
         //        ]);
 
+        $all  = $post[Common::VAR_2];
+        $year = sanitize_text_field($all['year']);
+        //        $span    = 'one_month';
+        $user_id = get_current_user_id();
 
-        Common::send_success('Profile loaded', $profile);
+        $all = Study::get_user_stats_progress_chart($user_id, $year);
+
+        Common::send_success('Progress chart here', $all);
 
 
     }
@@ -423,10 +413,10 @@ class AjaxFrontHelper {
 
     public function ajax_front_mark_answer($post): void {
         Initializer::verify_post($post);
-        //			Common::send_error( [
-        //				__METHOD__,
-        //				'post' => $post,
-        //			] );
+//        			Common::send_error( [
+//        				__METHOD__,
+//        				'post' => $post,
+//        			] );
 
         $all        = $post[Common::VAR_2];
         $study_id   = (int) sanitize_text_field($all['study_id']);

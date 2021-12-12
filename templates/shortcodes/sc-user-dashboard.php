@@ -19,30 +19,30 @@ $url_settings = $current_url.'?'.http_build_query(array_merge($_GET, array("dash
     <?php /*** Tabs **/ ?>
     <div class="sp-tab flex gap-2 justify-content-center my-4 all-loaded" style="display: none">
         <div class="sp-one-tab ">
-            <a href="<?php echo esc_url_raw($url_dg); ?>" class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 hover:text-white cursor-pointer
+            <a href="<?php echo esc_url_raw($url_dg); ?>" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
 			text-decoration-none bg-sp-200"
                @click.prevent="gotoMenu('deck-groups')"
-               :class="{'font-bold bg-sp-500 text-white ' : menu === 'deck-groups'}"
+               :class="[menu === 'deck-groups' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']"
             >Deck Groups</a>
         </div>
         <div class="sp-one-tab ">
             <a href="<?php echo esc_url_raw($url_settings); ?>"
-               class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 hover:text-white cursor-pointer text-decoration-none bg-sp-200"
+               class="px-2 whitespace-nowrap  md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 hover:text-white focus:text-white cursor-pointer text-decoration-none bg-sp-200"
                @click.prevent="gotoMenu('stats')"
-               :class="{'font-bold bg-sp-500 text-white ' : menu === 'stats'}">Stats</a>
+               :class="[menu === 'stats' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Stats</a>
         </div>
         <div class="sp-one-tab ">
             <a href="<?php echo esc_url_raw($url_settings); ?>"
-               class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 hover:text-white cursor-pointer text-decoration-none bg-sp-200"
+               class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer text-decoration-none bg-sp-200"
                @click.prevent="gotoMenu('settings')"
-               :class="{'font-bold bg-sp-500 text-white ' : menu === 'settings'}">Settings</a>
+               :class="[menu === 'settings' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Settings</a>
         </div>
         <div class="sp-one-tab ">
             <a href="<?php echo esc_url_raw($url_profile); ?>"
-               class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 hover:text-white cursor-pointer text-decoration-none
+               class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer text-decoration-none
 			bg-sp-200"
                @click.prevent="gotoMenu('profile')"
-               :class="{'font-bold bg-sp-500 text-white ' : menu === 'profile'}">Profile</a>
+               :class="[menu === 'profile' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Profile</a>
         </div>
     </div>
 
