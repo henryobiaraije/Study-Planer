@@ -134,6 +134,15 @@ function get_uncategorized_deck_id() {
     return $id;
 }
 
+function get_card_group_background_image($cg_image_id){
+    $image_url = wp_get_attachment_image_url($cg_image_id);
+    if(!$image_url){
+        $cg_image_id = get_option(Settings::OP_DEFAULT_CARD_BG_IMAGE, 0);
+        $image_url = wp_get_attachment_image_url($cg_image_id);
+    }
+    return $image_url;
+}
+
 
 global $wpdb;
 $prefix = $wpdb->prefix.'sp_';

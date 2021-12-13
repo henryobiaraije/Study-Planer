@@ -28,6 +28,7 @@ use StudyPlanner\Libs\Settings;
 use StudyPlanner\Models\Tag;
 use StudyPlanner\Services\Card_Due_Date_Service;
 use function StudyPlanner\get_all_card_grades;
+use function StudyPlanner\get_card_group_background_image;
 
 /**
  * Class AjaxFrontHelper
@@ -79,10 +80,10 @@ class AjaxFrontHelper {
 
     public function ajax_front_load_stats_card_types($post): void {
         Initializer::verify_post($post, true);
-//                Common::send_error([
-//                    'ajax_front_load_stats_card_types',
-//                    'post' => $post,
-//                ]);
+        //                Common::send_error([
+        //                    'ajax_front_load_stats_card_types',
+        //                    'post' => $post,
+        //                ]);
 
         $all  = $post[Common::VAR_2];
         $span = sanitize_text_field($all['date']);
@@ -604,29 +605,31 @@ class AjaxFrontHelper {
 
         $all_cards = $study::get_user_cards_to_study($study->id, $user_id);
 
+        foreach($all_cards as $card){
+            $card->card_group->card_group_edit_url = '';
+            $card->card_group->bg_image_url = get_card_group_background_image($card->card_group->bg_image_id);
+
+        }
 
         //			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
 
 
-        //			Common::send_error( [
-        //				'ajax_front_create_study',
-        //				'post'                   => $post,
-        //				'Manager::getQueryLog()' => Manager::getQueryLog(),
-        //				'$study_id'              => $study_id,
-        //				'$all_cards'             => $all_cards,
-        //				'$user_cards_new'        => $user_cards_new,
-        //				'$user_cards_revise'     => $user_cards_revise,
-        //				'$user_cards_on_hold'    => $user_cards_on_hold,
-        //				'$study'                 => $study,
-        //				'$tags'                  => $tags,
-        //				'$no_of_new'             => $no_of_new,
-        //				'$no_on_hold'            => $no_on_hold,
-        //				'$no_to_revise'          => $no_to_revise,
-        //				'$revise_all'            => $revise_all,
-        //				'$study_all_new'         => $study_all_new,
-        //				'$study_all_on_hold'     => $study_all_on_hold,
-        //				'$user_id'               => $user_id,
-        //			] );
+//        Common::send_error([
+//            'ajax_front_create_study',
+//            'post'                   => $post,
+//            'Manager::getQueryLog()' => Manager::getQueryLog(),
+//            '$study_id'              => $study_id,
+//            '$all_cards'             => $all_cards,
+//            '$study'                 => $study,
+//            '$tags'                  => $tags,
+//            '$no_of_new'             => $no_of_new,
+//            '$no_on_hold'            => $no_on_hold,
+//            '$no_to_revise'          => $no_to_revise,
+//            '$revise_all'            => $revise_all,
+//            '$study_all_new'         => $study_all_new,
+//            '$study_all_on_hold'     => $study_all_on_hold,
+//            '$user_id'               => $user_id,
+//        ]);
 
 
         Common::send_success('Cards loaded.', [

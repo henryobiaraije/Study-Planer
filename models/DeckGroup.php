@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Models\Tag;
+use function StudyPlanner\get_card_group_background_image;
+use function StudyPlanner\get_uncategorized_deck_group_id;
+use function StudyPlanner\get_uncategorized_deck_id;
 
 class DeckGroup extends Model {
     protected $table = SP_DB_PREFIX.'deck_groups';
@@ -76,20 +79,23 @@ class DeckGroup extends Model {
     }
 
     public static function get_deck_groups_front_end($args): array {
-        $user_id     = get_current_user_id();
-        $default     = [
+        $user_id                     = get_current_user_id();
+        $default                     = [
             'search'       => '',
             'page'         => 1,
             'per_page'     => 5,
             'with_trashed' => false,
             'only_trashed' => false,
         ];
-        $args        = wp_parse_args($args, $default);
-        $deck_groups = DeckGroup
+        $args                        = wp_parse_args($args, $default);
+        $uncategorized_deck_group_id = get_uncategorized_deck_group_id();
+        $uncategorized_deck_id       = get_uncategorized_deck_id();
+        $deck_groups                 = DeckGroup
             ::with([
                 'tags',
-                'decks'             => function ($query) {
-                    $query->withCount('card_groups');
+                'decks'             => function ($query) use ($uncategorized_deck_id) {
+                    $query->withCount('card_groups')
+                        ->where('id', '!=', $uncategorized_deck_id);
                 },
                 'decks.card_groups' => function ($query) {
                     $query->withCount('cards');
@@ -99,6 +105,7 @@ class DeckGroup extends Model {
                 },
             ])
             ->where('name', 'like', "%{$args['search']}%")
+            ->where('id', '!=', $uncategorized_deck_group_id)
             ->withCount([
                 'decks',
             ]);
@@ -167,6 +174,7 @@ class DeckGroup extends Model {
                 }
             }
 
+
             $decks_arr = $decks->all();
             usort($decks_arr, function ($a, $b) {
                 if ($a["deck_total_due_cards"] === $b["deck_total_due_cards"]) {
@@ -200,16 +208,16 @@ class DeckGroup extends Model {
             }
             return ($a["total_due"] > $b["total_due"]) ? -1 : 1;
         });
-//        Common::send_error([
-//            'ajax_admin_load_deck_group',
-//            '$user_id'         => $user_id,
-//            '$args'            => $args,
-//            '$all_deck_groups' => $all_deck_groups,
-//            '$deck_groups'     => $deck_groups,
-//            '$deck_group_arr'  => $deck_group_arr,
-//            //				'$deck_groups'     => $deck_groups->toSql(),
-//            //				'getQuery'         => $deck_groups->getQuery(),
-//        ]);
+        //        Common::send_error([
+        //            'ajax_admin_load_deck_group',
+        //            '$user_id'         => $user_id,
+        //            '$args'            => $args,
+        //            '$all_deck_groups' => $all_deck_groups,
+        //            '$deck_groups'     => $deck_groups,
+        //            '$deck_group_arr'  => $deck_group_arr,
+        //            //				'$deck_groups'     => $deck_groups->toSql(),
+        //            //				'getQuery'         => $deck_groups->getQuery(),
+        //        ]);
 
         return [
             'total'       => $total,

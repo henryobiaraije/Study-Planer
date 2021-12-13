@@ -393,6 +393,7 @@ $current_year = date('Y');
 
             <?php /**** Card Types  *****/ ?>
             <div class="one-chart shadow p-2 m-2 mb-4 rounded position-relative min-h-[300px]">
+                <h4 class="text-center m-0 bold font-bold fs-4">Card Types</h4>
                 <p class="text-center m-0 mb-2">The division of cards in your decks</p>
                 <div v-if="!useStats.ajaxDeckCardTypeChart.sending">
                     <!-- <form @submit.prevent="useStats._reloadReviewCount"
@@ -411,8 +412,9 @@ $current_year = date('Y');
                                     name="forecast_span" value="all" type="radio"> <span>All</span></label>
                      </form>-->
                     <div class="chart-review-count sp-slide-in">
-                        <div class="m-auto " id="sp-chart-card-types"
-                             style="width:360px; height:300px;"></div>
+                        <!--                        <div class="m-auto " id="sp-chart-card-types"-->
+                        <!--                             style="width:360px; height:300px;"></div>-->
+                        <canvas class="m-auto" id="sp-chart-card-types" style="max-width:350px;max-width:700px"></canvas>
                     </div>
                     <div class=" sp-slide-in">
                         <!--                        <ul>-->

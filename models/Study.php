@@ -150,6 +150,7 @@ class Study extends Model {
         $graphable                         = [
             'heading'      => [],
             'pie_data'     => [],
+            'pie_data2'    => [],
             'total_cards'  => 0,
             'total_mature' => 0,
             'total_young'  => 0,
@@ -237,18 +238,19 @@ class Study extends Model {
             'value' => $total_new_cards,
         ];
         $graphable['total_cards'] = $total_matured + $total_new_cards + $total_young;
+        $graphable['pie_data2']   = [$total_matured, $total_young, $total_new_cards];
 
-//        Common::send_error([
-//            __METHOD__,
-//            '$total_new_cards'                => $total_new_cards,
-//            '$total_matured'                  => $total_matured,
-//            '$total_young'                    => $total_young,
-//            '$new_cards'                      => $new_cards,
-//            '$graphable'                      => $graphable,
-//            '$all_answers_card_types_matured' => $all_answers_card_types_matured,
-//            '$all_answers_card_types_young'   => $all_answers_card_types_young,
-//            '$forecast_new_cards_to_study'    => $forecast_new_cards_to_study,
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$total_new_cards'                => $total_new_cards,
+        //            '$total_matured'                  => $total_matured,
+        //            '$total_young'                    => $total_young,
+        //            '$new_cards'                      => $new_cards,
+        //            '$graphable'                      => $graphable,
+        //            '$all_answers_card_types_matured' => $all_answers_card_types_matured,
+        //            '$all_answers_card_types_young'   => $all_answers_card_types_young,
+        //            '$forecast_new_cards_to_study'    => $forecast_new_cards_to_study,
+        //        ]);
 
         return [
             'graphable' => $graphable,

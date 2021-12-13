@@ -2,7 +2,7 @@
 
 ?>
 
-<ul class="sp-deck-groups">
+<ul class="sp-deck-groups list-none" style="list-style: none;">
     <li v-for="(item,itemIndex) in deckGroupList"
         :key="item.id"
         class="mb-4">
@@ -84,9 +84,9 @@
                     </div>
                 </div>
             </div>
-            <ul class="sp-decks "
+            <ul class="sp-decks list-none  list-none"
                 :class="['decks-'+item.id]"
-                style="display: none">
+                style="display: none; list-style: none">
                 <?php /**** Deck header ***/ ?>
                 <li v-for="(item2,itemIndex2) in item.decks_arr"
                     :key="item2.id"

@@ -21,6 +21,7 @@
     "bootstrap": "^5.1.0",
     "bootstrap-vue": "^2.21.2",
     "chart.js": "^3.6.1",
+    "chartjs-plugin-labels": "^1.1.0",
     "ckeditor5": "^31.0.0",
     "crypto-js": "^4.1.1",
     "echarts": "^5.2.2",

@@ -11,7 +11,7 @@ if (!is_user_logged_in()) {
     <div class="modal-dialog" style="max-width: 95%;">
         <form v-if="null !== studyToEdit" @submit.prevent="userDash.startStudy" class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" >
+                <h5 class="modal-title">
                     <span @click.prevent="incrShowExtra">Study</span>
                     ({{studyToEdit.deck.name}}) | {{userDash.answeredCount.value}}
                     <span v-if="null !== currentQuestion"
@@ -22,7 +22,9 @@ if (!is_user_logged_in()) {
                 <button type="button" id="hide-question-moadl" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div v-if="null !== currentQuestion" class="sp-question">
+                <div v-if="null !== currentQuestion" class="sp-question min-h-[65vh]"
+                     style="background-repeat: no-repeat;background-size: cover;"
+                     :style="{'background-image' : 'url('+currentQuestion.card_group.bg_image_url+')'}">
                     <div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question">
                         <div v-html="currentQuestion.question "
                              class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center sp-slide-in mb-2"></div>
