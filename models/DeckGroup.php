@@ -140,9 +140,10 @@ class DeckGroup extends Model {
                 } else {
                     $_deck->due_summary = Study::get_study_due_summary($_study->id, $user_id);
                 }
-                $deck_total_due_cards               = $_deck->due_summary['new']
+                $deck_total_due_cards = $_deck->due_summary['new']
                     + $_deck->due_summary['revision']
                     + $_deck->due_summary['previously_false'];
+                +$_deck->due_summary['revision'];
                 $_deck->deck_total_due_cards        = $deck_total_due_cards;
                 $dg_due_summary['total']            += $deck_total_due_cards;
                 $dg_due_summary['new']              = $dg_due_summary['new'] + $_deck->due_summary['new'];
@@ -166,10 +167,9 @@ class DeckGroup extends Model {
                 }
             }
 
-            $decks = $decks->all();
-            usort($decks, function ($a, $b) {
-                if ($a["deck_total_due_cards"] == $b["deck_total_due_cards"]) {
-                    //                    dd($a->deck_total_due_cards);
+            $decks_arr = $decks->all();
+            usort($decks_arr, function ($a, $b) {
+                if ($a["deck_total_due_cards"] === $b["deck_total_due_cards"]) {
                     return 0;
                 }
                 return ($a["deck_total_due_cards"] > $b["deck_total_due_cards"]) ? -1 : 1;
@@ -185,22 +185,35 @@ class DeckGroup extends Model {
             //                    '$decks'           => $decks,
             //                ]);
             //            }
+            $dg->decks_arr   = $decks_arr;
             $dg->decks       = $decks;
             $dg->due_summary = $dg_due_summary;
+            $dg->total_due   = $dg_due_summary['total']
+                + $dg_due_summary['new']
+                + $dg_due_summary['revision']
+                + $dg_due_summary['previously_false'];
         }
-        //			Common::send_error( [
-        //				'ajax_admin_load_deck_group',
-        //				'$user_id'            => $user_id,
-        //				'$args'            => $args,
-        //				'$all_deck_groups' => $all_deck_groups,
-        //				'$deck_groups'     => $deck_groups,
-        ////				'$deck_groups'     => $deck_groups->toSql(),
-        ////				'getQuery'         => $deck_groups->getQuery(),
-        //			] );
+        $deck_group_arr = $deck_groups->all();
+        usort($deck_group_arr, function ($a, $b) {
+            if ($a["total_due"] == $b["total_due"]) {
+                return 0;
+            }
+            return ($a["total_due"] > $b["total_due"]) ? -1 : 1;
+        });
+//        Common::send_error([
+//            'ajax_admin_load_deck_group',
+//            '$user_id'         => $user_id,
+//            '$args'            => $args,
+//            '$all_deck_groups' => $all_deck_groups,
+//            '$deck_groups'     => $deck_groups,
+//            '$deck_group_arr'  => $deck_group_arr,
+//            //				'$deck_groups'     => $deck_groups->toSql(),
+//            //				'getQuery'         => $deck_groups->getQuery(),
+//        ]);
 
         return [
             'total'       => $total,
-            'deck_groups' => $deck_groups->all(),
+            'deck_groups' => $deck_group_arr,
         ];
     }
 

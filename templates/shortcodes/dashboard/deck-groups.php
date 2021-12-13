@@ -11,7 +11,7 @@
             <div class="flex flex-wrap sp-deck-group-header">
                 <div @click="toggle('.decks-'+item.id)"
                      style="min-width: 300px"
-                     class="sp-header-title flex bg-sp-100 hover:bg-sp-200  px-3 py-3 flex-1">
+                     class="sp-header-title flex bg-sp-200 hover:bg-sp-300  px-3 py-3 flex-1">
                     <div class="sp-icon flex-initial items-center flex">
                         <svg xmlns="http://www.w3.org/2000/svg"
                              xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -62,7 +62,7 @@
                     <div class="sp-name text-2xl px-10 py-2  flex-1 font-medium items-center flex flex-1 font-medium items-center justify-center px-10 py-2 sp-name text-2xl text-center">
                         {{item.name}}
                     </div>
-                    <div class="sp-deck-count flex-initial flex items-center">{{item.decks.length}} decks</div>
+                    <div class="sp-deck-count flex-initial flex items-center">{{item.decks_arr.length}} decks</div>
                 </div>
                 <div class="sp-header-stats  py-2 px-4 flex-initial bg-sp-100 w-full md:w-auto"
                      style="min-width: 300px">
@@ -88,7 +88,7 @@
                 :class="['decks-'+item.id]"
                 style="display: none">
                 <?php /**** Deck header ***/ ?>
-                <li v-for="(item2,itemIndex2) in item.decks"
+                <li v-for="(item2,itemIndex2) in item.decks_arr"
                     :key="item2.id"
                     class="pl-4 mt-2">
                     <div @click="userDash.openStudyModal(item2)" class="sp-d-header cursor-pointer  flex flex-wrap gap-0 md:gap-2">
