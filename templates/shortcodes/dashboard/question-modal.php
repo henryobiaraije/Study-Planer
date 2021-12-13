@@ -7,9 +7,9 @@ if (!is_user_logged_in()) {
 
 
 <div class="modal fade" id="modal-questions" style="z-index:99999999;display: none" tabindex="-1"
-     aria-labelledby="exampleModalEdit" aria-hidden="true">
-    <div class="modal-dialog" style="max-width: 95%;">
-        <form v-if="null !== studyToEdit" @submit.prevent="userDash.startStudy" class="modal-content">
+     aria-labelledby="exampleModalEdit" aria-hidden="true" style="padding:0; margin:0">
+    <div class="modal-dialog" style="max-width: 100%;margin: 0;height: 100%;min-height: 100%;max-height: 100%;">
+        <form v-if="null !== studyToEdit" @submit.prevent="userDash.startStudy" class="modal-content" style="height: 100%;">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <span @click.prevent="incrShowExtra">Study</span>
@@ -22,27 +22,31 @@ if (!is_user_logged_in()) {
                 <button type="button" id="hide-question-moadl" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div v-if="null !== currentQuestion" class="sp-question min-h-[65vh]"
+                <div v-if="null !== currentQuestion" class="sp-question min-h-[65vh] flex align-items-center"
                      style="background-repeat: no-repeat;background-size: cover;"
                      :style="{'background-image' : 'url('+currentQuestion.card_group.bg_image_url+')'}">
                     <?php /*** Basic Card ***/ ?>
-                    <div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question" style="font-family: 'Montserrat', sans-serif;">
-                        <div v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.answer : currentQuestion.question "
-                             class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center sp-slide-in mb-2"></div>
-                        <div v-show="userDash.showCurrentAnswer.value"  style="font-family: 'Montserrat', sans-serif;"
+                    <div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question"
+                         style="font-family: 'Montserrat', sans-serif;">
+                        <div  v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.answer : currentQuestion.question "
+                             class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center mb-2"></div>
+                        <div v-show="userDash.showCurrentAnswer.value" style="font-family: 'Montserrat', sans-serif;"
                              v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.question : currentQuestion.answer"
-                             class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center sp-slide-in"></div>
+                             class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
                     </div>
+                    <?php /*** Gap Card ***/ ?>
                     <div v-else-if="'gap' === currentQuestion.card_group.card_type" class="sp-gap-question ">
-                        <div @click="userDash._showAnswer()" v-html="currentQuestion.question"  style="font-family: 'Montserrat', sans-serif;"
-                             class="shadow p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto sp-slide-in"></div>
-                        <div v-show="userDash.showCurrentAnswer.value" v-html="currentQuestion.answer"  style="font-family: 'Montserrat', sans-serif;"
-                             class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center sp-slide-in"></div>
+                        <div v-show="!userDash.showCurrentAnswer.value"
+                             @click="userDash._showAnswer()" v-html="currentQuestion.question" style="font-family: 'Montserrat', sans-serif;"
+                             class=" p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto "></div>
+                        <div v-show="userDash.showCurrentAnswer.value" v-html="currentQuestion.answer" style="font-family: 'Montserrat', sans-serif;"
+                             class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
                     </div>
                     <?php /*** Table Card ***/ ?>
                     <div v-else-if="'table' === currentQuestion.card_group.card_type" class="sp-table-question ">
-                        <table @click="userDash._showAnswer()" v-if="currentQuestion.question.length > 0"
-                               class="table gap-table shadow p-2 bg-sp-100 rounded sp-slide-in mb-2"  style="font-family: 'Montserrat', sans-serif;">
+                        <table v-show="!userDash.showCurrentAnswer.value"
+                               @click="userDash._showAnswer()" v-if="currentQuestion.question.length > 0"
+                               class="table gap-table  p-2 bg-sp-100 rounded  mb-2" style="font-family: 'Montserrat', sans-serif;">
                             <thead>
                             <tr>
                                 <th v-for="(item2,itemIndex2) in currentQuestion.question[0]"
@@ -61,8 +65,9 @@ if (!is_user_logged_in()) {
                             </tr>
                             </tbody>
                         </table>
-                        <table v-if="currentQuestion.answer.length > 0 && userDash.showCurrentAnswer.value"  style="font-family: 'Montserrat', sans-serif;"
-                               class="table gap-table shadow p-2 bg-sp-100 rounded sp-slide-in">
+                        <table v-if="currentQuestion.answer.length > 0 && userDash.showCurrentAnswer.value"
+                               style="font-family: 'Montserrat', sans-serif;"
+                               class="table gap-table  p-2 bg-sp-100 rounded ">
                             <thead>
                             <tr>
                                 <th v-for="(item2,itemIndex2) in currentQuestion.answer[0]"
@@ -84,7 +89,8 @@ if (!is_user_logged_in()) {
                     </div>
                     <?php /*** Image Card ***/ ?>
                     <div v-else-if="'image' === currentQuestion.card_group.card_type">
-                        <div class="sp-image-question m-auto sp-slide-in mb-2">
+                        <div v-show="!userDash.showCurrentAnswer.value"
+                             class="sp-image-question m-auto  mb-2">
                             <div class="image-area" :style="{height: currentQuestion.h+'px' }">
                                 <div :id="'main-preview-'+currentQuestion.hash"
                                      class="image-area-inner-preview image-card-view ">
@@ -99,7 +105,7 @@ if (!is_user_logged_in()) {
                                 </div>
                             </div>
                         </div>
-                        <div v-show="userDash.showCurrentAnswer.value" class="sp-image-question m-auto sp-slide-in">
+                        <div v-show="userDash.showCurrentAnswer.value" class="sp-image-question m-auto ">
                             <div class="image-area" :style="{height: currentQuestion.h+'px' }">
                                 <div :id="'main-preview-'+currentQuestion.hash"
                                      class="image-area-inner-preview image-card-view ">
@@ -159,7 +165,7 @@ if (!is_user_logged_in()) {
                 </div>
                 <?php /** Debug Section */ ?>
                 <section v-if="showExtra && null !== userDash.lastAnsweredDebugData.value" class="debug-section p-2">
-                    <table class="table shadow rounded">
+                    <table class="table  rounded">
                         <tbody>
                         <tr v-for="(value,key) in userDash.lastAnsweredDebugData.value">
                             <td>{{key}}</td>

@@ -62,23 +62,26 @@
                     <div class="sp-name text-2xl px-10 py-2  flex-1 font-medium items-center flex flex-1 font-medium items-center justify-center px-10 py-2 sp-name text-2xl text-center">
                         {{item.name}}
                     </div>
-                    <div class="sp-deck-count flex-initial flex items-center">{{item.decks_arr.length}} decks</div>
+                    <div class="sp-deck-count flex-initial flex items-center">{{item.decks_arr.length}} deck{{(item.decks_arr.length > 1) ? 's' : ''
+                        }}
+                    </div>
                 </div>
                 <div class="sp-header-stats  py-2 px-4 flex-initial bg-sp-100 w-full md:w-auto"
+                     @click="toggle('.decks-'+item.id)"
                      style="min-width: 300px">
-                    <div class="status-title text-center font-bold">Number of cards due for revision</div>
+<!--                    <div class="status-title text-center font-bold">Number of cards due for revision</div>-->
                     <div class="to-study flex">
-                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
-                            <div class="study-title whitespace-nowrap">On
-                                hold <?php //todo might change to "Previously false" ?></div>
+                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center flex gap-2">
+                            <div class="study-title whitespace-nowrap ">On
+                                hold: <?php //todo might change to "Previously false" ?></div>
                             <div class="study-number font-bold fs-4">{{item.due_summary['previously_false']}}</div>
                         </div>
-                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
-                            <div class="study-title whitespace-nowrap">Revision</div>
+                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center flex gap-2">
+                            <div class="study-title whitespace-nowrap">Revision:</div>
                             <div class="study-number font-bold fs-4">{{item.due_summary['revision']}}</div>
                         </div>
-                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
-                            <div class="study-title whitespace-nowrap">New cards</div>
+                        <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center flex gap-2">
+                            <div class="study-title whitespace-nowrap">New cards:</div>
                             <div class="study-number font-bold fs-4">{{item.due_summary['new']}}</div>
                         </div>
                     </div>
@@ -99,7 +102,9 @@
 									items-center flex flex-1 font-medium items-center justify-center px-10 py-2 sp-name text-2xl text-center">
                                 {{item2.name}}
                             </div>
-                            <div class="sp-deck-count flex-initial flex items-center">{{item2.card_count}} cards</div>
+                            <div class="sp-deck-count flex-initial flex items-center">{{item2.card_count}} card{{(item2.card_count > 1) ? 's' : ''
+                                }}
+                            </div>
                         </div>
                         <div class="sp-header-stats  py-2 flex-initial bg-sp-100 w-full md:w-auto"
                              style="min-width: 300px;">

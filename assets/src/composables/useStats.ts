@@ -1807,7 +1807,7 @@ export default function (status = 'publish') {
     ajaxChartAnswerButtons, ajaxHourlyBreakdown, ajaxDeckCardTypeChart,
     _loadAllStats, _loadForecast, _loadProgressChart,
     forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime, _reloadChartAnswerButtons,
-    _loadChartAnswerButtons, _loadChartHourlyBreakDown,
+    _loadChartAnswerButtons, _loadChartHourlyBreakDown,statsChartInterval,
     statsForecast, ajaxReview, statsReview, reviewCountSpan, reviewTimeSpan,
     statsReviewTime, chartAddedTimeSpan, chartIntervalTimeSpan, statsChartAnserButtons,
     statsHourlyBreakdown, chartProgressChartYear,

@@ -81,7 +81,7 @@
 			<div class="modal-footer" >
 				<ajax-action
 						button-text="Study"
-						css-classes="button"
+						css-classes="sp-action-button"
 						icon="fa fa-save"
 						:ajax="userDash.ajaxSaveStudy.value" >
 				</ajax-action >

@@ -281,6 +281,12 @@ class Initialize_Db {
             //                $table->foreign('card_id')->references('id')->on(SP_TABLE_CARDS)->cascadeOnUpdate()->nullOnDelete();
             //            });
         }
+        if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'question')) {
+            Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
+                $table->boolean('question')->after('answer');
+            });
+        }
+
 
     }
 

@@ -1127,13 +1127,13 @@ class Study extends Model {
             //            'card_ids_not_in' => $matured_cards['card_ids'],
         ])['answers'];
 
-        //        Common::send_error([
-        //            __METHOD__,
-        //            'user_id'       => $user_id,
-        //            "start_date"                          => $start_date,
-        //            'end_date'                            => $end_date,
-        //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
-        //        ]);
+        //                Common::send_error([
+        //                    __METHOD__,
+        //                    'user_id'       => $user_id,
+        //                    "start_date"                          => $start_date,
+        //                    'end_date'                            => $end_date,
+        //                    '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //                ]);
 
         $max_day_diff         = 0;
         $day_diff_count_total = 0;
@@ -1206,13 +1206,15 @@ class Study extends Model {
         $day_diff_average                     = (0 === $no_of_day_diffs) ? 0 : $day_diff_count_total / $no_of_day_diffs;
         $graphable['days']                    = $days;
         $graphable['longest_interval']        = $max_day_diff;
-        $graphable['day_diff_average']        = $day_diff_average;
+        $graphable['day_diff_average']        = number_format($day_diff_average, 2);
         $graphable['formed_day_diff_average'] = Common::get_days_or_months($day_diff_average);
         $graphable['formed_longest_interval'] = Common::get_days_or_months($max_day_diff);
+
         //        Common::send_error([
         //            __METHOD__,
         //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
         //            '$answer'                             => $answer,
+        //            '$no_of_day_diffs'                    => $no_of_day_diffs,
         //            '$max_day_diff'                       => $max_day_diff,
         //            '$day_diff_count_total'               => $day_diff_count_total,
         //            '$days'                               => $days,
@@ -2791,7 +2793,10 @@ class Study extends Model {
 
         try {
             $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
-
+            $user_timezone_midnight_today      = get_user_timezone_date_midnight_today($user_id);
+            //            Common::send_error( [
+            //                '$study_id'                   => $study_id,
+            //            ] );
             $study         = Study::with('tags')->findOrFail($study_id);
             $deck_id       = $study->deck_id;
             $tags          = [];
@@ -2803,6 +2808,7 @@ class Study extends Model {
                 $tags = $study->tags->pluck('id');
             }
 
+
             /*** Get all new cards answered today "Only those answered once and today are truly new" ***/
             $query_new_answered_today     = Answered::where('study_id', '=', $study_id)
                 ->where('created_at', '>', $user_timezone_early_morning_today)
@@ -2812,13 +2818,13 @@ class Study extends Model {
             $count_new_studied_today      = $new_card_ids_answered_today->count();
             $no_of_new_remaining_to_study = $no_of_new - $count_new_studied_today;
 
-            //				Common::send_error( [
-            //					'sql'                           => $query_new_answered_today->toSql(),
-            //					'getBindings'                   => $query_new_answered_today->getBindings(),
-            //					'$count_new_studied_today'      => $count_new_studied_today,
-            //					'$no_of_new_remaining_to_study' => $no_of_new_remaining_to_study,
-            //					'$new_card_ids_answered_today'  => $new_card_ids_answered_today,
-            //				] );
+            //            				Common::send_error( [
+            //            					'sql'                           => $query_new_answered_today->toSql(),
+            //            					'getBindings'                   => $query_new_answered_today->getBindings(),
+            //            					'$count_new_studied_today'      => $count_new_studied_today,
+            //            					'$no_of_new_remaining_to_study' => $no_of_new_remaining_to_study,
+            //            					'$new_card_ids_answered_today'  => $new_card_ids_answered_today,
+            //            				] );
 
             /*** Prepare basic query ***/
             $cards_query = Manager::table(SP_TABLE_CARDS.' as c')
@@ -2827,6 +2833,16 @@ class Study extends Model {
                 ->leftJoin(SP_TABLE_TAGGABLES.' as tg', 'tg.taggable_id', '=', 'cg.id')
                 ->leftJoin(SP_TABLE_TAGS.' as t', 't.id', '=', 'tg.tag_id')
                 ->where('tg.taggable_type', '=', CardGroup::class)
+                ->where(function ($query) use ($user_timezone_midnight_today) {
+                    $query
+                        ->where(function ($q) use ($user_timezone_midnight_today) {
+                            $q->whereNotNull('cg.scheduled_at')
+                                ->where('cg.scheduled_at', '<=', $user_timezone_midnight_today);
+                        })
+                        ->orWhere(function ($q) {
+                            $q->whereNull('cg.scheduled_at');
+                        });
+                })
                 //					->whereNotIn( 'c.id', function ( $q ) use ( $study_id ) {
                 //						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED . ' as a' )
                 //							->where( 'study_id', '=', $study_id )
@@ -2835,6 +2851,7 @@ class Study extends Model {
                 ->select(
                     'c.id as card_id'
                 );
+
 
             /*** Add just a few tags? ***/
             if (!$add_all_tags) {
@@ -2895,16 +2912,16 @@ class Study extends Model {
             /*** Get the cards ***/
             $all_cards = Card::with('card_group', 'card_group.deck')
                 ->whereIn('id', $card_ids);
-            //            Common::send_error([
-            //                '$card_ids'                   => $card_ids,
-            //                '$user_timezone_early_morning_today'                   => $user_timezone_early_morning_today,
-            //                '$all_cards->toSql()'         => $all_cards->toSql(),
-            //                '$all_cards->getBindings()'   => $all_cards->getBindings(),
-            //                '$all_cards->get()'           => $all_cards->get(),
-            //                '$cards_query->toSql()'       => $cards_query->toSql(),
-            //                '$cards_query->getBindings()' => $cards_query->getBindings(),
-            //                '$cards_query->get('          => $cards_query->get(),
-            //            ]);
+//            Common::send_error([
+//                '$card_ids'                          => $card_ids,
+//                '$user_timezone_early_morning_today' => $user_timezone_early_morning_today,
+//                '$all_cards->toSql()'                => $all_cards->toSql(),
+//                '$all_cards->getBindings()'          => $all_cards->getBindings(),
+//                '$all_cards->get()'                  => $all_cards->get(),
+//                '$cards_query->toSql()'              => $cards_query->toSql(),
+//                '$cards_query->getBindings()'        => $cards_query->getBindings(),
+//                '$cards_query->get('                 => $cards_query->get(),
+//            ]);
             //            dd(
             //                $card_ids,
             //                $all_cards->toSql(),
@@ -2939,11 +2956,19 @@ class Study extends Model {
             ];
 
         } catch (ItemNotFoundException $e) {
+//            Common::send_error([
+//                __METHOD__,
+//                '$e' => $e->getMessage(),
+//            ]);
             //todo handle later
             return [
                 'cards' => [],
             ];
         } catch (ModelNotFoundException $e) {
+//            Common::send_error([
+//                __METHOD__,
+//                '$e' => $e->getMessage(),
+//            ]);
             //todo handle later
             return [
                 'cards' => [],

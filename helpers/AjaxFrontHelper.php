@@ -434,15 +434,16 @@ class AjaxFrontHelper {
 
     public function ajax_front_mark_answer($post): void {
         Initializer::verify_post($post);
-        //        			Common::send_error( [
-        //        				__METHOD__,
-        //        				'post' => $post,
-        //        			] );
+        //        Common::send_error([
+        //            __METHOD__,
+        //            'post' => $post,
+        //        ]);
 
         $all        = $post[Common::VAR_2];
         $study_id   = (int) sanitize_text_field($all['study_id']);
         $card_id    = (int) sanitize_text_field($all['card_id']);
-        $answer     = $all['answer'];
+        $e_answer   = $all['answer'];
+        $e_question = $all['question'];
         $grade      = sanitize_text_field($all['grade']);
         $all_grades = get_all_card_grades();
 
@@ -511,7 +512,8 @@ class AjaxFrontHelper {
         $answer = Answered::create([
             'study_id'            => $study_id,
             'card_id'             => $card_id,
-            'answer'              => $answer,
+            'answer'              => $e_answer,
+            'question'            => $e_question,
             'grade'               => $grade,
             'answered_as_new'     => $answered_as_new,
             'answered_as_revised' => $answered_as_revised,
@@ -587,12 +589,12 @@ class AjaxFrontHelper {
             Common::send_error('Invalid study plan');
         }
 
-        //			Common::send_error( [
-        //				'ajax_front_get_question',
-        //				'post'      => $post,
-        //				'$study_id' => $study_id,
-        //				'$study'    => $study,
-        //			] );
+        //        			Common::send_error( [
+        //        				'ajax_front_get_question',
+        //        				'post'      => $post,
+        //        				'$study_id' => $study_id,
+        //        				'$study'    => $study,
+        //        			] );
 
         $tags              = $study->tags;
         $no_of_new         = $study->no_of_new;
@@ -605,31 +607,31 @@ class AjaxFrontHelper {
 
         $all_cards = $study::get_user_cards_to_study($study->id, $user_id);
 
-        foreach($all_cards as $card){
+        foreach ($all_cards as $card) {
             $card->card_group->card_group_edit_url = '';
-            $card->card_group->bg_image_url = get_card_group_background_image($card->card_group->bg_image_id);
+            $card->card_group->bg_image_url        = get_card_group_background_image($card->card_group->bg_image_id);
 
         }
 
         //			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
 
 
-//        Common::send_error([
-//            'ajax_front_create_study',
-//            'post'                   => $post,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//            '$study_id'              => $study_id,
-//            '$all_cards'             => $all_cards,
-//            '$study'                 => $study,
-//            '$tags'                  => $tags,
-//            '$no_of_new'             => $no_of_new,
-//            '$no_on_hold'            => $no_on_hold,
-//            '$no_to_revise'          => $no_to_revise,
-//            '$revise_all'            => $revise_all,
-//            '$study_all_new'         => $study_all_new,
-//            '$study_all_on_hold'     => $study_all_on_hold,
-//            '$user_id'               => $user_id,
-//        ]);
+        //                Common::send_error([
+        //                    'ajax_front_create_study',
+        //                    'post'                   => $post,
+        //                    'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //                    '$study_id'              => $study_id,
+        //                    '$all_cards'             => $all_cards,
+        //                    '$study'                 => $study,
+        //                    '$tags'                  => $tags,
+        //                    '$no_of_new'             => $no_of_new,
+        //                    '$no_on_hold'            => $no_on_hold,
+        //                    '$no_to_revise'          => $no_to_revise,
+        //                    '$revise_all'            => $revise_all,
+        //                    '$study_all_new'         => $study_all_new,
+        //                    '$study_all_on_hold'     => $study_all_on_hold,
+        //                    '$user_id'               => $user_id,
+        //                ]);
 
 
         Common::send_success('Cards loaded.', [
@@ -645,6 +647,8 @@ class AjaxFrontHelper {
         //				'ajax_front_create_study',
         //				'post' => $post,
         //			] );
+        Initializer::verify_post($post, true);
+        $user_id = get_current_user_id();
 
         $all               = $post[Common::VAR_2]['study'];
         $deck_id           = (int) sanitize_text_field($all['deck']['id']);
@@ -664,16 +668,10 @@ class AjaxFrontHelper {
                 'post' => $post,
             ]);
         }
-        $study = null;
-        if (!empty($study_id)) {
-            $study = Study::find($study_id);
-
-            if (empty($study)) {
-                Common::send_error('Invalid study plan');
-            }
-        }
-
-        $user_id = get_current_user_id();
+        $study = Study
+            ::where('deck_id', '=', $deck_id)
+            ->where('user_id', '=', $user_id)
+            ->get()->first();
 
         Manager::beginTransaction();
 

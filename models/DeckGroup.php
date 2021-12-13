@@ -115,16 +115,16 @@ class DeckGroup extends Model {
         $deck_groups = $deck_groups->offset($offset)
             ->limit($args['per_page'])
             ->orderByDesc('id');
-        //			Common::send_error( [
-        //				__METHOD__,
-        //				'query' => $deck_groups->toSql(),
-        //			] );
+//        Common::send_error([
+//            __METHOD__,
+//            'query' => $deck_groups->toSql(),
+//        ]);
         $deck_groups = $deck_groups->get();
-        //			Common::send_error( [
-        //				'ajax_admin_load_deck_group',
-        //				'$args'        => $args,
-        //				'$deck_groups' => $deck_groups,
-        //			] );
+//        Common::send_error([
+//            'ajax_admin_load_deck_group',
+//            '$args'        => $args,
+//            '$deck_groups' => $deck_groups,
+//        ]);
         $all_deck_groups = [];
         foreach ($deck_groups as $dg) {
             $decks          = $dg->decks;
@@ -147,7 +147,7 @@ class DeckGroup extends Model {
                 } else {
                     $_deck->due_summary = Study::get_study_due_summary($_study->id, $user_id);
                 }
-                $deck_total_due_cards = $_deck->due_summary['new']
+                $deck_total_due_cards               = $_deck->due_summary['new']
                     + $_deck->due_summary['revision']
                     + $_deck->due_summary['previously_false'];
                 $_deck->deck_total_due_cards        = $deck_total_due_cards;
