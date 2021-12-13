@@ -150,7 +150,6 @@ class DeckGroup extends Model {
                 $deck_total_due_cards = $_deck->due_summary['new']
                     + $_deck->due_summary['revision']
                     + $_deck->due_summary['previously_false'];
-                +$_deck->due_summary['revision'];
                 $_deck->deck_total_due_cards        = $deck_total_due_cards;
                 $dg_due_summary['total']            += $deck_total_due_cards;
                 $dg_due_summary['new']              = $dg_due_summary['new'] + $_deck->due_summary['new'];

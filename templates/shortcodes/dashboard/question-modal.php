@@ -25,22 +25,24 @@ if (!is_user_logged_in()) {
                 <div v-if="null !== currentQuestion" class="sp-question min-h-[65vh]"
                      style="background-repeat: no-repeat;background-size: cover;"
                      :style="{'background-image' : 'url('+currentQuestion.card_group.bg_image_url+')'}">
-                    <div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question">
-                        <div v-html="currentQuestion.question "
+                    <?php /*** Basic Card ***/ ?>
+                    <div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question" style="font-family: 'Montserrat', sans-serif;">
+                        <div v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.answer : currentQuestion.question "
                              class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center sp-slide-in mb-2"></div>
-                        <div v-show="userDash.showCurrentAnswer.value" v-html="currentQuestion.answer"
+                        <div v-show="userDash.showCurrentAnswer.value"  style="font-family: 'Montserrat', sans-serif;"
+                             v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.question : currentQuestion.answer"
                              class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center sp-slide-in"></div>
                     </div>
                     <div v-else-if="'gap' === currentQuestion.card_group.card_type" class="sp-gap-question ">
-                        <div @click="userDash._showAnswer()" v-html="currentQuestion.question"
+                        <div @click="userDash._showAnswer()" v-html="currentQuestion.question"  style="font-family: 'Montserrat', sans-serif;"
                              class="shadow p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto sp-slide-in"></div>
-                        <div v-show="userDash.showCurrentAnswer.value" v-html="currentQuestion.answer"
+                        <div v-show="userDash.showCurrentAnswer.value" v-html="currentQuestion.answer"  style="font-family: 'Montserrat', sans-serif;"
                              class="sp-answer lg:max-w-4xl m-auto shadow p-2 rounded-2 text-center sp-slide-in"></div>
                     </div>
                     <?php /*** Table Card ***/ ?>
                     <div v-else-if="'table' === currentQuestion.card_group.card_type" class="sp-table-question ">
                         <table @click="userDash._showAnswer()" v-if="currentQuestion.question.length > 0"
-                               class="table gap-table shadow p-2 bg-sp-100 rounded sp-slide-in mb-2">
+                               class="table gap-table shadow p-2 bg-sp-100 rounded sp-slide-in mb-2"  style="font-family: 'Montserrat', sans-serif;">
                             <thead>
                             <tr>
                                 <th v-for="(item2,itemIndex2) in currentQuestion.question[0]"
@@ -59,7 +61,7 @@ if (!is_user_logged_in()) {
                             </tr>
                             </tbody>
                         </table>
-                        <table v-if="currentQuestion.answer.length > 0 && userDash.showCurrentAnswer.value"
+                        <table v-if="currentQuestion.answer.length > 0 && userDash.showCurrentAnswer.value"  style="font-family: 'Montserrat', sans-serif;"
                                class="table gap-table shadow p-2 bg-sp-100 rounded sp-slide-in">
                             <thead>
                             <tr>
@@ -87,6 +89,7 @@ if (!is_user_logged_in()) {
                                 <div :id="'main-preview-'+currentQuestion.hash"
                                      class="image-area-inner-preview image-card-view ">
 									<span v-for="(item2,itemIndex2) in currentQuestion.question.boxes"
+                                          style="font-family: 'Montserrat', sans-serif;"
                                           :id="'sp-box-preview-'+item2.hash"
                                           :class="{'show-box': item2.show, 'asked-box' : item2.asked, 'hide-box' : item2.hide }"
                                           :key="item2.hash" class="sp-box-preview ">
@@ -101,6 +104,7 @@ if (!is_user_logged_in()) {
                                 <div :id="'main-preview-'+currentQuestion.hash"
                                      class="image-area-inner-preview image-card-view ">
 									<span v-for="(item2,itemIndex2) in currentQuestion.answer.boxes"
+                                          style="font-family: 'Montserrat', sans-serif;"
                                           :id="'sp-box-preview-'+item2.hash"
                                           :class="{'show-box': item2.show, 'hide-box' : item2.hide, 'hide-box' : item2.hide }"
                                           :key="item2.hash" class="sp-box-preview">

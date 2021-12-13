@@ -249,6 +249,12 @@ const m_init = {
       jQuery('.all-loaded').show();
       this.generalInit();
     });
+    jQuery('head').append(`
+    <style>
+     @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;1,300&display=swap');
+    </style>`
+    );
+    console.log('Style appended');
     // vdis.xhrLoadEndpoints();
   },
   pageChanged(page) {
