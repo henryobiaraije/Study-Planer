@@ -144,6 +144,273 @@ class Study extends Model {
         return Study::with('tags', 'deck')->find($study_id);
     }
 
+    public static function get_user_stats_card_types($user_id, $span) {
+        //        $matured_cards = self::get_user_matured_card_ids($user_id);
+        $graphable                         = [
+            'heading'       => [],
+            'cumulative'    => [],
+            'y'             => [],
+            'm'             => [],
+            'y_debug'       => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'm_debug'       => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'total_reviews' => 0,
+            'average'       => 0,
+            'due_tomorrow'  => 0,
+        ];
+        $matured_day_no                    = get_mature_card_days();
+        $end_date                          = null;
+        $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
+        $start_date                        = $user_timezone_early_morning_today;
+        $_date                             = new DateTime($start_date);
+        if ('one_month' === $span) {
+            $_date->add(new DateInterval('P30D'));
+        } elseif ('three_month' === $span) {
+            $_date->add(new DateInterval('P3M'));
+        } elseif ('one_year' === $span) {
+            $_date->add(new DateInterval('P1Y'));
+        } elseif ('all' === $span) {
+            $newest_answer_query = Answered
+                ::orderByDesc('next_due_at')
+                ->limit(1);
+            if (empty($end_date)) {
+                $_date->add(new DateInterval('P3D'));
+                $end_date = $_date->format('Y-m-d H:i:s');
+            } else {
+                $end_date = $newest_answer_query->get()->first()->next_due_at;
+            }
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$newest_answer_query sql' => $newest_answer_query->toSql(),
+            //                '$_date ' => $_date,
+            //                '$newest_answer_query sql getBindings' => $newest_answer_query->getBindings(),
+            //                '$newest_answer_query get' => $newest_answer_query->get(),
+            //            ]);
+        }
+        if ('all' !== $span) {
+            $end_date = $_date->format('Y-m-d H:i:s');
+        }
+        $_start_date = new DateTime($start_date);
+        $_end_date   = new DateTime($end_date);
+
+        $no_of_days = (int) $_end_date->diff($_start_date)->format("%a"); //3
+        $days       = [];
+        for ($_a = 0; $_a < $no_of_days; $_a++) {
+            $graphable['heading'][] = $_a.'d';
+            $days[]                 = [
+                'y' => [
+                    'count'     => 0,
+                    'answers'   => [],
+                    'new_cards' => [],
+                ],
+                'm' => [
+                    'count'   => 0,
+                    'answers' => [],
+                ],
+            ];
+        }
+
+
+        $forecast_all_answers_distinct = ChartForecastHelper::get_forecast_all_answers_distinct([
+            'user_id'       => $user_id,
+            "start_date"    => $start_date,
+            'end_date'      => $end_date,
+            'no_date_limit' => ($end_date === null),
+            //            'card_ids_not_in' => $matured_cards['card_ids'],
+        ])['answers'];
+        $forecast_new_cards_to_study   = ChartForecastHelper::get_forecast_cards_new([
+            'user_id' => $user_id,
+        ])['all'];
+
+        // Form young and matured cards from answered cards
+        foreach ($forecast_all_answers_distinct as $answer) {
+            $study             = $answer->study;
+            $no_on_hold        = $study->no_on_hold;
+            $no_to_revise      = $study->no_to_revise;
+            $revise_all        = $study->revise_all;
+            $study_all_on_hold = $study->study_all_on_hold;
+            $day_dif           = $answer->day_diff;
+            $day_diff_today    = $answer->day_diff_today;
+            if ($day_dif >= $matured_day_no) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $days[$day_diff_today]['m']['count']++;
+                $days[$day_diff_today]['m']['answers'][] = $answer;
+            } else {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $days[$day_diff_today]['y']['count']++;
+                $days[$day_diff_today]['y']['answers'][] = $answer;
+            }
+
+            //            Common::send_error([
+            //                '$no_to_revise'                  => $no_to_revise,
+            //                '$answer'                        => $answer,
+            //                '$no_on_hold'                    => $no_on_hold,
+            //                '$revise_all'                    => $revise_all,
+            //                '$study_all_on_hold'             => $study_all_on_hold,
+            //                '$day_dif'                       => $day_dif,
+            //                '$start_date'                    => $start_date,
+            //                '$end_date'                      => $end_date,
+            //                '$span'                          => $span,
+            //                '$no_of_days'                    => $no_of_days,
+            //                '$days'                          => $days,
+            //                '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
+            //                '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
+            //                'Manager::getQueryLog()'         => Manager::getQueryLog(),
+            //            ]);
+        }
+
+        // Form young cards from new cards and spread them by no_of_new per study
+        $hold_studies = [];
+        $card_groups  = collect($forecast_new_cards_to_study)
+            ->pluck('card_groups');
+        foreach ($card_groups as $_card_group) {
+            $all_new_cards = $_card_group->pluck('cards')->flatten();
+            //            Common::send_error([
+            //                '$hold_studies'  => $hold_studies,
+            //                '$all_new_cards' => $all_new_cards,
+            //            ]);
+            $_new_day_index = 0;
+            foreach ($all_new_cards as $key => $new_card) {
+                $study         = $new_card->study;
+                $study_id      = $study->id;
+                $no_of_new     = $study->no_of_new;
+                $study_all_new = $study->study_all_new;
+                if (!array_key_exists($study_id, $hold_studies)) {
+                    $hold_studies[$study_id] = [];
+                }
+                if (!array_key_exists($_new_day_index, $hold_studies[$study_id])) {
+                    $hold_studies[$study_id][$_new_day_index] = [
+                        'count' => 0,
+                    ];
+                }
+
+                if ($study_all_new) {
+                    if (!array_key_exists(0, $days)) {
+                        $graphable['heading'][] = '0d';
+                        $days[0]                = [
+                            'y' => [
+                                'count'     => 0,
+                                'answers'   => [],
+                                'new_cards' => [],
+                            ],
+                            'm' => [
+                                'count'   => 0,
+                                'answers' => [],
+                            ],
+                        ];
+                    }
+                    $days[0]['y']['count']++;
+                    $days[0]['y']['new_cards'][] = $new_card;
+                } else {
+                    //                if (1 === $key) {
+                    //                    Common::send_error([
+                    //                        __METHOD__,
+                    //                        '$key'            => $key,
+                    //                        '$hold_studies'   => $hold_studies,
+                    //                        '$_new_day_index' => $_new_day_index,
+                    //                        '$study_id'       => $study_id,
+                    //                        '$no_of_new'      => $no_of_new,
+                    //                        'count count'     => $hold_studies[$study_id][$_new_day_index]['count'],
+                    //                    ]);
+                    //                }
+                    if ($hold_studies[$study_id][$_new_day_index]['count'] >= $no_of_new) {
+                        $_new_day_index++;
+                    }
+                    if (!array_key_exists($_new_day_index, $hold_studies[$study_id])) {
+                        $hold_studies[$study_id][$_new_day_index] = [
+                            'count' => 0,
+                        ];
+                    }
+                    $hold_studies[$study_id][$_new_day_index]['count']++;
+
+                    if (!array_key_exists($_new_day_index, $days)) {
+                        $graphable['heading'][] = $_new_day_index.'d';
+                        $days[$_new_day_index]  = [
+                            'y' => [
+                                'count'     => 0,
+                                'answers'   => [],
+                                'new_cards' => [],
+                            ],
+                            'm' => [
+                                'count'   => 0,
+                                'answers' => [],
+                            ],
+                        ];
+                    }
+                    $days[$_new_day_index]['y']['count']++;
+                    $days[$_new_day_index]['y']['new_cards'][] = $new_card;
+                }
+                //            if (3 === $key) {
+                //                Common::send_error([
+                //                    __METHOD__,
+                //                    '$key'            => $key,
+                //                    '$hold_studies'   => $hold_studies,
+                //                    '$_new_day_index' => $_new_day_index,
+                //                    '$study_id'       => $study_id,
+                //                    '$no_of_new'      => $no_of_new,
+                //                ]);
+                //            }
+            }
+        }
+
+
+        $cumulative_count = 0;
+        foreach ($days as $key => $day) {
+            //            if (0 === $key) {
+            //                $graphable['y'][]                    = 0;
+            //                $graphable['m'][]                    = 0;
+            //                $cumulative_count                    += 0;
+            //                $graphable['total_reviews']          += 0;
+            //                $graphable['cumulative'][]           = $cumulative_count;
+            //                $graphable['y_debug']['answers'][]   = $day['m']['answers'];
+            //                $graphable['y_debug']['new_cards'][] = $day['y']['new_cards'];
+            //                $graphable['m_debug']['answers'][]   = $day['m']['answers'];
+            //                continue;
+            //            }
+            $graphable['y'][]                    = $day['y']['count'];
+            $graphable['m'][]                    = $day['m']['count'];
+            $cumulative_count                    += ($day['m']['count'] + $day['y']['count']);
+            $graphable['total_reviews']          += ($day['m']['count'] + $day['y']['count']);
+            $graphable['cumulative'][]           = $cumulative_count;
+            $graphable['y_debug']['answers'][]   = $day['m']['answers'];
+            $graphable['y_debug']['new_cards'][] = $day['y']['new_cards'];
+            $graphable['m_debug']['answers'][]   = $day['m']['answers'];
+            if (1 === $key) {
+                $graphable['due_tomorrow'] = ($day['m']['count'] + $day['y']['count']);
+            }
+        }
+        $graphable['average'] = $graphable['total_reviews'] / $no_of_days;
+        $graphable['average'] = number_format($graphable['average'], 2);
+
+        //        Common::send_error([
+        //            '$hold_studies'                  => $hold_studies,
+        //            '$study_all_new'                 => $study_all_new,
+        //            '$card_groups'                   => $card_groups,
+        //            '$_new_day_index'                => $_new_day_index,
+        //            '$all_new_cards'                 => $all_new_cards,
+        //            '$start_date'                    => $start_date,
+        //            '$end_date'                      => $end_date,
+        //            '$span'                          => $span,
+        //            '$graphable'                     => $graphable,
+        //            '$no_of_days'                    => $no_of_days,
+        //            '$days'                          => $days,
+        //            '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
+        //            '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
+        //            'Manager::getQueryLog()'         => Manager::getQueryLog(),
+        //        ]);
+
+        return [
+            'graphable' => $graphable,
+        ];
+
+
+    }
+
     public static function get_user_card_forecast($user_id, $span) {
         //        $matured_cards = self::get_user_matured_card_ids($user_id);
         $graphable                         = [

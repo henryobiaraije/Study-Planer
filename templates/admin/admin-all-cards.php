@@ -97,6 +97,13 @@
 					<div slot="selected-row-actions" >
 						<?php if ( $in_trash ): ?>
 							<ajax-action-not-form
+									button-text="Restore Selected  "
+									css-classes="button button-secondary"
+									icon="fa fa-redo"
+									@click="allCards.batchRestore()"
+									:ajax="allCards.ajaxRestore.value" >
+							</ajax-action-not-form >
+							<ajax-action-not-form
 									button-text="Delete Selected Permanently "
 									css-classes="button button-link-delete"
 									icon="fa fa-trash"

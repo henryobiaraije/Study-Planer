@@ -9,12 +9,12 @@ if (!defined('ABSPATH')) {
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Events\Dispatcher;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Models\Tag;
 
-class Card extends Model
-{
+class Card extends Model {
     protected $table = SP_TABLE_CARDS;
     use HasRelationships;
     use SoftDeletes;
@@ -32,37 +32,43 @@ class Card extends Model
 
     protected $casts = [
         'question' => 'array',
-        'answer' => 'array',
+        'answer'   => 'array',
     ];
 
-    public function answered()
-    {
+    protected static function boot() {
+        static::setEventDispatcher(new Dispatcher());
+        parent::boot();
+
+        static::deleting(function ($invoice) {
+            $invoice->answered()->delete();
+        });
+    }
+
+    public function answered() {
         return $this->hasMany(Answered::class);
     }
 
-    public function card_group()
-    {
+    public function card_group() {
         return $this->belongsTo(CardGroup::class);
     }
 
-//    public function studies()
-//    {
-//        return $this->hasManyThrough(Study::class, Answered::class);
-//    }
+    //    public function studies()
+    //    {
+    //        return $this->hasManyThrough(Study::class, Answered::class);
+    //    }
     //public function studies() {
     //			return $this->hasManyThrough( Study::class,Answered::class );
     //		}
 
-    protected function getCastType($key)
-    {
-        $card_type = $this->card_group->card_type;
+    protected function getCastType($key) {
+        $card_type             = $this->card_group->card_type;
         $is_question_or_answer = in_array($key, ['question', 'answer']);
-        $is_table_or_image = in_array($card_type, ['image', 'table']);
-        $make_array = $is_question_or_answer && $is_table_or_image;
+        $is_table_or_image     = in_array($card_type, ['image', 'table']);
+        $make_array            = $is_question_or_answer && $is_table_or_image;
 
         if ($make_array) {
-//				dd($key,$card_type,parent::getCastType( $key ));
-//				$this->type;
+            //				dd($key,$card_type,parent::getCastType( $key ));
+            //				$this->type;
             return parent::getCastType($key);
         } else {
             return $this->type;

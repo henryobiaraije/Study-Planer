@@ -23,6 +23,7 @@
     "chart.js": "^3.6.1",
     "ckeditor5": "^31.0.0",
     "crypto-js": "^4.1.1",
+    "echarts": "^5.2.2",
     "font-awesome": "^4.7.0",
     "js-cookie": "^3.0.1",
     "timeago.js": "^4.0.0-beta.3",

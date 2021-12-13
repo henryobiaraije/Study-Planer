@@ -72,9 +72,29 @@ class AjaxFrontHelper {
         add_action('front_sp_ajax_front_load_stats_hourly_breakdown', array($this, 'ajax_front_load_stats_hourly_breakdown'));
         add_action('front_sp_ajax_admin_load_user_profile', array($this, 'ajax_admin_load_user_profile'));
         add_action('front_sp_ajax_front_load_stats_progress_chart', array($this, 'ajax_front_load_stats_progress_chart'));
+        add_action('front_sp_ajax_front_load_stats_card_types', array($this, 'ajax_front_load_stats_card_types'));
     }
 
     /*** <editor-fold desc="Chart Stats"> **/
+
+    public function ajax_front_load_stats_card_types($post): void {
+        Initializer::verify_post($post, true);
+//        Common::send_error([
+//            'ajax_front_load_stats_card_types',
+//            'post' => $post,
+//        ]);
+
+        $all  = $post[Common::VAR_2];
+        $year = sanitize_text_field($all['year']);
+        //        $span    = 'one_month';
+        $user_id = get_current_user_id();
+
+        $all = Study::get_user_stats_card_types($user_id, $year);
+
+        Common::send_success('Stats Card types here', $all);
+
+
+    }
 
     public function ajax_front_load_stats_progress_chart($post): void {
         Initializer::verify_post($post, true);
@@ -413,10 +433,10 @@ class AjaxFrontHelper {
 
     public function ajax_front_mark_answer($post): void {
         Initializer::verify_post($post);
-//        			Common::send_error( [
-//        				__METHOD__,
-//        				'post' => $post,
-//        			] );
+        //        			Common::send_error( [
+        //        				__METHOD__,
+        //        				'post' => $post,
+        //        			] );
 
         $all        = $post[Common::VAR_2];
         $study_id   = (int) sanitize_text_field($all['study_id']);

@@ -80,6 +80,11 @@ $url_settings = $current_url.'?'.http_build_query(array_merge($_GET, array("dash
         <?php \StudyPlanner\load_template('shortcodes/dashboard/question-modal'); ?>
     </div>
 
+    <?php /** Modal Chart Deck's card type */ ?>
+    <div>
+        <?php \StudyPlanner\load_template('shortcodes/dashboard/modal-decks-card-types-chart'); ?>
+    </div>
+
 
     <?php /***** Notifications ***/ ?>
     <hover-notifications></hover-notifications>

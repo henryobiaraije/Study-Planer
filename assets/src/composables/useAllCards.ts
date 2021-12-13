@@ -10,10 +10,10 @@ import {vdata} from "../admin/admin-deck-groups";
 declare var bootstrap;
 
 const tableData = ref({
-  columns          : [
+  columns: [
     {
-      label  : 'Name',
-      field  : 'name',
+      label: 'Name',
+      field: 'name',
       tooltip: 'Endpoint Name',
     },
     {
@@ -49,135 +49,147 @@ const tableData = ref({
     //   field: 'cards',
     // },
   ],
-  rows             : [],
-  isLoading        : true,
-  totalRecords     : 0,
-  totalTrashed     : 0,
-  serverParams     : {
+  rows: [],
+  isLoading: true,
+  totalRecords: 0,
+  totalTrashed: 0,
+  serverParams: {
     columnFilters: {},
-    sort         : {
-      created_at : '',
+    sort: {
+      created_at: '',
       modified_at: '',
     },
-    page         : 1,
-    perPage      : 10
+    page: 1,
+    perPage: 10
   },
   paginationOptions: {
-    enabled         : true,
-    mode            : 'page',
-    perPage         : Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 2,
-    position        : 'bottom',
-    perPageDropdown : [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
+    enabled: true,
+    mode: 'page',
+    perPage: Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 2,
+    position: 'bottom',
+    perPageDropdown: [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
     dropdownAllowAll: true,
-    setCurrentPage  : 1,
-    nextLabel       : 'next',
-    prevLabel       : 'prev',
+    setCurrentPage: 1,
+    nextLabel: 'next',
+    prevLabel: 'prev',
     rowsPerPageLabel: 'Rows per page',
-    ofLabel         : 'of',
-    pageLabel       : 'page', // for 'pages' mode
-    allLabel        : 'All',
+    ofLabel: 'of',
+    pageLabel: 'page', // for 'pages' mode
+    allLabel: 'All',
   },
-  searchOptions    : {
-    enabled       : true,
-    trigger       : '', // can be "enter"
+  searchOptions: {
+    enabled: true,
+    trigger: '', // can be "enter"
     skipDiacritics: true,
-    placeholder   : 'Search links',
+    placeholder: 'Search links',
   },
-  sortOption       : {
+  sortOption: {
     enabled: false,
   },
   //
-  post_status  : 'publish',
-  selectedRows : [] as Array<_CardGroup>,
+  post_status: 'publish',
+  selectedRows: [] as Array<_CardGroup>,
   searchKeyword: '',
 });
-const totals    = ref({
-  active : 0,
+const totals = ref({
+  active: 0,
   trashed: 0
 });
 
 export default function (status = 'publish') {
-  const ajax                  = ref<_Ajax>({
-    sending       : false,
-    error         : false,
-    errorMessage  : '',
-    success       : false,
+  const ajax = ref<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
     successMessage: '',
   });
-  const ajaxSearch            = ref<_Ajax>({
-    sending       : false,
-    error         : false,
-    errorMessage  : '',
-    success       : false,
+  const ajaxSearch = ref<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
     successMessage: '',
   });
-  const ajaxCreate            = ref<_Ajax>({
-    sending       : false,
-    error         : false,
-    errorMessage  : '',
-    success       : false,
+  const ajaxCreate = ref<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
     successMessage: '',
   });
-  const ajaxUpdate            = ref<_Ajax>({
-    sending       : false,
-    error         : false,
-    errorMessage  : '',
-    success       : false,
+  const ajaxUpdate = ref<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
     successMessage: '',
   });
-  const ajaxTrash             = ref<_Ajax>({
-    sending       : false,
-    error         : false,
-    errorMessage  : '',
-    success       : false,
+  const ajaxTrash = ref<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
     successMessage: '',
   });
-  const ajaxDelete            = ref<_Ajax>({
-    sending       : false,
-    error         : false,
-    errorMessage  : '',
-    success       : false,
+  const ajaxDelete = ref<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
     successMessage: '',
   });
-  const modalEditId           = ref('');
+  const ajaxRestore = ref<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
+    successMessage: '',
+  });
+  const modalEditId = ref('');
   tableData.value.post_status = status;
-  const editedItems           = ref<Array<_CardGroup>>([]);
-  let sendOnline              = null;
-  let itemToEdit              = ref<_CardGroup>(null);
-  let total                   = ref<number>(0);
-  let newItem                 = ref({
-    name     : '',
+  const editedItems = ref<Array<_CardGroup>>([]);
+  let sendOnline = null;
+  let itemToEdit = ref<_CardGroup>(null);
+  let total = ref<number>(0);
+  let newItem = ref({
+    name: '',
     deckGroup: null as _DeckGroup,
-    tags     : [] as Array<_Tag>
+    tags: [] as Array<_Tag>
   })
-  let searchResults           = ref<Array<_CardGroup>>([]);
-  const _editCounter          = ref<{ [key: number]: { counter: number } }>({});
+  let searchResults = ref<Array<_CardGroup>>([]);
+  const _editCounter = ref<{ [key: number]: { counter: number } }>({});
   //
-  const create                = () => {xhrCreateNew();}
-  const updateEditing         = () => {
+  const create = () => {
+    xhrCreateNew();
+  }
+  const updateEditing = () => {
     xhrUpdateBatch([itemToEdit.value]);
   }
-  const batchUpdate           = () => {
+  const batchUpdate = () => {
     xhrUpdateBatch(tt().selectedRows);
   }
-  const batchTrash            = () => {
+  const batchTrash = () => {
     xhrTrashBatch(tt().selectedRows);
   }
-  const batchDelete           = () => {
+  const batchDelete = () => {
     xhrDeleteBatch(tt().selectedRows);
   }
-  const load                  = () => {
+  const batchRestore = () => {
+    xhrRestoreBatch(tt().selectedRows);
+  }
+  const load = () => {
     xhrLoad();
   }
-  const search                = (query: string) => {
+  const search = (query: string) => {
     xhrSearch(query);
   }
   //
-  const onSelect              = (items: { selectedRows: Array<_CardGroup> }) => {
+  const onSelect = (items: { selectedRows: Array<_CardGroup> }) => {
     console.log('selected', {items});
     tt().selectedRows = items.selectedRows;
   };
-  const onEdit                = (item: _CardGroup) => {
+  const onEdit = (item: _CardGroup) => {
     if (undefined === _editCounter.value[item.id]) {
       _editCounter.value[item.id] = {
         counter: 0,
@@ -191,36 +203,36 @@ export default function (status = 'publish') {
       }
     }, 500);
   };
-  const onSearch              = (params: { searchTerm: string }) => {
+  const onSearch = (params: { searchTerm: string }) => {
     tt().searchKeyword = params.searchTerm;
     xhrLoad();
   };
-  const onPageChange          = (params: { currentPage: number, currentPerPage: number, prevPage: number, total: number }) => {
+  const onPageChange = (params: { currentPage: number, currentPerPage: number, prevPage: number, total: number }) => {
     tt().paginationOptions.setCurrentPage = params.currentPage;
-    tt().paginationOptions.perPage        = params.currentPerPage;
+    tt().paginationOptions.perPage = params.currentPerPage;
     xhrLoad();
   };
-  const onSortChange          = (params) => {
+  const onSortChange = (params) => {
 
   };
-  const onColumnFilter        = (params) => {
+  const onColumnFilter = (params) => {
     //
     console.log('sort change');
   };
-  const onPerPageChange       = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
+  const onPerPageChange = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
     tt().paginationOptions.setCurrentPage = params.currentPage;
-    tt().paginationOptions.perPage        = params.currentPerPage;
+    tt().paginationOptions.perPage = params.currentPerPage;
     Cookies.set('spPerPage', params.currentPerPage);
     xhrLoad();
   };
-  const loadItems             = () => {
+  const loadItems = () => {
     xhrLoad();
   };
-  const openEditModal         = (item: _CardGroup, modalId: string) => {
-    itemToEdit.value   = item;
-    modalEditId.value  = modalId;
+  const openEditModal = (item: _CardGroup, modalId: string) => {
+    itemToEdit.value = item;
+    modalEditId.value = modalId;
     const modalElement = jQuery(modalId)[0];
-    const myModal      = new bootstrap.Modal(modalElement);
+    const myModal = new bootstrap.Modal(modalElement);
     myModal.show();
     modalElement.addEventListener('shown.bs.modal', function () {
 
@@ -229,25 +241,25 @@ export default function (status = 'publish') {
       editedItems.value = null;
     });
   }
-  const closeEditModal        = () => {
+  const closeEditModal = () => {
     const modalElement = jQuery(modalEditId.value)[0];
-    const myModal      = new bootstrap.Modal(modalElement);
+    const myModal = new bootstrap.Modal(modalElement);
     myModal.hide();
     editedItems.value = null;
   };
-  const tt                    = () => tableData.value;
+  const tt = () => tableData.value;
 
-  const xhrLoad        = () => {
+  const xhrLoad = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
-    sendOnline                   = new Server().send_online({
+    sendOnline = new Server().send_online({
       data: [
         Store.nonce,
         {
           params: {
-            per_page      : tt().paginationOptions.perPage,
-            page          : tt().paginationOptions.setCurrentPage,
+            per_page: tt().paginationOptions.perPage,
+            page: tt().paginationOptions.setCurrentPage,
             search_keyword: tt().searchKeyword,
-            status        : tt().post_status,
+            status: tt().post_status,
           },
         }
       ],
@@ -258,14 +270,14 @@ export default function (status = 'publish') {
       },
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.stop();
-        const items          = done.data.details.card_groups;
-        const total          = done.data.details.total;
-        const theTotals      = done.data.totals;
+        const items = done.data.details.card_groups;
+        const total = done.data.details.total;
+        const theTotals = done.data.totals;
         // console.log({done, items, total, totals});
-        tt().isLoading       = false;
+        tt().isLoading = false;
         tableData.value.rows = items;
-        totals.value         = theTotals;
-        tt().totalRecords    = total;
+        totals.value = theTotals;
+        tt().totalRecords = total;
       },
       funcFailue(done) {
         handleAjax.error(done);
@@ -273,17 +285,17 @@ export default function (status = 'publish') {
       },
     });
   };
-  const xhrSearch      = (query: string) => {
+  const xhrSearch = (query: string) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
-    sendOnline                   = new Server().send_online({
+    sendOnline = new Server().send_online({
       data: [
         vdata.localize.nonce,
         {
           params: {
-            per_page      : 5,
-            page          : 1,
+            per_page: 5,
+            page: 1,
             search_keyword: query,
-            status        : 'publish',
+            status: 'publish',
           },
         }
       ],
@@ -294,7 +306,7 @@ export default function (status = 'publish') {
       },
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.stop();
-        const items         = done.data;
+        const items = done.data;
         searchResults.value = items;
       },
       funcFailue(done) {
@@ -305,7 +317,7 @@ export default function (status = 'publish') {
   };
   const xhrUpdateBatch = (items: Array<_CardGroup>) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxUpdate.value);
-    sendOnline                   = new Server().send_online({
+    sendOnline = new Server().send_online({
       data: [
         Store.nonce,
         {
@@ -326,12 +338,12 @@ export default function (status = 'publish') {
       },
     });
   };
-  const xhrTrashBatch  = (items: Array<_CardGroup>) => {
+  const xhrTrashBatch = (items: Array<_CardGroup>) => {
     if (!confirm('Are you sure you want to trash these items?')) {
       return;
     }
     const handleAjax: HandleAjax = new HandleAjax(ajaxTrash.value);
-    sendOnline                   = new Server().send_online({
+    sendOnline = new Server().send_online({
       data: [
         Store.nonce,
         {
@@ -356,7 +368,7 @@ export default function (status = 'publish') {
       return;
     }
     const handleAjax: HandleAjax = new HandleAjax(ajaxDelete.value);
-    sendOnline                   = new Server().send_online({
+    sendOnline = new Server().send_online({
       data: [
         Store.nonce,
         {
@@ -376,15 +388,37 @@ export default function (status = 'publish') {
       },
     });
   };
-  const xhrCreateNew   = () => {
+  const xhrRestoreBatch = (items: Array<_CardGroup>) => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxRestore.value);
+    sendOnline = new Server().send_online({
+      data: [
+        Store.nonce,
+        {
+          card_groups: items,
+        }
+      ],
+      what: "admin_sp_ajax_admin_restore_card_group",
+      funcBefore() {
+        handleAjax.start();
+      },
+      funcSuccess(done: InterFuncSuccess) {
+        handleAjax.success(done);
+        xhrLoad();
+      },
+      funcFailue(done) {
+        handleAjax.error(done);
+      },
+    });
+  };
+  const xhrCreateNew = () => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
     new Server().send_online({
       data: [
         Store.nonce,
         {
-          name      : newItem.value.name,
+          name: newItem.value.name,
           deck_group: newItem.value.deckGroup,
-          tags      : newItem.value.tags,
+          tags: newItem.value.tags,
         }
       ],
       what: "admin_sp_ajax_admin_create_new_deck",
@@ -394,8 +428,8 @@ export default function (status = 'publish') {
       funcSuccess(done: InterFuncSuccess) {
         handleAjax.success(done);
         useDeckGroupLists().load();
-        newItem.value.name      = '';
-        newItem.value.tags      = [];
+        newItem.value.name = '';
+        newItem.value.tags = [];
         newItem.value.deckGroup = null;
         xhrLoad();
       },
@@ -411,11 +445,11 @@ export default function (status = 'publish') {
   // });
 
   return {
-    ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch,
+    ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch, ajaxRestore,
     total, create, itemToEdit, editedItems, tableData, load, newItem,
     onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
     onSortChange, onColumnFilter, updateEditing,
-    batchUpdate, batchDelete, batchTrash,
+    batchUpdate, batchDelete, batchTrash, batchRestore,
     totals, closeEditModal, openEditModal, search, searchResults,
   };
 

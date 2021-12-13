@@ -103,7 +103,9 @@
                         </div>
                         <div class="sp-header-stats  py-2 flex-initial bg-sp-100 w-full md:w-auto"
                              style="min-width: 300px;">
-                            <div class="status-title text-center font-bold">Number of cards due for revision</div>
+                            <div class="status-title text-center font-bold">Number of cards due for revision
+
+                            </div>
                             <div class="to-study flex">
                                 <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center ">
                                     <div class="study-title whitespace-nowrap whitespace-no-wrap">On

@@ -9,6 +9,7 @@ import 'vue-calendar-heatmap/dist/vue-calendar-heatmap.css'
 import VueCalendarHeatmap from 'vue-calendar-heatmap/dist/vue-calendar-heatmap.common'
 import Vue from "vue";
 import Cookies from 'js-cookie';
+import * as echarts from 'echarts';
 
 Vue.use(VueCalendarHeatmap)
 declare var bootstrap;
@@ -186,6 +187,13 @@ export default function (status = 'publish') {
     success: false,
     successMessage: '',
   });
+  const ajaxDeckCardTypeChart = reactive<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
+    successMessage: '',
+  });
   let statsProgressChart = ref<_ProgressChartGraphable>({
     total_current_streak: 0,
     total_daily_average: '',
@@ -200,6 +208,7 @@ export default function (status = 'publish') {
   let statsChartInterval = ref<_ChartIntervalGraphable>(null);
   let statsChartAnserButtons = ref<_ChartAnswerButtons>(null);
   let statsHourlyBreakdown = ref<_ChartHourlyBreakdownGraphable>(null);
+  let statsCardTypes = ref<_ChartHourlyBreakdownGraphable>(null);
   let forecastSpan = ref('one_month');
   let reviewCountSpan = ref('one_month');
   let reviewTimeSpan = ref('one_month');
@@ -207,6 +216,7 @@ export default function (status = 'publish') {
   let chartIntervalTimeSpan = ref('one_month');
   let chartAnswerButtonsTimeSpan = ref('one_month');
   let chartHourlyBreakdownDate = ref('');
+  let chartCardTypesSpan = ref('one_month');
   let chartProgressChartYear = ref(new Date().getFullYear());
   let progressHeatMapColors = ref([
     {
@@ -239,6 +249,7 @@ export default function (status = 'publish') {
     },
   ]);
   let progressSelectedColor = ref(Cookies.get('spProgressColor') ? Cookies.get('spProgressColor') : '');
+  const currentDeckCardType = ref<_Deck>(null);
 
   const colorLearning = '#4848bf';
   const colorYoung = '#9cd89c';
@@ -253,10 +264,59 @@ export default function (status = 'publish') {
     if (undefined !== colorLegend) {
       data = colorLegend.data;
     }
-    console.log({selectedColorCookie, data});
+    // console.log({selectedColorCookie, data});
     return data;
   }
 
+  const _initChartCardTypes = () => {
+    setTimeout(() => {
+
+      const chartDom = document.getElementById('sp-chart-card-types');
+      var myChart = echarts.init(chartDom);
+      // Specify configurations and data graphs
+      var option = {
+        color: [colorMature, colorYoung, colorDack],
+        title: {
+          // text: 'How Users Are Finding the Website',
+          // subtext: 'Fictitious',
+          x: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+          orient: 'horizontal',
+          left: 'top',
+          data: ['Mature: 426', 'Young+Learn: 7200', 'Unseen: 18675']
+        },
+        series: [
+          {
+            name: 'Access Sources',
+            type: 'pie',
+            radius: '25%',
+            center: ['50%', '60%'],
+            data: [
+              {value: 335, name: 'Mature: 426'},
+              {value: 310, name: 'Young+Learn: 7200'},
+              {value: 234, name: 'Unseen: 18675'},
+            ],
+            itemStyle: {
+              emphasis: {
+                shadowBlur: 0,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0)'
+              }
+            }
+          }
+        ]
+      };
+      // Use just the specified configurations and data charts.
+      myChart.setOption(option);
+      console.log('adding 34rr', {chartDom, myChart});
+
+    }, 500);
+  }
   const _initChartHourlyBreakdown = () => {
     setTimeout(() => {
       console.log('Using _initChartHourlyBreakdown', statsHourlyBreakdown.value.answers_per_hour);
@@ -1366,6 +1426,14 @@ export default function (status = 'publish') {
       _initChartHourlyBreakdown();
     });
   }
+  const _loadCardTypes = () => {
+    xhrLoadCardTypes().then((res) => {
+      _initChartCardTypes();
+    }).catch(() => {
+      // todo remove later
+      _initChartCardTypes();
+    });
+  }
   const _loadAllStats = () => {
     _loadProgressChart();
     _loadForecast();
@@ -1375,6 +1443,7 @@ export default function (status = 'publish') {
     _loadChartIntervals();
     _loadChartAnswerButtons();
     _loadChartHourlyBreakDown();
+    _loadCardTypes();
   }
 
   watch(progressSelectedColor, (current, old) => {
@@ -1600,10 +1669,39 @@ export default function (status = 'publish') {
       });
     });
   };
+  const xhrLoadCardTypes = () => {
+    console.log('0deg 339')
+    const handleAjax: HandleAjax = new HandleAjax(ajaxDeckCardTypeChart);
+    return new Promise((resolve, reject) => {
+      new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            date: chartCardTypesSpan.value,
+          }
+        ],
+        what: "front_sp_ajax_front_load_stats_card_types",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          statsCardTypes.value = done.data.graphable;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.stop();
+          console.log('0deg 339')
+          // handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
 
   return {
     ajax, ajaxProgressChart, ajaxForecast, ajaxReviewTime, ajaxChartAdded, ajaxChartInterval,
-    ajaxChartAnswerButtons, ajaxHourlyBreakdown,
+    ajaxChartAnswerButtons, ajaxHourlyBreakdown, ajaxDeckCardTypeChart,
     _loadAllStats, _loadForecast, _loadProgressChart,
     forecastSpan, _reloadForecast, _reloadReviewCount, _reloadReviewTime, _reloadChartAnswerButtons,
     _loadChartAnswerButtons, _loadChartHourlyBreakDown,
@@ -1613,6 +1711,7 @@ export default function (status = 'publish') {
     _reloadChartAdded, _reloadChartInterval, statsChartAdded, chartAnswerButtonsTimeSpan,
     chartHourlyBreakdownDate, statsProgressChart,
     progressHeatMapColors, progressSelectedColor, _getProgressColorLegend,
+    currentDeckCardType,
   }
 
 }

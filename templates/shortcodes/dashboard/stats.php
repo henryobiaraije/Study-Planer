@@ -14,6 +14,61 @@ $current_year = date('Y');
     <div class="stats-forecast ">
         <div class="stats-body">
 
+            <?php /**** Card Types  *****/ ?>
+            <div class="one-chart shadow p-2 m-2 mb-4 rounded position-relative min-h-[300px]">
+                <p class="text-center m-0 mb-2">The division of cards in your decks</p>
+                <div v-if="!useStats.ajaxDeckCardTypeChart.sending">
+                    <form @submit.prevent="useStats._reloadReviewCount"
+                          class="select-month text-center mb-2 sp-slide-in">
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadReviewCount" v-model="useStats.reviewCountSpan.value"
+                                   name="forecast_span" value="one_month" type="radio"> <span>1 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadReviewCount" v-model="useStats.reviewCountSpan.value"
+                                   name="forecast_span" value="three_month" type="radio"> <span>3 month</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadReviewCount" v-model="useStats.reviewCountSpan.value"
+                                   name="forecast_span" value="one_year" type="radio"> <span>1 year</span></label>
+                        <label class="m-2 cursor-pointer">
+                            <input @change="useStats._reloadReviewCount" v-model="useStats.reviewCountSpan.value"
+                                   name="forecast_span" value="all" type="radio"> <span>All</span></label>
+                    </form>
+                    <div class="chart-review-count sp-slide-in">
+                        <div class="m-auto " id="sp-chart-card-types"
+                             style="width:360px; height:300px;"></div>
+                    </div>
+                    <div class=" sp-slide-in">
+                        <!--                        <ul>-->
+                        <!--                            <li class="flex">-->
+                        <!--                                <div class="flex-1 text-right">Days studied:</div>-->
+                        <!--                                <div class="flex-1 text-left font-bold pl-2">-->
+                        <!--                                    {{useStats.statsReview.value.days_studied_percent}}%-->
+                        <!--                                    ({{useStats.statsReview.value.days_studied_count}} of-->
+                        <!--                                    {{useStats.statsReview.value.total_days}})-->
+                        <!--                                </div>-->
+                        <!--                            </li>-->
+                        <!--                            <li class="flex">-->
+                        <!--                                <div class="flex-1 text-right">Total:</div>-->
+                        <!--                                <div class="flex-1 text-left font-bold pl-2">-->
+                        <!--                                    {{useStats.statsReview.value.total_reviews}} reviews-->
+                        <!--                                </div>-->
+                        <!--                            </li>-->
+                        <!--                            <li class="flex">-->
+                        <!--                                <div class="flex-1 text-right">Average for day studied:</div>-->
+                        <!--                                <div class="flex-1 text-left font-bold pl-2">{{useStats.statsReview.value.average}} reviews/day</div>-->
+                        <!--                            </li>-->
+                        <!--                            <li class="flex">-->
+                        <!--                                <div class="flex-1 text-right">If you studied everyday:</div>-->
+                        <!--                                <div class="flex-1 text-left font-bold pl-2">{{useStats.statsReview.value.average_if_studied_per_day}} reviews/day-->
+                        <!--                                </div>-->
+                        <!--                            </li>-->
+                        <!--                        </ul>-->
+                    </div>
+                </div>
+                <div v-if="useStats.ajaxDeckCardTypeChart.sending" style="text-align: center;flex: 12;font-size: 50px;"><i
+                            class="fa fa-spin fa-spinner"></i></div>
+            </div>
+
             <?php /**** Progress Chart   *****/ ?>
             <div class="one-chart shadow p-2 m-2 mb-4 rounded position-relative min-h-[300px]">
                 <h4 class="text-center m-0 bold font-bold fs-4">Progress Chart</h4>
