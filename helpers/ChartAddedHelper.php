@@ -34,11 +34,9 @@ use function StudyPlanner\get_all_card_grades;
  *
  * @package StudyPlanner\Helpers
  */
-class ChartAddedHelper
-{
+class ChartAddedHelper {
 
-    public static function get_all_new_cards_added($args)
-    {
+    public static function get_all_new_cards_added($args) {
         $default = [
             'user_id'         => 0,
             'start_date'      => null,
@@ -53,31 +51,36 @@ class ChartAddedHelper
             ::with([
                 'studies.answers' => function ($query) use ($args) {
                     $query->select('*',
-                        // If > 21, is matured Else young
-                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE(created_at)) as day_diff'),
-                        // Difference in days from today and due date
-                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
+                        Manager::raw('DATEDIFF(DATE(created_at),DATE(created_at)) as day_diff'),
+                        Manager::raw('DATEDIFF(DATE(created_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
                     );
                     $query->where('answered_as_new', '=', true);
                     if ($args['no_date_limit']) {
-                        $query->where('next_due_at', '>=', $args['start_date']);
+                        $query->where('created_at', '>=', $args['start_date']);
                     } else {
-                        $query->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
+                        $query->whereBetween('created_at', [$args['start_date'], $args['end_date']]);
                     }
+//                    Common::send_error([
+//                        __METHOD__,
+//                        '$query sql'             => $query->toSql(),
+//                        '$query get'             => $query->get(),
+//                        '$args'                  => $args,
+//                        'Manager::getQueryLog()' => Manager::getQueryLog(),
+//                    ]);
                 },
             ])
             ->whereHas('studies.answers', function ($query) use ($args) {
                 $query->where('answered_as_new', '=', true);
             })
             ->where('ID', '=', $args['user_id']);
-//        Common::send_error([
-//            __METHOD__,
-//            '$uuu sql'               => $user->toSql(),
-//            '$uuu get'               => $user->get(),
-//            'empty get'              => empty($user->get()->all()),
-//            '$args'                  => $args,
-//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-//        ]);
+//                Common::send_error([
+//                    __METHOD__,
+//                    '$uuu sql'               => $user->toSql(),
+//                    '$uuu get'               => $user->get(),
+//                    'empty get'              => empty($user->get()->all()),
+//                    '$args'                  => $args,
+//                    'Manager::getQueryLog()' => Manager::getQueryLog(),
+//                ]);
         if (empty($user->get()->all())) {
             $answers = [];
         } else {

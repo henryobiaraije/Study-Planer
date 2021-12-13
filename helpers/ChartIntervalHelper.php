@@ -59,19 +59,19 @@ class ChartIntervalHelper
                     // Difference in days from today and due date
                     //                        Manager::raw('DATEDIFF(DATE(next_due_at),DATE("'.$args['start_date'].'")) as day_diff_today'),
                     );
-                    if ($args['no_date_limit']) {
-                        $query->where('next_due_at', '>=', $args['start_date']);
-                    } else {
-                        $query->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
-                    }
+//                    if ($args['no_date_limit']) {
+//                        $query->where('next_due_at', '>=', $args['start_date']);
+//                    } else {
+//                        $query->whereBetween('next_due_at', [$args['start_date'], $args['end_date']]);
+//                    }
                     $query->groupBy('day_diff');
-                    //                    Common::send_error([
-                    //                        __METHOD__,
-                    //                        '$query sql'             => $query->toSql(),
-                    //                        '$uuu get'               => $query->get(),
-                    //                        '$query'                 => $query,
-                    //                        'Manager::getQueryLog()' => Manager::getQueryLog(),
-                    //                    ]);
+//                                        Common::send_error([
+//                                            __METHOD__,
+//                                            '$query sql'             => $query->toSql(),
+//                                            '$uuu get'               => $query->get(),
+//                                            '$query'                 => $query,
+//                                            'Manager::getQueryLog()' => Manager::getQueryLog(),
+//                                        ]);
                 },
             ])
             ->where('ID', '=', $args['user_id']);

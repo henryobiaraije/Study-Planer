@@ -64,12 +64,23 @@ function get_user_timezone_minutes_to_add($user_id) {
     }
 }
 
-function get_user_timezone_date_midnight_today($user_id) {
+function get_user_timezone_date_early_morning_today($user_id) {
     $user_timezone_minutes_from_now = get_user_timezone_minutes_to_add($user_id);
     $_date_today                    = Common::getDateTime();
     $_datetime                      = new DateTime($_date_today);
     $_datetime->modify("$user_timezone_minutes_from_now minutes");
     $_datetime->setTime(0, 0, 0);
+    $the_date = $_datetime->format('Y-m-d H:i:s');
+
+    return $the_date;
+}
+
+function get_user_timezone_date_midnight_today($user_id) {
+    $user_timezone_minutes_from_now = get_user_timezone_minutes_to_add($user_id);
+    $_date_today                    = Common::getDateTime();
+    $_datetime                      = new DateTime($_date_today);
+    $_datetime->modify("$user_timezone_minutes_from_now minutes");
+    $_datetime->setTime(23, 59, 59);
     $the_date = $_datetime->format('Y-m-d H:i:s');
 
     return $the_date;

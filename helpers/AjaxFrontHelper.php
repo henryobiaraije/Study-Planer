@@ -278,7 +278,7 @@ class AjaxFrontHelper {
         //            '$span' => $span,
         //        ]);
 
-        Common::send_success('Charts added here', $all);
+        Common::send_success('Charts answer buttons here', $all);
 
 
     }
@@ -302,7 +302,7 @@ class AjaxFrontHelper {
         //            '$span' => $span,
         //        ]);
 
-        Common::send_success('Charts added here', $all);
+        Common::send_success('Charts intervals here', $all);
 
 
     }

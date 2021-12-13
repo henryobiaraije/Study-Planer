@@ -29,6 +29,7 @@ use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
 use StudyPlanner\Models\Tag;
 use function StudyPlanner\get_mature_card_days;
+use function StudyPlanner\get_user_timezone_date_early_morning_today;
 use function StudyPlanner\get_user_timezone_date_midnight_today;
 use function StudyPlanner\get_user_timezone_minutes_to_add;
 
@@ -145,7 +146,7 @@ class Study extends Model {
 
     public static function get_user_card_forecast($user_id, $span) {
         //        $matured_cards = self::get_user_matured_card_ids($user_id);
-        $graphable                    = [
+        $graphable                         = [
             'heading'       => [],
             'cumulative'    => [],
             'y'             => [],
@@ -162,11 +163,11 @@ class Study extends Model {
             'average'       => 0,
             'due_tomorrow'  => 0,
         ];
-        $matured_day_no               = get_mature_card_days();
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        $start_date                   = $user_timezone_today_midnight;
-        $_date                        = new DateTime($start_date);
+        $matured_day_no                    = get_mature_card_days();
+        $end_date                          = null;
+        $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
+        $start_date                        = $user_timezone_early_morning_today;
+        $_date                             = new DateTime($start_date);
         if ('one_month' === $span) {
             $_date->add(new DateInterval('P30D'));
         } elseif ('three_month' === $span) {
@@ -494,18 +495,19 @@ class Study extends Model {
     public static function get_user_stats_charts_answer_buttons($user_id, $span) {
         $measure_start_time = microtime(true);
         //        $matured_cards = self::get_user_matured_card_ids($user_id);
-        $graphable                    = [
+        $graphable                         = [
             'heading'  => [],
             'learning' => [],
             'y'        => [],
             'm'        => [],
         ];
-        $matured_day_no               = get_mature_card_days();
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        //        $start_date                   = $user_timezone_today_midnight;
-        $end_date = $user_timezone_today_midnight;
-        $_date    = new DateTime($user_timezone_today_midnight);
+        $matured_day_no                    = get_mature_card_days();
+        $end_date                          = null;
+        $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
+        $user_timezone_mid_night_today     = get_user_timezone_date_midnight_today($user_id);
+        //        $start_date                   = $user_timezone_early_morning_today;
+        $end_date = $user_timezone_mid_night_today;
+        $_date    = new DateTime($user_timezone_early_morning_today);
         if ('one_month' === $span) {
             $_date->sub(new DateInterval('P30D'));
         } elseif ('three_month' === $span) {
@@ -513,9 +515,7 @@ class Study extends Model {
         } elseif ('one_year' === $span) {
             $_date->sub(new DateInterval('P1Y'));
         } elseif ('all' === $span) {
-            $oldest_answer_query = Answered
-                ::orderBy('next_due_at')
-                ->limit(1);
+            $oldest_answer_query = self::get_user_oldest_answer($user_id);
             $start_date          = $oldest_answer_query->get()->first()->next_due_at;
             //            Common::send_error([
             //                __METHOD__,
@@ -665,6 +665,9 @@ class Study extends Model {
 
         //        Common::send_error([
         //            __METHOD__,
+        //            'user_id'                               => $user_id,
+        //            "start_date"                            => $start_date,
+        //            'end_date'                              => $end_date,
         //            '$forecast_all_answers_within_a_date'   => $forecast_all_answers_within_a_date,
         //            '$days'                                 => $days,
         //            '$all_learning_answer_ids'              => $all_learning_answer_ids,
@@ -768,17 +771,17 @@ class Study extends Model {
         $graphable['total_current_streak'] = count($current_streak);
 
 
-//        Common::send_error([
-//            __METHOD__,
-//            '$days_learned'       => $days_learned,
-//            //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
-//            '$days_learnt_count'  => $days_learnt_count,
-//            '$days_learnt_streak' => $days_learnt_streak,
-//            '$longest_streak'     => $longest_streak,
-//            '$streak_store'       => $streak_store,
-//            '$current_streak'     => $current_streak,
-//            '$graphable'          => $graphable,
-//        ]);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            '$days_learned'       => $days_learned,
+        //            //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //            '$days_learnt_count'  => $days_learnt_count,
+        //            '$days_learnt_streak' => $days_learnt_streak,
+        //            '$longest_streak'     => $longest_streak,
+        //            '$streak_store'       => $streak_store,
+        //            '$current_streak'     => $current_streak,
+        //            '$graphable'          => $graphable,
+        //        ]);
 
         $measure_end_time                       = microtime(true);
         $measure_execution_time                 = ($measure_end_time - $measure_start_time);
@@ -786,7 +789,6 @@ class Study extends Model {
         $graphable['zz_debug']                  = self::$sp_debug;
 
         //        Common::send_error([
-        //            "Answered::orderBy('id')->count()"    => Answered::orderBy('id')->count(),
         //            '$start_date'                         => $start_date,
         //            '$end_date'                           => $end_date,
         //            '$span'                               => $span,
@@ -811,19 +813,20 @@ class Study extends Model {
     public static function get_user_stats_charts_added($user_id, $span) {
         $measure_start_time = microtime(true);
         //        $matured_cards = self::get_user_matured_card_ids($user_id);
-        $graphable                    = [
+        $graphable                         = [
             'heading'                   => [],
             'new_cards_added'           => [],
             'cumulative_new_cards'      => [],
             'total_new_cards'           => 0,
             'average_new_cards_per_day' => 0,
         ];
-        $matured_day_no               = get_mature_card_days();
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        //        $start_date                   = $user_timezone_today_midnight;
-        $end_date = $user_timezone_today_midnight;
-        $_date    = new DateTime($user_timezone_today_midnight);
+        $matured_day_no                    = get_mature_card_days();
+        $end_date                          = null;
+        $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
+        $user_timezone_midnight_today      = get_user_timezone_date_midnight_today($user_id);
+        //        $start_date                   = $user_timezone_early_morning_today;
+        $end_date = $user_timezone_midnight_today;
+        $_date    = new DateTime($user_timezone_early_morning_today);
         if ('one_month' === $span) {
             $_date->sub(new DateInterval('P30D'));
         } elseif ('three_month' === $span) {
@@ -869,10 +872,13 @@ class Study extends Model {
             //            'card_ids_not_in' => $matured_cards['card_ids'],
         ])['answers'];
 
-        //        Common::send_error([
-        //            __METHOD__,
-        //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
-        //        ]);
+        //                Common::send_error([
+        //                    __METHOD__,
+        //                    'user_id'       => $user_id,
+        //                    "start_date"    => $start_date,
+        //                    'end_date'      => $end_date,
+        //                    '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //                ]);
 
 
         foreach ($forecast_all_answers_within_a_date as $answer) {
@@ -916,6 +922,9 @@ class Study extends Model {
         //            '$answer'                             => $answer,
         //            '$day_diff_today'                     => $day_diff_today,
         //            '$days'                               => $days,
+        //            'user_id'       => $user_id,
+        //            "start_date"    => $start_date,
+        //            'end_date'      => $end_date,
         //            '$graphable'                          => $graphable,
         //        ]);
 
@@ -925,7 +934,6 @@ class Study extends Model {
         $graphable['zz_debug']                  = self::$sp_debug;
 
         //        Common::send_error([
-        //            "Answered::orderBy('id')->count()"    => Answered::orderBy('id')->count(),
         //            '$start_date'                         => $start_date,
         //            '$end_date'                           => $end_date,
         //            '$span'                               => $span,
@@ -950,7 +958,7 @@ class Study extends Model {
     public static function get_user_stats_charts_intervals($user_id, $span) {
         $measure_start_time = microtime(true);
         //        $matured_cards = self::get_user_matured_card_ids($user_id);
-        $graphable                    = [
+        $graphable                         = [
             'heading'                 => [],
             'day_diffs'               => [],
             'day_diff_percentages'    => [],
@@ -958,12 +966,13 @@ class Study extends Model {
             'longest_interval'        => 0,
             'formed_longest_interval' => 0,
         ];
-        $matured_day_no               = get_mature_card_days();
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        //        $start_date                   = $user_timezone_today_midnight;
-        $end_date = $user_timezone_today_midnight;
-        $_date    = new DateTime($user_timezone_today_midnight);
+        $matured_day_no                    = get_mature_card_days();
+        $end_date                          = null;
+        $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
+        $user_timezone_midnight_today      = get_user_timezone_date_midnight_today($user_id);
+        //        $start_date                   = $user_timezone_early_morning_today;
+        $end_date = $user_timezone_midnight_today;
+        $_date    = new DateTime($user_timezone_early_morning_today);
         if ('one_month' === $span) {
             $_date->sub(new DateInterval('P30D'));
         } elseif ('three_month' === $span) {
@@ -1005,6 +1014,9 @@ class Study extends Model {
 
         //        Common::send_error([
         //            __METHOD__,
+        //            'user_id'       => $user_id,
+        //            "start_date"                          => $start_date,
+        //            'end_date'                            => $end_date,
         //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
         //        ]);
 
@@ -1109,7 +1121,7 @@ class Study extends Model {
     public static function get_user_card_review_count_and_time($user_id, $span) {
         $measure_start_time = microtime(true);
         //        $matured_cards = self::get_user_matured_card_ids($user_id);
-        $graphable                    = [
+        $graphable                         = [
             'heading'                       => [],
             'cumulative'                    => [],
             'y'                             => [],
@@ -1165,12 +1177,471 @@ class Study extends Model {
             'days_not_studied__time'        => 0,
             'days_studied_percent_time'     => 0,
         ];
-        $matured_day_no               = get_mature_card_days();
-        $end_date                     = null;
-        $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
-        //        $start_date                   = $user_timezone_today_midnight;
-        $end_date = $user_timezone_today_midnight;
-        $_date    = new DateTime($user_timezone_today_midnight);
+        $matured_day_no                    = get_mature_card_days();
+        $end_date                          = null;
+        $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
+        //        $start_date                   = $user_timezone_early_morning_today;
+        $end_date = $user_timezone_early_morning_today;
+        $_date    = new DateTime($user_timezone_early_morning_today);
+        if ('one_month' === $span) {
+            $_date->sub(new DateInterval('P30D'));
+        } elseif ('three_month' === $span) {
+            $_date->sub(new DateInterval('P3M'));
+        } elseif ('one_year' === $span) {
+            $_date->sub(new DateInterval('P1Y'));
+        } elseif ('all' === $span) {
+            $newest_answer_query = Answered
+                ::orderBy('next_due_at')
+                ->limit(1);
+            $start_date          = $newest_answer_query->get()->first()->next_due_at;
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$newest_answer_query sql' => $newest_answer_query->toSql(),
+            //                '$_date ' => $_date,
+            //                '$newest_answer_query sql getBindings' => $newest_answer_query->getBindings(),
+            //                '$newest_answer_query get' => $newest_answer_query->get(),
+            //            ]);
+        }
+        if ('all' !== $span) {
+            $start_date = $_date->format('Y-m-d H:i:s');
+        }
+        $_start_date = new DateTime($start_date);
+        $_end_date   = new DateTime($end_date);
+
+        $total_no_of_days = (int) $_end_date->diff($_start_date)->format("%a"); //3
+        $days             = [];
+        $__a_count        = 0 - $total_no_of_days + 1;
+        for ($_a = 0; $_a < $total_no_of_days; $_a++) {
+            $graphable['heading'][] = $__a_count.'d';
+            $__a_count++;
+            $days[] = [
+                'y'             => [
+                    'count'        => 0,
+                    'seconds_took' => 0,
+                    'minutes_took' => 0,
+                    'hours_took'   => 0,
+                    'cumulative'   => 0,
+                    'answers'      => [],
+                ],
+                'm'             => [
+                    'count'           => 0,
+                    'seconds_took'    => 0,
+                    'minutes_took'    => 0,
+                    'hours_took'      => 0,
+                    'cumulative'      => 0,
+                    'cumulative_time' => 0,
+                    'answers'         => [],
+                ],
+                'newly_learned' => [
+                    'count'        => 0,
+                    'seconds_took' => 0,
+                    'minutes_took' => 0,
+                    'hours_took'   => 0,
+                    'cumulative'   => 0,
+                    'answers'      => [],
+                ],
+                're_learned'    => [
+                    'count'        => 0,
+                    'seconds_took' => 0,
+                    'minutes_took' => 0,
+                    'hours_took'   => 0,
+                    'cumulative'   => 0,
+                    'answers'      => [],
+                ],
+            ];
+        }
+
+        $forecast_all_answers_within_a_date = ChartReviewHelper::get_forecast_all_answers_within_a_date([
+            'user_id'       => $user_id,
+            "start_date"    => $start_date,
+            'end_date'      => $end_date,
+            'no_date_limit' => ($end_date === null),
+            //            'card_ids_not_in' => $matured_cards['card_ids'],
+        ])['answers'];
+
+        //                Common::send_error([
+        //                    '$start_date'                         => $start_date,
+        //                    '$end_date'                           => $end_date,
+        //                    '$span'                               => $span,
+        //                    '$days'                               => $days,
+        //                    '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //                    'Manager::getQueryLog()'              => Manager::getQueryLog(),
+        //                ]);
+
+        $_cumulative_m             = 0;
+        $_cumulative_y             = 0;
+        $_cumulative_newly_learned = 0;
+        $_cumulative_re_learned    = 0;
+        $days_not_learnt           = 0;
+        foreach ($forecast_all_answers_within_a_date as $answer) {
+            $study             = $answer->study;
+            $no_on_hold        = $study->no_on_hold;
+            $no_to_revise      = $study->no_to_revise;
+            $revise_all        = $study->revise_all;
+            $study_all_on_hold = $study->study_all_on_hold;
+
+            $day_dif        = $answer->day_diff;
+            $day_diff_today = $answer->day_diff_today;
+
+            $is_matured       = $day_dif >= $matured_day_no;
+            $is_young         = $day_dif < $matured_day_no;
+            $is_newly_learned = !empty($answer->answered_as_new);
+            $is_relearned     = !empty($answer->answered_as_revised);
+            $seconds_took     = $answer->time_diff_second_spent;
+            $minutes_took     = $seconds_took / 60;
+            $hours_took       = $seconds_took / 3600;
+
+            if ($is_matured) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $_cumulative_m += $hours_took;
+                $days[$day_diff_today]['m']['count']++;
+                $days[$day_diff_today]['m']['seconds_took'] += $seconds_took;
+                $days[$day_diff_today]['m']['minutes_took'] += $minutes_took;
+                $days[$day_diff_today]['m']['hours_took']   += $hours_took;
+                $days[$day_diff_today]['m']['cumulative']   += $_cumulative_m;
+                $days[$day_diff_today]['m']['answers'][]    = $answer;
+            }
+            if ($is_young) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $_cumulative_y += $hours_took;
+                $days[$day_diff_today]['y']['count']++;
+                $days[$day_diff_today]['y']['seconds_took'] += $seconds_took;
+                $days[$day_diff_today]['y']['minutes_took'] += $minutes_took;
+                $days[$day_diff_today]['y']['hours_took']   += $hours_took;
+                $days[$day_diff_today]['y']['cumulative']   += $_cumulative_y;
+                $days[$day_diff_today]['y']['answers'][]    = $answer;
+            }
+            if ($is_newly_learned) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $_cumulative_newly_learned += $hours_took;
+                $days[$day_diff_today]['newly_learned']['count']++;
+                $days[$day_diff_today]['newly_learned']['seconds_took'] += $seconds_took;
+                $days[$day_diff_today]['newly_learned']['minutes_took'] += $minutes_took;
+                $days[$day_diff_today]['newly_learned']['hours_took']   += $hours_took;
+                $days[$day_diff_today]['newly_learned']['cumulative']   += $_cumulative_newly_learned;
+                $days[$day_diff_today]['newly_learned']['answers'][]    = $answer;
+            }
+            if ($is_relearned) {
+                //todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
+                $_cumulative_re_learned += $hours_took;
+                $days[$day_diff_today]['re_learned']['count']++;
+                $days[$day_diff_today]['re_learned']['seconds_took'] += $seconds_took;
+                $days[$day_diff_today]['re_learned']['minutes_took'] += $minutes_took;
+                $days[$day_diff_today]['re_learned']['hours_took']   += $hours_took;
+                $days[$day_diff_today]['re_learned']['cumulative']   += $_cumulative_re_learned;
+                $days[$day_diff_today]['re_learned']['answers'][]    = $answer;
+            }
+
+            //            Common::send_error([
+            //                '$no_to_revise'                       => $no_to_revise,
+            //                '$answer'                             => $answer,
+            //                '$no_on_hold'                         => $no_on_hold,
+            //                '$revise_all'                         => $revise_all,
+            //                '$study_all_on_hold'                  => $study_all_on_hold,
+            //                '$day_dif'                            => $day_dif,
+            //                '$start_date'                         => $start_date,
+            //                '$end_date'                           => $end_date,
+            //                '$span'                               => $span,
+            //                '$days'                               => $days,
+            //                '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+            //                //                '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
+            //                //                '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
+            //                'Manager::getQueryLog()'              => Manager::getQueryLog(),
+            //            ]);
+        }
+
+
+        //        Common::send_error([
+        //            '$start_date'                                          => $start_date,
+        //            '$end_date'                                            => $end_date,
+        //            '$span'                                                => $span,
+        //            '$days'                                                => $days,
+        //            'Manager::getQueryLog()'                               => Manager::getQueryLog(),
+        //        ]);
+
+        $cumulative_count             = 0;
+        $total_time_hours             = 0;
+        $total_hours_for_days_studied = 0;
+        //        $graphable['total_reviews'] = count($forecast_all_answers_within_a_date);
+        //        rsort($days);
+        $cumulative_y_count             = 0;
+        $cumulative_m_count             = 0;
+        $cumulative_newly_learned_count = 0;
+        $cumulative_re_learned_count    = 0;
+        $cumulative_y_time              = 0;
+        $cumulative_m_time              = 0;
+        $cumulative_newly_learned_time  = 0;
+        $cumulative_re_learned_time     = 0;
+        foreach ($days as $key => $day) {
+            $cumulative_y_count             += $day['y']['count'];
+            $cumulative_m_count             += $day['m']['count'];
+            $cumulative_newly_learned_count += $day['newly_learned']['count'];
+            $cumulative_re_learned_count    += $day['re_learned']['count'];
+            $cumulative_y_time              += $day['y']['hours_took'];
+            $cumulative_m_time              += $day['m']['hours_took'];
+            $cumulative_newly_learned_time  += $day['newly_learned']['hours_took'];
+            $cumulative_re_learned_time     += $day['re_learned']['hours_took'];
+            $today_time_for_today           = ($day['y']['hours_took']
+                + $day['m']['hours_took']
+                + $day['newly_learned']['hours_took']
+                + $day['re_learned']['hours_took']);
+            $total_time_hours               += $today_time_for_today;
+
+            if (empty($cumulative_y_count)
+                && empty($cumulative_m_count)
+                && empty($cumulative_newly_learned_count)
+                && empty($cumulative_re_learned_count)) {
+                // Not learnt today
+                $days_not_learnt++;
+            } else {
+                // He learnt today
+                $total_hours_for_days_studied += $today_time_for_today;
+            }
+
+            $graphable['y_time'][]                        = $day['y']['hours_took'];
+            $graphable['m_time'][]                        = $day['m']['hours_took'];
+            $graphable['newly_learned_time'][]            = $day['newly_learned']['hours_took'];
+            $graphable['relearned_time'][]                = $day['re_learned']['hours_took'];
+            $graphable['cumulative_y_time'][]             = $cumulative_y_time;
+            $graphable['cumulative_m_time'][]             = $cumulative_m_time;
+            $graphable['cumulative_newly_learned_time'][] = $cumulative_newly_learned_time;
+            $graphable['cumulative_relearned_time'][]     = $cumulative_re_learned_time;
+
+            $graphable['y'][]                        = $day['y']['count'];
+            $graphable['m'][]                        = $day['m']['count'];
+            $graphable['newly_learned'][]            = $day['newly_learned']['count'];
+            $graphable['relearned'][]                = $day['re_learned']['count'];
+            $graphable['cumulative_y'][]             = $cumulative_y_count;
+            $graphable['cumulative_m'][]             = $cumulative_m_count;
+            $graphable['cumulative_newly_learned'][] = $cumulative_newly_learned_count;
+            $graphable['cumulative_relearned'][]     = $cumulative_re_learned_count;
+            $cumulative_count                        += ($day['m']['count'] + $day['y']['count']);
+            $graphable['cumulative'][]               = $cumulative_count;
+            //            $graphable['y_debug']['answers'][]       = $day['m']['answers'];
+            //            $graphable['y_debug']['new_cards'][]     = $day['y']['new_cards'];
+            //            $graphable['m_debug']['answers'][]       = $day['m']['answers'];
+
+        }
+
+
+        $total_answers_count = self::get_total_answer_count_for_user($user_id, $start_date, $end_date);
+        $total_time_minutes  = $total_time_hours * 60;
+        $total_time_seconds  = $total_time_hours * 3600;
+        $total_days_studied  = $total_no_of_days - $days_not_learnt;
+        self::add_debug('Days Studied', [
+            '$no_of_days - $days_not_learnt' =>
+                "($total_no_of_days - $days_not_learnt)  = $total_days_studied",
+        ], true);
+        self::add_debug('Days Studied', [
+            '$no_of_days - $days_not_learnt' =>
+                "($total_no_of_days - $days_not_learnt)  = $total_days_studied",
+        ]);
+        self::add_debug('Total (Hours)', [
+            '$total_time_hours' => "$total_time_hours",
+        ], true);
+        $average_if_studied_per_day = ($total_answers_count / $total_no_of_days);
+        $average                    = ($total_days_studied < 1) ? 0 : $total_answers_count / $total_days_studied;
+        self::add_debug('Average for days studied', [
+            '$total_answers_count / $total_days_studied' =>
+                "($total_answers_count / $total_days_studied)  = $average",
+        ]);
+        self::add_debug('If you studied every day', [
+            '($total_answers_count / $total_no_of_days)' =>
+                "($total_answers_count / $total_no_of_days)  = $average_if_studied_per_day",
+        ]);
+        $total_answers_per_day = ($total_days_studied < 1) ? 0 : $total_answers_count / $total_days_studied;
+
+        $average_time_for_days_studied_hours   = ($total_days_studied < 1) ? 0 : $total_hours_for_days_studied / $total_days_studied; // Correct
+        $average_time_for_days_studied_minutes = ($total_days_studied < 1) ? 0 : ($total_hours_for_days_studied * 60) / $total_days_studied;
+        $average_time_for_days_studied_seconds = ($total_days_studied < 1) ? 0 : ($total_hours_for_days_studied * 3600) / $total_days_studied;
+        self::add_debug('Average for days studied (minutes)', [
+            '($total_hours_for_days_studied * 60) / $total_days_studied' =>
+                "($total_hours_for_days_studied * 60) / $total_days_studied = $average_time_for_days_studied_minutes",
+        ], true);
+
+        $average_time_if_studied_every_day_hours   = ($total_no_of_days < 1) ? 0 : $total_hours_for_days_studied / $total_no_of_days; // Correct
+        $average_time_if_studied_every_day_minutes = ($total_no_of_days < 1) ? 0 : ($total_hours_for_days_studied / 60) / $total_no_of_days;
+        $average_time_if_studied_every_day_seconds = ($total_no_of_days < 1) ? 0 : ($total_hours_for_days_studied / 3600) / $total_no_of_days;
+        self::add_debug('If you studied every day (average) (minutes)', [
+            '($total_hours_for_days_studied / 60) / $no_of_days' =>
+                "($total_hours_for_days_studied / 60) / $total_no_of_days = $average_time_if_studied_every_day_minutes",
+        ], true);
+
+        //        $average_answer_time_hours   = $total_time_hours / $total_answers_count;
+        //        $average_answer_time_minutes = $total_answers_count / ($total_time_hours * 60);
+        //        $average_answer_time_seconds = $total_answers_count / ($total_time_hours * 3600);
+        //        self::add_debug('Average answer time (minutes)', [
+        //            '$total_answers_count / ($total_time_hours * 60)' =>
+        //                "$total_answers_count / ($total_time_hours * 60) = $average_answer_time_minutes",
+        //        ]);
+
+        //        Common::send_error([
+        //            '$start_date'            => $start_date,
+        //            '$end_date'              => $end_date,
+        //            '$span'                  => $span,
+        //            '$days'                  => $days,
+        //            '$total_time_hours'      => $total_time_hours,
+        //            'Manager::getQueryLog()' => Manager::getQueryLog(),
+        //        ]);
+
+        // You are studying this no of cards per hour (Correct)
+        $average_answered_cards_per_hour         = ($total_time_hours < 1) ? 0 : $total_answers_count / $total_time_hours; // cards per hour
+        $average_answered_cards_per_minute       = ($total_time_hours < 1) ? 0 : $total_answers_count / ($total_time_hours * 60); // cards studied per minute
+        $average_answered_cards_per_seconds_time = ($average_answered_cards_per_minute < 1) ? 0 : 60 / $average_answered_cards_per_minute;
+        self::add_debug('Average answer time (minutes)', [
+            '$total_answers_count / $total_time_hours' =>
+                "$total_answers_count / $total_time_hours = $average_answered_cards_per_minute",
+        ], true);
+        self::add_debug('Average answer time (seconds)', [
+            '60 / Average answer time (minutes)' =>
+                "60 / $average_answered_cards_per_minute = $average_answered_cards_per_seconds_time",
+        ], true);
+        $days_studied_percent = ($total_days_studied / $total_no_of_days) * 100;
+
+        //                Common::send_error([
+        //                    '$start_date'                              => $start_date,
+        //                    '$average_answered_cards_per_minute'       => $average_answered_cards_per_minute,
+        //                    '$average_answered_cards_per_seconds_time' => $average_answered_cards_per_seconds_time,
+        //                    '$average_time_for_days_studied_hours'     => $average_time_for_days_studied_hours,
+        //                    '$average_time_for_days_studied_minutes'   => $average_time_for_days_studied_minutes,
+        //                    '$end_date'                                => $end_date,
+        //                    '$span'                                    => $span,
+        //                    '$graphable'                               => $graphable,
+        //                    '$total_time_hours'                        => $total_time_hours,
+        //                    '$no_of_days'                              => $total_no_of_days,
+        //                    '$total_answers_count'                     => $total_answers_count,
+        //                    '$total_days_studied'                      => $total_days_studied,
+        //                    '$days'                                    => $days,
+        //                    '$__a_count'                               => $__a_count,
+        //                    '$days_not_learnt'                         => $days_not_learnt,
+        //                    '$forecast_all_answers_within_a_date'      => $forecast_all_answers_within_a_date,
+        //                    'Manager::getQueryLog()'                   => Manager::getQueryLog(),
+        //                ]);
+
+
+        $formed_total_time       = $total_time_hours < 1.0 ?
+            ($total_time_minutes < 1.0 ? number_format($total_time_seconds, 2).' seconds'
+                : number_format($total_time_minutes, 2).' minutes') : number_format($total_time_hours, 2).' hours';
+        $debug_formed_total_time = "<b>Average for days studied: </b>";
+
+        $graphable['total_days']                                = $total_no_of_days;
+        $graphable['days_not_studied_count']                    = $days_not_learnt;
+        $graphable['days_studied_count']                        = $total_days_studied;
+        $graphable['days_studied_percent']                      = number_format($days_studied_percent, 2);
+        $graphable['total_reviews']                             = $total_answers_count;
+        $graphable['average_if_studied_per_day']                = number_format($average_if_studied_per_day, 2);
+        $graphable['average']                                   = number_format($average, 2);
+        $graphable['total_hours']                               = number_format(($total_time_hours), 2);
+        $graphable['total_minutes']                             = number_format(($total_time_minutes), 2);
+        $graphable['total_seconds']                             = number_format($total_time_seconds, 2);
+        $graphable['formed_total_time']                         = $formed_total_time;
+        $graphable['total_reviews_time']                        = $total_answers_count;
+        $graphable['average_time_for_days_studied_hours']       = number_format($average_time_for_days_studied_hours, 2);
+        $graphable['average_time_for_days_studied_minutes']     = number_format($average_time_for_days_studied_minutes, 2);
+        $graphable['average_time_for_days_studied_seconds']     = number_format($average_time_for_days_studied_seconds, 2);
+        $graphable['average_time_if_studied_every_day_hours']   = number_format($average_time_if_studied_every_day_hours, 2);
+        $graphable['average_time_if_studied_every_day_minutes'] = number_format(($average_time_if_studied_every_day_hours * 60), 2);
+        $graphable['average_time_if_studied_every_day_seconds'] = number_format(($average_time_if_studied_every_day_hours * 3600), 2);
+        //        $graphable['average_answer_time_hours']                 = number_format($average_answer_time_hours, 2);
+        //        $graphable['average_answer_time_minutes']               = number_format($average_answer_time_minutes, 2);
+        //        $graphable['average_answer_time_seconds']               = number_format($average_answer_time_seconds, 2);
+        $graphable['average_answer_cards_per_hour']           = number_format(($average_answered_cards_per_hour), 2);
+        $graphable['average_answer_cards_per_minute']         = number_format(($average_answered_cards_per_minute), 2);
+        $graphable['average_answered_cards_per_seconds_time'] = number_format(($average_answered_cards_per_seconds_time), 2);
+
+        $measure_end_time                       = microtime(true);
+        $measure_execution_time                 = ($measure_end_time - $measure_start_time);
+        $graphable['zz_measure_execution_time'] = $measure_execution_time;
+        $graphable['zz_debug']                  = self::$sp_debug;
+
+        //        Common::send_error([
+        //            '$start_date'                         => $start_date,
+        //            '$end_date'                           => $end_date,
+        //            '$span'                               => $span,
+        //            '$graphable'                          => $graphable,
+        //            '$total_time_hours'                   => $total_time_hours,
+        //            'tttotal_answer_count_for_user'         => self::get_total_answer_count_for_user($user_id),
+        //            '$no_of_days'                         => $total_no_of_days,
+        //            '$total_answers_count'                => $total_answers_count,
+        //            '$total_days_studied'                 => $total_days_studied,
+        //            '$days'                               => $days,
+        //            '$__a_count'                          => $__a_count,
+        //            '$days_not_learnt'                    => $days_not_learnt,
+        //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
+        //            'Manager::getQueryLog()'              => Manager::getQueryLog(),
+        //        ]);
+
+        return [
+            'graphable' => $graphable,
+        ];
+
+    }
+
+    public static function get_user_card_review_count_and_time2($user_id, $span) {
+        $measure_start_time = microtime(true);
+        //        $matured_cards = self::get_user_matured_card_ids($user_id);
+        $graphable                         = [
+            'heading'                       => [],
+            'cumulative'                    => [],
+            'y'                             => [],
+            'm'                             => [],
+            'newly_learned'                 => [],
+            'relearned'                     => [],
+            'y_time'                        => [],
+            'm_time'                        => [],
+            'newly_learned_time'            => [],
+            'relearned_time'                => [],
+            'cumulative_y'                  => [],
+            'cumulative_m'                  => [],
+            'cumulative_newly_learned'      => [],
+            'cumulative_relearned'          => [],
+            'cumulative_y_time'             => [],
+            'cumulative_m_time'             => [],
+            'cumulative_newly_learned_time' => [],
+            'cumulative_relearned_time'     => [],
+            'y_debug'                       => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'm_debug'                       => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'newly_learned_debug'           => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'relearned_debug'               => [
+                'answers'   => [],
+                'new_cards' => [],
+            ],
+            'm_cumulative'                  => 0,
+            'y_cumulative'                  => 0,
+            'newly_learned_cumulative'      => 0,
+            're_learned_cumulative'         => 0,
+            'm_cumulative_time'             => 0,
+            'y_cumulative_time'             => 0,
+            'newly_learned_cumulative_time' => 0,
+            're_learned_cumulative_time'    => 0,
+            'total_reviews_time'            => 0,
+            'average'                       => 0,
+            'average_if_studied_per_day'    => 0,
+            'total_days'                    => 0,
+            'total_hours'                   => 0,
+            'total_minutes'                 => 0,
+            'total_seconds'                 => 0,
+            'total_days_time'               => 0,
+            'days_studied_count'            => 0,
+            'days_studied_time'             => 0,
+            'days_not_studied__time'        => 0,
+            'days_studied_percent_time'     => 0,
+        ];
+        $matured_day_no                    = get_mature_card_days();
+        $end_date                          = null;
+        $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
+        //        $start_date                   = $user_timezone_early_morning_today;
+        $end_date = $user_timezone_early_morning_today;
+        $_date    = new DateTime($user_timezone_early_morning_today);
         if ('one_month' === $span) {
             $_date->sub(new DateInterval('P30D'));
         } elseif ('three_month' === $span) {
@@ -1403,7 +1874,7 @@ class Study extends Model {
         }
 
 
-        $total_answers_count = Answered::orderBy('id')->count();
+        $total_answers_count = self::get_total_answer_count_for_user($user_id, $start_date, $end_date);
         $total_time_minutes  = $total_time_hours * 60;
         $total_time_seconds  = $total_time_hours * 3600;
         $total_days_studied  = $total_no_of_days - $days_not_learnt;
@@ -1478,7 +1949,6 @@ class Study extends Model {
         $days_studied_percent = ($total_days_studied / $total_no_of_days) * 100;
 
         //        Common::send_error([
-        //            "Answered::orderBy('id')->count()"         => Answered::orderBy('id')->count(),
         //            '$start_date'                              => $start_date,
         //            '$average_answer_time_minutes'             => $average_answer_time_minutes,
         //            '$average_answer_time_seconds'             => $average_answer_time_seconds,
@@ -1539,10 +2009,10 @@ class Study extends Model {
         $graphable['zz_debug']                  = self::$sp_debug;
 
         //        Common::send_error([
-        //            "Answered::orderBy('id')->count()"    => Answered::orderBy('id')->count(),
         //            '$start_date'                         => $start_date,
         //            '$end_date'                           => $end_date,
         //            '$span'                               => $span,
+        //            'total_answer_count_for_user'         => self::get_total_answer_count_for_user($user_id),
         //            '$graphable'                          => $graphable,
         //            '$total_time_hours'                   => $total_time_hours,
         //            '$no_of_days'                         => $total_no_of_days,
@@ -1905,7 +2375,7 @@ class Study extends Model {
     public static function get_user_cards_on_hold($study_id, $user_id, $particular_date = null) {
 
         try {
-            $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
+            $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
 
             $study        = Study::with('tags')->findOrFail($study_id);
             $deck_id      = $study->deck_id;
@@ -1930,7 +2400,7 @@ class Study extends Model {
             /*** Get all cards revised today answered today (To exclude them later if "false === $study->no_to_revise") ***/
             $query_revised_today                 = Answered
                 ::where('study_id', '=', $study_id)
-                ->where('created_at', '>', $user_timezone_today_midnight)
+                ->where('created_at', '>', $user_timezone_early_morning_today)
                 //					->whereNotIn( 'grade', [ 'again' ] )
                 ->where('answered_as_revised', '=', true);
             $card_ids_revised_today              = $query_revised_today->pluck('card_id');
@@ -1942,7 +2412,7 @@ class Study extends Model {
             //					'getBindings'                          => $query_revised_today->getBindings(),
             //					'$card_ids_revised_today'              => $card_ids_revised_today,
             //					'$no_of_new_remaining_to_revise_today' => $no_of_new_remaining_to_revise_today,
-            //					'$user_timezone_today_midnight'        => $user_timezone_today_midnight,
+            //					'$user_timezone_early_morning_today'        => $user_timezone_early_morning_today,
             //				] );
 
             /*** Prepare basic query ***/
@@ -1969,7 +2439,7 @@ class Study extends Model {
             /*** Return only those answered before (Not in cards revised today) and grade = hold ***/
             $cards_query = $cards_query
                 ->whereIn('c.id', function ($q) use (
-                    $user_timezone_today_midnight,
+                    $user_timezone_early_morning_today,
                     $card_ids_revised_today,
                     $study_id,
                     $user_id
@@ -1990,7 +2460,7 @@ class Study extends Model {
                         })
                         ->whereIn('grade', ['hold'])
                         ->where('study_id', $study_id)
-                        ->where('next_due_at', '<=', $user_timezone_today_midnight)
+                        ->where('next_due_at', '<=', $user_timezone_early_morning_today)
                         ->distinct();
                     //						dd( $q->toSql(), $q->getBindings(),$card_ids_revised_today, $q->get() );
                 });
@@ -2058,7 +2528,7 @@ class Study extends Model {
     public static function get_user_cards_to_revise($study_id, $user_id) {
 
         try {
-            $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
+            $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
 
             $study        = Study::with('tags')->findOrFail($study_id);
             $deck_id      = $study->deck_id;
@@ -2082,7 +2552,7 @@ class Study extends Model {
 
             /*** Get all cards revised today answered today (To exclude them later if "false === $study->no_to_revise") ***/
             $query_revised_today                 = Answered::where('study_id', '=', $study_id)
-                ->where('created_at', '>', $user_timezone_today_midnight)
+                ->where('created_at', '>', $user_timezone_early_morning_today)
                 ->whereNotIn('grade', ['again'])
                 ->where('study_id', '=', $study_id)
                 ->where('answered_as_revised', '=', true);
@@ -2124,7 +2594,7 @@ class Study extends Model {
 
             /*** Filter out cards answered today with grade not "again" ***/
             //				$cards_query = $cards_query
-            //					->whereNotIn( 'c.id', function ( $q ) use ( $user_timezone_today_midnight ) {
+            //					->whereNotIn( 'c.id', function ( $q ) use ( $user_timezone_early_morning_today ) {
             //						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED )
             //							->where( 'grade', '!=', 'again' );
             //					} );
@@ -2132,7 +2602,7 @@ class Study extends Model {
             /*** Return only those answered before (Not in cards revised today) ***/
             $cards_query = $cards_query
                 ->whereIn('c.id', function ($q) use (
-                    $user_timezone_today_midnight,
+                    $user_timezone_early_morning_today,
                     $card_ids_revised_today,
                     $study_id
                 ) {
@@ -2140,7 +2610,7 @@ class Study extends Model {
                         ->whereNotIn('card_id', $card_ids_revised_today)
                         ->whereNotIn('grade', ['hold'])
                         ->where('study_id', $study_id)
-                        ->where('next_due_at', '<=', $user_timezone_today_midnight)
+                        ->where('next_due_at', '<=', $user_timezone_early_morning_today)
                         ->distinct();
                     //						dd( $q->toSql(), $q->getBindings(),$q->get() );
                 });
@@ -2205,7 +2675,7 @@ class Study extends Model {
     public static function get_user_cards_new($study_id, $user_id) {
 
         try {
-            $user_timezone_today_midnight = get_user_timezone_date_midnight_today($user_id);
+            $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
 
             $study         = Study::with('tags')->findOrFail($study_id);
             $deck_id       = $study->deck_id;
@@ -2220,7 +2690,7 @@ class Study extends Model {
 
             /*** Get all new cards answered today "Only those answered once and today are truly new" ***/
             $query_new_answered_today     = Answered::where('study_id', '=', $study_id)
-                ->where('created_at', '>', $user_timezone_today_midnight)
+                ->where('created_at', '>', $user_timezone_early_morning_today)
                 ->where('grade', '!=', 'again')
                 ->where('answered_as_new', '=', true);
             $new_card_ids_answered_today  = $query_new_answered_today->pluck('card_id');
@@ -2268,7 +2738,7 @@ class Study extends Model {
             /*** Filter out cards answered today with grade not "again" ***/
             $cards_query = $cards_query
                 ->whereNotIn('c.id', function ($q) use (
-                    $user_timezone_today_midnight,
+                    $user_timezone_early_morning_today,
                     $user_id
                 ) {
                     //                    $q->select('card_id')->from(SP_TABLE_ANSWERED)
@@ -2279,7 +2749,7 @@ class Study extends Model {
                         ->leftJoin(SP_TABLE_STUDY.' as sss', 'sss.id', '=', 'aaa.study_id')
                         ->leftJoin(SP_TABLE_USERS.' as uuu', 'uuu.ID', '=', 'sss.user_id')
                         ->where('uuu.ID', '=', $user_id)
-                        ->where('aaa.created_at', '>', $user_timezone_today_midnight)
+                        ->where('aaa.created_at', '>', $user_timezone_early_morning_today)
                         ->distinct();
                 });
 
@@ -2312,7 +2782,7 @@ class Study extends Model {
                 ->whereIn('id', $card_ids);
             //            Common::send_error([
             //                '$card_ids'                   => $card_ids,
-            //                '$user_timezone_today_midnight'                   => $user_timezone_today_midnight,
+            //                '$user_timezone_early_morning_today'                   => $user_timezone_early_morning_today,
             //                '$all_cards->toSql()'         => $all_cards->toSql(),
             //                '$all_cards->getBindings()'   => $all_cards->getBindings(),
             //                '$all_cards->get()'           => $all_cards->get(),
@@ -2496,6 +2966,38 @@ class Study extends Model {
             'query get'         => $query->get(),
             'query getBindings' => $query->getBindings(),
         ]);
+    }
+
+    private static function get_total_answer_count_for_user($user_id, $start_date, $end_date) {
+        $count = Manager::table(SP_TABLE_ANSWERED.' as a')
+            ->join(SP_TABLE_STUDY.' as s', 's.id', '=', 'a.study_id')
+            ->join(SP_TABLE_USERS.' as u', 'u.id', '=', 's.user_id')
+            ->where('s.user_id', '=', $user_id)
+            ->whereBetween('a.created_at', [$start_date, $end_date])
+            ->count();
+        return $count;
+    }
+
+    private static function get_user_oldest_answer($user_id) {
+        $answer = Manager::table(SP_TABLE_ANSWERED.' as a')
+            ->join(SP_TABLE_STUDY.' as s', 's.id', '=', 'a.study_id')
+            ->join(SP_TABLE_USERS.' as u', 'u.id', '=', 's.user_id')
+            ->where('s.user_id', '=', $user_id)
+            ->orderBy('a.created_at', 'asc')
+            ->limit(1)
+            ->get()->first();
+        return $answer;
+    }
+
+    private static function get_user_newest_answer($user_id) {
+        $answer = Manager::table(SP_TABLE_ANSWERED.' as a')
+            ->join(SP_TABLE_STUDY.' as s', 's.id', '=', 'a.study_id')
+            ->join(SP_TABLE_USERS.' as u', 'u.id', '=', 's.user_id')
+            ->where('s.user_id', '=', $user_id)
+            ->orderBy('a.created_at', 'desc')
+            ->limit(1)
+            ->get()->first();
+        return $answer;
     }
 
 }
