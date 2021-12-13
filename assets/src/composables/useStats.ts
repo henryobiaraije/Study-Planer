@@ -123,6 +123,18 @@ interface _ChartHourlyBreakdownGraphable {
   percentage_correct: Array<number>;
 }
 
+interface _ChartCardTypesGraphable {
+  heading: Array<string>;
+  pie_data: Array<{
+    name: string;
+    value: number;
+  }>;
+  total_cards: number;
+  total_mature: number;
+  total_new: number;
+  total_young: number;
+}
+
 export default function (status = 'publish') {
   const ajax = ref<_Ajax>({
     sending: false,
@@ -208,7 +220,7 @@ export default function (status = 'publish') {
   let statsChartInterval = ref<_ChartIntervalGraphable>(null);
   let statsChartAnserButtons = ref<_ChartAnswerButtons>(null);
   let statsHourlyBreakdown = ref<_ChartHourlyBreakdownGraphable>(null);
-  let statsCardTypes = ref<_ChartHourlyBreakdownGraphable>(null);
+  let statsCardTypes = ref<_ChartCardTypesGraphable>(null);
   let forecastSpan = ref('one_month');
   let reviewCountSpan = ref('one_month');
   let reviewTimeSpan = ref('one_month');
@@ -288,7 +300,8 @@ export default function (status = 'publish') {
         legend: {
           orient: 'horizontal',
           left: 'top',
-          data: ['Mature: 426', 'Young+Learn: 7200', 'Unseen: 18675']
+          // data: ['Mature: 426', 'Young+Learn: 7200', 'Unseen: 18675']
+          data: statsCardTypes.value.heading,
         },
         series: [
           {
@@ -296,11 +309,12 @@ export default function (status = 'publish') {
             type: 'pie',
             radius: '25%',
             center: ['50%', '60%'],
-            data: [
-              {value: 335, name: 'Mature: 426'},
-              {value: 310, name: 'Young+Learn: 7200'},
-              {value: 234, name: 'Unseen: 18675'},
-            ],
+            // data: [
+            //   {value: 335, name: 'Mature: 426'},
+            //   {value: 310, name: 'Young+Learn: 7200'},
+            //   {value: 234, name: 'Unseen: 18675'},
+            // ],
+            data: statsCardTypes.value.pie_data,
             itemStyle: {
               emphasis: {
                 shadowBlur: 0,

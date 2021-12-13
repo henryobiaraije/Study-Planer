@@ -79,17 +79,17 @@ class AjaxFrontHelper {
 
     public function ajax_front_load_stats_card_types($post): void {
         Initializer::verify_post($post, true);
-//        Common::send_error([
-//            'ajax_front_load_stats_card_types',
-//            'post' => $post,
-//        ]);
+//                Common::send_error([
+//                    'ajax_front_load_stats_card_types',
+//                    'post' => $post,
+//                ]);
 
         $all  = $post[Common::VAR_2];
-        $year = sanitize_text_field($all['year']);
+        $span = sanitize_text_field($all['date']);
         //        $span    = 'one_month';
         $user_id = get_current_user_id();
 
-        $all = Study::get_user_stats_card_types($user_id, $year);
+        $all = Study::get_user_stats_card_types($user_id, $span);
 
         Common::send_success('Stats Card types here', $all);
 
