@@ -11,6 +11,7 @@ use Model\DeckGroup;
 use StudyPlanner\Db\Initialize_Db;
 use StudyPlanner\Helpers\AjaxFrontHelper;
 use StudyPlanner\Helpers\AjaxHelper;
+use StudyPlanner\Helpers\RunOnceHelpers;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
 use StudyPlanner\Pages\Admin_Basic_Card;
@@ -90,6 +91,7 @@ class Initializer {
         add_action('admin_enqueue_scripts', array($this, 'register_default_admin_scripts'));
         add_action('wp_enqueue_scripts', array($this, 'register_default_frontend_scripts'));
 
+        RunOnceHelpers::get_instance();
         AjaxHelper::get_instance();
         AjaxFrontHelper::get_instance();
         AdminDeckGroups::get_instance();

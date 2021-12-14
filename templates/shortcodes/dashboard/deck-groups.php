@@ -74,15 +74,15 @@
                         <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center flex gap-2">
                             <div class="study-title whitespace-nowrap ">On
                                 hold: <?php //todo might change to "Previously false" ?></div>
-                            <div class="study-number font-bold fs-4">{{item.due_summary['previously_false']}}</div>
+                            <div :class="{'bg-sp-100 rounded-full px-2 font-bold' : item.due_summary['previously_false'] > 0}" class="study-number fs-4">{{item.due_summary['previously_false']}}</div>
                         </div>
                         <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center flex gap-2">
                             <div class="study-title whitespace-nowrap">Revision:</div>
-                            <div class="study-number font-bold fs-4">{{item.due_summary['revision']}}</div>
+                            <div :class="{'bg-sp-100 rounded-full px-2 font-bold' : item.due_summary['revision'] > 0}" class="study-number fs-4">{{item.due_summary['revision']}}</div>
                         </div>
                         <div class="one-study bg-white flex-1 shadow p-2 m-2 text-center flex gap-2">
                             <div class="study-title whitespace-nowrap">New cards:</div>
-                            <div class="study-number font-bold fs-4">{{item.due_summary['new']}}</div>
+                            <div :class="{'bg-sp-100 rounded-full px-2 font-bold' : item.due_summary['new'] > 0}" class="study-number fs-4">{{item.due_summary['new']}}</div>
                         </div>
                     </div>
                 </div>
@@ -140,9 +140,9 @@
                                 <!--                                </div>-->
                             </div>
                             <ul class="flex flex-wrap gap-4 flex-initial py-1 px-2 justify-content-center md:justify-content-end w-full md:w-auto">
-                                <li><span class="text-gray-500">On Hold: </span> <b>{{item2.due_summary['previously_false']}}</b></li>
-                                <li><span class="text-gray-500">Revision: </span> <b>{{item2.due_summary['revision']}}</b></li>
-                                <li><span class="text-gray-500">New cards: </span> <b>{{item2.due_summary['new']}}</b></li>
+                                <li><span class="text-gray-500">On Hold: </span> <span :class="{'bg-sp-100 rounded-full px-2 font-bold' : item2.due_summary['previously_false'] > 0}">{{item2.due_summary['previously_false']}}</span></li>
+                                <li><span class="text-gray-500">Revision: </span> <span :class="{'bg-sp-100 rounded-full px-2 font-bold' : item2.due_summary['revision'] > 0}">{{item2.due_summary['revision']}}</span></li>
+                                <li><span class="text-gray-500">New cards: </span> <span :class="{'bg-sp-100 rounded-full px-2 font-bold' : item2.due_summary['new'] > 0}">{{item2.due_summary['new']}}</span></li>
                             </ul>
                         </div>
                     </div>

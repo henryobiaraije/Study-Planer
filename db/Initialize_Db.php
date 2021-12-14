@@ -286,6 +286,11 @@ class Initialize_Db {
                 $table->boolean('question')->after('answer');
             });
         }
+        if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'card_last_updated_at')) {
+            Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
+                $table->dateTime('card_last_updated_at')->after('updated_at');
+            });
+        }
 
 
     }
