@@ -69,12 +69,10 @@ class RunOnceHelpers {
         $table = Manager
             ::table(SP_TABLE_ANSWERED.' as a')
             ->leftJoin(SP_TABLE_CARDS.' as c', 'c.id', '=', 'a.card_id')
-            ->where('a.id', '=', 153)
             ->update([
                 'card_last_updated_at' => Manager::raw('c.updated_at'),
             ]);
-//        dd($table->toSql());
-
+        get_option('spROUpdAnsLasUpdCId', true);
     }
 
 

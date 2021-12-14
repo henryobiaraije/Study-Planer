@@ -543,11 +543,13 @@ class AjaxFrontHelper {
                 'study_id' => $study_id,
             ]);
 
-            $next_due_date         = $next_due->get_next_due_date();
-            $answer->next_due_at   = $next_due_date['next_due_date_morning'];
-            $answer->next_interval = $next_due_date['next_interval'];
-            $answer->ease_factor   = $next_due_date['ease_factor'];
+            $next_due_date                = $next_due->get_next_due_date();
+            $answer->next_due_at          = $next_due_date['next_due_date_morning'];
+            $answer->next_interval        = $next_due_date['next_interval'];
+            $answer->ease_factor          = $next_due_date['ease_factor'];
+            $answer->card_last_updated_at = $card->updated_at;
             $answer->save();
+
 
             Manager::commit();
 
@@ -606,11 +608,78 @@ class AjaxFrontHelper {
         $user_id           = get_current_user_id();
 
         $all_cards = $study::get_user_cards_to_study($study->id, $user_id);
-
+        //        Common::send_error([
+        //            'ajax_front_create_study',
+        //            'post'       => $post,
+        //            '$all_cards' => $all_cards,
+        //        ]);
         foreach ($all_cards as $card) {
+            $card_type = $card->card_group->card_type;
+            if (in_array($card_type, ['table', 'image'])) {
+                if (!is_array($card->answer)) {
+                    $card->answer = json_decode($card->answer);
+                }
+                if (!is_array($card->question)) {
+                    $card->question = json_decode($card->question);
+                }
+                if (!is_array($card->card_group->whole_question)) {
+                    $card->card_group->whole_question = json_decode($card->card_group->whole_question);
+                }
+            }
+
+
             $card->card_group->card_group_edit_url = '';
             $card->card_group->bg_image_url        = get_card_group_background_image($card->card_group->bg_image_id);
-
+            $table                                 = Manager
+                ::table(SP_TABLE_ANSWERED.' as a')
+                ->join(SP_TABLE_CARDS.' as c', 'c.id', '=', 'a.card_id')
+                ->join(SP_TABLE_STUDY.' as s', 's.id', '=', 'a.study_id')
+                ->where('s.user_id', '=', $user_id)
+                ->where('c.id', '=', $card->id)
+                ->where('a.grade', '!=', 'hold')
+                ->orderByDesc('a.id')
+                ->limit(1)
+                ->select(
+                    'a.id',
+                    'a.card_id',
+                    'a.answer',
+                    'a.card_last_updated_at',
+                    'a.rejected_at',
+                    'c.updated_at as card_updated_at',
+                    'c.answer as card_answer',
+                );
+            $has_updated                           = false;
+            $get                                   = $table->get()->first();
+            $card_answer                           = '';
+            if (!empty($get)) {
+                $answer          = $get->answer;
+                $card_answer     = $get->card_answer;
+                $last_updated_at = $get->card_last_updated_at;
+                $updated_at      = $get->updated_at;
+                if ($card_answer !== $answer) {
+                    $has_updated = true;
+                }
+                //                Common::send_error([
+                //                    'ajax_front_create_study',
+                //                    'post'                   => $post,
+                //                    '$card'                   => $card,
+                //                    'Manager::getQueryLog()' => Manager::getQueryLog(),
+                //                    '$study_id'              => $study_id,
+                //                    '$answer'                => $answer,
+                //                    '$has_updated'           => $has_updated,
+                //                    '$card_answer'           => $card_answer,
+                //                ]);
+            }
+            $card->has_updated = $has_updated;
+            //            Common::send_error([
+            //                'ajax_front_create_study',
+            //                'post'                   => $post,
+            //                'Manager::getQueryLog()' => Manager::getQueryLog(),
+            //                '$study_id'              => $study_id,
+            //                '$table sql'             => $table->toSql(),
+            //                '$table getBindings'     => $table->getBindings(),
+            //                '$table get'             => $table->get(),
+            //            ]);
         }
 
         //			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];

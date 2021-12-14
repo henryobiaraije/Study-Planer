@@ -1119,10 +1119,10 @@ class AjaxHelper {
     }
 
     public function ajax_admin_restore_card_group($post): void {
-//        Common::send_error([
-//            'ajax_admin_restore_card_group',
-//            'post' => $post,
-//        ]);
+        //        Common::send_error([
+        //            'ajax_admin_restore_card_group',
+        //            'post' => $post,
+        //        ]);
 
         $all  = $post[Common::VAR_2];
         $args = wp_parse_args(
@@ -1147,11 +1147,11 @@ class AjaxHelper {
                 //                ]);
             }
             $group->restore();
-//            Common::send_error([
-//                'ajax_admin_trash_cards',
-//                'post'       => $post,
-//                '$the_cards' => $the_cards,
-//            ]);
+            //            Common::send_error([
+            //                'ajax_admin_trash_cards',
+            //                'post'       => $post,
+            //                '$the_cards' => $the_cards,
+            //            ]);
 
             //            $group->cards()->each(function($card){
             //                $card->answered()->delete();
@@ -1468,6 +1468,20 @@ class AjaxHelper {
         if (empty($card_group)) {
             Common::send_error('Invalid card group');
         }
+        foreach ($card_group->cards as $card) {
+            $card_type = $card->card_group->card_type;
+            if (in_array($card_type, ['table', 'image'])) {
+                if (!is_array($card->answer)) {
+                    $card->answer = json_decode($card->answer);
+                }
+                if (!is_array($card->question)) {
+                    $card->question = json_decode($card->question);
+                }
+                if (!is_array($card_group->whole_question)) {
+                    $card_group->whole_question = json_decode($card_group->whole_question);
+                }
+            }
+        }
         //			if ( 'table' === $card_group->card_type ) {
         //				$card_group->whole_question = json_decode( $card_group->whole_question );
         //				foreach ( $card_group->cards as $card ) {
@@ -1483,13 +1497,13 @@ class AjaxHelper {
         //			}
 
         //			$cards = $card_group->cards;
-        //			Common::send_error( [
-        //				'ajax_admin_create_new_basic_card',
-        //				'post'           => $post,
-        //				'$card_group_id' => $card_group_id,
-        //				'$card_group'    => $card_group,
-        ////				'$cards'         => $cards,
-        //			] );
+        //        Common::send_error([
+        //            'ajax_admin_create_new_basic_card',
+        //            'post'           => $post,
+        //            '$card_group_id' => $card_group_id,
+        //            '$card_group'    => $card_group,
+        //            //				'$cards'         => $cards,
+        //        ]);
 
 
         Common::send_success('Loaded successfully.', [

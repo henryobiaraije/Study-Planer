@@ -492,6 +492,7 @@ export default function (cardGroupId = 0) {
           if (hold.cards.length > 0) {
             // item.value = hold.cards[0];
           }
+          console.log({hold});
           // cardGroup.value = hold;
           cardGroup.value.whole_question      = hold.whole_question;
           imageItem.value                     = hold.whole_question;
