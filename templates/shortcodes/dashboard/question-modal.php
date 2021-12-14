@@ -21,14 +21,17 @@ if (!is_user_logged_in()) {
                 </h5>
                 <button type="button" id="hide-question-moadl" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div v-if="null !== currentQuestion" class="sp-question min-h-[65vh] flex align-items-center"
+            <div class="modal-body" style="background-color: #fff">
+                <div class="mb-4">
+                    <?php \StudyPlanner\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>
+                </div>
+                <div v-if="null !== currentQuestion && !currentQuestion.has_updated" class="sp-question min-h-[65vh] flex align-items-center overflow-x-auto"
                      style="background-repeat: no-repeat;background-size: cover;"
                      :style="{'background-image' : 'url('+currentQuestion.card_group.bg_image_url+')'}">
                     <?php /*** Basic Card ***/ ?>
                     <div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question"
                          style="font-family: 'Montserrat', sans-serif;">
-                        <div  v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.answer : currentQuestion.question "
+                        <div v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.answer : currentQuestion.question "
                              class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center mb-2"></div>
                         <div v-show="userDash.showCurrentAnswer.value" style="font-family: 'Montserrat', sans-serif;"
                              v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.question : currentQuestion.answer"
@@ -88,7 +91,7 @@ if (!is_user_logged_in()) {
                         </table>
                     </div>
                     <?php /*** Image Card ***/ ?>
-                    <div v-else-if="'image' === currentQuestion.card_group.card_type">
+                    <div v-else-if="'image' === currentQuestion.card_group.card_type" class="w-full">
                         <div v-show="!userDash.showCurrentAnswer.value"
                              class="sp-image-question m-auto  mb-2">
                             <div class="image-area" :style="{height: currentQuestion.h+'px' }">
@@ -124,12 +127,15 @@ if (!is_user_logged_in()) {
                     <div v-if="userDash.ajaxLoadingCard.sending" style="text-align: center;flex: 12;font-size: 50px;"><i
                                 class="fa fa-spin fa-spinner"></i></div>
                 </div>
+
                 <div class="modal-footer justify-center">
-                    <div v-if="!userDash.showGrade.value" class="show-answer m-2">
+                    <?php /*** Buttons (Show Answer | Hold) ***/ ?>
+                    <div v-if="!userDash.showGrade.value && null !== currentQuestion && !currentQuestion.has_updated" class="show-answer m-2">
                         <button @click="userDash._showAnswer()" type="button" class="sp-action-button">Show Answer
                         </button>
                         <button @click="userDash._hold()" type="button" class="sp-action-button">Hold</button>
                     </div>
+                    <?php /*** Buttons (Again | Hard | Good | Easy) ***/ ?>
                     <div v-if="userDash.showGrade.value" class="show-grade flex justify-center">
                         <div class="one-grade flex-initial px-2 mx-2">
                             <span class="grade-time block text-center"></span>
@@ -153,15 +159,28 @@ if (!is_user_logged_in()) {
                             </button>
                         </div>
                     </div>
-                    <!--				<div v-if="showExtra > 5" >-->
-                    <!--					<ajax-action-not-form-->
-                    <!--							button-text="Load question"-->
-                    <!--							@click="userDash._getQuestions"-->
-                    <!--							css-classes="button"-->
-                    <!--							icon="fa fa-redo"-->
-                    <!--							:ajax="userDash.ajaxSaveStudy.value" >-->
-                    <!--					</ajax-action-not-form >-->
-                    <!--				</div >-->
+                    <?php /*** Accept changes ***/ ?>
+                    <div v-if="null !== currentQuestion && currentQuestion.has_updated" class="show-grade flex justify-center">
+                        <div class="flex align-items-center font-bold">Accept Changes?</div>
+                        <div class="one-grade flex-initial px-2 mx-2">
+                            <span class="grade-time block text-center"></span>
+                            <button @click="userDash._acceptChanges('yes')" class="sp-action-button" type="button">Yes</button>
+                        </div>
+                        <div class="one-grade flex-initial mx-2">
+                            <span class="grade-time block text-center"></span>
+                            <button @click="userDash._acceptChanges('no')" type="button" class="sp-action-button">No
+                            </button>
+                        </div>
+                        <div class="one-grade flex-initial mx-2">
+                            <span class="grade-time block text-center"></span>
+                            <button @click="userDash._acceptChanges('remind_me_later')" type="button" class="sp-action-button">Remind Me Later</button>
+                        </div>
+                    </div>
+                    <div v-if="null !== currentQuestion && currentQuestion.has_updated" class="w-full mt-2 flex-1 min-w-300px" style="flex:12">
+                        <label class="w-full">
+                            <textarea v-model="currentQuestion.accept_changes_comment" class="w-full" placeholder="Comment on this change"></textarea>
+                        </label>
+                    </div>
                 </div>
                 <?php /** Debug Section */ ?>
                 <section v-if="showExtra && null !== userDash.lastAnsweredDebugData.value" class="debug-section p-2">

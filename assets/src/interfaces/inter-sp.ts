@@ -60,6 +60,7 @@ export interface _Card extends _TimeStamps {
   x_position?: number;
   y_position?: number;
   answering_type?: string;
+  has_updated?: boolean;
 }
 
 

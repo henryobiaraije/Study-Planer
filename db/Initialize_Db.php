@@ -115,6 +115,7 @@ class Initialize_Db {
         $this->create_table_study();
         $this->create_table_answered();
         $this->create_table_study_log();
+        $this->create_answer_log();
 
     }
 
@@ -283,12 +284,38 @@ class Initialize_Db {
         }
         if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'question')) {
             Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
-                $table->boolean('question')->after('answer');
+                $table->text('question')->after('answer');
             });
         }
         if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'card_last_updated_at')) {
             Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
                 $table->dateTime('card_last_updated_at')->after('updated_at');
+            });
+        }
+        if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'accept_changes_comment')) {
+            Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
+                $table->text('accept_changes_comment')->after('card_last_updated_at');
+            });
+        }
+
+
+    }
+
+    public function create_answer_log() {
+        // Answered
+
+        if (!$this->schema_builder->hasTable(SP_TABLE_ANSWER_LOG)) {
+            Capsule::schema()->create(SP_TABLE_ANSWER_LOG, function (Blueprint $table) {
+                global $wpdb;
+                $table->id();
+                $table->foreignId('study_id')->constrained(SP_TABLE_STUDY)->cascadeOnDelete()->cascadeOnUpdate()->comment('The study id');
+                $table->bigInteger('card_id')->index()->unsigned()->nullable();
+                $table->foreign('card_id')->references('id')->on(SP_TABLE_CARDS)->cascadeOnUpdate()->nullOnDelete();
+                $table->dateTime('last_updated_at');
+                $table->text('accepted_change_comment');
+                $table->text('question');
+                $table->text('answer');
+                $table->timestamps();
             });
         }
 

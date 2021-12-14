@@ -155,11 +155,16 @@ export default function (cardGroupId = 0) {
   const applyPreviewCss      = (_imageItem: _ImageItem) => {
     const mainHash = _imageItem.hash;
     const mainId   = 'main-preview-' + mainHash;
+    const mainOldAnswerId   = 'main-preview-old' + mainHash;
     const styleId  = 'main-preview-style-' + mainHash;
     const css      = `
       <style id="${styleId}">
         #${mainId}, .sp-image-question {
           height: ${_imageItem.h}px;
+          width: ${_imageItem.w}px;
+        } 
+        #${mainOldAnswerId}, .sp-image-question {
+          height: ${_imageItem.h + 50}px;
           width: ${_imageItem.w}px;
         }
       </style>

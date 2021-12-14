@@ -74,6 +74,7 @@ class AjaxFrontHelper {
         add_action('front_sp_ajax_admin_load_user_profile', array($this, 'ajax_admin_load_user_profile'));
         add_action('front_sp_ajax_front_load_stats_progress_chart', array($this, 'ajax_front_load_stats_progress_chart'));
         add_action('front_sp_ajax_front_load_stats_card_types', array($this, 'ajax_front_load_stats_card_types'));
+        //        add_action('front_sp_ajax_front_accept_changes', array($this, 'ajax_front_accept_changes'));
     }
 
     /*** <editor-fold desc="Chart Stats"> **/
@@ -576,6 +577,190 @@ class AjaxFrontHelper {
 
     }
 
+    public function ______ajax_front_accept_changes($post): void {
+        Initializer::verify_post($post, true);
+        //        Common::send_error([
+        //            __METHOD__,
+        //            'post' => $post,
+        //        ]);
+
+        $all                = $post[Common::VAR_2];
+        $current_question   = $all['currentQuestion'];
+        $e_study            = $all['study'];
+        $card_id            = (int) sanitize_text_field($current_question['id']);
+        $user_id            = get_current_user_id();
+        $button             = sanitize_text_field($all['button']);
+        $study_id           = (int) sanitize_text_field($e_study['id']);
+        $e_current_answer   = $current_question['answer'];
+        $e_current_question = $current_question['question'];
+
+        $study = Study::with('deck.card_group')->find($study_id);
+        if (empty($study)) {
+            Common::send_error('Invalid study deck');
+        }
+        $card = Card::with('card_group')->find($card_id);
+        if (empty($card)) {
+            Common::send_error('Invalid card.');
+        }
+
+        if (!in_array($button, ['yes', 'no', 'remind_me_later'])) {
+            Common::send_error('Invalid Button');
+        }
+
+        $last_old_answer = Answered::where('study_id', '=', $study_id)->where('card_id', '=', $card_id)->get()->first();
+
+        if ('yes' === $button) {
+
+            $study_log = StudyLog
+                ::where('study_id', '=', $study_id)
+                ->where('card_id', '=', $card_id)
+                ->where('action', '=', 'start')
+                ->limit(1)
+                ->orderByDesc('id')
+                ->get()->first();
+
+            //        Common::send_error([
+            //            'ajax_front_get_question',
+            //            'post'                 => $post,
+            //            '$study_log'           => $study_log,
+            //            '$study_id'            => $study_id,
+            //            '$study'               => $study,
+            //            '$grade'               => $grade,
+            //            '$card'                => $card,
+            //            '$all_grades'          => $all_grades,
+            //            '$answer'              => $answer,
+            //            '$card_group'          => $card_group,
+            //            '$answered_as_revised' => $answered_as_revised,
+            //        ]);
+
+            Manager::beginTransaction();
+
+            $answer = Answered::create([
+                'study_id'            => $study_id,
+                'card_id'             => $card_id,
+                'answer'              => $e_current_answer,
+                'question'            => $e_current_question,
+                'grade'               => $last_old_answer->grade,
+                'answered_as_new'     => false,
+                'answered_as_revised' => true,
+                'started_at'          => $study_log->created_at,
+                //				'next_due_at' => Common::getDateTime( - 7 ),
+            ]);
+            $study_log->forceDelete();
+            try {
+                $next_due = new Card_Due_Date_Service([
+                    'card_id'  => $card_id,
+                    'study_id' => $study_id,
+                ]);
+
+                $next_due_date                = $next_due->get_next_due_date();
+                $answer->next_due_at          = $next_due_date['next_due_date_morning'];
+                $answer->next_interval        = $next_due_date['next_interval'];
+                $answer->ease_factor          = $next_due_date['ease_factor'];
+                $answer->card_last_updated_at = $card->updated_at;
+                $answer->save();
+                //                Manager::commit();
+
+                //                Common::send_error([
+                //                    'ajax_front_get_question',
+                //                    'post'           => $post,
+                //                    '$study_id'      => $study_id,
+                //                    '$study'         => $study,
+                //                    '$card'          => $card,
+                //                    '$study_log'     => $study_log,
+                //                    '$answer'        => $answer,
+                //                    '$next_due_date' => $next_due_date,
+                //                ]);
+                //                Common::send_success('Answered.', [
+                //                    'debug_display' => $next_due_date['debug_display'],
+                //                    'next_interval' => $next_due_date['next_interval'],
+                //                ]);
+            } catch (\Exception $e) {
+                Common::send_error('Error: '.$e->getMessage());
+            }
+        } elseif ('no' === $button) {
+
+            $study_log = StudyLog
+                ::where('study_id', '=', $study_id)
+                ->where('card_id', '=', $card_id)
+                ->where('action', '=', 'start')
+                ->limit(1)
+                ->orderByDesc('id')
+                ->get()->first();
+
+            //        Common::send_error([
+            //            'ajax_front_get_question',
+            //            'post'                 => $post,
+            //            '$study_log'           => $study_log,
+            //            '$study_id'            => $study_id,
+            //            '$study'               => $study,
+            //            '$grade'               => $grade,
+            //            '$card'                => $card,
+            //            '$all_grades'          => $all_grades,
+            //            '$answer'              => $answer,
+            //            '$card_group'          => $card_group,
+            //            '$answered_as_revised' => $answered_as_revised,
+            //        ]);
+
+            Manager::beginTransaction();
+
+            $answer = Answered::create([
+                'study_id'            => $study_id,
+                'card_id'             => $card_id,
+                'answer'              => $last_old_answer->answer,
+                'question'            => $last_old_answer->question,
+                'grade'               => $last_old_answer->grade,
+                'answered_as_new'     => false,
+                'answered_as_revised' => true,
+                'started_at'          => $study_log->created_at,
+                //				'next_due_at' => Common::getDateTime( - 7 ),
+            ]);
+            $study_log->forceDelete();
+            try {
+                $next_due = new Card_Due_Date_Service([
+                    'card_id'  => $card_id,
+                    'study_id' => $study_id,
+                ]);
+
+                $next_due_date                = $next_due->get_next_due_date();
+                $answer->next_due_at          = $next_due_date['next_due_date_morning'];
+                $answer->next_interval        = $next_due_date['next_interval'];
+                $answer->ease_factor          = $next_due_date['ease_factor'];
+                $answer->card_last_updated_at = $card->updated_at;
+                $answer->save();
+                //                Manager::commit();
+
+                //                Common::send_error([
+                //                    'ajax_front_get_question',
+                //                    'post'           => $post,
+                //                    '$study_id'      => $study_id,
+                //                    '$study'         => $study,
+                //                    '$card'          => $card,
+                //                    '$study_log'     => $study_log,
+                //                    '$answer'        => $answer,
+                //                    '$next_due_date' => $next_due_date,
+                //                ]);
+                //                Common::send_success('Answered.', [
+                //                    'debug_display' => $next_due_date['debug_display'],
+                //                    'next_interval' => $next_due_date['next_interval'],
+                //                ]);
+            } catch (\Exception $e) {
+                Common::send_error('Error: '.$e->getMessage());
+            }
+        }
+
+        Common::send_error([
+            __METHOD__,
+            'post'             => $post,
+            '$last_old_answer' => $last_old_answer,
+            '$card'            => $card,
+            '$study'           => $study,
+            '$button'          => $button,
+        ]);
+
+
+    }
+
     public function ajax_front_get_today_questions_in_study($post): void {
         //			Common::send_error( [
         //				'ajax_front_get_question',
@@ -627,10 +812,9 @@ class AjaxFrontHelper {
                 }
             }
 
-
             $card->card_group->card_group_edit_url = '';
             $card->card_group->bg_image_url        = get_card_group_background_image($card->card_group->bg_image_id);
-            $table                                 = Manager
+            $query_last_answer                     = Manager
                 ::table(SP_TABLE_ANSWERED.' as a')
                 ->join(SP_TABLE_CARDS.' as c', 'c.id', '=', 'a.card_id')
                 ->join(SP_TABLE_STUDY.' as s', 's.id', '=', 'a.study_id')
@@ -645,62 +829,104 @@ class AjaxFrontHelper {
                     'a.answer',
                     'a.card_last_updated_at',
                     'a.rejected_at',
+                    'a.updated_at',
                     'c.updated_at as card_updated_at',
                     'c.answer as card_answer',
                 );
             $has_updated                           = false;
-            $get                                   = $table->get()->first();
-            $card_answer                           = '';
-            if (!empty($get)) {
-                $answer          = $get->answer;
-                $card_answer     = $get->card_answer;
-                $last_updated_at = $get->card_last_updated_at;
-                $updated_at      = $get->updated_at;
-                if ($card_answer !== $answer) {
+            $get_last_answer                       = $query_last_answer->get()->first();
+            $is_image_or_table                     = in_array($card->card_group->card_type, ['image', 'table']);
+            $answer_old_answer                     = null;
+            $answer_old_question                   = null;
+            $answer_card_last_updated_at           = null;
+            $card_updated_at                       = null;
+            $accept_changes_comment                = '';
+            if (!empty($get_last_answer)) {
+                $answer_old_answer           = $get_last_answer->answer;
+                $answer_old_question         = $get_last_answer->question;
+                $answer_card_last_updated_at = $get_last_answer->card_last_updated_at;
+                $updated_at                  = $get_last_answer->updated_at;
+                $accept_changes_comment      = $get_last_answer->accept_changes_comment;
+                $card_updated_at             = $get_last_answer->card_updated_at;
+                $_old_answer                 = $answer_old_answer;
+
+                if ($is_image_or_table) {
+                    if (!is_object($answer_old_answer)) {
+                        $answer_old_answer = json_decode($answer_old_answer);
+                    }
+                    if (!is_object($answer_old_answer)) {
+                        $answer_old_answer = json_decode($answer_old_answer);
+                    }
+                    if (!is_object($answer_old_answer)) {
+                        $answer_old_answer = json_decode($answer_old_answer);
+                    }
+                    //                    Common::send_error([
+                    //                        'ajax_front_create_study',
+                    //                        'post'               => $post,
+                    //                        '$answer_old_answer' => $answer_old_answer,
+                    //                        '$decode'            => $decode,
+                    //                    ]);
+                }
+                if ($answer_card_last_updated_at !== $card_updated_at) {
                     $has_updated = true;
                 }
                 //                Common::send_error([
                 //                    'ajax_front_create_study',
-                //                    'post'                   => $post,
-                //                    '$card'                   => $card,
-                //                    'Manager::getQueryLog()' => Manager::getQueryLog(),
-                //                    '$study_id'              => $study_id,
-                //                    '$answer'                => $answer,
-                //                    '$has_updated'           => $has_updated,
-                //                    '$card_answer'           => $card_answer,
+                //                    'post'                            => $post,
+                //                    '$card'                           => $card,
+                //                    '$get'                            => $get,
+                //                    'is_array($answer_old_answer)'    => is_array($answer_old_answer),
+                //                    'json_decode($answer_old_answer)' => json_decode($answer_old_answer),
+                //                    '$answer_old_answer'              => $answer_old_answer,
+                //                    '$is_image_or_table'              => $is_image_or_table,
+                //                    'Manager::getQueryLog()'          => Manager::getQueryLog(),
+                //                    '$study_id'                       => $study_id,
+                //                    '$card_updated_at'                => $card_updated_at,
+                //                    '$answer_last_updated_at'         => $answer_card_last_updated_at,
+                //                    '$has_updated'                    => $has_updated,
+                //                    '$table toSql'                    => $table->toSql(),
+                //                    '$table getBindings'              => $table->getBindings(),
+                //                    '$updated_at'                     => $updated_at,
                 //                ]);
             }
-            $card->has_updated = $has_updated;
+            $card->old_answer             = $answer_old_answer;
+            $card->old_question           = $answer_old_question;
+            $card->has_updated            = $has_updated;
+            $card->accept_changes_comment = $accept_changes_comment;
+            $card->accept_change_button   = '';
+
             //            Common::send_error([
             //                'ajax_front_create_study',
             //                'post'                   => $post,
+            //                '$answer_old_answer'     => $answer_old_answer,
+            //                '$card'                  => $card,
+            //                '$is_image_or_table'     => $is_image_or_table,
             //                'Manager::getQueryLog()' => Manager::getQueryLog(),
             //                '$study_id'              => $study_id,
-            //                '$table sql'             => $table->toSql(),
-            //                '$table getBindings'     => $table->getBindings(),
-            //                '$table get'             => $table->get(),
             //            ]);
         }
 
         //			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
 
 
-        //                Common::send_error([
-        //                    'ajax_front_create_study',
-        //                    'post'                   => $post,
-        //                    'Manager::getQueryLog()' => Manager::getQueryLog(),
-        //                    '$study_id'              => $study_id,
-        //                    '$all_cards'             => $all_cards,
-        //                    '$study'                 => $study,
-        //                    '$tags'                  => $tags,
-        //                    '$no_of_new'             => $no_of_new,
-        //                    '$no_on_hold'            => $no_on_hold,
-        //                    '$no_to_revise'          => $no_to_revise,
-        //                    '$revise_all'            => $revise_all,
-        //                    '$study_all_new'         => $study_all_new,
-        //                    '$study_all_on_hold'     => $study_all_on_hold,
-        //                    '$user_id'               => $user_id,
-        //                ]);
+//        Common::send_error([
+//            'ajax_front_create_study',
+//            'try'                    => json_decode("[\"hello\"]"),
+//            'try3'                   => json_encode(['hello']),
+//            'post'                   => $post,
+//            'Manager::getQueryLog()' => Manager::getQueryLog(),
+//            '$study_id'              => $study_id,
+//            '$all_cards'             => $all_cards,
+//            '$study'                 => $study,
+//            '$tags'                  => $tags,
+//            '$no_of_new'             => $no_of_new,
+//            '$no_on_hold'            => $no_on_hold,
+//            '$no_to_revise'          => $no_to_revise,
+//            '$revise_all'            => $revise_all,
+//            '$study_all_new'         => $study_all_new,
+//            '$study_all_on_hold'     => $study_all_on_hold,
+//            '$user_id'               => $user_id,
+//        ]);
 
 
         Common::send_success('Cards loaded.', [

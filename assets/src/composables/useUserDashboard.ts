@@ -194,6 +194,17 @@ export default function (status = 'publish') {
       _nextQuestion();
     }, 200);
   }
+  const _acceptChanges = (button: string) => {
+    // xhrAcceptAnswer(button, studyToEdit.value, currentQuestion.value).then(() => {
+    //
+    // });
+    if ('yes' === button) {
+      // currentQuestion.value.
+    } else if ('no' === button) {
+
+    }
+
+  }
   //
 
   const xhrLoad = () => {
@@ -351,6 +362,39 @@ export default function (status = 'publish') {
       });
     });
   };
+  const ____xhrAcceptAnswer = (button: string, study: _Study, currentQuestion: _Card) => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
+    return new Promise((resolve, reject) => {
+      sendOnline = new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            button,
+            study,
+            currentQuestion
+          }
+        ],
+        what: "front_sp_ajax_front_accept_changes",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          // lastAnsweredDebugData.value = done.data.debug_display;
+          // const nextInterval: number  = done.data.next_interval;
+          // if (1 > nextInterval) {
+          //   allQuestions.value.push(card);
+          // }
+          // studyToEdit.value = done.data;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
   const xhrMarkAnswerOnHold = (study: _Study, card: _Card, grade: string, answer: string) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
@@ -436,7 +480,7 @@ export default function (status = 'publish') {
     deckGroups, studyToEdit, startStudy, _getQuestions,
     load, openStudyModal, closeStudyModal, allQuestions,
     currentQuestion, answeredCount,
-    showCurrentAnswer, showGrade, _hold,
+    showCurrentAnswer, showGrade, _hold, _acceptChanges,
     _showAnswer, _markAnswer, lastAnsweredDebugData,
   };
 

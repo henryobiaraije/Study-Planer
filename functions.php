@@ -134,11 +134,11 @@ function get_uncategorized_deck_id() {
     return $id;
 }
 
-function get_card_group_background_image($cg_image_id){
+function get_card_group_background_image($cg_image_id) {
     $image_url = wp_get_attachment_image_url($cg_image_id);
-    if(!$image_url){
+    if (!$image_url) {
         $cg_image_id = get_option(Settings::OP_DEFAULT_CARD_BG_IMAGE, 0);
-        $image_url = wp_get_attachment_image_url($cg_image_id);
+        $image_url   = wp_get_attachment_image_url($cg_image_id);
     }
     return $image_url;
 }
@@ -155,5 +155,6 @@ define('SP_TABLE_CARD_GROUPS', SP_DB_PREFIX.'card_groups');
 define('SP_TABLE_CARDS', SP_DB_PREFIX.'cards');
 define('SP_TABLE_STUDY', SP_DB_PREFIX.'study');
 define('SP_TABLE_ANSWERED', SP_DB_PREFIX.'answered');
+define('SP_TABLE_ANSWER_LOG', SP_DB_PREFIX.'answer_log');
 define('SP_TABLE_USERS', $wpdb->prefix.'users');
 define('SP_TABLE_STUDY_LOG', SP_DB_PREFIX.'study_log');

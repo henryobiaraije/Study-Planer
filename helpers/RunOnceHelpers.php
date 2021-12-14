@@ -14,6 +14,7 @@ use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Model\Answered;
+use Model\AnswerLog;
 use Model\Card;
 use Model\CardGroup;
 use Model\CardGroups;
@@ -58,7 +59,8 @@ class RunOnceHelpers {
     }
 
     public function run_all_once() {
-        $this->run_once_update_answers_last_updated_card_ids();
+        //        $this->run_once_update_answers_last_updated_card_ids();
+        $this->run_once_fill_the_answer_log();
     }
 
     public function run_once_update_answers_last_updated_card_ids() {
@@ -66,13 +68,49 @@ class RunOnceHelpers {
         if ($option) {
             return;
         }
+        //        dd($option);
         $table = Manager
             ::table(SP_TABLE_ANSWERED.' as a')
             ->leftJoin(SP_TABLE_CARDS.' as c', 'c.id', '=', 'a.card_id')
             ->update([
-                'card_last_updated_at' => Manager::raw('c.updated_at'),
+                'a.card_last_updated_at' => Manager::raw('c.updated_at'),
+                'a.answer'               => Manager::raw('c.answer'),
+                'a.question'             => Manager::raw('c.question'),
             ]);
-        get_option('spROUpdAnsLasUpdCId', true);
+        update_option('spROUpdAnsLasUpdCId', true);
+    }
+
+    public function run_once_fill_the_answer_log() {
+        $option = get_option('spROFillAnswerLog', false);
+        if ($option) {
+            return;
+        }
+        //        dd($option);
+        $query_answers = Answered
+            ::where('grade', '!=', 'hold')
+            ->groupBy('id')
+            ->orderByDesc('id')
+            ->get();
+        foreach ($query_answers as $answer) {
+            $old_log = AnswerLog
+                ::where('study_id', '=', $answer->study_id)
+                ->where('card_id', '=', $answer->card_id)
+                ->get()->first();
+            if (empty($old_log)) {
+                $old_log = AnswerLog::create([
+                    'study_id' => $answer->study_id,
+                    'card_id'  => $answer->card_id,
+                ]);
+            }
+            $old_log->update([
+                'last_updated_at'         => $answer->card_last_updated_at,
+                'accepted_change_comment' => '',
+                'question'                => $answer->question,
+                'answer'                  => $answer->question,
+            ]);
+        }
+
+        update_option('spROFillAnswerLog', true);
     }
 
 
