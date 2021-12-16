@@ -131,8 +131,15 @@ export default function (status = 'publish') {
         if (currentQuestion.value.card_group.card_type === 'image') {
           useImageCard().applyPreviewCss(currentQuestion.value.question);
           useImageCard().applyPreviewCss(currentQuestion.value.answer);
+          // useImageCard().applyPreviewCssOld(currentQuestion.value.old_question);
+          // useImageCard().applyPreviewCssOld(currentQuestion.value.old_question);
+          useImageCard().applyPreviewCssOld(currentQuestion.value.old_answer);
+
           useImageCard().applyBoxesPreviewCss(currentQuestion.value.question.boxes);
           useImageCard().applyBoxesPreviewCss(currentQuestion.value.answer.boxes);
+          useImageCard().applyBoxesPreviewCss(currentQuestion.value.old_question.boxes);
+          useImageCard().applyBoxesPreviewCss(currentQuestion.value.old_answer.boxes);
+          useImageCard().applyBoxesPreviewCssOld(currentQuestion.value.old_answer.boxes);
         }
       }
     } else {
@@ -154,6 +161,7 @@ export default function (status = 'publish') {
       study = {
         deck: deck,
         tags: [],
+        tags_excluded: [],
         all_tags: true,
         no_of_new: '' as any as number,
         no_on_hold: '' as any as number,
@@ -173,8 +181,13 @@ export default function (status = 'publish') {
     // console.log('show curr', showCurrentAnswer.value, showGrade.value);
   }
   const _markAnswer = (grade: string) => {
-    xhrMarkAnswer(studyToEdit.value, currentQuestion.value, grade, currentQuestion.value.answer,
-      currentQuestion.value.question);
+    xhrMarkAnswer(
+      studyToEdit.value,
+      currentQuestion.value,
+      grade,
+      currentQuestion.value.answer,
+      currentQuestion.value.question
+    );
     setTimeout(() => {
       showCurrentAnswer.value = false;
       showGrade.value = false;
@@ -186,8 +199,8 @@ export default function (status = 'publish') {
       _nextQuestion();
     }, 200);
   }
-  const _hold = (grade: string) => {
-    xhrMarkAnswerOnHold(studyToEdit.value, currentQuestion.value, grade, currentQuestion.value.answer);
+  const _hold = () => {
+    xhrMarkAnswerOnHold(studyToEdit.value, currentQuestion.value);
     setTimeout(() => {
       showCurrentAnswer.value = false;
       showGrade.value = false;
@@ -201,9 +214,13 @@ export default function (status = 'publish') {
     if ('yes' === button) {
       // currentQuestion.value.
     } else if ('no' === button) {
-
+      currentQuestion.value.question = currentQuestion.value.old_question;
+      currentQuestion.value.answer = currentQuestion.value.old_answer;
+    }else{
+      _hold();
+      _nextQuestion();
     }
-
+    currentQuestion.value.has_updated = false;
   }
   //
 
@@ -338,7 +355,8 @@ export default function (status = 'publish') {
             grade,
             card_id: card.id,
             answer,
-            question
+            question,
+            card_whole : card,
           }
         ],
         what: "front_sp_ajax_front_mark_answer",
@@ -395,7 +413,39 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrMarkAnswerOnHold = (study: _Study, card: _Card, grade: string, answer: string) => {
+  const xhrMarkAnswerOnHold = (study: _Study, card: _Card) => {
+    const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
+    return new Promise((resolve, reject) => {
+      sendOnline = new Server().send_online({
+        data: [
+          Store.nonce,
+          {
+            study_id: study.id,
+            card_id: card.id,
+          }
+        ],
+        what: "front_sp_ajax_front_mark_answer_on_hold",
+        funcBefore() {
+          handleAjax.start();
+        },
+        funcSuccess(done: InterFuncSuccess) {
+          handleAjax.stop();
+          // lastAnsweredDebugData.value = done.data.debug_display;
+          // const nextInterval: number  = done.data.next_interval;
+          // if (1 > nextInterval) {
+          //   allQuestions.value.push(card);
+          // }
+          // studyToEdit.value = done.data;
+          resolve(0);
+        },
+        funcFailue(done) {
+          handleAjax.error(done);
+          reject();
+        },
+      });
+    });
+  };
+  const xhrMarkAnswerOnHold2 = (study: _Study, card: _Card, grade: string, answer: string) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({

@@ -42,7 +42,7 @@
 				<?php /**** Cards formed ***/ ?>
 				<div class="card-preview rounded-3 p-2 bg-sp-300 border-1 border-sp-200" >
 					<h3 class="font-bold fs-5  my-2" >Cards formed ({{gapCard.items.value.length}})
-						<i class="fa fa-redo fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer" ></i ></h3 >
+						<i class="fa fa-recycle fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer" ></i ></h3 >
 					<ul >
 						<li v-for="(item,itemIndex) in gapCard.items.value"
 						    :data-hash="item.hash"

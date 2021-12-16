@@ -60,6 +60,13 @@ class Study extends Model {
 
     private static $sp_debug = [];
 
+    public function tagsExcluded() {
+        return $this->morphToMany(Tag::class, 'taggable', SP_TABLE_TAGGABLES_EXCLUDED);
+    }
+
+    public function tags_excluded() {
+        return $this->morphToMany(Tag::class, 'taggable', SP_TABLE_TAGGABLES_EXCLUDED);
+    }
 
     public function tags() {
         return $this->morphToMany(Tag::class, 'taggable', SP_TABLE_TAGGABLES);
@@ -118,6 +125,7 @@ class Study extends Model {
         }
         $studies->with([
             'tags',
+            'tags_excluded',
             'deck',
             'user',
         ])
@@ -2381,7 +2389,7 @@ class Study extends Model {
         ];
     }
 
-    public static function get_user_cards($study_id, $user_id) {
+    public static function get_user_cards_____($study_id, $user_id) {
 
         try {
             $user_timezone_minutes_from_now = get_user_timezone_minutes_to_add($user_id);
@@ -2396,9 +2404,10 @@ class Study extends Model {
             //					'$user_timezone_minutes_from_now' => $user_timezone_minutes_from_now,
             //				] );
 
-            $study             = Study::with('tags')->find($study_id);
+            $study             = Study::with('tags', 'tags_excluded')->find($study_id);
             $deck_id           = $study->deck_id;
             $tags              = [];
+            $tags_excluded = [];
             $add_all_tags      = $study->all_tags;
             $study_all_new     = $study->study_all_new;
             $revise_all        = $study->revise_all;
@@ -2408,6 +2417,7 @@ class Study extends Model {
 
             if (!$add_all_tags) {
                 $tags = $study->tags->pluck('id');
+                $tags_excluded = $study->tagsExcluded->pluck('id');
             }
 
 
@@ -2428,6 +2438,7 @@ class Study extends Model {
 
             if (!$add_all_tags) {
                 $cards_query = $cards_query->whereIn('t.id', $tags);
+                $cards_query = $cards_query->whereNotIn('t.id', $tags_excluded);
             }
 
             $cards_query = $cards_query->where('d.id', '=', $deck_id)
@@ -2475,9 +2486,9 @@ class Study extends Model {
             ]);
 
 
-            return [
-                'cards' => $cards,
-            ];
+//            return [
+//                'cards' => $cards,
+//            ];
 
         } catch (ItemNotFoundException $e) {
             //todo handle later
@@ -2494,15 +2505,17 @@ class Study extends Model {
         try {
             $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
 
-            $study        = Study::with('tags')->findOrFail($study_id);
+            $study        = Study::with('tags', 'tags_excluded')->findOrFail($study_id);
             $deck_id      = $study->deck_id;
             $tags         = [];
+            $tags_excluded = [];
             $add_all_tags = $study->all_tags;
             $revise_all   = $study->revise_all;
             $no_to_revise = $study->no_to_revise;
 
             if (!$add_all_tags) {
                 $tags = $study->tags->pluck('id');
+                $tags_excluded = $study->tagsExcluded->pluck('id');
             }
 
             /**
@@ -2546,6 +2559,7 @@ class Study extends Model {
             /*** Add just a few tags? ***/
             if (!$add_all_tags) {
                 $cards_query = $cards_query->whereIn('t.id', $tags);
+                $cards_query = $cards_query->whereNotIn('t.id', $tags_excluded);
             }
 
             /*** Revise a few cards? ***/
@@ -2647,15 +2661,17 @@ class Study extends Model {
         try {
             $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today($user_id);
 
-            $study        = Study::with('tags')->findOrFail($study_id);
+            $study        = Study::with('tags', 'tags_excluded')->findOrFail($study_id);
             $deck_id      = $study->deck_id;
             $tags         = [];
+            $tags_excluded = [];
             $add_all_tags = $study->all_tags;
             $revise_all   = $study->revise_all;
             $no_to_revise = $study->no_to_revise;
 
             if (!$add_all_tags) {
                 $tags = $study->tags->pluck('id');
+                $tags_excluded = $study->tagsExcluded->pluck('id');
             }
 
             /**
@@ -2698,6 +2714,7 @@ class Study extends Model {
             /*** Add just a few tags? ***/
             if (!$add_all_tags) {
                 $cards_query = $cards_query->whereIn('t.id', $tags);
+                $cards_query = $cards_query->whereNotIn('t.id', $tags_excluded);
             }
 
             /*** Revise a few cards? ***/
@@ -2797,15 +2814,17 @@ class Study extends Model {
             //            Common::send_error( [
             //                '$study_id'                   => $study_id,
             //            ] );
-            $study         = Study::with('tags')->findOrFail($study_id);
+            $study         = Study::with('tags', 'tags_excluded')->findOrFail($study_id);
             $deck_id       = $study->deck_id;
             $tags          = [];
+            $tags_excluded = [];
             $add_all_tags  = $study->all_tags;
             $study_all_new = $study->study_all_new;
             $no_of_new     = $study->no_of_new;
 
             if (!$add_all_tags) {
-                $tags = $study->tags->pluck('id');
+                $tags          = $study->tags->pluck('id');
+                $tags_excluded = $study->tagsExcluded->pluck('id');
             }
 
 
@@ -2818,19 +2837,22 @@ class Study extends Model {
             $count_new_studied_today      = $new_card_ids_answered_today->count();
             $no_of_new_remaining_to_study = $no_of_new - $count_new_studied_today;
 
-            //            				Common::send_error( [
-            //            					'sql'                           => $query_new_answered_today->toSql(),
-            //            					'getBindings'                   => $query_new_answered_today->getBindings(),
-            //            					'$count_new_studied_today'      => $count_new_studied_today,
-            //            					'$no_of_new_remaining_to_study' => $no_of_new_remaining_to_study,
-            //            					'$new_card_ids_answered_today'  => $new_card_ids_answered_today,
-            //            				] );
+            //            Common::send_error([
+            //                'sql'                           => $query_new_answered_today->toSql(),
+            //                'getBindings'                   => $query_new_answered_today->getBindings(),
+            //                '$count_new_studied_today'      => $count_new_studied_today,
+            //                '$no_of_new_remaining_to_study' => $no_of_new_remaining_to_study,
+            //                '$new_card_ids_answered_today'  => $new_card_ids_answered_today,
+            //                '$tags_excluded'                => $tags_excluded,
+            //                '$study'                        => $study,
+            //            ]);
 
             /*** Prepare basic query ***/
             $cards_query = Manager::table(SP_TABLE_CARDS.' as c')
                 ->leftJoin(SP_TABLE_CARD_GROUPS.' as cg', 'cg.id', '=', 'c.card_group_id')
                 ->leftJoin(SP_TABLE_DECKS.' as d', 'd.id', '=', 'cg.deck_id')
                 ->leftJoin(SP_TABLE_TAGGABLES.' as tg', 'tg.taggable_id', '=', 'cg.id')
+                ->leftJoin(SP_TABLE_TAGGABLES_EXCLUDED.' as tgex', 'tgex.taggable_id', '=', 'cg.id')
                 ->leftJoin(SP_TABLE_TAGS.' as t', 't.id', '=', 'tg.tag_id')
                 ->where('tg.taggable_type', '=', CardGroup::class)
                 ->where(function ($query) use ($user_timezone_midnight_today) {
@@ -2852,10 +2874,10 @@ class Study extends Model {
                     'c.id as card_id'
                 );
 
-
             /*** Add just a few tags? ***/
             if (!$add_all_tags) {
                 $cards_query = $cards_query->whereIn('t.id', $tags);
+                $cards_query = $cards_query->whereNotIn('t.id', $tags_excluded);
             }
 
             /*** Study just a few new cards? ***/
@@ -2956,19 +2978,19 @@ class Study extends Model {
             ];
 
         } catch (ItemNotFoundException $e) {
-//            Common::send_error([
-//                __METHOD__,
-//                '$e' => $e->getMessage(),
-//            ]);
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$e' => $e->getMessage(),
+            //            ]);
             //todo handle later
             return [
                 'cards' => [],
             ];
         } catch (ModelNotFoundException $e) {
-//            Common::send_error([
-//                __METHOD__,
-//                '$e' => $e->getMessage(),
-//            ]);
+            //            Common::send_error([
+            //                __METHOD__,
+            //                '$e' => $e->getMessage(),
+            //            ]);
             //todo handle later
             return [
                 'cards' => [],

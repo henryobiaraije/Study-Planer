@@ -92,6 +92,7 @@
 			}
 			$this->card  = $card;
 			$this->study = $study;
+			// Loads the last 3 answers
 			$this->load_answers();
 			$this->calculate_d();
 			$this->calculate_f();
@@ -232,7 +233,6 @@
 //				'$last_due_at'           => $last_due_at,
 //				'$last_answered_at'      => $last_answered_at,
 			];
-
 
 		}
 

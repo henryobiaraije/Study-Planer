@@ -20,7 +20,7 @@ class AnswerLog extends Model {
     protected $fillable = [
         'study_id',
         'card_id',
-        'last_updated_at',
+        'last_card_updated_at',
         'accepted_change_comment',
         'question',
         'answer',

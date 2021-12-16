@@ -35,6 +35,13 @@ class Card extends Model {
         'answer'   => 'array',
     ];
 
+    protected $dateFormat = 'Y-m-d H:i:s';
+
+    protected $dates = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
     protected static function boot() {
         static::setEventDispatcher(new Dispatcher());
         parent::boot();

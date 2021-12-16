@@ -471,7 +471,7 @@ function setup(props) {
   // const status       = searchParams.get('status');
   // console.log('in setup', {url, searchParams, status});
   return {
-    searchTags: useTagSearch(),
+    searchTags: useTagSearch(false),
     userDash: useUserDashboard(),
     timezones: useTimezones(),
     useUserProfile: useUserProfile(),

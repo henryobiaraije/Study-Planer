@@ -39,6 +39,7 @@ export interface _Study {
   deck: _Deck,
   user: any,
   tags: Array<_Tag>,
+  tags_excluded: Array<_Tag>,
   all_tags: boolean,
   no_to_revise: number,
   no_of_new: number,
@@ -61,6 +62,8 @@ export interface _Card extends _TimeStamps {
   y_position?: number;
   answering_type?: string;
   has_updated?: boolean;
+  old_question?: any;
+  old_answer?: any;
 }
 
 

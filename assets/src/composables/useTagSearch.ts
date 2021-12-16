@@ -6,26 +6,26 @@ import Cookies from 'js-cookie';
 import {vdata} from "../admin/admin-deck-groups";
 import {_Tag} from "../interfaces/inter-sp";
 
-export default function () {
-  const ajax       = ref<_Ajax>({
-    sending       : false,
-    error         : false,
-    errorMessage  : '',
-    success       : false,
+export default function (canCreate = true) {
+  const ajax = ref<_Ajax>({
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
     successMessage: '',
   });
   const ajaxCreate = ref<_Ajax>({
-    sending       : false,
-    error         : false,
-    errorMessage  : '',
-    success       : false,
+    sending: false,
+    error: false,
+    errorMessage: '',
+    success: false,
     successMessage: '',
   });
   //
-  const newName    = ref('');
-  let results      = ref<Array<_Tag>>([]);
+  const newName = ref('');
+  let results = ref<Array<_Tag>>([]);
   // let results    = ref<Array<any>>([]);
-  let sendOnline   = null as Server;
+  let sendOnline = null as Server;
 
   const search = (query: string) => {
     xhrSearchTags(query)
@@ -37,15 +37,15 @@ export default function () {
       sendOnline.abortRequest();
     }
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
-    sendOnline                   = new Server().send_online({
+    sendOnline = new Server().send_online({
       data: [
         vdata.localize.nonce,
         {
           params: {
-            per_page      : 5,
-            page          : 1,
+            per_page: 5,
+            page: 1,
             search_keyword: query,
-            status        : 'publish',
+            status: 'publish',
           },
         }
       ],
@@ -54,7 +54,7 @@ export default function () {
         handleAjax.start();
       },
       funcSuccess(done: InterFuncSuccess) {
-        const items   = done.data.details.items;
+        const items = done.data.details.items;
         results.value = items;
         handleAjax.stop();
       },
@@ -66,6 +66,9 @@ export default function () {
   };
 
   const xhrCreate = (query: string) => {
+    if (!canCreate) {
+      return;
+    }
     // console.log('Crete new tag',{query})
     const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
     new Server().send_online({

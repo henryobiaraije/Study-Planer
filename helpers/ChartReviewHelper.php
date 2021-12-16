@@ -254,6 +254,7 @@ class ChartReviewHelper
         $user         = User
             ::with([
                 'studies.tags',
+                'studies.tags_excluded',
                 'studies.deck',
             ])
             ->where('ID', '=', $user_id);
@@ -264,7 +265,9 @@ class ChartReviewHelper
             $all_tags         = $study->all_tags;
             $deck             = $study->deck;
             $tags             = $study->tags;
+            $tags_excluded     = $study->tags_excluded;
             $tag_ids          = $tags->pluck('id');
+            $tags_excluded_ids = $tags_excluded->pluck('id');
             $query_card_group = CardGroup
                 ::with([
                     'cards' => function ($query) use ($user_id) {
@@ -316,8 +319,9 @@ class ChartReviewHelper
                     $query->where('deck_id', '=', $deck->id);
                 });
             if (!$all_tags) {
-                $query_card_group = $query_card_group->whereHas('tags', function ($query) use ($tag_ids) {
+                $query_card_group = $query_card_group->whereHas('tags', function ($query) use ($tag_ids,$tags_excluded_ids) {
                     $query->whereIn(SP_TABLE_TAGS.'.id', $tag_ids);
+                    $query->whereNotIn(SP_TABLE_TAGS.'.id', $tags_excluded_ids);
                     //                    Common::send_error([
                     //                        __METHOD__,
                     //                        '$query sql' => $query->toSql(),

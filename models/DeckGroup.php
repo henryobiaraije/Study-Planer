@@ -260,6 +260,13 @@ class DeckGroup extends Model {
             } else {
                 $_deck->due_summary = Study::get_study_due_summary($_study->id, $user_id);
             }
+            $deck_total_due_cards               = $_deck->due_summary['new']
+                + $_deck->due_summary['revision']
+                + $_deck->due_summary['previously_false'];
+            $_deck->deck_total_due_cards        = $deck_total_due_cards;
+            $dg_due_summary['total']            += $deck_total_due_cards;
+
+
             $card_counts                        = $_deck->card_groups->pluck('cards_count');
             $_deck->card_count                  = array_sum($card_counts->toArray());
             $dg_due_summary['new']              = $dg_due_summary['new'] + $_deck->due_summary['new'];
@@ -267,6 +274,14 @@ class DeckGroup extends Model {
             $dg_due_summary['previously_false'] = $dg_due_summary['previously_false'] + $_deck->due_summary['previously_false'];
         }
         $dg->due_summary = $dg_due_summary;
+        $decks_arr = $decks->all();
+        usort($decks_arr, function ($a, $b) {
+            if ($a["deck_total_due_cards"] === $b["deck_total_due_cards"]) {
+                return 0;
+            }
+            return ($a["deck_total_due_cards"] > $b["deck_total_due_cards"]) ? -1 : 1;
+        });
+        $dg->decks_arr   = $decks_arr;
 
         //        Common::send_error([
         //            __METHOD__,

@@ -88,7 +88,7 @@ $url_settings = $current_url.'?'.http_build_query(array_merge($_GET, array("dash
 
     <?php /***** Notifications ***/ ?>
     <hover-notifications></hover-notifications>
-    <div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;">
+    <div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;padding: 0">
         <div style="text-align: center;flex: 12;font-size: 50px;">
             <i class="fa fa-spin fa-spinner"></i></div>
     </div>

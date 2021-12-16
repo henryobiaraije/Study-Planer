@@ -110,6 +110,7 @@ class Initialize_Db {
         $this->create_table_deck();
         $this->create_table_tags();
         $this->create_table_taggable();
+        $this->create_table_taggable_excluded();
         $this->create_table_card_group();
         $this->create_table_cards();
         $this->create_table_study();
@@ -164,6 +165,29 @@ class Initialize_Db {
         // Taggables
         if (!$this->schema_builder->hasTable(SP_TABLE_TAGGABLES)) {
             Capsule::schema()->create(SP_TABLE_TAGGABLES, function (Blueprint $table) {
+                $table->id();
+                //                $table->foreignId('tag_id')->constrained(SP_TABLE_TAGS)->onDelete('cascade');
+                $table->foreignId('tag_id')->constrained(SP_TABLE_TAGS)->cascadeOnDelete()->cascadeOnUpdate();
+                $table->string('taggable_id');
+                $table->string('taggable_type');
+                $table->softDeletes();
+                $table->timestamps();
+            });
+        }
+        if (!$this->schema_builder->hasColumn(SP_TABLE_TAGGABLES, 'excluded')) {
+            Capsule::schema()->table(SP_TABLE_TAGGABLES, function (Blueprint $table) {
+                $table->boolean('excluded')->after('taggable_type');
+            });
+        }
+
+
+    }
+
+    public function create_table_taggable_excluded() {
+
+        // Taggables Excluded
+        if (!$this->schema_builder->hasTable(SP_TABLE_TAGGABLES_EXCLUDED)) {
+            Capsule::schema()->create(SP_TABLE_TAGGABLES_EXCLUDED, function (Blueprint $table) {
                 $table->id();
                 //                $table->foreignId('tag_id')->constrained(SP_TABLE_TAGS)->onDelete('cascade');
                 $table->foreignId('tag_id')->constrained(SP_TABLE_TAGS)->cascadeOnDelete()->cascadeOnUpdate();
@@ -267,20 +291,6 @@ class Initialize_Db {
                 $table->softDeletes();
                 $table->timestamps();
             });
-            //            if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'answered_as_revised')) {
-            //                Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
-            //                    $table->boolean('answered_as_revised')->after('answered_as_new');
-            //                });
-            //            }
-            //            if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'started_at')) {
-            //                Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
-            //                    $table->dateTime('started_at')->after('next_due_at');
-            //                });
-            //            }
-        } else {
-            //            Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
-            //                $table->foreign('card_id')->references('id')->on(SP_TABLE_CARDS)->cascadeOnUpdate()->nullOnDelete();
-            //            });
         }
         if (!$this->schema_builder->hasColumn(SP_TABLE_ANSWERED, 'question')) {
             Capsule::schema()->table(SP_TABLE_ANSWERED, function (Blueprint $table) {
@@ -311,7 +321,7 @@ class Initialize_Db {
                 $table->foreignId('study_id')->constrained(SP_TABLE_STUDY)->cascadeOnDelete()->cascadeOnUpdate()->comment('The study id');
                 $table->bigInteger('card_id')->index()->unsigned()->nullable();
                 $table->foreign('card_id')->references('id')->on(SP_TABLE_CARDS)->cascadeOnUpdate()->nullOnDelete();
-                $table->dateTime('last_updated_at');
+                $table->dateTime('last_card_updated_at');
                 $table->text('accepted_change_comment');
                 $table->text('question');
                 $table->text('answer');
@@ -333,7 +343,7 @@ class Initialize_Db {
                 //                $table->foreignId('card_id')->references('id')->on(SP_TABLE_CARDS);
                 $table->foreignId('card_id')->constrained(SP_TABLE_CARDS)->cascadeOnUpdate()->cascadeOnDelete();
                 //                $table->foreignId('answered_id')->references('id')->on(SP_TABLE_ANSWERED);
-                $table->foreignId('answered_id')->constrained(SP_TABLE_ANSWERED)->cascadeOnDelete()->cascadeOnDelete();
+//                $table->foreignId('answered_id')->nullable()->constrained(SP_TABLE_ANSWERED)->cascadeOnDelete()->cascadeOnDelete();
                 $table->string('action');
                 $table->dateTime('created_at');
             });

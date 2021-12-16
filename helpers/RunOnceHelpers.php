@@ -59,7 +59,7 @@ class RunOnceHelpers {
     }
 
     public function run_all_once() {
-        //        $this->run_once_update_answers_last_updated_card_ids();
+        $this->run_once_update_answers_last_updated_card_ids();
         $this->run_once_fill_the_answer_log();
     }
 
@@ -83,7 +83,7 @@ class RunOnceHelpers {
     public function run_once_fill_the_answer_log() {
         $option = get_option('spROFillAnswerLog', false);
         if ($option) {
-            return;
+            //            return;
         }
         //        dd($option);
         $query_answers = Answered
@@ -103,10 +103,10 @@ class RunOnceHelpers {
                 ]);
             }
             $old_log->update([
-                'last_updated_at'         => $answer->card_last_updated_at,
+                'last_card_updated_at'    => $answer->card_last_updated_at,
                 'accepted_change_comment' => '',
                 'question'                => $answer->question,
-                'answer'                  => $answer->question,
+                'answer'                  => $answer->answer,
             ]);
         }
 

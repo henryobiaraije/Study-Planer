@@ -99,7 +99,7 @@
 							<ajax-action-not-form
 									button-text="Restore Selected  "
 									css-classes="button button-secondary"
-									icon="fa fa-redo"
+									icon="fa fa-recycle"
 									@click="allCards.batchRestore()"
 									:ajax="allCards.ajaxRestore.value" >
 							</ajax-action-not-form >

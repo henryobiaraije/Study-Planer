@@ -25,7 +25,7 @@ if (!is_user_logged_in()) {
                 <div class="mb-4">
                     <?php \StudyPlanner\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>
                 </div>
-                <div v-if="null !== currentQuestion && !currentQuestion.has_updated" class="sp-question min-h-[65vh] flex align-items-center overflow-x-auto"
+                <div v-if="null !== currentQuestion && !currentQuestion.has_updated" class="sp-question min-h-[65vh] flex align-items-center overflow-x-auto moxal-y-hidden"
                      style="background-repeat: no-repeat;background-size: cover;"
                      :style="{'background-image' : 'url('+currentQuestion.card_group.bg_image_url+')'}">
                     <?php /*** Basic Card ***/ ?>
@@ -46,7 +46,7 @@ if (!is_user_logged_in()) {
                              class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
                     </div>
                     <?php /*** Table Card ***/ ?>
-                    <div v-else-if="'table' === currentQuestion.card_group.card_type" class="sp-table-question ">
+                    <div v-else-if="'table' === currentQuestion.card_group.card_type" class="sp-table-question m-auto">
                         <table v-show="!userDash.showCurrentAnswer.value"
                                @click="userDash._showAnswer()" v-if="currentQuestion.question.length > 0"
                                class="table gap-table  p-2 bg-sp-100 rounded  mb-2" style="font-family: 'Montserrat', sans-serif;">

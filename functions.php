@@ -150,6 +150,7 @@ define('SP_DB_PREFIX', $prefix);
 define('SP_TABLE_DECK_GROUPS', SP_DB_PREFIX.'deck_groups');
 define('SP_TABLE_TAGS', SP_DB_PREFIX.'tags');
 define('SP_TABLE_TAGGABLES', SP_DB_PREFIX.'taggables');
+define('SP_TABLE_TAGGABLES_EXCLUDED', SP_DB_PREFIX.'taggables_excluded');
 define('SP_TABLE_DECKS', SP_DB_PREFIX.'decks');
 define('SP_TABLE_CARD_GROUPS', SP_DB_PREFIX.'card_groups');
 define('SP_TABLE_CARDS', SP_DB_PREFIX.'cards');
