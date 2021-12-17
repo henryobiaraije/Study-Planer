@@ -1519,7 +1519,7 @@ class AjaxHelper {
         //				'ajax_admin_create_tag',
         //				'post' => $post,
         //			] );
-        Common::verify_post($post, true, true);
+        Initializer::verify_post($post, true, true);
         $all  = $post[Common::VAR_2];
         $name = sanitize_text_field($all['name']);
 
