@@ -9,68 +9,69 @@ import useImageCard from "./useImageCard";
 declare var bootstrap;
 
 export default function (status = 'publish') {
-  const ajax = ref<_Ajax>({
-    sending: false,
-    error: false,
-    errorMessage: '',
-    success: false,
+  const ajax                = ref<_Ajax>({
+    sending       : false,
+    error         : false,
+    errorMessage  : '',
+    success       : false,
     successMessage: '',
   });
-  const ajaxSaveStudy = ref<_Ajax>({
-    sending: false,
-    error: false,
-    errorMessage: '',
-    success: false,
+  const ajaxSaveStudy       = ref<_Ajax>({
+    sending       : false,
+    error         : false,
+    errorMessage  : '',
+    success       : false,
     successMessage: '',
   });
-  const ajaxLoadingCard = ref<_Ajax>({
-    sending: false,
-    error: false,
-    errorMessage: '',
-    success: false,
+  const ajaxLoadingCard     = ref<_Ajax>({
+    sending       : false,
+    error         : false,
+    errorMessage  : '',
+    success       : false,
     successMessage: '',
   });
-  let sendOnline = null;
-  let deckGroups = ref<Array<_DeckGroup>>([]);
-  let studies = ref<Array<_Study>>([]);
-  let studyToEdit = ref<_Study>(null);
-  let _modalOpenQuestion = ref(null);
-  let allQuestions = ref<Array<_Card>>([]);
-  let currentQuestionIndex = ref<number>(-1);
-  let currentQuestion = ref<_Card>(null);
-  let showCurrentAnswer = ref<boolean>(false);
-  let showGrade = ref<boolean>(false);
+  let sendOnline            = null;
+  let deckGroups            = ref<Array<_DeckGroup>>([]);
+  let studies               = ref<Array<_Study>>([]);
+  let studyToEdit           = ref<_Study>(null);
+  let _modalOpenQuestion    = ref(null);
+  let allQuestions          = ref<Array<_Card>>([]);
+  let currentQuestionIndex  = ref<number>(-1);
+  let currentQuestion       = ref<_Card>(null);
+  let showCurrentAnswer     = ref<boolean>(false);
+  let showGrade             = ref<boolean>(false);
   let lastAnsweredDebugData = ref<Array<{ [key: string]: string }>>(null);
-  let studyLogIntervalId = ref(null);
+  let studyLogIntervalId    = ref(null);
 
   /**
    * Returns the study belonging to a deck or return a new study
    * @param deck
    */
-  const load = () => {
+  const load                    = () => {
     return xhrLoad();
   }
-  const openStudyModal = (deck: _Deck) => {
-    studyToEdit.value = getStudyForDeck(deck);
+  const openStudyModal          = (deck: _Deck) => {
+    studyToEdit.value  = getStudyForDeck(deck);
     const modalElement = jQuery('#modal-new')[0];
-    const myModal = new bootstrap.Modal(modalElement);
+    const myModal      = new bootstrap.Modal(modalElement);
     myModal.show();
     modalElement.addEventListener('shown.bs.modal', function () {
-
+      jQuery('body').append(jQuery(modalElement).parent());
     });
     modalElement.addEventListener('hidden.bs.modal', function () {
 
     });
   };
-  const closeStudyModal = () => {
+  const closeStudyModal         = () => {
     jQuery('#hide-modal-new').trigger('click');
   };
-  const openQuestionModal = () => {
-    const modalElement = jQuery('#modal-questions')[0];
-    const myModal = new bootstrap.Modal(modalElement);
+  const openQuestionModal       = () => {
+    const modalElement       = jQuery('#modal-questions')[0];
+    const myModal            = new bootstrap.Modal(modalElement);
     _modalOpenQuestion.value = myModal;
     myModal.show();
     modalElement.addEventListener('shown.bs.modal', function () {
+      jQuery('body').append(jQuery(modalElement).parent());
       // studyLogIntervalId.value = setInterval(() => {
       //
       // }, 5000);
@@ -83,20 +84,20 @@ export default function (status = 'publish') {
       xhrGetSingleDeckGroup(currentQuestion.value.card_group.deck.id)
     });
   };
-  const closeQuestionModal = () => {
+  const closeQuestionModal      = () => {
     // const modalElement = jQuery('#modal-questions')[0];
     // const myModal = new bootstrap.Modal(modalElement);
     // _modalOpenQuestion.value.hide();
     jQuery('#hide-question-moadl').trigger('click');
     // jQuery('#modal-questions').hide();
   };
-  const openStudyCompleteModal = (show = true) => {
+  const openStudyCompleteModal  = (show = true) => {
     const modalElement = jQuery('#modal-study-complete')[0];
-    const myModal = new bootstrap.Modal(modalElement);
+    const myModal      = new bootstrap.Modal(modalElement);
     if (show) {
       myModal.show();
       modalElement.addEventListener('shown.bs.modal', function () {
-
+        jQuery('body').append(jQuery(modalElement).parent());
       });
       modalElement.addEventListener('hidden.bs.modal', function () {
       });
@@ -106,7 +107,7 @@ export default function (status = 'publish') {
   const closeStudyCompleteModal = () => {
     openStudyCompleteModal().hide(false);
   };
-  const startStudy = () => {
+  const startStudy              = () => {
     xhrCreateOrUpdateStudy(studyToEdit.value).then(() => {
       closeStudyModal();
       openQuestionModal();
@@ -117,7 +118,7 @@ export default function (status = 'publish') {
       _nextQuestion();
     });
   }
-  const _nextQuestion = () => {
+  const _nextQuestion           = () => {
     // if (currentQuestion.value !== null) {
     //     xhrRecordStudyLog(studyToEdit.value, currentQuestion.value, 'stop');
     // }
@@ -152,35 +153,35 @@ export default function (status = 'publish') {
     }
 
   }
-  const _getQuestions = () => {
+  const _getQuestions           = () => {
     // xhrGetTodayQuestionsInStudy(studyToEdit.value);
   }
-  const getStudyForDeck = (deck: _Deck) => {
+  const getStudyForDeck         = (deck: _Deck) => {
     let study = studies.value.find((s: _Study) => deck.id === s.deck.id);
     if (undefined === study) {
       study = {
-        deck: deck,
-        tags: [],
-        tags_excluded: [],
-        all_tags: true,
-        no_of_new: '' as any as number,
-        no_on_hold: '' as any as number,
-        no_to_revise: '' as any as number,
-        revise_all: true,
-        study_all_new: true,
+        deck             : deck,
+        tags             : [],
+        tags_excluded    : [],
+        all_tags         : true,
+        no_of_new        : '' as any as number,
+        no_on_hold       : '' as any as number,
+        no_to_revise     : '' as any as number,
+        revise_all       : true,
+        study_all_new    : true,
         study_all_on_hold: true,
-        user: null,
+        user             : null,
       };
     }
     console.log({study});
     return study;
   }
-  const _showAnswer = () => {
+  const _showAnswer             = () => {
     showCurrentAnswer.value = true;
-    showGrade.value = true;
+    showGrade.value         = true;
     // console.log('show curr', showCurrentAnswer.value, showGrade.value);
   }
-  const _markAnswer = (grade: string) => {
+  const _markAnswer             = (grade: string) => {
     xhrMarkAnswer(
       studyToEdit.value,
       currentQuestion.value,
@@ -190,7 +191,7 @@ export default function (status = 'publish') {
     );
     setTimeout(() => {
       showCurrentAnswer.value = false;
-      showGrade.value = false;
+      showGrade.value         = false;
       if ('again' === grade) {
         // Answer it again
         currentQuestion.value.answering_type = 'Revising Card'
@@ -199,15 +200,15 @@ export default function (status = 'publish') {
       _nextQuestion();
     }, 200);
   }
-  const _hold = () => {
+  const _hold                   = () => {
     xhrMarkAnswerOnHold(studyToEdit.value, currentQuestion.value);
     setTimeout(() => {
       showCurrentAnswer.value = false;
-      showGrade.value = false;
+      showGrade.value         = false;
       _nextQuestion();
     }, 200);
   }
-  const _acceptChanges = (button: string) => {
+  const _acceptChanges          = (button: string) => {
     // xhrAcceptAnswer(button, studyToEdit.value, currentQuestion.value).then(() => {
     //
     // });
@@ -215,8 +216,8 @@ export default function (status = 'publish') {
       // currentQuestion.value.
     } else if ('no' === button) {
       currentQuestion.value.question = currentQuestion.value.old_question;
-      currentQuestion.value.answer = currentQuestion.value.old_answer;
-    }else{
+      currentQuestion.value.answer   = currentQuestion.value.old_answer;
+    } else {
       _hold();
       _nextQuestion();
     }
@@ -224,7 +225,7 @@ export default function (status = 'publish') {
   }
   //
 
-  const xhrLoad = () => {
+  const xhrLoad                     = () => {
     console.log('start loading');
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     return new Promise((resolve, reject) => {
@@ -233,10 +234,10 @@ export default function (status = 'publish') {
           Store.nonce,
           {
             params: {
-              per_page: 1000,
-              page: 1,
+              per_page      : 1000,
+              page          : 1,
               search_keyword: '',
-              status: 'publish',
+              status        : 'publish',
             },
           }
         ],
@@ -246,11 +247,11 @@ export default function (status = 'publish') {
         },
         funcSuccess(done: InterFuncSuccess) {
           handleAjax.stop();
-          const groups = done.data.details.deck_groups;
+          const groups     = done.data.details.deck_groups;
           const allStudies = done.data.studies.studies;
           // console.log({groups, allStudies});
           deckGroups.value = groups;
-          studies.value = allStudies;
+          studies.value    = allStudies;
           resolve(0);
         },
         funcFailue(done) {
@@ -259,7 +260,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrRecordStudyLog = (study: _Study, card: _Card, action = 'start') => {
+  const xhrRecordStudyLog           = (study: _Study, card: _Card, action = 'start') => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -267,8 +268,8 @@ export default function (status = 'publish') {
           Store.nonce,
           {
             study_id: study.id,
-            card_id: card.id,
-            action: action,
+            card_id : card.id,
+            action  : action,
           }
         ],
         what: "front_sp_ajax_front_record_study_log",
@@ -318,7 +319,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrCreateOrUpdateStudy = (study: _Study) => {
+  const xhrCreateOrUpdateStudy      = (study: _Study) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -344,19 +345,19 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrMarkAnswer = (study: _Study, card: _Card, grade: string, answer: any, question: any) => {
+  const xhrMarkAnswer               = (study: _Study, card: _Card, grade: string, answer: any, question: any) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
         data: [
           Store.nonce,
           {
-            study_id: study.id,
+            study_id  : study.id,
             grade,
-            card_id: card.id,
+            card_id   : card.id,
             answer,
             question,
-            card_whole : card,
+            card_whole: card,
           }
         ],
         what: "front_sp_ajax_front_mark_answer",
@@ -380,7 +381,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const ____xhrAcceptAnswer = (button: string, study: _Study, currentQuestion: _Card) => {
+  const ____xhrAcceptAnswer         = (button: string, study: _Study, currentQuestion: _Card) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -413,7 +414,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrMarkAnswerOnHold = (study: _Study, card: _Card) => {
+  const xhrMarkAnswerOnHold         = (study: _Study, card: _Card) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -421,7 +422,7 @@ export default function (status = 'publish') {
           Store.nonce,
           {
             study_id: study.id,
-            card_id: card.id,
+            card_id : card.id,
           }
         ],
         what: "front_sp_ajax_front_mark_answer_on_hold",
@@ -445,7 +446,7 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrMarkAnswerOnHold2 = (study: _Study, card: _Card, grade: string, answer: string) => {
+  const xhrMarkAnswerOnHold2        = (study: _Study, card: _Card, grade: string, answer: string) => {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({
@@ -454,7 +455,7 @@ export default function (status = 'publish') {
           {
             study_id: study.id,
             grade,
-            card_id: card.id,
+            card_id : card.id,
             answer
           }
         ],
@@ -479,8 +480,8 @@ export default function (status = 'publish') {
       });
     });
   };
-  const xhrGetSingleDeckGroup = (deckId: number) => {
-    const dis = this;
+  const xhrGetSingleDeckGroup       = (deckId: number) => {
+    const dis                    = this;
     const handleAjax: HandleAjax = new HandleAjax(ajaxSaveStudy.value);
     return new Promise((resolve, reject) => {
       sendOnline = new Server().send_online({

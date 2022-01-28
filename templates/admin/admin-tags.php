@@ -12,7 +12,7 @@
 	}
 ?>
 
-<div class="admin-tags wrap" >
+<div class="sp admin-tags wrap" >
 
 	<?php /***** Header ******/ ?>
 	<!--	<editor-fold desc="Header">-->

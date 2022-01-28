@@ -15,7 +15,7 @@
 	}
 ?>
 
-<div class="admin-decks wrap" >
+<div class="sp admin-decks wrap" >
 
 	<?php /***** Header ******/ ?>
 	<!--	<editor-fold desc="Header">-->

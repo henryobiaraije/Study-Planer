@@ -10,7 +10,7 @@
 
 ?>
 
-<div class="admin-basic-card wrap" >
+<div class="sp admin-basic-card wrap" >
 	<!--	<editor-fold desc="Header">-->
 	<h1 class="wp-heading-inline" ><?php echo $page_title; ?> </h1 >
 	<br />

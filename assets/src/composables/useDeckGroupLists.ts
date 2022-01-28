@@ -191,8 +191,7 @@ export default function (status = 'publish') {
   const loadItems             = () => {
     xhrLoad();
   };
-  const openEditModal         = (item: _DeckGroup, modalId: string) => {
-    deckGroupToEdit.value = item;
+  const openEditModal         = (item: _DeckGroup, modalId: string) => { deckGroupToEdit.value = item;
     modalEditId.value     = modalId;
     const modalElement    = jQuery(modalId)[0];
     const myModal         = new bootstrap.Modal(modalElement);

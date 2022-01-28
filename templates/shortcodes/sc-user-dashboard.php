@@ -14,7 +14,7 @@ $url_settings = $current_url.'?'.http_build_query(array_merge($_GET, array("dash
 ?>
 
 
-<div class="sp-sc-ud">
+<div class="sp sp-sc-ud">
     <span class="reset-vue" @click="resetVue()"></span>
     <?php /*** Tabs **/ ?>
     <div class="sp-tab flex gap-2 justify-content-center my-4 all-loaded" style="display: none">

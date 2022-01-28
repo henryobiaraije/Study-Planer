@@ -12,7 +12,7 @@
 
 ?>
 
-<div class="admin-gap-card wrap" >
+<div class="sp admin-gap-card wrap" >
 	<span class="reset-vue" @click="resetVue()" ></span >
 	<!--	<editor-fold desc="Header">-->
 	<h1 class="wp-heading-inline" ><?php echo $page_title; ?> </h1 >

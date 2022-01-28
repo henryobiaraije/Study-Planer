@@ -2204,7 +2204,9 @@ class AjaxHelper {
         $deck_group->tags()->detach();
         foreach ($tags as $one) {
             $tag = Tag::find($one['id']);
+//            $tags = $deck_group->tags();
             $deck_group->tags()->save($tag);
+//	        $deck_group->tags()->attach($tag);
             //				Common::send_error( [
             //					'ajax_admin_create_new_deck_group',
             //					'post'             => $post,

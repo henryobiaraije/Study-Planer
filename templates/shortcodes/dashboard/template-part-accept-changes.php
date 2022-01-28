@@ -2,7 +2,7 @@
      style="background-repeat: no-repeat;background-size: cover;"
      :style="{'background-image' : 'url('+currentQuestion.card_group.bg_image_url+')'}">
     <?php /*** Basic Card ***/ ?>
-    <div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question"
+    <div v-if="'basic' === currentQuestion.card_group.card_type" class="sp-basic-question w-full text-center"
          style="font-family: 'Montserrat', sans-serif;">
         <div class="font-bold ">Old Answer</div>
         <div  style="font-family: 'Montserrat', sans-serif;"
@@ -14,7 +14,7 @@
              class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
     </div>
     <?php /*** Gap Card ***/ ?>
-    <div v-else-if="'gap' === currentQuestion.card_group.card_type" class="sp-gap-question ">
+    <div v-else-if="'gap' === currentQuestion.card_group.card_type" class="sp-gap-question w-full text-center">
         <div class="font-bold ">Old Answer</div>
         <div  v-html="currentQuestion.old_answer" style="font-family: 'Montserrat', sans-serif;"
              class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
@@ -23,7 +23,7 @@
              class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
     </div>
     <?php /*** Table Card ***/ ?>
-    <div v-else-if="'table' === currentQuestion.card_group.card_type" class="sp-table-question m-auto">
+    <div v-else-if="'table' === currentQuestion.card_group.card_type" class="sp-table-question m-auto w-full-text-center">
         <div class="font-bold ">Old Answer</div>
         <table v-if="currentQuestion.answer.length > 0 "
                style="font-family: 'Montserrat', sans-serif;"

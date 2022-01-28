@@ -1005,7 +1005,7 @@ class Study extends Model {
 
 
         foreach ($forecast_all_answers_within_a_date as $answer) {
-            $day_diff_today                           = $answer->day_diff_today;
+            $day_diff_today                           = ($answer->day_diff_today - 1);
             $days[$day_diff_today]['new_cards_added'] += 1;
             //            Common::send_error([
             //                __METHOD__,

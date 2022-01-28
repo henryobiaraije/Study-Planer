@@ -15,7 +15,7 @@
 	}
 ?>
 
-<div class="deck-groups wrap" >
+<div class="sp deck-groups wrap" >
 
 	<?php /***** Header ******/ ?>
 	<!--	<editor-fold desc="Header">-->

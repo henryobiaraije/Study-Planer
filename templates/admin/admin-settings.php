@@ -7,7 +7,7 @@ use StudyPlanner\Libs\Settings;
 ?>
 
 
-<div class="admin-settings wrap">
+<div class="sp admin-settings wrap">
     <h1 class="wp-heading-inline">Settings</h1>
     <br/>
     <div class=" all-loaded" style="display: none;">

@@ -13,7 +13,7 @@
 ?>
 
 
-<div class="admin-table-card" >
+<div class="sp admin-table-card" >
 	<span class="reset-vue" @click="resetVue()" ></span >
 	<div class="all-loaded" style="display: none;" >
 		<form v-if="showMain" @submit.prevent="useTableCard._createOrUpdate()"

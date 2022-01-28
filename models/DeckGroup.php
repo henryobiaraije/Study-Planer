@@ -65,7 +65,7 @@ class DeckGroup extends Model {
             ->limit($args['per_page'])
             ->orderByDesc('id')->get();
 
-        //			Common::send_error( [
+        //			Common::isend_error( [
         //				'ajax_admin_load_deck_group',
         //				'$args'        => $args,
         //				'$deck_groups' => $deck_groups->toSql(),

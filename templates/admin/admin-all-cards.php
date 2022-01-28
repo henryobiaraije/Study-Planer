@@ -19,7 +19,7 @@
 ?>
 
 
-<div class="admin-all-cards" >
+<div class="sp admin-all-cards" >
 	<?php /***** Header ******/ ?>
 	<!--	<editor-fold desc="Header">-->
 	<ul class="subsubsub all-loaded w-full p-0" style="display: none" >

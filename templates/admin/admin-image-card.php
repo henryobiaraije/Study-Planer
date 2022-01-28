@@ -12,7 +12,7 @@
 
 ?>
 
-<div class="admin-image-card" >
+<div class="sp admin-image-card" >
 	<span class="reset-vue" @click="resetVue()" ></span >
 	<div class="all-loaded" style="display: none;" >
 		<form v-if="showMain" @submit.prevent="useImageCard._createOrUpdate()"
