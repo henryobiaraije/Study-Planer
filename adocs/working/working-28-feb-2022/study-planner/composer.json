@@ -1,0 +1,42 @@
+{
+  "name": "pereere/study-planner",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Pereere Codes",
+      "email": "mpereere3@gmail.com"
+    }
+  ],
+  "config": {
+    "platform": {
+      "php": "7.3"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\Controllers\\": "app/controllers",
+      "App\\Models\\": "app/models"
+    },
+    "classmap": [
+      "models\\",
+      "pages\\",
+      "libs\\",
+      "helpers\\",
+      "db\\",
+      "shortcodes\\",
+      "services\\"
+    ]
+  },
+  "require": {
+    "illuminate/database": "^8.69",
+    "illuminate/events": "^8.70",
+    "ext-pdo": "*",
+    "staudenmeir/eloquent-has-many-deep": "^1.7",
+    "doctrine/dbal": "^3.3"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^5.3"
+  }
+}
