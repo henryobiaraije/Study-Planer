@@ -34,7 +34,15 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/pipeline" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/bus" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/staudenmeir/eloquent-has-many-deep" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/dbal" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/deprecations" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/event-manager" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/adocs/working/working-28-feb-2022" />
     </content>
+    <content url="file://$MODULE_DIR$/adocs/working/working-28-feb-2022" />
     <content url="file://$MODULE_DIR$/../../../wp-includes" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
