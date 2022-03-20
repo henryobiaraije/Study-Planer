@@ -33,6 +33,7 @@ if (!is_user_logged_in()) {
 						     style="font-family: 'Montserrat', sans-serif;">
 							<div v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.answer : currentQuestion.question "
 							     class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center mb-2"></div>
+							<hr style="border-top-width: 1px;border-color: #b2b2b2;margin: 10px;" />
 							<div v-show="userDash.showCurrentAnswer.value" style="font-family: 'Montserrat', sans-serif;"
 							     v-html="(currentQuestion.card_group.reverse === 1) ? currentQuestion.question : currentQuestion.answer"
 							     class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
@@ -42,6 +43,7 @@ if (!is_user_logged_in()) {
 							<div v-show="!userDash.showCurrentAnswer.value"
 							     @click="userDash._showAnswer()" v-html="currentQuestion.question" style="font-family: 'Montserrat', sans-serif;"
 							     class=" p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto "></div>
+							<hr style="border-top-width: 1px;border-color: #b2b2b2;margin: 10px;" />
 							<div v-show="userDash.showCurrentAnswer.value" v-html="currentQuestion.answer" style="font-family: 'Montserrat', sans-serif;"
 							     class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
 						</div>
@@ -68,6 +70,7 @@ if (!is_user_logged_in()) {
 								</tr>
 								</tbody>
 							</table>
+<!--							<hr style="border-top-width: 1px;border-color: #b2b2b2;margin: 10px;" />-->
 							<table v-if="currentQuestion.answer.length > 0 && userDash.showCurrentAnswer.value"
 							       style="font-family: 'Montserrat', sans-serif;"
 							       class="table gap-table  p-2 bg-sp-100 rounded ">
@@ -92,8 +95,7 @@ if (!is_user_logged_in()) {
 						</div>
 			  <?php /*** Image Card ***/ ?>
 						<div v-else-if="'image' === currentQuestion.card_group.card_type" class="w-full">
-							<div v-show="!userDash.showCurrentAnswer.value"
-							     class="sp-image-question m-auto  mb-2">
+							<div v-show="!userDash.showCurrentAnswer.value" class="sp-image-question m-auto  mb-2">
 								<div class="image-area" :style="{height: currentQuestion.h+'px' }">
 									<div :id="'main-preview-'+currentQuestion.hash"
 									     class="image-area-inner-preview image-card-view ">
@@ -127,7 +129,6 @@ if (!is_user_logged_in()) {
 						<div v-if="userDash.ajaxLoadingCard.sending" style="text-align: center;flex: 12;font-size: 50px;"><i
 									class="fa fa-spin fa-spinner"></i></div>
 					</div>
-
 					<div class="modal-footer justify-center">
 			  <?php /*** Buttons (Show Answer | Hold) ***/ ?>
 						<div v-if="!userDash.showGrade.value && null !== currentQuestion && !currentQuestion.has_updated" class="show-answer m-2">

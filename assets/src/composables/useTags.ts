@@ -249,10 +249,10 @@ export default function (status = 'publish') {
       data: [
         vdata.localize.nonce,
         {
-          deck_groups: items,
+          tags: items,
         }
       ],
-      what: "admin_sp_ajax_admin_update_deck_group",
+      what: "admin_sp_ajax_admin_update_tags",
       funcBefore() {
         handleAjax.start();
         // vdata.tableData.isLoading = true;

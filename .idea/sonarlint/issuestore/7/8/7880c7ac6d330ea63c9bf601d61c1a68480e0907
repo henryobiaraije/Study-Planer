@@ -1,0 +1,95 @@
+
+o	php:S3776–"TRefactor this function to reduce its Cognitive Complexity from 38 to the 15 allowed.(Ğå£óüÿÿÿÿ
+o	php:S3776”"TRefactor this function to reduce its Cognitive Complexity from 33 to the 15 allowed.(–ù ãúÿÿÿÿ
+n	php:S1192ø"SDefine a constant instead of duplicating this literal "Invalid study plan" 4 times.(âÖİÚÿÿÿÿÿ
+^	php:S1192Õ"HDefine a constant instead of duplicating this literal "Error: " 3 times.(ç£öÈ
+d	php:S1192½"NDefine a constant instead of duplicating this literal "Invalid card." 4 times.(õÛµ³
+I	php:S1481È	".Remove this unused "$per_page" local variable.(ù˜µõúÿÿÿÿ
+E	php:S1481É	"*Remove this unused "$page" local variable.(Òå¸Êùÿÿÿÿ
+O	php:S1481Ê	"4Remove this unused "$search_keyword" local variable.(Ñ¼®ˆúÿÿÿÿ
+G	php:S1481Ë	",Remove this unused "$status" local variable.(» ù¢ÿÿÿÿÿ
+D	php:S1481Ó".Remove this unused "$study_id" local variable.(ì´œİ
+B	php:S1481–",Remove this unused "$answer" local variable.(«¦ü
+G	php:S1481 ",Remove this unused "$length" local variable.(äÓŸµøÿÿÿÿ
+C	php:S1481ä"-Remove this unused "$user_id" local variable.(¸´ò°
+I	php:S1481Ó"3Remove this unused "$new_study_log" local variable.(ì÷‡÷
+C	php:S1481Y")Remove this unused "$all" local variable.(ŠÇ‡æıÿÿÿÿ
+K	php:S1481»"5Remove this unused "$last_updated_at" local variable.(‰Ã¼Ğ
+E	php:S1481ª"*Remove this unused "$tags" local variable.(§ıÍŞûÿÿÿÿ
+D	php:S1481«"/Remove this unused "$no_of_new" local variable.(âàå
+K	php:S1481¬"0Remove this unused "$no_on_hold" local variable.(Ñ§°…üÿÿÿÿ
+M	php:S1481­"2Remove this unused "$no_to_revise" local variable.(¹šÿ›üÿÿÿÿ
+K	php:S1481®"0Remove this unused "$revise_all" local variable.(ÍÕ …üÿÿÿÿ
+I	php:S1481¯"3Remove this unused "$study_all_new" local variable.(©á»È
+R	php:S1481°"7Remove this unused "$study_all_on_hold" local variable.(‚ÃÛ·ùÿÿÿÿ
+F	php:S1481è"0Remove this unused "$updated_at" local variable.(èÇ…
+G	php:S1481ë"1Remove this unused "$_old_answer" local variable.(·ÖĞé
+…	php:S1448'"kClass "AjaxFrontHelper" has 23 methods, which is greater than 20 authorized. Split it into smaller classes.(Á¾©Åûÿÿÿÿ
+€	php:S1186-"lAdd a nested comment explaining why this method is empty, throw an Exception or complete the implementation.(ë¼“H
+E	php:S1066È"/Merge this if statement with the enclosing one.(¤¥¢
+E	php:S1066Í"/Merge this if statement with the enclosing one.(ü–¥£
+8php:S125N"Remove this commented out code.(ù®íşÿÿÿÿ
+8php:S125T"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+8php:S125b"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+8php:S125s"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+8php:S125z"Remove this commented out code.(ÑÉ‘Áùÿÿÿÿ
+9php:S125†"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125"Remove this commented out code.(ÑÉ‘Áùÿÿÿÿ
+9php:S125™"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125¤"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125°"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125·"Remove this commented out code.(ÑÉ‘Áùÿÿÿÿ
+9php:S125»"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125È"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125Ï"Remove this commented out code.(ÑÉ‘Áùÿÿÿÿ
+9php:S125Ó"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125à"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ç"Remove this commented out code.(ÑÉ‘Áùÿÿÿÿ
+9php:S125ë"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ø"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ÿ"Remove this commented out code.(ÑÉ‘Áùÿÿÿÿ
+9php:S125ƒ"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125—"Remove this commented out code.(ÑÉ‘Áùÿÿÿÿ
+9php:S125›"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125«"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125Ù"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ë"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ó"Remove this commented out code.(’ØÔÈşÿÿÿÿ
+9php:S125£"Remove this commented out code.(Òº’öúÿÿÿÿ
+9php:S125·"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125õ"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125‘"Remove this commented out code.(Òº’öúÿÿÿÿ
+4php:S125»"Remove this commented out code.(Ë¬‚ğ
+9php:S125Á"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125Û"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ƒ"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+3php:S125«"Remove this commented out code.(Š‹®
+9php:S125­"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125È"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+3php:S125ğ"Remove this commented out code.(Š‹®
+9php:S125ò"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125—"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125Ã"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125Ö"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125á"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ì"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ú"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ƒ"Remove this commented out code.(Õæş­üÿÿÿÿ
+9php:S125…"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125•"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+4php:S125Ÿ"Remove this commented out code.(ñŸÏÂ
+9php:S125£"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125´"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125÷"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125š"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125¥"Remove this commented out code.(Õæş­üÿÿÿÿ
+9php:S125¨"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125Ê"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125£	"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125µ	"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125Â	"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125Û	"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ö	"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ
+9php:S125ş	"Remove this commented out code.(¿ƒÛíÿÿÿÿÿ

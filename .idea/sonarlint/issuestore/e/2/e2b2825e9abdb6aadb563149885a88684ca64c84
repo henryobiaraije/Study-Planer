@@ -1,0 +1,24 @@
+
+I	php:S1135?"4Complete the task associated to this "TODO" comment.(’í’ä
+Bphp:S108i")Either remove or fill this block of code.(ãÓ˜“ÿÿÿÿÿ
+jphp:S101"QRename class "Initialize_Db" to match the regular expression ^[A-Z][a-zA-Z0-9]*$.(Œ¡Ğïşÿÿÿÿ
+N	php:S1144D"4Remove this unused private "define_prefixes" method.(§Ø½¬ùÿÿÿÿ
+e	php:S11171"KRename "$capsule" which has the same name as the field declared at line 22.(ÃŠ¸ÿÿÿÿÿ
+l	php:S1117="RRename "$schema_builder" which has the same name as the field declared at line 23.(ÕÎïóûÿÿÿÿ
+†	php:S1186D"lAdd a nested comment explaining why this method is empty, throw an Exception or complete the implementation.(§Ø½¬ùÿÿÿÿ
+3php:S125%"Remove this commented out code.(ûâşç
+8php:S125*"Remove this commented out code.(·áÓÑüÿÿÿÿ
+9php:S125"Remove this commented out code.(ìµóÂûÿÿÿÿ
+9php:S125«"Remove this commented out code.(Ó²ƒóıÿÿÿÿ
+4php:S125³"Remove this commented out code.(ß€ Á
+9php:S125Â"Remove this commented out code.(Ó²ƒóıÿÿÿÿ
+4php:S125Õ"Remove this commented out code.(ˆ½óŞ
+4php:S125é"Remove this commented out code.(ÓŒŸ§
+9php:S125ş"Remove this commented out code.(î›‰ñıÿÿÿÿ
+4php:S125€"Remove this commented out code.(ÏÈ¯«
+4php:S125—"Remove this commented out code.(Æ–šå
+9php:S125›"Remove this commented out code.(ôúº…ùÿÿÿÿ
+4php:S125©"Remove this commented out code.(Ñ²†
+4php:S125×"Remove this commented out code.(Æ–šå
+4php:S125Ù"Remove this commented out code.(º¾¸Ì
+9php:S125Û"Remove this commented out code.(´”íÏùÿÿÿÿ

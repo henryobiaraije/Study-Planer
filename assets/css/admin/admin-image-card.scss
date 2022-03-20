@@ -39,6 +39,7 @@
         cursor: pointer;
         &.show-box {
           background-color: transparent;
+          border: 0;
         }
         &.asked-box {
           background-color: #ff7d7a;
