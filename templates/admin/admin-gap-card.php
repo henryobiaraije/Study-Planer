@@ -33,9 +33,12 @@
 					<div class="sp-wp-editor bg-white my-2 p-2 rounded shadow" >
 						<span class="editor-title" >Question</span >
 						<div class="editor-input" >
-							<input-editor
+							<!--							<input-editor-->
+							<!--									:value="gapCardGroup.whole_question"-->
+							<!--									v-model="gapCardGroup.whole_question" ></input-editor >-->
+							<input-editorb
 									:value="gapCardGroup.whole_question"
-									v-model="gapCardGroup.whole_question" ></input-editor >
+									v-model="gapCardGroup.whole_question" ></input-editorb >
 						</div >
 					</div >
 				</div >

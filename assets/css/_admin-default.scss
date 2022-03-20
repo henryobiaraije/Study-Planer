@@ -49,3 +49,8 @@ div#wp-editor-g8uuq45id {
   --sp-color-accent: #ed7d31;
   --sp-color-accent-light: #fbe4d5;
 }
+ol, ul {
+  list-style: auto;
+  margin: auto;
+  padding: revert;
+}
