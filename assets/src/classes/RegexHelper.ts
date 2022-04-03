@@ -45,7 +45,8 @@ export default class RegexHelper {
           value2.gaps.forEach(val => {
             // Looping through and add [...] to gaps and then bold answers in answer
             const _rRegex = new RegExp(val);
-            question      = question.replace(_rRegex, "<strong>[...]</strong>");
+            // question      = question.replace(_rRegex, "<strong>[...]</strong>");
+            question      = question.replace(val, "<strong>[...]</strong>");
             const _hold   = RegexHelper.getAnswerFromCurlyBrackets(val);
             answer        = answer.replace(val, `<strong>${_hold}</strong>`);
             console.log({cDetails, answer, question, key, value, key2, value2, val})
