@@ -12,10 +12,12 @@
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node",
-    "sourceMap": true,
+    "esModuleInterop": true,
+    //    "sourceMap": true,
     //    "strict": true,
     "strict": false,
-    "experimentalDecorators": true // neccessary to use vue class component
+    "experimentalDecorators": true
+    // neccessary to use vue class component
   }
 }
 

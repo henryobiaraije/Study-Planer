@@ -7,6 +7,7 @@ namespace StudyPlanner\Db;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Model\Deck;
 use Model\DeckGroup;
@@ -85,7 +86,12 @@ class Initialize_Db {
 			$deck_group = DeckGroup::firstOrCreate( [ 'name' => 'Uncategorized' ] );
 			update_option( Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, $deck_group->id );
 			$this->create_default_deck( $deck_group );
+		}catch ( QueryException $e ) {
+			$deck_group = DeckGroup::firstOrCreate( [ 'name' => 'Uncategorized' ] );
+			update_option( Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, $deck_group->id );
+			$this->create_default_deck( $deck_group );
 		}
+
 	}
 
 	private function create_default_deck( $deck_group ) {

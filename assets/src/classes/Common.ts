@@ -4,7 +4,7 @@ export default class Common {
 
   private static generatedRandom = [];
 
-  public static getRandomString() {
+  public static __getRandomString() {
     let rand1 = Common.rand();
     let rand2 = Common.rand();
     // while (Common.generatedRandom.indexOf(rand) > -1) {
@@ -28,4 +28,19 @@ export default class Common {
 
     return result;
   }
+
+  public static getRandomString(length = 20) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() *
+                                             charactersLength));
+    }
+    result +=  new Date().getTime() + new Date().getMilliseconds();
+
+    return result;
+  }
+
 }
+
