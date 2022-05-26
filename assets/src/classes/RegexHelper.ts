@@ -32,14 +32,15 @@ export default class RegexHelper {
             // Looping through all add fill answers in other gaps normally except in the current card
             const qAnswer = RegexHelper.getAnswerFromCurlyBrackets(val);
             const _rRegex = new RegExp(val);
-            question      = question.replace(_rRegex, `${qAnswer}`);
+            // question      = question.replace(_rRegex, `${qAnswer}`);
+            question      = question.replace(val, qAnswer);
             const _hold   = RegexHelper.getAnswerFromCurlyBrackets(val);
             answer        = answer.replace(val, `${_hold}`);
           });
         } else {
           value2.gaps.forEach(val => {
             // Looping through and add [...] to gaps and then bold answers in answer
-            const _rRegex = new RegExp(val);
+            // const _rRegex = new RegExp(val);
             // question      = question.replace(_rRegex, "<strong>[...]</strong>");
             question      = question.replace(val, "<strong>[...]</strong>");
             const _hold   = RegexHelper.getAnswerFromCurlyBrackets(val);
@@ -55,14 +56,14 @@ export default class RegexHelper {
         const _existingItem = existingItems[cExists];
         items.push({
           ..._existingItem,
-          question: question,
-          answer  : answer,
+          question: question.trim(),
+          answer  : answer.trim(),
         });
       } else {
         items.push({
           id      : 0,
-          question: question,
-          answer  : answer,
+          question: question.trim(),
+          answer  : answer.trim(),
           c_number: key,
           hash    : Common.getRandomString(),
         });
@@ -72,6 +73,7 @@ export default class RegexHelper {
     // console.groupEnd();
     return items;
   }
+
   public static __getItemsFromGapWholeQuestion(wholeQuestion: string, existingItems: Array<_Card>): Array<_Card> {
     console.groupCollapsed('getItemsFromGapWholeQuestion');
     const cDetails: _CDetail  = RegexHelper.getCDetails(wholeQuestion);
@@ -182,11 +184,11 @@ export default class RegexHelper {
         regex.lastIndex++;
       }
       m.some((match, groupIndex) => {
-        const hasHtml = RegexHelper._hasHtml(match);
-        if (hasHtml) {
-          alert('Error: HTML tag found in ' + match);
-          return true;
-        }
+        // const hasHtml = RegexHelper._hasHtml(match);
+        // if (hasHtml) {
+        //   alert('Error: HTML tag found in ' + match);
+        //   return true;
+        // }
         const cId = RegexHelper._getCId(match);
         if (undefined === cDetails[cId]) {
           cDetails[cId] = {
@@ -233,11 +235,11 @@ export default class RegexHelper {
         regex.lastIndex++;
       }
       m.some((match, groupIndex) => {
-        const hasHtml = RegexHelper._hasHtml(match);
-        if (hasHtml) {
-          alert('Error: HTML tag found in ' + match);
-          return true;
-        }
+        // const hasHtml = RegexHelper._hasHtml(match);
+        // if (hasHtml) {
+        //   alert('Error: HTML tag found in ' + match);
+        //   return true;
+        // }
         const cId = RegexHelper._getCId(match);
         if (undefined === cDetails[cId]) {
           cDetails[cId] = {

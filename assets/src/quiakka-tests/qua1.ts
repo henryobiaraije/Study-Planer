@@ -1,5 +1,5 @@
-import RegexHelper, {_CDetail} from "../../../../../../../laragon/www/Test-Site-Wordpress/wp-content/plugins/study-planner/assets/src/classes/RegexHelper";
-import {_Card} from "../../../../../../../laragon/www/Test-Site-Wordpress/wp-content/plugins/study-planner/assets/src/interfaces/inter-sp";
+// import RegexHelper, {_CDetail} from "../../../../../../../laragon/www/Test-Site-Wordpress/wp-content/plugins/study-planner/assets/src/classes/RegexHelper";
+// import {_Card} from "../../../../../../../laragon/www/Test-Site-Wordpress/wp-content/plugins/study-planner/assets/src/interfaces/inter-sp";
 
 // const fullQuestion = "When you {{c1::decide}} to use a {{c2::gap}} card that has a latin {{c3::numeral like [iii]}} in them, remember to {{c2::reload}} the preview before {{c4::saving}} the post.";
 const fullQuestion      = "When you {{c1::decide}} to use a {{c2::gap}} card  ";
