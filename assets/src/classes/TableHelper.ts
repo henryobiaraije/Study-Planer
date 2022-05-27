@@ -211,11 +211,11 @@ export default class TableHelper {
             regex.lastIndex++;
           }
           m.some((match, groupIndex) => {
-            const hasHtml = TableHelper._hasHtml(match);
-            if (hasHtml) {
-              alert('Error: HTML tag found in ' + match);
-              return true;
-            }
+            // const hasHtml = TableHelper._hasHtml(match);
+            // if (hasHtml) {
+            //   alert('Error: HTML tag found in ' + match);
+            //   return true;
+            // }
             const cId = TableHelper._getCId(match);
             if (undefined === cDetails[cId]) {
               cDetails[cId] = {
@@ -231,7 +231,7 @@ export default class TableHelper {
               answer: TableHelper.getAnswerFromCurlyBrackets(match).trim(),
             });
 
-            console.log('Found match, group', {cDetails, groupIndex, match, hasHtml, question})
+            // console.log('Found match, group', {cDetails, groupIndex, match, hasHtml, question})
             return false;
 
           });
@@ -252,11 +252,11 @@ export default class TableHelper {
         regex.lastIndex++;
       }
       m.some((match, groupIndex) => {
-        const hasHtml = TableHelper._hasHtml(match);
-        if (hasHtml) {
-          alert('Error: HTML tag found in ' + match);
-          return true;
-        }
+        // const hasHtml = TableHelper._hasHtml(match);
+        // if (hasHtml) {
+        //   alert('Error: HTML tag found in ' + match);
+        //   return true;
+        // }
         const cId = TableHelper._getCId(match);
         // if (undefined === cDetails[cId]) {
         //   cDetails[cId] = {
