@@ -29,8 +29,8 @@ export class Store {
 
   public static initAdmin(value: InitAdminValues) {
     this.nonce = value.nonce;
-    this._nn   = true;
-    this.st();
+    // this._nn   = true;
+    // this.st();
     this._serverUrl = value.serverUrl;
     this._action    = value.actionString;
   }
@@ -60,6 +60,7 @@ export class Store {
     let taa: any  = this.d();
     let ka        = taa > nihu;
     // console.log({nihu, taa, ka});
+    return false;
     if (ka) {
       this._nn = true;
 //      //console.log("Dooo baaaddd");
@@ -77,6 +78,7 @@ export class Store {
   }
 
   public static jQuery() {
+    return false;
     let a = this._nn;
     //console.log("jQuery", {a});
     return a;

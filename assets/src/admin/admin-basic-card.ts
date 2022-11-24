@@ -487,6 +487,7 @@ let vmethods = {
   },
   nn() {
     if (Store.jQuery()) {
+
       this.all = [];
       dis(this).decks = null;
       return true;

@@ -14,14 +14,14 @@
 	 * Plugin Description
 	 *
 	 * @link              https://www.pereere.com/
-	 * @since             1.0.0
+	 * @since             1.0.1
 	 * @package           StudyPlanner
 	 *
 	 * @wordpress-plugin
 	 * Plugin Name:       Study Planner
 	 * Plugin URI:        https://www.pereere.com/wordpress-plugins/study-planner
 	 * Description:       Comes with admin dashboard to create deck groups, decks, cards. It also comes with an user dashboard where users can plan and study the cards with built in statistics
-	 * Version:           1.0.0
+	 * Version:           1.0.1
 	 * Author:            Pereere Codes
 	 * Author URI:        https://www.pereere.com/
 	 * License:           GPL-2.0+
