@@ -78,7 +78,6 @@
 			//        add_action('front_sp_ajax_front_accept_changes', array($this, 'ajax_front_accept_changes'));
 		}
 
-
 		public function ajax_admin_load_user_profile( $post ) : void {
 			Initializer::verify_post( $post, true );
 			//        Common::send_error([

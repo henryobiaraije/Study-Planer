@@ -14,14 +14,15 @@ use Model\DeckGroup;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
 use StudyPlanner\Libs\Settings;
+
 use function StudyPlanner\get_default_image_display_type;
 use function StudyPlanner\print_log;
 
 class Initialize_Db {
 
 	private static $instance;
-	private        $capsule;
-	private        $schema_builder;
+	private $capsule;
+	private $schema_builder;
 
 
 	public static function get_instance() {
@@ -63,54 +64,58 @@ class Initialize_Db {
 		$this->schema_builder = $schema_builder;
 		// todo remove after test
 		Manager::enableQueryLog();
-
 	}
 
 	private function define_prefixes() {
-
 	}
 
 	public function create_default_rows() {
-
 		$this->crete_default_deck_group();
-
 	}
 
-	private function crete_default_deck_group() {
-		try {
-			$deck_group = DeckGroup::query()->firstOrFail(
-				[ 'name' => 'Uncategorized' ]
-			);
+	private function crete_default_deck_group(): void {
+		$deck_group = DeckGroup::query()
+		                       ->where( 'name', '=', 'Uncategorized' )
+		                       ->first();
+		if ( $deck_group ) {
 			$this->create_default_deck( $deck_group );
-		} catch ( PDOException $e ) {
-			$deck_group = DeckGroup::firstOrCreate( [ 'name' => 'Uncategorized' ] );
-			update_option( Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, $deck_group->id );
-			$this->create_default_deck( $deck_group );
-		}catch ( QueryException $e ) {
-			$deck_group = DeckGroup::firstOrCreate( [ 'name' => 'Uncategorized' ] );
-			update_option( Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, $deck_group->id );
-			$this->create_default_deck( $deck_group );
+
+			return;
 		}
 
+		$deck_group = DeckGroup
+			::query()
+			->where( 'name', '=', 'Uncategorized' )
+			->withTrashed();
+		if ( ! empty( $deck_group ) ) {
+			$deck_group->forceDelete();
+			$deck_group = DeckGroup::firstOrCreate( [ 'name' => 'Uncategorized' ] );
+		}
+		$id = $deck_group->id;
+
+		update_option( Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, $id );
+		$this->create_default_deck( $deck_group );
 	}
 
-	private function create_default_deck( $deck_group ) {
-		try {
-			$deck = Deck::query()
-			            ->where( 'name', '=', 'Uncategorized' )
-			            ->where( 'deck_group_id', '=', $deck_group->id )
-			            ->firstOrFail();
-		} catch ( ModelNotFoundException $e ) {
-			$deck = Deck::where( 'name', 'Uncategorized' );
+	private function create_default_deck( $deck_group ): void {
+		$deck = Deck::query()
+		            ->where( 'name', '=', 'Uncategorized' )
+		            ->where( 'deck_group_id', '=', $deck_group->id )
+		            ->first();
+		if ( ! empty( $deck ) ) {
+			return;
+		}
+
+		$deck = Deck::where( 'name', 'Uncategorized' );
+		if ( ! empty( $deck ) ) {
 			$deck->delete();
-			$deck = Deck::firstOrCreate( [
-				'name'          => 'Uncategorized',
-				'deck_group_id' => $deck_group->id,
-			] );
-			update_option( Settings::OP_UNCATEGORIZED_DECK_ID, $deck->id );
-		} catch ( PDOException $e ) {
-
 		}
+
+		$deck = Deck::create( [
+			'name'          => 'Uncategorized',
+			'deck_group_id' => $deck_group->id,
+		] );
+		update_option( Settings::OP_UNCATEGORIZED_DECK_ID, $deck->id );
 	}
 
 	public function create_tables() {
@@ -125,7 +130,6 @@ class Initialize_Db {
 		$this->create_table_answered();
 		$this->create_table_study_log();
 		$this->create_answer_log();
-
 	}
 
 	public function create_table_deck_group() {
@@ -138,10 +142,9 @@ class Initialize_Db {
 				$table->timestamps();
 			} );
 		}
-
 	}
 
-	public function create_table_deck() {
+	public function create_table_deck(): void {
 		// Deck
 		if ( ! $this->schema_builder->hasTable( SP_TABLE_DECKS ) ) {
 			Capsule::schema()->create( SP_TABLE_DECKS, function ( Blueprint $table ) {
@@ -153,7 +156,20 @@ class Initialize_Db {
 				$table->timestamps();
 			} );
 		}
+	}
 
+	public function create_table_topics(): void {
+		// Deck
+		if ( ! $this->schema_builder->hasTable( SP_TABLE_DECKS ) ) {
+			Capsule::schema()->create( SP_TABLE_DECKS, function ( Blueprint $table ) {
+				$table->id();
+				$table->string( 'name' )->unique();
+				//                $table->foreignId('deck_group_id')->references('id')->on(SP_TABLE_DECK_GROUPS);
+				$table->foreignId( 'deck_group_id' )->constrained( SP_TABLE_DECK_GROUPS )->cascadeOnDelete()->cascadeOnUpdate();
+				$table->softDeletes();
+				$table->timestamps();
+			} );
+		}
 	}
 
 	public function create_table_tags() {
@@ -169,7 +185,6 @@ class Initialize_Db {
 	}
 
 	public function create_table_taggable() {
-
 		// Taggables
 		if ( ! $this->schema_builder->hasTable( SP_TABLE_TAGGABLES ) ) {
 			Capsule::schema()->create( SP_TABLE_TAGGABLES, function ( Blueprint $table ) {
@@ -192,7 +207,6 @@ class Initialize_Db {
 	}
 
 	public function create_table_taggable_excluded() {
-
 		// Taggables Excluded
 		if ( ! $this->schema_builder->hasTable( SP_TABLE_TAGGABLES_EXCLUDED ) ) {
 			Capsule::schema()->create( SP_TABLE_TAGGABLES_EXCLUDED, function ( Blueprint $table ) {
@@ -205,13 +219,11 @@ class Initialize_Db {
 				$table->timestamps();
 			} );
 		}
-
 	}
 
 	public function create_table_card_group() {
 		// Card group
 		if ( ! $this->schema_builder->hasTable( SP_TABLE_CARD_GROUPS ) ) {
-
 			Capsule::schema()->create( SP_TABLE_CARD_GROUPS, function ( Blueprint $table ) {
 				global $wpdb;
 				$table->id();
@@ -228,7 +240,6 @@ class Initialize_Db {
 				$table->timestamps();
 			} );
 		}
-
 	}
 
 	public function create_table_cards() {
@@ -248,7 +259,6 @@ class Initialize_Db {
 				$table->timestamps();
 			} );
 		}
-
 	}
 
 	public function create_table_study() {
@@ -272,7 +282,6 @@ class Initialize_Db {
 				$table->timestamps();
 			} );
 		}
-
 	}
 
 	public function create_table_answered() {
@@ -315,8 +324,6 @@ class Initialize_Db {
 				$table->text( 'accept_changes_comment' )->after( 'card_last_updated_at' )->nullable();
 			} );
 		}
-
-
 	}
 
 	public function create_answer_log() {
@@ -336,8 +343,6 @@ class Initialize_Db {
 				$table->timestamps();
 			} );
 		}
-
-
 	}
 
 	public function create_table_study_log() {
@@ -356,7 +361,6 @@ class Initialize_Db {
 				$table->dateTime( 'created_at' );
 			} );
 		}
-
 	}
 
 }
