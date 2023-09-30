@@ -159,3 +159,4 @@ define('SP_TABLE_ANSWERED', SP_DB_PREFIX.'answered');
 define('SP_TABLE_ANSWER_LOG', SP_DB_PREFIX.'answer_log');
 define('SP_TABLE_USERS', $wpdb->prefix.'users');
 define('SP_TABLE_STUDY_LOG', SP_DB_PREFIX.'study_log');
+define('SP_TABLE_TOPICS', SP_DB_PREFIX.'topics');
