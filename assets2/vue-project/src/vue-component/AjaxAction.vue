@@ -1,51 +1,55 @@
-<template >
-	<component :is="el" >
-		<button @click="startSending" :disabled="ajax.sending" type="submit" :class="cssClasses" >{{ buttonText }}
-			<i v-if="icon.length > 0 && !ajax.sending" :class="[icon]" ></i >
-			<i v-if="ajax.sending" class="fa fa-spin fa-spinner" ></i >
-		</button >
-	</component >
-</template >
+<template>
+  <component :is="el">
+    <button @click="startSending" :disabled="ajax.sending" type="submit" :class="cssClasses">{{ buttonText }}
+      <i v-if="icon.length > 0 && !ajax.sending" :class="[icon]"></i>
+      <i v-if="ajax.sending" class="fa fa-spin fa-spinner"></i>
+    </button>
+  </component>
+</template>
 
-<script lang="ts" >
+<script setup lang="ts">
 
-  import Vue from 'vue'
-  import Component, {mixins} from 'vue-class-component';
-  import {Prop, Watch} from "vue-property-decorator";
-  import {_Ajax} from "../classes/HandleAjax";
+import type {PropType} from "vue";
+import type {_Ajax} from "@/classes/HandleAjax";
 
-  // Define the props by using Vue's canonical way.
-
-  // HelloWorld class will be a Vue component
-  @Component
-  export default class AjaxAction extends Vue {
-    // Declared as component data
-    public message = 'Hello World!';
-
-    @Prop() readonly ajax: _Ajax;
-    @Prop({default: 'span'}) readonly el: String;
-    @Prop({default: 'Submit'}) readonly buttonText: String;
-    @Prop({default: true}) readonly showClose: boolean;
-    @Prop({default: 'left'}) readonly align: string;
-    @Prop({default: 'button button-primary'}) readonly cssClasses: string;
-    @Prop({default: ''}) readonly icon: string;
-
-
-    public startSending(event): void {
-      // if (this.ajax.sending) {
-      //   event.preventDefault();
-      // }
-      this.$emit('click');
-    }
-
-    @Watch('ajax.sending')
-    onAjaxChange(old, newValue) {
-      // console.log({old, newValue})
-    }
-
+const emit = defineEmits(['click']);
+const props = defineProps({
+  ajax: {
+    type: Object as PropType<_Ajax>,
+    required: true
+  },
+  el: {
+    type: String,
+    default: 'span'
+  },
+  buttonText: {
+    type: String,
+    default: 'Submit'
+  },
+  showClose: {
+    type: Boolean,
+    default: true
+  },
+  align: {
+    type: String,
+    default: 'left'
+  },
+  cssClasses: {
+    type: String,
+    default: 'button button-primary'
+  },
+  icon: {
+    type: String,
+    default: ''
   }
-</script >
+});
 
-<style lang="scss" scoped >
+function startSending(event) {
+  emit('click');
+}
 
-</style >
+</script>
+
+<style lang="scss" scoped>
+
+</style>

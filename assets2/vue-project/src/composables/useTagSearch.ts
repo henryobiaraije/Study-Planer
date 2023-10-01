@@ -4,7 +4,7 @@ import type {_Ajax} from "@/classes/HandleAjax";
 import type {_Tag} from "@/interfaces/inter-sp";
 import {type InterFuncSuccess, Server} from "@/static/server";
 import {HandleAjax} from "@/classes/HandleAjax";
-import {vdata} from "@/admin/admin-topics";
+import {spClientData} from "@/functions";
 
 export default function (canCreate = true) {
     const ajax = ref<_Ajax>({
@@ -39,7 +39,7 @@ export default function (canCreate = true) {
         const handleAjax: HandleAjax = new HandleAjax(ajax.value);
         sendOnline = new Server().send_online({
             data: [
-                vdata.localize.nonce,
+                spClientData().nonce,
                 {
                     params: {
                         per_page: 5,
@@ -73,7 +73,7 @@ export default function (canCreate = true) {
         const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
         new Server().send_online({
             data: [
-                vdata.localize.nonce,
+                spClientData().nonce,
                 {
                     name: query,
                 }

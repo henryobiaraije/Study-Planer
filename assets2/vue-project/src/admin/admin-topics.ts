@@ -2,6 +2,7 @@ import {createApp} from 'vue'
 import "@/css/admin/admin-topics.scss";
 import {Store} from "@/static/store";
 import AdminTopics from "@/admin/AdminTopics.vue";
+import {spInitDevTools} from "@/miscelenous/init-dev-tools";
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
 const localize = pereere_dot_com_sp_general_localize_4736;
@@ -24,7 +25,7 @@ function renderVue() {
     // @ts-ignore
     const app = createApp(AdminTopics);
     app.mount('.admin-topics')
-
+    spInitDevTools();
 }
 
 renderVue();

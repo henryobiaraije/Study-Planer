@@ -1,4 +1,4 @@
-export function initDevTools() {
+export function spInitDevTools() {
     setTimeout(() => {
         // @ts-ignore
         const app = Array.from(document.querySelectorAll('*')).find((e) => e.__vue_app__).__vue_app__

@@ -34,33 +34,33 @@
                 label="name"
                 track-by="id"
             ></multiselect>
-<!--            <multiselect v-model="value" :options="options" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="Pick a value"></multiselect>-->
+            <!--            <multiselect v-model="value" :options="options" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="Pick a value"></multiselect>-->
           </div>
           <div class="mt-2">
             <span>Tags</span>
-            <!--							<vue-mulitiselect-->
-            <!--									v-model="deckNew.tags"-->
-            <!--									:options="searchTags.results.value"-->
-            <!--									:multiple="true"-->
-            <!--									:loading="searchTags.ajax.value.sending"-->
-            <!--									:searchable="true"-->
-            <!--									:close-on-select="true"-->
-            <!--									:taggable="true"-->
-            <!--									:createTag="false"-->
-            <!--									@tag="searchTags.addTag"-->
-            <!--									@search-change="searchTags.search"-->
-            <!--									placeholder="Tags"-->
-            <!--									label="name"-->
-            <!--									track-by="id"-->
-            <!--							></vue-mulitiselect >-->
+            <multiselect
+                v-model="deckNew.tags"
+                :options="searchTags.results.value"
+                :multiple="true"
+                :loading="searchTags.ajax.value.sending"
+                :searchable="true"
+                :close-on-select="true"
+                :taggable="true"
+                :createTag="false"
+                @tag="searchTags.addTag"
+                @search-change="searchTags.search"
+                placeholder="Tags"
+                label="name"
+                track-by="id"
+            ></multiselect>
           </div>
           <div class="mt-3">
-            <!--							<ajax-action-->
-            <!--									button-text="Create"-->
-            <!--									css-classes="button"-->
-            <!--									icon="fa fa-plus"-->
-            <!--									:ajax="decks.ajaxCreate.value" >-->
-            <!--							</ajax-action >-->
+            <ajax-action
+                button-text="Create"
+                css-classes="button"
+                icon="fa fa-plus"
+                :ajax="decks.ajaxCreate.value">
+            </ajax-action>
           </div>
         </form>
       </div>
@@ -78,6 +78,8 @@ import {computed, onMounted, ref} from "vue";
 import useDecks from "@/composables/useDecks";
 import jQuery from "jquery";
 import useDeckGroupLists from "@/composables/useDeckGroupLists";
+import useTagSearch from "@/composables/useTagSearch";
+import AjaxAction from "@/vue-component/AjaxAction.vue";
 
 const pageTitle = 'Topics';
 const activeUrl = 'admin.php?page=study-planner-topics';
@@ -86,6 +88,7 @@ const trashUrl = 'admin.php?page=study-planner-topics&status=trash';
 // <editor-fold desc="Composable">
 const decks = useDecks();
 const deckGroups = useDeckGroupLists();
+const searchTags = useTagSearch();
 
 // </editor-fold desc="Composable">
 
@@ -93,6 +96,13 @@ const deckGroups = useDeckGroupLists();
 // const options = ['Select option', 'options', 'selected', 'multiple', 'label', 'searchable', 'clearOnSelect', 'hideSelected', 'maxHeight', 'allowEmpty', 'showLabels', 'onChange', 'touched']
 
 // <editor-fold desc="Computed">
+
+defineProps({
+  name: {
+    type: String,
+    required: false
+  }
+});
 
 const totalActive = computed(() => {
   return 0;
@@ -108,12 +118,13 @@ const inTrash = computed(() => {
 const deckNew = computed(() => {
   return decks.newItem.value;
 })
+
 // </editor-fold desc="Computed">
 
 onMounted(() => {
   jQuery('.all-loading').hide();
   jQuery('.all-loaded').show();
-  console.log('hiding and showin')
+  deckGroups.load();
 });
 
 </script>
