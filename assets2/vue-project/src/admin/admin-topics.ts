@@ -1,4 +1,4 @@
-import {compile, createApp} from 'vue'
+import {createApp} from 'vue'
 import {initDevTools} from '@/miscelenous/init-dev-tools';
 import "@/css/admin/admin-topics.scss";
 import PickImage from "@/vue-component/PickImage.vue";
@@ -36,18 +36,9 @@ Store.initAdmin({
         },
     });
 
+    // @ts-ignore
     app.component('pick-image', PickImage);
 
     app.mount('.admin-topics')
-
-    // TimeComp,
-    //     'ajax-action': AjaxAction,
-    //     // 'ajax-action-not-form': AjaxActionNotForm,
-    //     LoadingButton,
-    //     HoverNotifications,
-    //     // VueTableDynamic,
-    //     VueGoodTable,
-    //     'vue-mulitiselect': Multiselect,
-
 
 })();
