@@ -20,6 +20,7 @@ export default defineConfig({
     },
     build: {
         sourcemap: true,
+        cssCodeSplit: true,
         rollupOptions: {
             input: {
                 'admin/admin-topics': fileURLToPath(new URL('./src/admin/admin-topics.ts', import.meta.url)),

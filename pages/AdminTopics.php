@@ -85,22 +85,23 @@ class AdminTopics {
 	}
 
 	public function register_scripts(): void {
-		$dis = $this;
+//		$dis = $this;
 //			$css = Initializer::$css_url . '/admin/admin-deck-groups.css';
 		$css = Initializer::$js_url . '/admin/admin-topics.css';
 //		$js  = Initializer::$js_url . '/admin/admin-topics.js';
-		$js = FileService::mp_get_js_url( 'admin/admin-topics' );
+		$js  = FileService::mp_get_js_url( 'admin/admin-topics' );
+		$css = FileService::mp_get_css_url( 'admin/admin-topics' );
 
 		wp_register_style( 'sp-admin-topics', $css, [], Initializer::$script_version );
 		wp_register_script( 'sp-admin-topics', $js, [ 'jquery' ], Initializer::$script_version, true );
 
 		// enqueue the scripts
-		add_action( 'sp_enqueue_default_admin_topics', function () use ( $dis ) {
+		add_action( 'sp_enqueue_default_admin_topics', function ()  {
 			do_action( 'sp_enqueue_default_admin_scripts' );
 			wp_enqueue_style( 'sp-admin-topics' );
 			wp_enqueue_script( 'sp-admin-topics' );
 
-			$dis->localize_data();
+			$this->localize_data();
 		} );
 	}
 
