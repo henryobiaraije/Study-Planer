@@ -1,8 +1,7 @@
 import {createApp} from 'vue'
-import {initDevTools} from '@/miscelenous/init-dev-tools';
 import "@/css/admin/admin-topics.scss";
-import PickImage from "@/vue-component/PickImage.vue";
 import {Store} from "@/static/store";
+import AdminTopics from "@/admin/AdminTopics.vue";
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
 const localize = pereere_dot_com_sp_general_localize_4736;
@@ -12,7 +11,7 @@ Store.initAdmin({
     nonce: localize.nonce,
 });
 
-(function () {
+function renderVue() {
 
     let elem = ".admin-topics";
 
@@ -22,23 +21,10 @@ Store.initAdmin({
         throw new Error(`Element ${elem} not found`);
     }
 
-    const app = createApp({
-        data() {
-            return {
-                message: "Hello Vue!",
-                imageId: 1651,
-            }
-        },
-        created() {
-            // jQuery(".mpereere-vue-loading").css("display", "none");
-            console.log(" created admin-topics");
-            initDevTools();
-        },
-    });
-
     // @ts-ignore
-    app.component('pick-image', PickImage);
-
+    const app = createApp(AdminTopics);
     app.mount('.admin-topics')
 
-})();
+}
+
+renderVue();

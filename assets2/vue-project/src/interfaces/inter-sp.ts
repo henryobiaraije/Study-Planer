@@ -109,3 +109,9 @@ export interface _ImageBox {
   imageUrl: string;
   hash: string;
 }
+
+export interface _Localize{
+  serverUrl: string;
+  actionString: string;
+  nonce: string;
+}

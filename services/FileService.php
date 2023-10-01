@@ -22,7 +22,7 @@ class FileService {
 	 *
 	 * @return array An array of arrays, where each sub-array contains full and relative file paths.
 	 */
-	function get_files_recursive( $folder, $extension, $relativePath = '' ) {
+	function get_files_recursive( string $folder, string $extension, string $relativePath = '' ) {
 		$matching_files = []; // Initialize an empty array to store matching files.
 
 		// Check if the folder exists.
@@ -86,7 +86,7 @@ class FileService {
 	}
 
 	public static function mp_get_css_url( string $file_name ): string {
-		return ( new self() )->mp_get_file_url( $file_name, 'js' );
+		return ( new self() )->mp_get_file_url( $file_name, 'css' );
 	}
 
 

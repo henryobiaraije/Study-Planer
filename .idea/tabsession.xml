@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SessionConfiguration">
+    <state version="1" />
+    <sessions>
+      <session name="Topics 1">
+        <files focusedFile="$PROJECT_DIR$/assets2/vue-project/src/admin/admin-topics.ts">
+          <file>$PROJECT_DIR$/assets2/vue-project/src/admin/admin-topics.ts</file>
+          <file>$PROJECT_DIR$/assets/src/admin/admin-decks.ts</file>
+          <file>$PROJECT_DIR$/templates/admin/admin-topics.php</file>
+          <file>$PROJECT_DIR$/templates/admin/admin-decks.php</file>
+          <file>$USER_HOME$/Downloads/alphonse-ai/alphonse-ai.php</file>
+          <file>$USER_HOME$/Downloads/alphonse-ai/assets/custom-media-router-tab.php</file>
+        </files>
+      </session>
+    </sessions>
+  </component>
+</project>

@@ -1,6 +1,6 @@
-import {InterFuncFailure, InterFuncSuccess} from "../static/server";
-import {_HoverNotification, ENUM_NOTIFICATION_TYPE} from "../vue-component/enums";
-// import {vdata} from "../admin/secondary-sites";
+import type {_HoverNotification} from "@/vue-component/enums";
+import {ENUM_NOTIFICATION_TYPE} from "@/vue-component/enums";
+import type {InterFuncFailure, InterFuncSuccess} from "@/static/server";
 
 declare var bootstrap;
 declare var jQuery;

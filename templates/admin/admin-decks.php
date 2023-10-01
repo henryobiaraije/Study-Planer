@@ -238,4 +238,5 @@
 		<div style="text-align: center;flex: 12;font-size: 50px;" >
 			<i class="fa fa-spin fa-spinner" ></i ></div >
 	</div >
+
 </div >
