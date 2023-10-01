@@ -5,5 +5,6 @@ export function initDevTools() {
         const devtools = window.__VUE_DEVTOOLS_GLOBAL_HOOK__
         devtools.enabled = true
         devtools.emit('app:init', app, version, {})
-    }, 3000);
+        console.log('vue devtools initialized')
+    }, 5000);
 }

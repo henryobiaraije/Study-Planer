@@ -18,5 +18,6 @@ if ('trash' === $status) {
 ?>
 
 <div class="sp admin-topics wrap">
-    <h1> Inside topic</h1>
+    <h1> Inside topic {{message}}</h1>
+
 </div>

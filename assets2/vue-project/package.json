@@ -12,6 +12,9 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false"
   },
   "dependencies": {
+    "@types/jquery": "^3.5.20",
+    "jquery": "^3.7.1",
+    "vite-plugin-vue": "^0.0.1",
     "vue": "^3.3.4"
   },
   "devDependencies": {
