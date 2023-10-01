@@ -20,6 +20,8 @@
     "underscore": "^1.13.6",
     "vite-plugin-vue": "^0.0.1",
     "vue": "^3.3.4",
+    "vue-facing-decorator": "^3.0.3",
+    "vue-good-table": "^2.21.11",
     "vue-multiselect": "^3.0.0-alpha.2"
   },
   "devDependencies": {

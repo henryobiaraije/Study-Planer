@@ -1,4 +1,3 @@
-import Cookies from 'js-cookie';
 import {ref} from "vue";
 import type {_Ajax} from "@/classes/HandleAjax";
 import type {_Tag} from "@/interfaces/inter-sp";
