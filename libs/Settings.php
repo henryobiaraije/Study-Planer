@@ -28,6 +28,7 @@ class Settings {
     public const SLUG_IMAGE_CARD  = 'study-planner-image-card';
     public const SLUG_SETTINGS    = 'study-planner-settings';
 
+	public const SLUG_TOPICS       = 'study-planner-topics';
 
     // Post types
     public const POST_TYPE_SEARCH_ENDPOINT = 'sbe_search_endpoint';

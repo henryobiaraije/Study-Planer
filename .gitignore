@@ -3,3 +3,4 @@ assets/_extra/bootstrap-4
 assets/node_modules
 
 /vendor/
+/assets2/vue-project/node_modules

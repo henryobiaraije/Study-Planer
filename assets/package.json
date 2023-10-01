@@ -4,7 +4,8 @@
   "description": "Multiple Knowledgebase modules",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --open --config webpack.dev.js",
+    "start1": "webpack serve --open --config webpack.dev.js",
+    "start": "webpack --watch --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
     "watch": "webpack --watch --config webpack.dev.js",
     "test": "jest --watch "
@@ -13,35 +14,28 @@
   "license": "MIT",
   "dependencies": {
     "@ckeditor/ckeditor5-build-inline": "^31.0.0",
-    "@ckeditor/ckeditor5-vue2": "^1.0.5",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@popperjs/core": "^2.10.2",
     "@types/underscore": "^1.11.2",
-    "@vue/composition-api": "^1.7.2",
-    "@vueform/multiselect": "^2.1.2",
     "bootstrap": "^5.1.0",
-    "bootstrap-vue": "^2.21.2",
     "ckeditor5": "^31.0.0",
     "crypto-js": "^4.1.1",
     "echarts": "^5.2.2",
     "font-awesome": "^4.7.0",
+    "jQuery": "^1.7.4",
     "js-cookie": "^3.0.1",
     "timeago.js": "^4.0.0-beta.3",
     "underscore": "^1.13.1",
-    "vue": "^2.6.13",
-    "vue-calendar-heatmap": "^0.8.4",
-    "vue-class-component": "^7.2.6",
-    "vue-good-table": "^2.21.10",
-    "vue-multiselect": "^2.1.6",
-    "vue-property-decorator": "^9.1.2",
-    "vue-table-dynamic": "^0.4.10",
-    "vuedraggable": "^2.24.3",
-    "vuex": "^3.6.2"
+    "vue": "^3.3.4",
+    "vue-good-table": "^2.21.11",
+    "vue-loader": "^17.2.2",
+    "vue-multiselect": "^2.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
     "@babel/preset-env": "^7.14.4",
     "@babel/preset-typescript": "^7.17.12",
+    "@types/jquery": "^3.5.20",
     "@types/node": "^20.4.5",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
@@ -51,12 +45,9 @@
     "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-prettier": "^5.0.0",
     "onchange": "^7.1.0",
-    "prettier": "3.0.0",
     "tailwindcss": "^3.3.3",
+    "ts-loader": "^9.2.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.1.6",
-    "vue-loader": "^15.9.7",
-    "vue-template-compiler": "^2.6.13",
-    "vuex-module-decorators": "^1.0.1"
+    "typescript": "^5.1.6"
   }
 }
