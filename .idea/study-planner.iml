@@ -41,6 +41,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/cache" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
       <excludeFolder url="file://$MODULE_DIR$/adocs/working/working-28-feb-2022" />
+      <excludeFolder url="file://$MODULE_DIR$/assets" />
     </content>
     <content url="file://$MODULE_DIR$/adocs/working/working-28-feb-2022" />
     <content url="file://$MODULE_DIR$/../../../wp-includes" />
