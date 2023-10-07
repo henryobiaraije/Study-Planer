@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LaravelQuerySettings">
+    <option name="filterDataSources" value="true" />
+    <option name="filteredDataSources">
+      <set>
+        <option value="a9d9f082-e6c9-4ae0-a6e6-5ec74b2ae607&lt;-/lq/-&gt;test-site-wordpress" />
+      </set>
+    </option>
+    <option name="tablePrefix" value="wp_rum_" />
+  </component>
+</project>

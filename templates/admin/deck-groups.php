@@ -193,7 +193,6 @@
 		</div >
 	</div >
 
-
 	<hover-notifications ></hover-notifications >
 	<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
 		<div style="text-align: center;flex: 12;font-size: 50px;" >

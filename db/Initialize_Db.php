@@ -20,7 +20,6 @@ use function StudyPlanner\print_log;
 
 class Initialize_Db
 {
-
     private static $instance;
     private $capsule;
     private $schema_builder;

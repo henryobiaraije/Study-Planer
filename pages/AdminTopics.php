@@ -97,10 +97,11 @@ class AdminTopics
     {
 //		$dis = $this;
 //			$css = Initializer::$css_url . '/admin/admin-deck-groups.css';
-        $css = Initializer::$js_url . '/admin/admin-topics.css';
+//        $css = Initializer::$js_url . '/admin/admin-topics.css';
 //		$js  = Initializer::$js_url . '/admin/admin-topics.js';
         $js = FileService::mp_get_js_url('admin-topics');
         $css = FileService::mp_get_css_url('admin-topics');
+//		$js = "http://localhost:5173/src/admin/admin-topics.ts";
 
         wp_enqueue_editor();
         wp_register_style('sp-admin-topics', $css, [], Initializer::$script_version);

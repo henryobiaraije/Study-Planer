@@ -70,6 +70,9 @@ const tableData = ref({
         ofLabel: 'of',
         pageLabel: 'page', // for 'pages' mode
         allLabel: 'All',
+        //
+        // mode: 'records',
+        // infoFn: (params) => `my own page ${params.firstRecordOnPage}`,
     },
     searchOptions: {
         enabled: true,
@@ -232,7 +235,6 @@ export default function (status = 'publish') {
         editedItemTracker.value = null;
     };
     const tt = () => tableData.value;
-
     const xhrLoad = () => {
         const handleAjax: HandleAjax = new HandleAjax(ajax.value);
         sendOnline = new Server().send_online({

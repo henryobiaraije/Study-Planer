@@ -24,7 +24,9 @@ export default defineConfig({
         cssCodeSplit: true,
         rollupOptions: {
             input: {
-                'admin/admin-topics': fileURLToPath(new URL('./src/admin/admin-topics.ts', import.meta.url)),
+                'main-admin': fileURLToPath(new URL('./src/admin/main-admin.ts', import.meta.url)),
+                // 'admin/admin-topics': fileURLToPath(new URL('./src/admin/admin-topics.ts', import.meta.url)),
+                // 'admin/admin-deck-groups': fileURLToPath(new URL('./src/admin/admin-deck-groups', import.meta.url)),
             },
         },
     },

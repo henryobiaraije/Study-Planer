@@ -16,7 +16,6 @@
 		protected $table = SP_TABLE_DECKS;
 
 		use SoftDeletes;
-
 		protected $dates    = [ 'deleted_at' ];
 		protected $fillable = [ 'name', 'deck_group_id' ];
 
