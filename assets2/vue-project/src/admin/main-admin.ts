@@ -4,6 +4,7 @@ import {Store} from "@/static/store";
 import AdminTopics from "@/admin/AdminTopics.vue";
 import {spInitDevTools} from "@/miscelenous/init-dev-tools";
 import AdminDeckGroups from "@/admin/AdminDeckGroups.vue";
+import AdminDecks from "@/admin/AdminDecks.vue";
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
 const localize = pereere_dot_com_sp_general_localize_4736;
@@ -24,7 +25,11 @@ function renderVue() {
         {
             elem: '.admin-groups',
             component: AdminDeckGroups
-        }
+        },
+        {
+            elem: '.admin-decks',
+            component: AdminDecks
+        },
     ] as Array<{ elem: string, component: any }>;
 
     elemAndComponent.forEach((item) => {
