@@ -112,5 +112,4 @@ class Admin_Basic_Card {
 
 	}
 
-
 }
