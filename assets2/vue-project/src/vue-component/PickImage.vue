@@ -12,62 +12,62 @@
   </div>
 </template>
 
-<script setup lang="ts">
-
-const bgImage = useBgImage();
-// @Component({
-//   setup() {
-//     return {
-//       bgImage: useBgImage(),
-//     }
-//   }
-// })
-
-// bgImage = setup(() => useBgImage());
-// counter = setup(() => useCounter());
-
-const props = defineProps({
-  value: {type: Number, default: 0, required: true},
-  defaultImage: {type: Number, default: 0, required: true,},
-  buttonText: {type: String, default: 'Use Image'},
-  headerText: {type: String, default: 'Pick Image',},
-})
+<script lang="ts">
+import {defineComponent} from "vue";
 import useBgImage from "@/composables/useBgImage";
-import {computed, watch} from "vue";
 
-const emit = defineEmits<{
-  (e: 'input', id: number): void
-}>();
-
-
-const imageUrl = computed(() => bgImage.loadedImageUrl.value);
-
-const imageId = computed(() => {
-  let imageId = props.value;
-  if (imageId < 1) {
-    imageId = props.defaultImage;
+export default defineComponent({
+  name: 'PickImage',
+  emits: ['update:modelValue'],
+  props: {
+    value: {type: Number, default: 0, required: true},
+    defaultImage: {type: Number, default: 0, required: true,},
+    buttonText: {type: String, default: 'Use Image'},
+    headerText: {type: String, default: 'Pick Image',},
+  },
+  setup: (props, ctx) => {
+    return {
+      bgImage: useBgImage(),
+    }
+  },
+  computed: {
+    imageUrl() {
+      return this.bgImage.loadedImageUrl.value;
+    },
+    imageId() {
+      let imageId = this.value;
+      if (imageId < 1) {
+        imageId = this.defaultImage;
+      }
+      return imageId;
+    }
+  },
+  methods: {
+    initImage(imageId: number) {
+      //@ts-ignore
+      this.bgImage.xhrLoadImage(imageId);
+    },
+    selectImage() {
+      //@ts-ignore
+      this.bgImage.pickImage().then((res) => {
+        this.$emit('update:modelValue', res.id);
+        this.initImage(res.id);
+        // console.log('resol', res);
+      });
+    }
+  },
+  created() {
+    let imageId = this.value;
+    if (imageId < 1) {
+      imageId = this.defaultImage;
+    }
+    this.initImage(imageId);
   }
-  return imageId;
 });
 
-function initImage(imageId: number) {
-  //@ts-ignore
-  bgImage.xhrLoadImage(imageId);
-}
-
-function selectImage() {
-  //@ts-ignore
-  bgImage.pickImage().then((res) => {
-    emit('input', res.id);
-    initImage(res.id);
-    // console.log('resol', res);
-  });
-}
-
-
-watch(props.value, (to, from) => {
-  console.log('watch change', {to, from});
-});
+// watch(props.value, (to, from) => {
+//   console.log('watch change', {to, from});
+// });
 
 </script>
 

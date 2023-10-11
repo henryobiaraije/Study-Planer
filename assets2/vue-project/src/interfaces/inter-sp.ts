@@ -124,4 +124,18 @@ export interface _Localize {
     serverUrl: string;
     actionString: string;
     nonce: string;
+    localize: {
+        default_bg_image: number,
+        nonce: string;
+        page_all_cards: string;
+        page_basic_card: string;
+        page_deck_groups: string;
+        page_decks: string;
+        page_gap_card: string;
+        page_settings: string;
+        page_table_card: string;
+        page_tags: string;
+        page_topics: string;
+        site_url: string;
+    }
 }

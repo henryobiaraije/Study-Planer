@@ -7,6 +7,7 @@ import AdminDeckGroups from "@/admin/AdminDeckGroups.vue";
 import AdminDecks from "@/admin/AdminDecks.vue";
 import AdminTags from "@/admin/AdminTags.vue";
 import AdminAllCards from "@/admin/AdminAllCards.vue";
+import AdminBasicCard from "@/admin/AdminBasicCard.vue";
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
 const localize = pereere_dot_com_sp_general_localize_4736;
@@ -39,6 +40,10 @@ function renderVue() {
         {
             elem: '.admin-all-cards',
             component: AdminAllCards
+        },
+        {
+            elem: '.admin-basic-card',
+            component: AdminBasicCard
         },
     ] as Array<{ elem: string, component: any }>;
 
