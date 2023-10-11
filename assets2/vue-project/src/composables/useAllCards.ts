@@ -1,11 +1,11 @@
-import {_Ajax, HandleAjax} from "../classes/HandleAjax";
-import {InterFuncSuccess, Server} from "../static/server";
-import {Store} from "../static/store";
-import {ref, onMounted} from "@vue/composition-api";
-import Cookies from 'js-cookie';
-import {_Tag, _DeckGroup, _CardGroup} from "../interfaces/inter-sp";
-import useDeckGroupLists from "./useDeckGroupLists";
-import {vdata} from "../admin/admin-deck-groups";
+import {ref} from "vue";
+import type {_CardGroup, _DeckGroup, _Tag} from "@/interfaces/inter-sp";
+import type {_Ajax} from "@/classes/HandleAjax";
+import {HandleAjax} from "@/classes/HandleAjax";
+import {type InterFuncSuccess, Server} from "@/static/server";
+import useDeckGroupLists from "@/composables/useDeckGroupLists";
+import Cookies from "js-cookie";
+import {spClientData} from "@/functions";
 
 declare var bootstrap;
 
@@ -222,7 +222,7 @@ export default function (status = 'publish') {
   const onPerPageChange = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
     tt().paginationOptions.setCurrentPage = params.currentPage;
     tt().paginationOptions.perPage = params.currentPerPage;
-    Cookies.set('spPerPage', params.currentPerPage);
+    Cookies.set('spPerPage', params.currentPerPage.toString());
     xhrLoad();
   };
   const loadItems = () => {
@@ -253,7 +253,7 @@ export default function (status = 'publish') {
     const handleAjax: HandleAjax = new HandleAjax(ajax.value);
     sendOnline = new Server().send_online({
       data: [
-        Store.nonce,
+        spClientData().nonce,
         {
           params: {
             per_page: tt().paginationOptions.perPage,
@@ -289,7 +289,7 @@ export default function (status = 'publish') {
     const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
     sendOnline = new Server().send_online({
       data: [
-        vdata.localize.nonce,
+        spClientData().nonce,
         {
           params: {
             per_page: 5,
@@ -319,7 +319,7 @@ export default function (status = 'publish') {
     const handleAjax: HandleAjax = new HandleAjax(ajaxUpdate.value);
     sendOnline = new Server().send_online({
       data: [
-        Store.nonce,
+        spClientData().nonce,
         {
           decks: items,
         }
@@ -345,7 +345,7 @@ export default function (status = 'publish') {
     const handleAjax: HandleAjax = new HandleAjax(ajaxTrash.value);
     sendOnline = new Server().send_online({
       data: [
-        Store.nonce,
+        spClientData().nonce,
         {
           card_groups: items,
         }
@@ -370,7 +370,7 @@ export default function (status = 'publish') {
     const handleAjax: HandleAjax = new HandleAjax(ajaxDelete.value);
     sendOnline = new Server().send_online({
       data: [
-        Store.nonce,
+        spClientData().nonce,
         {
           card_groups: items,
         }
@@ -392,7 +392,7 @@ export default function (status = 'publish') {
     const handleAjax: HandleAjax = new HandleAjax(ajaxRestore.value);
     sendOnline = new Server().send_online({
       data: [
-        Store.nonce,
+        spClientData().nonce,
         {
           card_groups: items,
         }
@@ -414,7 +414,7 @@ export default function (status = 'publish') {
     const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
     new Server().send_online({
       data: [
-        Store.nonce,
+        spClientData().nonce,
         {
           name: newItem.value.name,
           deck_group: newItem.value.deckGroup,
