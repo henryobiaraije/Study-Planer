@@ -1,5 +1,5 @@
 import Common from "./Common";
-import {_Card} from "../interfaces/inter-sp";
+import type {_Card} from "@/interfaces/inter-sp";
 
 export interface _CDetail {
   [key: string]: {

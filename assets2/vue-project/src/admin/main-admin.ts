@@ -9,6 +9,8 @@ import AdminTags from "@/admin/AdminTags.vue";
 import AdminAllCards from "@/admin/AdminAllCards.vue";
 import AdminBasicCard from "@/admin/AdminBasicCard.vue";
 import AdminGapCard from "@/admin/AdminGapCard.vue";
+import AdminTableCard from "@/admin/AdminTableCard.vue";
+
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
 const localize = pereere_dot_com_sp_general_localize_4736;
@@ -22,33 +24,38 @@ Store.initAdmin({
 
 function renderVue() {
     const elemAndComponent = [
-        {
-            elem: '.admin-topics',
-            component: AdminTopics,
-        },
-        {
-            elem: '.admin-groups',
-            component: AdminDeckGroups
-        },
-        {
-            elem: '.admin-decks',
-            component: AdminDecks
-        },
-        {
-            elem: '.admin-tags',
-            component: AdminTags
-        },
-        {
-            elem: '.admin-all-cards',
-            component: AdminAllCards
-        },
-        {
-            elem: '.admin-basic-card',
-            component: AdminBasicCard
-        },
+        // {
+        //     elem: '.admin-topics',
+        //     component: AdminTopics,
+        // },
+        // {
+        //     elem: '.admin-groups',
+        //     component: AdminDeckGroups
+        // },
+        // {
+        //     elem: '.admin-decks',
+        //     component: AdminDecks
+        // },
+        // {
+        //     elem: '.admin-tags',
+        //     component: AdminTags
+        // },
+        // {
+        //     elem: '.admin-all-cards',
+        //     component: AdminAllCards
+        // },
+        // {
+        //     elem: '.admin-basic-card',
+        //     component: AdminBasicCard
+        // },
         {
             elem: '.admin-gap-card',
             component: AdminGapCard
+            // component: AdminBasicCard
+        },
+        {
+            elem: '.admin-table-card',
+            component: AdminTableCard
             // component: AdminBasicCard
         },
     ] as Array<{ elem: string, component: any }>;

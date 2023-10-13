@@ -13,7 +13,9 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "@types/js-cookie": "^3.0.4",
+    "bootstrap": "^5.3.2",
     "crypto-js": "^4.1.1",
     "jquery": "^3.7.1",
     "js-cookie": "^3.0.5",
