@@ -72,7 +72,13 @@ class Admin_Table_Card {
 
 	public function load_view(): void {
 		do_action( 'sp_enqueue_default_admin_table_card' );
-		\StudyPlanner\load_template( 'admin/admin-table-card' );
+		// \StudyPlanner\load_template( 'admin/admin-table-card' );
+		echo '<div class="sp admin-table-card wrap"></div>';
+		echo '<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
+				<div style="text-align: center;flex: 12;font-size: 50px;" >
+				<i class="fa fa-spin fa-spinner" ></i ></div >
+			</div >
+		';
 	}
 
 	public function get_page_data(): array {
