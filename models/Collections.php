@@ -63,40 +63,30 @@ class Collections extends Model {
 	}
 
 	public static function get_collections( $args ): array {
-		$default = array(
+		$default     = array(
 			'search'       => '',
 			'page'         => 1,
 			'per_page'     => 5,
 			'with_trashed' => false,
 			'only_trashed' => false,
 		);
-		$args    = wp_parse_args( $args, $default );
-		$deck    = self::where( 'name', 'like', "%{$args['search']}%" );
+		$args        = wp_parse_args( $args, $default );
+		$collections = self::where( 'name', 'like', "%{$args['search']}%" );
 
-		$total  = $deck->count();
-		$offset = ( $args['page'] - 1 );
-		$deck   = $deck->offset( $offset )
-					   ->limit( $args['per_page'] )
-					   ->orderByDesc( 'id' )->get();
-
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// '$args'        => $args,
-		// '$deck_groups' => $deck_groups->toSql(),
-		// 'getQuery'     => $deck_groups->getQuery(),
-		// ] );
+		$total       = $collections->count();
+		$offset      = ( $args['page'] - 1 );
+		$collections = $collections->offset( $offset )
+								   ->limit( $args['per_page'] )
+								   ->orderByDesc( 'id' )->get();
 
 		return array(
 			'total'       => $total,
-			'collections' => $deck->all(),
+			'collections' => $collections->all(),
 		);
 	}
 
 	public static function get_totals(): array {
-		$all     = array(
-			'active'  => 0,
-			'trashed' => 0,
-		);
+		$all     = array();
 		$active  = self::query()
 					   ->selectRaw( Manager::raw( 'count(*) as count' ) )
 					   ->get();

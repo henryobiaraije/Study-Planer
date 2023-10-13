@@ -31,6 +31,78 @@
       </div>
       <!--    Table   -->
       <div class="table-area flex-1">
+        <vue-good-table
+            :columns="tableDataValue.columns"
+            :mode="'remote'"
+            :rows="tableDataValue.rows"
+            :total-rows="tableDataValue.totalRecords"
+            :compact-mode="true"
+            :line-numbers="true"
+            :is-loading="tableDataValue.isLoading"
+            :pagination-options="tableDataValue.paginationOptions"
+            :search-options="tableDataValue.searchOptions"
+            :sort-options="tableDataValue.sortOption"
+            :select-options="{ enabled: true, selectOnCheckboxOnly: true, }"
+            :theme="''"
+            @page-change="collections.onPageChange"
+            @sort-change="collections.onSortChange"
+            @column-filter="collections.onColumnFilter"
+            @per-page-change="collections.onPerPageChange"
+            @selected-rows-change="collections.onSelect"
+            @search="collections.onSearch"
+        >
+          <template slot="table-row" #table-row="props">
+            <div v-if="props.column.field === 'name'">
+              <input @input="collections.onEdit(props.row)"
+                     :disabled="props.row.name === 'Uncategorized' || inTrash"
+                     v-model="props.row.name"/>
+              <div class="row-actions">
+									<span class="edit">
+									<a @click.prevent="collections.openEditModal(props.row,'#modal-edit')" class="text-blue-500 font-bold"
+                     href="#">
+									Edit <i class="fa fa-pen-alt"></i></a>  </span>
+              </div>
+            </div>
+            <div v-else-if="props.column.field === 'deck_group'">
+              {{ props.row.deck_group ? props.row.deck_group.name : '' }}
+            </div>
+            <div v-else-if="props.column.field === 'tags'">
+              <ul class="" style="min-width: 100px;">
+                <li v-for="(item,itemIndex) in props.row.tags"
+                    class="inline-flex items-center justify-center mr-1 px-2 py-1 text-xs font-bold leading-none text-white bg-gray-500 rounded">
+                  {{ item.name }}
+                </li>
+              </ul>
+            </div>
+            <span v-else-if="props.column.field === 'created_at'">
+							<time-comp :time="props.row.created_at"></time-comp>
+						</span>
+            <span v-else-if="props.column.field === 'updated_at'">
+							<time-comp :time="props.row.updated_at"></time-comp>
+						</span>
+            <span v-else>
+				      {{ props.formattedRow[props.column.field] }}
+				    </span>
+          </template>
+          <div slot="selected-row-actions">
+            <ajax-action-not-form
+                v-if="inTrash"
+                button-text="Delete Selected Permanently "
+                css-classes="button button-link-delete"
+                icon="fa fa-trash"
+                @click="collections.batchDelete()"
+                :ajax="collections.ajaxDelete.value">
+            </ajax-action-not-form>
+            <ajax-action-not-form
+                v-else
+                button-text="Trash Selected "
+                css-classes="button button-link-delete"
+                icon="fa fa-trash"
+                @click="collections.batchTrash()"
+                :ajax="collections.ajaxTrash.value">
+            </ajax-action-not-form>
+          </div>
+        </vue-good-table>
       </div>
 
       <!-- Edit Modal -->

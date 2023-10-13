@@ -237,7 +237,7 @@ export default function (status = 'publish') {
             },
             funcSuccess(done: InterFuncSuccess) {
                 handleAjax.stop();
-                const items = done.data.details.decks;
+                const items = done.data.details.collections;
                 const total = done.data.details.total;
                 const theTotals = done.data.totals;
                 console.log({done, items, total, totals});
@@ -287,7 +287,7 @@ export default function (status = 'publish') {
             data: [
                 Store.nonce,
                 {
-                    decks: items,
+                    collections: items,
                 }
             ],
             what: "admin_sp_ajax_admin_update_collections",
