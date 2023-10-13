@@ -64,10 +64,12 @@ export default function (cardGroupId = 0) {
         created_at: '',
         updated_at: '',
         deleted_at: '',
+        collection: 0,
     });
     let setBgAsDefault = ref(false);
 
     const createOrUpdate = () => {
+        console.log({cardGroupId});
         if (cardGroupId > 0) {
             xhrUpdate();
         } else {

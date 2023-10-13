@@ -98,6 +98,7 @@ export interface _CardGroup extends _TimeStamps {
     reverse: boolean;
     cards_count?: number;
     card_group_edit_url?: string;
+    collection?: number;
 }
 
 export interface _ImageItem {

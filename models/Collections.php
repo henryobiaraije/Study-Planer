@@ -45,15 +45,14 @@ class Collections extends Model {
 			'only_trashed' => false,
 		);
 		$args    = wp_parse_args( $args, $default );
-		if ( $args['with_trashed'] ) {
-			$items = self::withoutTrashed()::with( 'tags' );
-		} elseif ( $args['only_trashed'] ) {
-			$items = self::onlyTrashed();
-		} else {
-			$items = self::with( 'tags' );
-		}
-		$items  = $items
-			->where( 'name', 'like', "%{$args['search']}%" );
+		// if ( $args['with_trashed'] ) {
+		// $items = self::withoutTrashed()::with( 'tags' );
+		// } elseif ( $args['only_trashed'] ) {
+		// $items = self::onlyTrashed();
+		// } else {
+		// $items = self::with( 'tags' );
+		// }
+		$items  = self::where( 'name', 'like', "%{$args['search']}%" );
 		$offset = ( $args['page'] - 1 );
 		$items  = $items->offset( $offset )
 						->limit( $args['per_page'] )

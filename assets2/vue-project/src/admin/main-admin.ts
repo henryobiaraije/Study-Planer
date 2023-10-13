@@ -42,14 +42,14 @@ function renderVue() {
         //     elem: '.admin-tags',
         //     component: AdminTags
         // },
-        {
-            elem: '.admin-all-cards',
-            component: AdminAllCards
-        },
         // {
-        //     elem: '.admin-basic-card',
-        //     component: AdminBasicCard
+        //     elem: '.admin-all-cards',
+        //     component: AdminAllCards
         // },
+        {
+            elem: '.admin-basic-card',
+            component: AdminBasicCard
+        },
         // {
         //     elem: '.admin-gap-card',
         //     component: AdminGapCard

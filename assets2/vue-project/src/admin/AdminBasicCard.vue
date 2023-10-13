@@ -25,13 +25,13 @@
       </div>
     </div>
     <div class="bg-white my-2 p-2 rounded shadow">
-      <span class="">Scheduled at (optional)</span>
-      <div class="border-1 p-1 px-2 mb-3 mt-0">
-        <label>
-          <span> </span>
-          <input v-model="basicCardGroup.scheduled_at" type="datetime-local">
-        </label>
-      </div>
+      <!--      <span class="">Scheduled at (optional)</span>-->
+      <!--      <div class="border-1 p-1 px-2 mb-3 mt-0">-->
+      <!--        <label>-->
+      <!--          <span> </span>-->
+      <!--          <input v-model="basicCardGroup.scheduled_at" type="datetime-local" :required="false">-->
+      <!--        </label>-->
+      <!--      </div>-->
       <div v-if="isEditing" class="flex bg-sp-100 rounded ">
         <div class="rounded bg-white text-black flex-auto m-2 p-1 text-center md:w-full">
           Created:
@@ -69,6 +69,27 @@
           label="name"
           track-by="id"
       ></vue-mulitiselect>
+    </div>
+    <div class="bg-white my-2 p-2 rounded shadow">
+      <span> Collection </span>
+      <vue-mulitiselect
+          v-model="basicCardGroup.collection"
+          :options="collections.searchResults.value"
+          :multiple="false"
+          :loading="collections.ajaxSearch.value.sending"
+          :searchable="true"
+          :allowEmpty="false"
+          :close-on-select="true"
+          :taggable="false"
+          :createTag="false"
+          @search-change="collections.search"
+          placeholder="Collection"
+          label="name"
+          track-by="id"
+      ></vue-mulitiselect>
+      <p class="text-xs text-gray-400 py-1">When you select a collection, the card will not be displayed on the frontend
+        until the collection is
+        published.</p>
     </div>
     <div class="mt-2 mb-2 bg-white my-2 p-2 rounded shadow">
       <span>Tags</span>
@@ -126,6 +147,7 @@ import useBasicCard from "@/composables/useBasicCard";
 import InputEditor from "@/vue-component/InputEditor.vue";
 import {spClientData} from "@/functions";
 import PickImage from "@/vue-component/PickImage.vue";
+import useCollections from "@/composables/useCollections";
 
 export default defineComponent({
   name: 'AdminBasicCard',
@@ -161,6 +183,7 @@ export default defineComponent({
       decks: useDecks(status),
       searchTags: useTagSearch(),
       basicCard: useBasicCard(cardGroupId),
+      collections: useCollections(),
     }
   },
   computed: {

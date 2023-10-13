@@ -83,8 +83,8 @@ class Initialize_Db {
 		}
 
 		$deck_group = DeckGroup::query()
-			->where( 'name', '=', 'Uncategorized' )
-			->withTrashed();
+							   ->where( 'name', '=', 'Uncategorized' )
+							   ->withTrashed();
 		if ( ! empty( $deck_group ) ) {
 			$deck_group->forceDelete();
 			$deck_group = DeckGroup::firstOrCreate( array( 'name' => 'Uncategorized' ) );
@@ -272,6 +272,23 @@ class Initialize_Db {
 					$table->string( 'image_type' )->nullable()->comment( 'The image Display type for image cards. e.g. hide_one_show_one' );
 					$table->softDeletes();
 					$table->timestamps();
+				}
+			);
+		}
+		if ( ! $this->schema_builder->hasColumn( SP_TABLE_CARD_GROUPS, 'collection_id' ) ) {
+			Capsule::schema()->table(
+				SP_TABLE_CARD_GROUPS,
+				function ( Blueprint $table ) {
+					// $table
+					// ->integer( 'collection_id' )
+					// ->after( 'card_type' )
+					// ->nullable();
+					$table
+						->foreignId( 'collection_id' )
+						->constrained( SP_TABLE_COLLECTIONS )
+						->cascadeOnDelete()
+						->cascadeOnUpdate()
+						->nullOnDelete();
 				}
 			);
 		}

@@ -290,7 +290,7 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_IMAGE_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
 
@@ -414,7 +414,7 @@ class AjaxHelper {
 
 		// Delete cards without not updated
 		$cards_to_delete = $all_cards = CardGroup::find( $cg_id )->cards()
-												 ->whereNotIn( 'c_number', $c_numbers_updated )->get()->pluck( 'id' )->all();
+		                                         ->whereNotIn( 'c_number', $c_numbers_updated )->get()->pluck( 'id' )->all();
 
 		Answered::whereIn( 'card_id', $cards_to_delete )->forceDelete();
 		Card::whereIn( 'id', $cards_to_delete )->forceDelete();
@@ -448,7 +448,7 @@ class AjaxHelper {
 		}
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_IMAGE_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
 
@@ -596,7 +596,7 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_TABLE_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
 
@@ -728,8 +728,8 @@ class AjaxHelper {
 		Manager::commit();
 		// Delete cards without not updated
 		$all_cards = CardGroup::find( $cg_id )->cards()
-							  ->whereNotIn( 'c_number', $c_numbers_updated )
-							  ->forceDelete();
+		                      ->whereNotIn( 'c_number', $c_numbers_updated )
+		                      ->forceDelete();
 		//
 		// Common::send_error( [
 		// 'ajax_admin_create_new_basic_card',
@@ -755,7 +755,7 @@ class AjaxHelper {
 		}
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_TABLE_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
 
@@ -877,8 +877,8 @@ class AjaxHelper {
 		Manager::commit();
 		// Delete cards without not updated
 		$all_cards = CardGroup::find( $cg_id )->cards()
-							  ->whereNotIn( 'c_number', $c_numbers_updated )
-							  ->forceDelete();
+		                      ->whereNotIn( 'c_number', $c_numbers_updated )
+		                      ->forceDelete();
 
 		//
 		// Common::send_error( [
@@ -905,7 +905,7 @@ class AjaxHelper {
 		}
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_GAP_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
 
@@ -1034,7 +1034,7 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_GAP_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
 
@@ -1266,6 +1266,7 @@ class AjaxHelper {
 		$schedule_at         = $e_card_group['scheduled_at'];
 		$reverse             = $e_card_group['reverse'];
 		$e_cards             = $e_card_group['cards'];
+		$e_collection        = $e_card_group['collection'];
 		$cg_name             = sanitize_text_field( $e_card_group['name'] );
 		if ( empty( $schedule_at ) ) {
 			$schedule_at = Common::getDateTime();
@@ -1301,6 +1302,11 @@ class AjaxHelper {
 			Common::send_error( 'Invalid card' );
 		}
 
+		$collection_id = null;
+		if ( is_array( $e_collection ) ) {
+			$collection_id = $e_collection['id'];
+		}
+
 		Manager::beginTransaction();
 
 		$card_group->whole_question = $question;
@@ -1308,6 +1314,9 @@ class AjaxHelper {
 		$card_group->bg_image_id    = $bg_image_id;
 		$card_group->name           = $cg_name;
 		$card_group->deck_id        = $e_deck_id;
+		if ( $collection_id ) {
+			$card_group->collection_id = $collection_id;
+		}
 		$card_group->save();
 		$card_group->tags()->detach();
 		foreach ( $e_tags as $one ) {
@@ -1347,8 +1356,8 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
-					 . '&action=card-edit'
-					 . '&card-group=' . $card_group->id;
+		             . '&action=card-edit'
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
 
@@ -1400,21 +1409,10 @@ class AjaxHelper {
 			Common::send_error( 'Invalid deck' );
 		}
 
-		// Common::send_error( [
-		// 'ajax_admin_create_new_basic_card',
-		// 'post'                 => $post,
-		// '$e_card'              => $e_card,
-		// '$reverse'             => $reverse,
-		// '$e_card_group'        => $e_card_group,
-		// '$question'            => $question,
-		// '$e_set_bg_as_default' => $e_set_bg_as_default,
-		// '$bg_image_id'         => $bg_image_id,
-		// '$answer'              => $answer,
-		// '$deck'                => $deck,
-		// '$cg_name'             => $cg_name,
-		// '$e_tags'              => $e_tags,
-		// '$schedule_at'         => $schedule_at,
-		// ] );
+		$collection_id = null;
+		if ( ! empty( $e_card_group['collection'] ) ) {
+			$collection_id = $e_card_group['collection']['id'];
+		}
 
 		Manager::beginTransaction();
 		$card_group                 = new CardGroup();
@@ -1425,6 +1423,9 @@ class AjaxHelper {
 		$card_group->name           = $cg_name;
 		$card_group->deck_id        = $e_deck_id;
 		$card_group->reverse        = $reverse;
+		if ( $collection_id ) {
+			$card_group->collection_id = $collection_id;
+		}
 		$card_group->save();
 		$card_group->tags()->detach();
 		foreach ( $e_tags as $one ) {
@@ -1466,22 +1467,17 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
 
 	}
 
 	public function ajax_admin_load_basic_card( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_create_new_basic_card',
-		// 'post' => $post,
-		// ] );
-
 		$all           = $post[ Common::VAR_2 ];
 		$card_group_id = (int) sanitize_text_field( $all['card_group_id'] );
 
-		$card_group = CardGroup::with( 'tags', 'cards', 'deck' )->find( $card_group_id );
+		$card_group = CardGroup::with( 'tags', 'cards', 'deck', 'collection' )->find( $card_group_id );
 		if ( empty( $card_group ) ) {
 			Common::send_error( 'Invalid card group' );
 		}
@@ -1807,12 +1803,12 @@ class AjaxHelper {
 			$id                    = (int) sanitize_text_field( $item['id'] );
 			$uncategorized_deck_id = get_uncategorized_deck_id();
 			CardGroup::withTrashed()
-					 ->where( 'deck_id', '=', $id )
-					->update(
-						array(
-							'deck_id' => $uncategorized_deck_id,
-						)
-					);
+			         ->where( 'deck_id', '=', $id )
+			         ->update(
+				         array(
+					         'deck_id' => $uncategorized_deck_id,
+				         )
+			         );
 			$deck = Deck::withTrashed()->find( $id );
 			$deck->tags()->detach();
 			$deck->forceDelete();
@@ -1932,10 +1928,6 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_create_new_deck( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_create_new_deck',
-		// 'post' => $post,
-		// ] );
 
 		$all        = $post[ Common::VAR_2 ];
 		$name       = sanitize_text_field( $all['name'] );
@@ -1986,10 +1978,6 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_update_decks( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_update_decks',
-		// 'post' => $post,
-		// ] );
 
 		$all = $post[ Common::VAR_2 ];
 
@@ -2234,11 +2222,11 @@ class AjaxHelper {
 			$uncategorized_deck_group_id = get_uncategorized_deck_group_id();
 			if ( $uncategorized_deck_group_id ) {
 				Deck::where( 'deck_group_id', '=', $id )
-					->update(
-						array(
-							'deck_group_id' => $uncategorized_deck_group_id,
-						)
-					);
+				    ->update(
+					    array(
+						    'deck_group_id' => $uncategorized_deck_group_id,
+					    )
+				    );
 			}
 			// Delete the deck group
 			$deck_group = DeckGroup::withTrashed()->find( $id );
@@ -2386,29 +2374,16 @@ class AjaxHelper {
 	// <editor-fold desc="Collections">
 
 	public function ajax_admin_trash_collections( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_trash_deck_group',
-		// 'post' => $post,
-		// ] );
-
 		$all  = $post[ Common::VAR_2 ];
 		$args = wp_parse_args(
 			$all,
 			array(
-				'decks' => array(),
+				'collections' => array(),
 			)
 		);
-		foreach ( $args['decks'] as $item ) {
+		foreach ( $args['collections'] as $item ) {
 			$id = (int) sanitize_text_field( $item['id'] );
 			Deck::find( $id )->delete();
-			// Deck::query()->where( 'id', '=', $id )->delete();
-			// Common::send_error( [
-			// 'ajax_admin_create_new_deck_group',
-			// 'post'  => $post,
-			// '$all'  => $all,
-			// '$id'   => $id,
-			// '$args' => $args,
-			// ] );
 		}
 
 		Common::send_success( 'Trashed successfully.' );
@@ -2416,42 +2391,30 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_delete_collections( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_trash_deck_group',
-		// 'post' => $post,
-		// ] );
 
 		$all  = $post[ Common::VAR_2 ];
 		$args = wp_parse_args(
 			$all,
 			array(
-				'decks' => array(),
+				'collections' => array(),
 			)
 		);
 
-		foreach ( $args['decks'] as $item ) {
+		foreach ( $args['collections'] as $item ) {
 			Manager::beginTransaction();
 			$id                    = (int) sanitize_text_field( $item['id'] );
 			$uncategorized_deck_id = get_uncategorized_deck_id();
 			CardGroup::withTrashed()
-					 ->where( 'deck_id', '=', $id )
-					->update(
-						array(
-							'deck_id' => $uncategorized_deck_id,
-						)
-					);
+			         ->where( 'collection_id', '=', $id )
+			         ->update(
+				         array(
+					         'deck_id' => $uncategorized_deck_id,
+				         )
+			         );
 			$deck = Deck::withTrashed()->find( $id );
 			$deck->tags()->detach();
 			$deck->forceDelete();
 			Manager::commit();
-			// Deck::query()->where( 'id', '=', $id )->delete();
-			// Common::send_error( [
-			// 'ajax_admin_create_new_deck_group',
-			// 'post'  => $post,
-			// '$all'  => $all,
-			// '$id'   => $id,
-			// '$args' => $args,
-			// ] );
 		}
 
 		Common::send_success( 'Deleted successfully.' );
@@ -2494,27 +2457,12 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_search_collections( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// 'post' => $post,
-		// ] );
-
 		$params         = $post[ Common::VAR_2 ]['params'];
 		$per_page       = (int) sanitize_text_field( $params['per_page'] );
 		$page           = (int) sanitize_text_field( $params['page'] );
 		$search_keyword = sanitize_text_field( $params['search_keyword'] );
 		$status         = sanitize_text_field( $params['status'] );
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// 'post'            => $post,
-		// '$params'         => $params,
-		// '$per_page'       => $per_page,
-		// '$page'           => $page,
-		// '$search_keyword' => $search_keyword,
-		// '$status'         => $status,
-		// ] );
-
-		$items = Deck::get_deck_simple(
+		$items          = Collections::get_collections_simple(
 			array(
 				'search'       => $search_keyword,
 				'page'         => $page,
@@ -2523,18 +2471,7 @@ class AjaxHelper {
 			)
 		);
 
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// 'post'            => $post,
-		// '$params'         => $params,
-		// '$per_page'       => $per_page,
-		// '$page'           => $page,
-		// '$search_keyword' => $search_keyword,
-		// '$deck_groups'    => $deck_groups,
-		// '$status'         => $status,
-		// ] );
-
-		Common::send_success( 'Decks  found.', $items );
+		Common::send_success( 'Collections found.', $items );
 
 	}
 
