@@ -16,6 +16,7 @@ use PHPMailer\PHPMailer\Exception;
 use StudyPlanner\Initializer;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
+use StudyPlanner\Models\Collections;
 use StudyPlanner\Models\Tag;
 use function StudyPlanner\get_default_image_display_type;
 use function StudyPlanner\get_mature_card_days;
@@ -93,6 +94,15 @@ class AjaxHelper {
 		add_action( 'admin_sp_ajax_admin_load_settings', array( $this, 'ajax_admin_load_settings' ) );
 		add_action( 'admin_sp_ajax_admin_update_settings', array( $this, 'ajax_admin_update_settings' ) );
 		// </editor-fold desc="Card">
+
+		// <editor-fold desc="Collections">
+		add_action( 'admin_sp_ajax_admin_load_collections', array( $this, 'ajax_admin_load_collections' ) );
+		add_action( 'admin_sp_ajax_admin_search_collections', array( $this, 'ajax_admin_search_collections' ) );
+		add_action( 'admin_sp_ajax_admin_create_new_collection', array( $this, 'ajax_admin_create_new_collection' ) );
+		add_action( 'admin_sp_ajax_admin_update_collections', array( $this, 'ajax_admin_update_collections' ) );
+		add_action( 'admin_sp_ajax_admin_trash_collections', array( $this, 'ajax_admin_trash_collections' ) );
+		add_action( 'admin_sp_ajax_admin_delete_collections', array( $this, 'ajax_admin_delete_collections' ) );
+		// </editor-fold desc="Collections">
 	}
 
 	// <editor-fold desc="Image Cards">
@@ -280,7 +290,7 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_IMAGE_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
 
@@ -404,7 +414,7 @@ class AjaxHelper {
 
 		// Delete cards without not updated
 		$cards_to_delete = $all_cards = CardGroup::find( $cg_id )->cards()
-												 ->whereNotIn( 'c_number', $c_numbers_updated )->get()->pluck( 'id' )->all();
+		                                         ->whereNotIn( 'c_number', $c_numbers_updated )->get()->pluck( 'id' )->all();
 
 		Answered::whereIn( 'card_id', $cards_to_delete )->forceDelete();
 		Card::whereIn( 'id', $cards_to_delete )->forceDelete();
@@ -438,7 +448,7 @@ class AjaxHelper {
 		}
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_IMAGE_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
 
@@ -586,7 +596,7 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_TABLE_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
 
@@ -718,8 +728,8 @@ class AjaxHelper {
 		Manager::commit();
 		// Delete cards without not updated
 		$all_cards = CardGroup::find( $cg_id )->cards()
-							  ->whereNotIn( 'c_number', $c_numbers_updated )
-							  ->forceDelete();
+		                      ->whereNotIn( 'c_number', $c_numbers_updated )
+		                      ->forceDelete();
 		//
 		// Common::send_error( [
 		// 'ajax_admin_create_new_basic_card',
@@ -745,7 +755,7 @@ class AjaxHelper {
 		}
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_TABLE_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
 
@@ -867,8 +877,8 @@ class AjaxHelper {
 		Manager::commit();
 		// Delete cards without not updated
 		$all_cards = CardGroup::find( $cg_id )->cards()
-							  ->whereNotIn( 'c_number', $c_numbers_updated )
-							  ->forceDelete();
+		                      ->whereNotIn( 'c_number', $c_numbers_updated )
+		                      ->forceDelete();
 
 		//
 		// Common::send_error( [
@@ -895,7 +905,7 @@ class AjaxHelper {
 		}
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_GAP_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
 
@@ -1024,7 +1034,7 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_GAP_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
 
@@ -1337,8 +1347,8 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
-					 . '&action=card-edit'
-					 . '&card-group=' . $card_group->id;
+		             . '&action=card-edit'
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
 
@@ -1456,7 +1466,7 @@ class AjaxHelper {
 		// ] );
 
 		$edit_page = Initializer::get_admin_url( Settings::SLUG_BASIC_CARD )
-					 . '&card-group=' . $card_group->id;
+		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
 
@@ -1797,12 +1807,12 @@ class AjaxHelper {
 			$id                    = (int) sanitize_text_field( $item['id'] );
 			$uncategorized_deck_id = get_uncategorized_deck_id();
 			CardGroup::withTrashed()
-					 ->where( 'deck_id', '=', $id )
-					->update(
-						array(
-							'deck_id' => $uncategorized_deck_id,
-						)
-					);
+			         ->where( 'deck_id', '=', $id )
+			         ->update(
+				         array(
+					         'deck_id' => $uncategorized_deck_id,
+				         )
+			         );
 			$deck = Deck::withTrashed()->find( $id );
 			$deck->tags()->detach();
 			$deck->forceDelete();
@@ -2224,11 +2234,11 @@ class AjaxHelper {
 			$uncategorized_deck_group_id = get_uncategorized_deck_group_id();
 			if ( $uncategorized_deck_group_id ) {
 				Deck::where( 'deck_group_id', '=', $id )
-					->update(
-						array(
-							'deck_group_id' => $uncategorized_deck_group_id,
-						)
-					);
+				    ->update(
+					    array(
+						    'deck_group_id' => $uncategorized_deck_group_id,
+					    )
+				    );
 			}
 			// Delete the deck group
 			$deck_group = DeckGroup::withTrashed()->find( $id );
@@ -2372,5 +2382,238 @@ class AjaxHelper {
 
 	}
 	// </editor-fold desc="Others">
+
+	// <editor-fold desc="Collections">
+
+	public function ajax_admin_trash_collections( $post ): void {
+		// Common::send_error( [
+		// 'ajax_admin_trash_deck_group',
+		// 'post' => $post,
+		// ] );
+
+		$all  = $post[ Common::VAR_2 ];
+		$args = wp_parse_args(
+			$all,
+			array(
+				'decks' => array(),
+			)
+		);
+		foreach ( $args['decks'] as $item ) {
+			$id = (int) sanitize_text_field( $item['id'] );
+			Deck::find( $id )->delete();
+			// Deck::query()->where( 'id', '=', $id )->delete();
+			// Common::send_error( [
+			// 'ajax_admin_create_new_deck_group',
+			// 'post'  => $post,
+			// '$all'  => $all,
+			// '$id'   => $id,
+			// '$args' => $args,
+			// ] );
+		}
+
+		Common::send_success( 'Trashed successfully.' );
+
+	}
+
+	public function ajax_admin_delete_collections( $post ): void {
+		// Common::send_error( [
+		// 'ajax_admin_trash_deck_group',
+		// 'post' => $post,
+		// ] );
+
+		$all  = $post[ Common::VAR_2 ];
+		$args = wp_parse_args(
+			$all,
+			array(
+				'decks' => array(),
+			)
+		);
+
+		foreach ( $args['decks'] as $item ) {
+			Manager::beginTransaction();
+			$id                    = (int) sanitize_text_field( $item['id'] );
+			$uncategorized_deck_id = get_uncategorized_deck_id();
+			CardGroup::withTrashed()
+			         ->where( 'deck_id', '=', $id )
+			         ->update(
+				         array(
+					         'deck_id' => $uncategorized_deck_id,
+				         )
+			         );
+			$deck = Deck::withTrashed()->find( $id );
+			$deck->tags()->detach();
+			$deck->forceDelete();
+			Manager::commit();
+			// Deck::query()->where( 'id', '=', $id )->delete();
+			// Common::send_error( [
+			// 'ajax_admin_create_new_deck_group',
+			// 'post'  => $post,
+			// '$all'  => $all,
+			// '$id'   => $id,
+			// '$args' => $args,
+			// ] );
+		}
+
+		Common::send_success( 'Deleted successfully.' );
+
+	}
+
+	public function ajax_admin_load_collections( $post ): void {
+		// Common::send_error( [
+		// 'ajax_admin_load_deck_group',
+		// 'post' => $post,
+		// ] );
+
+		$params         = $post[ Common::VAR_2 ]['params'];
+		$per_page       = (int) sanitize_text_field( $params['per_page'] );
+		$page           = (int) sanitize_text_field( $params['page'] );
+		$search_keyword = sanitize_text_field( $params['search_keyword'] );
+		$status         = sanitize_text_field( $params['status'] );
+
+		$collections = Collections::get_collections(
+			array(
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			)
+		);
+		$totals      = Collections::get_totals();
+
+		Common::send_success(
+			'Collections loaded.',
+			array(
+				'details' => $collections,
+				'totals'  => $totals,
+			),
+			array(
+				'post' => $post,
+			)
+		);
+
+	}
+
+	public function ajax_admin_search_collections( $post ): void {
+		// Common::send_error( [
+		// 'ajax_admin_load_deck_group',
+		// 'post' => $post,
+		// ] );
+
+		$params         = $post[ Common::VAR_2 ]['params'];
+		$per_page       = (int) sanitize_text_field( $params['per_page'] );
+		$page           = (int) sanitize_text_field( $params['page'] );
+		$search_keyword = sanitize_text_field( $params['search_keyword'] );
+		$status         = sanitize_text_field( $params['status'] );
+		// Common::send_error( [
+		// 'ajax_admin_load_deck_group',
+		// 'post'            => $post,
+		// '$params'         => $params,
+		// '$per_page'       => $per_page,
+		// '$page'           => $page,
+		// '$search_keyword' => $search_keyword,
+		// '$status'         => $status,
+		// ] );
+
+		$items = Deck::get_deck_simple(
+			array(
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			)
+		);
+
+		// Common::send_error( [
+		// 'ajax_admin_load_deck_group',
+		// 'post'            => $post,
+		// '$params'         => $params,
+		// '$per_page'       => $per_page,
+		// '$page'           => $page,
+		// '$search_keyword' => $search_keyword,
+		// '$deck_groups'    => $deck_groups,
+		// '$status'         => $status,
+		// ] );
+
+		Common::send_success( 'Decks  found.', $items );
+
+	}
+
+	public function ajax_admin_create_new_collection( $post ): void {
+
+		$all  = $post[ Common::VAR_2 ];
+		$name = sanitize_text_field( $all['name'] );
+
+		try {
+			Manager::beginTransaction();
+			$collection       = new Collections();
+			$collection->name = $name;
+			$collection->save();
+
+			Manager::commit();
+		} catch ( PDOException $e ) {
+			Common::send_error( 'Item already exists' );
+		}
+
+		Common::send_success( 'Collection created.' );
+
+	}
+
+	public function ajax_admin_update_collections( $post ): void {
+		// Common::send_error( [
+		// 'ajax_admin_update_decks',
+		// 'post' => $post,
+		// ] );
+
+		$all = $post[ Common::VAR_2 ];
+
+		$decks = $all['decks'];
+		foreach ( $decks as $one_deck ) {
+			$name          = sanitize_text_field( $one_deck['name'] );
+			$e_deck_group  = $one_deck['deck_group'];
+			$tags          = $one_deck['tags'];
+			$deck_id       = (int) sanitize_text_field( $one_deck['id'] );
+			$deck_group_id = (int) sanitize_text_field( $e_deck_group['id'] );
+
+			if ( empty( $e_deck_group ) ) {
+				Common::send_error( 'Please select a deck group' );
+			}
+
+			$deck = Deck::find( $deck_id );
+			$deck->update(
+				array(
+					'name'          => $name,
+					'deck_group_id' => $deck_group_id,
+				)
+			);
+			// Common::send_error( [
+			// 'ajax_admin_create_new_deck_group',
+			// 'post'           => $post,
+			// '$deck_group_id' => $deck_group_id,
+			// '$tags'          => $tags,
+			// '$name'          => $name,
+			// '$e_deck_group'  => $e_deck_group,
+			// ] );
+			$deck->tags()->detach();
+			foreach ( $tags as $one ) {
+				$tag_id = (int) sanitize_text_field( $one['id'] );
+				$tag    = Tag::find( $tag_id );
+				$deck->tags()->save( $tag );
+				// Common::send_error( [
+				// 'ajax_admin_create_new_deck_group',
+				// 'post'           => $post,
+				// '$deck_group_id' => $deck_group_id,
+				// '$tags'          => $tags,
+				// '$name'          => $name,
+				// '$tag'           => $tag,
+				// '$deck_group'      => $deck_group,
+				// ] );
+			}
+		}
+
+		Common::send_success( 'Saved.' );
+
+	}
+
+	// </editor-fold desc="Collections">
 
 }

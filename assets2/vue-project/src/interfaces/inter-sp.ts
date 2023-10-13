@@ -139,3 +139,11 @@ export interface _Localize {
         site_url: string;
     }
 }
+
+export interface _Collection {
+    id: number;
+    name: string;
+    trashed: boolean;
+    created_at: string;
+    updated_at: boolean,
+}

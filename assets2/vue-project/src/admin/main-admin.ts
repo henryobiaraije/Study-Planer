@@ -11,6 +11,7 @@ import AdminBasicCard from "@/admin/AdminBasicCard.vue";
 import AdminGapCard from "@/admin/AdminGapCard.vue";
 import AdminTableCard from "@/admin/AdminTableCard.vue";
 import AdminImageCard from "@/admin/AdminImageCard.vue";
+import AdminCollections from "@/admin/AdminCollections.vue";
 
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
@@ -53,13 +54,17 @@ function renderVue() {
         //     elem: '.admin-gap-card',
         //     component: AdminGapCard
         // },
+        // {
+        //     elem: '.admin-table-card',
+        //     component: AdminTableCard
+        // },
+        // {
+        //     elem: '.admin-image-card',
+        //     component: AdminImageCard
+        // },
         {
-            elem: '.admin-table-card',
-            component: AdminTableCard
-        },
-        {
-            elem: '.admin-image-card',
-            component: AdminImageCard
+            elem: '.admin-collections',
+            component: AdminCollections
         },
     ] as Array<{ elem: string, component: any }>;
 
