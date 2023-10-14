@@ -50,14 +50,14 @@ function renderVue() {
         //     elem: '.admin-basic-card',
         //     component: AdminBasicCard
         // },
-        {
-            elem: '.admin-gap-card',
-            component: AdminGapCard
-        },
         // {
-        //     elem: '.admin-table-card',
-        //     component: AdminTableCard
+        //     elem: '.admin-gap-card',
+        //     component: AdminGapCard
         // },
+        {
+            elem: '.admin-table-card',
+            component: AdminTableCard
+        },
         // {
         //     elem: '.admin-image-card',
         //     component: AdminImageCard

@@ -141,7 +141,7 @@
         <div class="border-1 p-1 px-2 mb-3 mt-0">
           <label>
             <span> </span>
-            <input v-model="tableCardGroup.scheduled_at" type="datetime-local">
+            <input v-model="tableCardGroup.scheduled_at" type="datetime-local" step="any">
           </label>
         </div>
         <div v-if="isEditing" class="flex flex-wrap bg-sp-100 rounded ">
@@ -175,6 +175,46 @@
             :taggable="false" :createTag="false" @search-change="decks.search"
             placeholder="Deck" label="name" track-by="id"
         ></vue-mulitiselect>
+      </div>
+      <div class="bg-white my-2 p-2 rounded shadow">
+        <span>Topic </span>
+        <vue-mulitiselect
+            v-model="tableCardGroup.topic"
+            :options="topics.searchResults.value"
+            :multiple="false"
+            :loading="topics.ajaxSearch.value.sending"
+            :searchable="true"
+            :allowEmpty="false"
+            :close-on-select="true"
+            :taggable="false"
+            :createTag="false"
+            @search-change="topics.search"
+            placeholder="Topic"
+            label="name"
+            track-by="id"
+        ></vue-mulitiselect>
+      </div>
+      <div class="bg-white my-2 p-2 rounded shadow">
+        <span> Collection </span>
+        <vue-mulitiselect
+            v-model="tableCardGroup.collection"
+            :options="collections.searchResults.value"
+            :multiple="false"
+            :loading="collections.ajaxSearch.value.sending"
+            :searchable="true"
+            :allowEmpty="false"
+            :close-on-select="true"
+            :taggable="false"
+            :createTag="false"
+            @search-change="collections.search"
+            placeholder="Collection"
+            label="name"
+            track-by="id"
+        ></vue-mulitiselect>
+        <p class="text-xs text-gray-400 py-1">When you select a collection, the card will not be displayed on the
+          frontend
+          until the collection is
+          published.</p>
       </div>
       <!--      <?php /**** Tags ***/ ?>-->
       <div class="mt-2 mb-2 bg-white my-2 p-2 rounded shadow">
@@ -230,6 +270,8 @@ import {spClientData} from "@/functions";
 import InputEditor from "@/vue-component/InputEditor.vue";
 import InputEditorB from "@/vue-component/InputEditorB.vue";
 import useTableCard from "@/composables/useTableCard";
+import useTopics from "@/composables/useTopics";
+import useCollections from "@/composables/useCollections";
 
 export default defineComponent({
   name: 'AdminTableCard',
@@ -255,6 +297,8 @@ export default defineComponent({
       tableCard: useTableCard(cardGroupId),
       decks: useDecks(status),
       searchTags: useTagSearch(),
+      collections: useCollections(),
+      topics: useTopics(),
     };
   },
   computed: {

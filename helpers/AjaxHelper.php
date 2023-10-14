@@ -468,6 +468,8 @@ class AjaxHelper {
 		$e_cards             = $all['cards'];
 		$e_card_group        = $all['cardGroup'];
 		$e_deck              = $e_card_group['deck'];
+		$e_collection        = $e_card_group['collection'];
+		$e_topic             = $e_card_group['topic'];
 		$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
 		$whole_question      = $e_card_group['whole_question'];
 		$whole_question      = wp_json_encode( $whole_question );
@@ -483,6 +485,9 @@ class AjaxHelper {
 		}
 		if ( empty( $e_deck ) ) {
 			Common::send_error( 'Please select a deck' );
+		}
+		if ( empty( $e_topic ) ) {
+			Common::send_error( 'Please select a topic' );
 		}
 		if ( empty( $whole_question ) ) {
 			// Common::send_error( 'Please provide a question' );
@@ -506,20 +511,15 @@ class AjaxHelper {
 			Common::send_error( 'Invalid deck' );
 		}
 
-		// Common::send_error( [
-		// 'ajax_admin_create_new_basic_card',
-		// 'post'                 => $post,
-		// '$reverse'             => $reverse,
-		// '$whole_question'      => $whole_question,
-		// '$e_cards'             => $e_cards,
-		// '$e_card_group'        => $e_card_group,
-		// '$e_set_bg_as_default' => $e_set_bg_as_default,
-		// '$bg_image_id'         => $bg_image_id,
-		// '$deck'                => $deck,
-		// '$cg_name'             => $cg_name,
-		// '$e_tags'              => $e_tags,
-		// '$schedule_at'         => $schedule_at,
-		// ] );
+		$e_topic_id = $e_topic['id'];
+		$topic      = Topic::find( $e_topic_id );
+		if ( empty( $topic ) ) {
+			Common::send_error( 'Invalid topic' );
+		}
+		$e_collection_id = null;
+		if ( is_array( $e_collection ) ) {
+			$e_collection_id = $e_collection['id'];
+		}
 
 		Manager::beginTransaction();
 		$card_group                 = new CardGroup();
@@ -530,6 +530,12 @@ class AjaxHelper {
 		$card_group->name           = $cg_name;
 		$card_group->deck_id        = $e_deck_id;
 		$card_group->reverse        = $reverse;
+		if ( $e_collection_id ) {
+			$card_group->collection_id = $e_collection_id;
+		}
+		if ( $e_topic_id ) {
+			$card_group->topic_id = $e_topic_id;
+		}
 		$card_group->save();
 		$card_group->tags()->detach();
 		foreach ( $e_tags as $one ) {
@@ -603,15 +609,12 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_update_table_card( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_update_table_card',
-		// 'post' => $post,
-		// ] );
-
 		$all                 = $post[ Common::VAR_2 ];
 		$e_cards             = $all['cards'];
 		$e_card_group        = $all['cardGroup'];
 		$e_deck              = $e_card_group['deck'];
+		$e_collection        = $e_card_group['collection'];
+		$e_topic             = $e_card_group['topic'];
 		$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
 		$whole_question      = wp_json_encode( $e_card_group['whole_question'] );
 		$e_set_bg_as_default = $all['set_bg_as_default'];
@@ -627,6 +630,9 @@ class AjaxHelper {
 		}
 		if ( empty( $e_deck ) ) {
 			Common::send_error( 'Please select a deck' );
+		}
+		if ( empty( $e_topic ) ) {
+			Common::send_error( 'Please select a topic' );
 		}
 		if ( empty( $whole_question ) ) {
 			// Common::send_error( 'Please provide a question' );
@@ -654,20 +660,17 @@ class AjaxHelper {
 		if ( empty( $card_group ) ) {
 			Common::send_error( 'Invalid Card group' );
 		}
-		// Common::send_error( [
-		// 'ajax_admin_create_new_basic_card',
-		// 'post'                 => $post,
-		// 'toSql'                => $card_group->toSql(),
-		// '$reverse'             => $reverse,
-		// '$e_card_group'        => $e_card_group,
-		// '$e_set_bg_as_default' => $e_set_bg_as_default,
-		// '$bg_image_id'         => $bg_image_id,
-		// '$deck'                => $deck,
-		// '$cg_name'             => $cg_name,
-		// '$e_tags'              => $e_tags,
-		// '$e_cards'             => $e_cards,
-		// '$schedule_at'         => $schedule_at,
-		// ] );
+
+
+		$e_topic_id = $e_topic['id'];
+		$topic      = Topic::find( $e_topic_id );
+		if ( empty( $topic ) ) {
+			Common::send_error( 'Invalid topic' );
+		}
+		$e_collection_id = null;
+		if ( is_array( $e_collection ) ) {
+			$e_collection_id = $e_collection['id'];
+		}
 		Manager::beginTransaction();
 		$card_group->whole_question = $whole_question;
 		$card_group->scheduled_at   = $schedule_at;
@@ -675,6 +678,12 @@ class AjaxHelper {
 		$card_group->name           = $cg_name;
 		$card_group->deck_id        = $e_deck_id;
 		$card_group->reverse        = false;
+		if ( $e_collection_id ) {
+			$card_group->collection_id = $e_collection_id;
+		}
+		if ( $e_topic_id ) {
+			$card_group->topic_id = $e_topic_id;
+		}
 		$card_group->save();
 		$card_group->tags()->detach();
 		foreach ( $e_tags as $one ) {

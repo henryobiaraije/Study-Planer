@@ -52,6 +52,8 @@ export default function (cardGroupId = 0) {
         cards: [],
         id: 0,
         deck: null,
+        topic: null,
+        collection: null,
         reverse: false,
         bg_image_id: 0,
         name: '',
@@ -228,6 +230,8 @@ export default function (cardGroupId = 0) {
                     cardGroup.value.tags = hold.tags;
                     cardGroup.value.cards_count = hold.cards_count;
                     cardGroup.value.deck = hold.deck;
+                    cardGroup.value.topic = hold.topic;
+                    cardGroup.value.collection = hold.collection;
                     cardGroup.value.bg_image_id = hold.bg_image_id;
                     cardGroup.value.group_type = hold.group_type;
                     cardGroup.value.deleted_at = hold.deleted_at;
