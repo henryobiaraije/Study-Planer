@@ -2128,8 +2128,8 @@ class AjaxHelper {
 		Common::send_success(
 			'Topics loaded.',
 			array(
-				'topics' => $topics,
-				'totals' => $totals,
+				'details' => $topics,
+				'totals'  => $totals,
 			),
 			array(
 				'post' => $post,
@@ -2160,47 +2160,30 @@ class AjaxHelper {
 
 		$all = $post[ Common::VAR_2 ];
 
-		$decks = $all['decks'];
-		foreach ( $decks as $one_deck ) {
-			$name          = sanitize_text_field( $one_deck['name'] );
-			$e_deck_group  = $one_deck['deck_group'];
-			$tags          = $one_deck['tags'];
-			$deck_id       = (int) sanitize_text_field( $one_deck['id'] );
-			$deck_group_id = (int) sanitize_text_field( $e_deck_group['id'] );
+		$topics = $all['topics'];
+		foreach ( $topics as $one_topic ) {
+			$name     = sanitize_text_field( $one_topic['name'] );
+			$e_deck   = $one_topic['deck'];
+			$tags     = $one_topic['tags'];
+			$topic_id = (int) sanitize_text_field( $one_topic['id'] );
+			$deck_id  = (int) sanitize_text_field( $e_deck['id'] );
 
-			if ( empty( $e_deck_group ) ) {
+			if ( empty( $e_deck ) ) {
 				Common::send_error( 'Please select a deck group' );
 			}
 
-			$deck = Deck::find( $deck_id );
-			$deck->update(
+			$topic = Topic::find( $topic_id );
+			$topic->update(
 				array(
-					'name'          => $name,
-					'deck_group_id' => $deck_group_id,
+					'name' => $name,
+					'deck' => $deck_id,
 				)
 			);
-			// Common::send_error( [
-			// 'ajax_admin_create_new_deck_group',
-			// 'post'           => $post,
-			// '$deck_group_id' => $deck_group_id,
-			// '$tags'          => $tags,
-			// '$name'          => $name,
-			// '$e_deck_group'  => $e_deck_group,
-			// ] );
-			$deck->tags()->detach();
+			$topic->tags()->detach();
 			foreach ( $tags as $one ) {
 				$tag_id = (int) sanitize_text_field( $one['id'] );
 				$tag    = Tag::find( $tag_id );
-				$deck->tags()->save( $tag );
-				// Common::send_error( [
-				// 'ajax_admin_create_new_deck_group',
-				// 'post'           => $post,
-				// '$deck_group_id' => $deck_group_id,
-				// '$tags'          => $tags,
-				// '$name'          => $name,
-				// '$tag'           => $tag,
-				// '$deck_group'      => $deck_group,
-				// ] );
+				$topic->tags()->save( $tag );
 			}
 		}
 

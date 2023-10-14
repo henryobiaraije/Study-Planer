@@ -46,10 +46,10 @@ function renderVue() {
         //     elem: '.admin-all-cards',
         //     component: AdminAllCards
         // },
-        {
-            elem: '.admin-basic-card',
-            component: AdminBasicCard
-        },
+        // {
+        //     elem: '.admin-basic-card',
+        //     component: AdminBasicCard
+        // },
         // {
         //     elem: '.admin-gap-card',
         //     component: AdminGapCard
@@ -62,10 +62,10 @@ function renderVue() {
         //     elem: '.admin-image-card',
         //     component: AdminImageCard
         // },
-        {
-            elem: '.admin-collections',
-            component: AdminCollections
-        },
+        // {
+        //     elem: '.admin-collections',
+        //     component: AdminCollections
+        // },
     ] as Array<{ elem: string, component: any }>;
 
     elemAndComponent.forEach((item) => {
