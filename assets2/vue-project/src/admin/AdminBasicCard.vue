@@ -71,6 +71,24 @@
       ></vue-mulitiselect>
     </div>
     <div class="bg-white my-2 p-2 rounded shadow">
+      <span>Topic </span>
+      <vue-mulitiselect
+          v-model="basicCardGroup.topic"
+          :options="topics.searchResults.value"
+          :multiple="false"
+          :loading="topics.ajaxSearch.value.sending"
+          :searchable="true"
+          :allowEmpty="false"
+          :close-on-select="true"
+          :taggable="false"
+          :createTag="false"
+          @search-change="topics.search"
+          placeholder="Topic"
+          label="name"
+          track-by="id"
+      ></vue-mulitiselect>
+    </div>
+    <div class="bg-white my-2 p-2 rounded shadow">
       <span> Collection </span>
       <vue-mulitiselect
           v-model="basicCardGroup.collection"
@@ -148,6 +166,7 @@ import InputEditor from "@/vue-component/InputEditor.vue";
 import {spClientData} from "@/functions";
 import PickImage from "@/vue-component/PickImage.vue";
 import useCollections from "@/composables/useCollections";
+import useTopics from "@/composables/useTopics";
 
 export default defineComponent({
   name: 'AdminBasicCard',
@@ -184,6 +203,7 @@ export default defineComponent({
       searchTags: useTagSearch(),
       basicCard: useBasicCard(cardGroupId),
       collections: useCollections(),
+      topics: useTopics(),
     }
   },
   computed: {

@@ -29,8 +29,9 @@ class CardGroup extends Model {
 		'scheduled_at',
 		'name',
 		'reverse',
+		'topic_id'
 	);
-	protected $appends  = array( 'card_group_edit_url' );
+	protected $appends = array( 'card_group_edit_url' );
 
 	protected $dates = array( 'deleted_at' );
 
@@ -59,6 +60,10 @@ class CardGroup extends Model {
 
 	public function deck() {
 		return $this->belongsTo( Deck::class );
+	}
+
+	public function topic() {
+		return $this->belongsTo( Topic::class, 'topic_id' );
 	}
 
 	public function collection() {
@@ -106,10 +111,10 @@ class CardGroup extends Model {
 		$total       = $card_groups->count();
 		$offset      = ( $args['page'] - 1 );
 		$card_groups = $card_groups->offset( $offset )
-								   ->withCount( 'cards' )
-								   ->with( 'deck' )
-								   ->limit( $args['per_page'] )
-								   ->orderByDesc( 'id' )->get();
+		                           ->withCount( 'cards' )
+		                           ->with( 'deck' )
+		                           ->limit( $args['per_page'] )
+		                           ->orderByDesc( 'id' )->get();
 
 		// Common::send_error( [
 		// 'ajax_admin_load_deck_group',
@@ -135,7 +140,7 @@ class CardGroup extends Model {
 			$slug = Settings::SLUG_IMAGE_CARD;
 		}
 		$card_url = Initializer::get_admin_url( $slug )
-					. '&card-group=' . $this->id;
+		            . '&card-group=' . $this->id;
 
 		return $card_url;
 	}
@@ -146,10 +151,10 @@ class CardGroup extends Model {
 			'trashed' => 0,
 		);
 		$active  = self::query()
-							->selectRaw( Manager::raw( 'count(*) as count' ) )
-							->get();
+		               ->selectRaw( Manager::raw( 'count(*) as count' ) )
+		               ->get();
 		$trashed = self::onlyTrashed()
-							->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
+		               ->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
 
 		$all['active']  = $active[0]['count'];
 		$all['trashed'] = $trashed[0]['count'];

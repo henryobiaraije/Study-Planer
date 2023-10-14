@@ -1258,6 +1258,7 @@ class AjaxHelper {
 		$e_card              = $all['card'];
 		$e_card_group        = $all['cardGroup'];
 		$e_deck              = $e_card_group['deck'];
+		$e_topic             = $e_card_group['topic'];
 		$e_card_group_id     = $e_card_group['id'];
 		$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
 		$question            = $e_card_group['whole_question'];
@@ -1279,6 +1280,9 @@ class AjaxHelper {
 		if ( empty( $e_deck ) ) {
 			Common::send_error( 'Please select a deck' );
 		}
+		if ( empty( $e_topic ) ) {
+			Common::send_error( 'Please select a topic' );
+		}
 		if ( empty( $question ) ) {
 			Common::send_error( 'Please provide a question' );
 		}
@@ -1292,6 +1296,13 @@ class AjaxHelper {
 		if ( empty( $deck ) ) {
 			Common::send_error( 'Invalid deck' );
 		}
+
+		$e_topic_id = $e_topic['id'];
+		$topic      = Topic::find( $e_topic_id );
+		if ( empty( $topic ) ) {
+			Common::send_error( 'Invalid topic' );
+		}
+
 		$card_group = CardGroup::find( $e_card_group_id );
 		if ( empty( $card_group ) ) {
 			Common::send_error( 'Invalid card group' );
@@ -1316,6 +1327,9 @@ class AjaxHelper {
 		$card_group->deck_id        = $e_deck_id;
 		if ( $collection_id ) {
 			$card_group->collection_id = $collection_id;
+		}
+		if ( $e_topic_id ) {
+			$card_group->topic_id = $e_topic_id;
 		}
 		$card_group->save();
 		$card_group->tags()->detach();
@@ -1364,15 +1378,11 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_create_new_basic_card( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_create_new_basic_card',
-		// 'post' => $post,
-		// ] );
-
 		$all                 = $post[ Common::VAR_2 ];
 		$e_card              = $all['card'];
 		$e_card_group        = $all['cardGroup'];
 		$e_deck              = $e_card_group['deck'];
+		$e_topic             = $e_card_group['topic'];
 		$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
 		$question            = $e_card_group['whole_question'];
 		$answer              = $e_card['answer'];
@@ -1388,6 +1398,9 @@ class AjaxHelper {
 		}
 		if ( empty( $e_deck ) ) {
 			Common::send_error( 'Please select a deck' );
+		}
+		if ( empty( $e_topic ) ) {
+			Common::send_error( 'Please select a topic' );
 		}
 		if ( empty( $question ) ) {
 			Common::send_error( 'Please provide a question' );
@@ -1408,6 +1421,11 @@ class AjaxHelper {
 		if ( empty( $deck ) ) {
 			Common::send_error( 'Invalid deck' );
 		}
+		$e_topic_id = $e_topic['id'];
+		$topic      = Topic::find( $e_topic_id );
+		if ( empty( $topic ) ) {
+			Common::send_error( 'Invalid topic' );
+		}
 
 		$collection_id = null;
 		if ( ! empty( $e_card_group['collection'] ) ) {
@@ -1425,6 +1443,9 @@ class AjaxHelper {
 		$card_group->reverse        = $reverse;
 		if ( $collection_id ) {
 			$card_group->collection_id = $collection_id;
+		}
+		if ( $e_topic_id ) {
+			$card_group->topic_id = $e_topic_id;
 		}
 		$card_group->save();
 		$card_group->tags()->detach();
@@ -1477,7 +1498,7 @@ class AjaxHelper {
 		$all           = $post[ Common::VAR_2 ];
 		$card_group_id = (int) sanitize_text_field( $all['card_group_id'] );
 
-		$card_group = CardGroup::with( 'tags', 'cards', 'deck', 'collection' )->find( $card_group_id );
+		$card_group = CardGroup::with( 'tags', 'cards', 'deck', 'collection','topic' )->find( $card_group_id );
 		if ( empty( $card_group ) ) {
 			Common::send_error( 'Invalid card group' );
 		}

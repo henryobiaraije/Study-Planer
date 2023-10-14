@@ -55,6 +55,7 @@ export default function (cardGroupId = 0) {
         cards: [],
         id: 0,
         deck: null,
+        topic: null,
         reverse: false,
         bg_image_id: 0,
         name: '',

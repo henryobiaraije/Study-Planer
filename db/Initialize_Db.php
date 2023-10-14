@@ -74,8 +74,8 @@ class Initialize_Db {
 
 	private function crete_default_deck_group(): void {
 		$deck_group = DeckGroup::query()
-							   ->where( 'name', '=', 'Uncategorized' )
-							   ->first();
+		                       ->where( 'name', '=', 'Uncategorized' )
+		                       ->first();
 		if ( $deck_group ) {
 			$this->create_default_deck( $deck_group );
 
@@ -83,8 +83,8 @@ class Initialize_Db {
 		}
 
 		$deck_group = DeckGroup::query()
-							   ->where( 'name', '=', 'Uncategorized' )
-							   ->withTrashed();
+		                       ->where( 'name', '=', 'Uncategorized' )
+		                       ->withTrashed();
 		if ( ! empty( $deck_group ) ) {
 			$deck_group->forceDelete();
 			$deck_group = DeckGroup::firstOrCreate( array( 'name' => 'Uncategorized' ) );
@@ -97,9 +97,9 @@ class Initialize_Db {
 
 	private function create_default_deck( $deck_group ): void {
 		$deck = Deck::query()
-					->where( 'name', '=', 'Uncategorized' )
-					->where( 'deck_group_id', '=', $deck_group->id )
-					->first();
+		            ->where( 'name', '=', 'Uncategorized' )
+		            ->where( 'deck_group_id', '=', $deck_group->id )
+		            ->first();
 		if ( ! empty( $deck ) ) {
 			return;
 		}
@@ -286,6 +286,19 @@ class Initialize_Db {
 					$table
 						->foreignId( 'collection_id' )
 						->constrained( SP_TABLE_COLLECTIONS )
+						->cascadeOnDelete()
+						->cascadeOnUpdate()
+						->nullOnDelete();
+				}
+			);
+		}
+		if ( ! $this->schema_builder->hasColumn( SP_TABLE_CARD_GROUPS, 'topic_id' ) ) {
+			Capsule::schema()->table(
+				SP_TABLE_CARD_GROUPS,
+				function ( Blueprint $table ) {
+					$table
+						->foreignId( 'topic_id' )
+						->constrained( SP_TABLE_TOPICS )
 						->cascadeOnDelete()
 						->cascadeOnUpdate()
 						->nullOnDelete();
