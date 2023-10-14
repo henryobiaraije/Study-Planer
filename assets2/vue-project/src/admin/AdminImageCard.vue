@@ -56,8 +56,8 @@
           <li v-for="(item,itemIndex) in useImageCard.items.value"
               :data-hash="item.hash" style="max-width: 90vw;"
               class="bg-white p-2 rounded-3 overflow-x-auto">
-            <ul class="flex ">
-              <li><b>Question:</b>
+            <ul class="flex !list-none !m-0 !p-0">
+              <li><b>Question {{ itemIndex + 1 }} :</b>
                 <div class="image-area" :style="{height: item.question.h+'px' }">
                   <div :id="'main-preview-'+item.question.hash" class="image-area-inner-preview image-card-view ">
 											<span v-for="(item2,itemIndex2) in item.question.boxes" :id="'sp-box-preview-'+item2.hash"
@@ -101,7 +101,7 @@
           <div class="border-1 p-1 px-2 mb-3 mt-0">
             <label>
               <span> </span>
-              <input v-model="imageCardGroup.scheduled_at" type="datetime-local">
+              <input v-model="imageCardGroup.scheduled_at" type="datetime-local" step="any">
             </label>
           </div>
           <div v-if="isEditing" class="flex flex-wrap bg-sp-100 rounded ">
@@ -135,6 +135,46 @@
               :taggable="false" :createTag="false" @search-change="decks.search"
               placeholder="Deck" label="name" track-by="id"
           ></vue-mulitiselect>
+        </div>
+        <div class="bg-white my-2 p-2 rounded shadow">
+          <span>Topic </span>
+          <vue-mulitiselect
+              v-model="imageCardGroup.topic"
+              :options="topics.searchResults.value"
+              :multiple="false"
+              :loading="topics.ajaxSearch.value.sending"
+              :searchable="true"
+              :allowEmpty="false"
+              :close-on-select="true"
+              :taggable="false"
+              :createTag="false"
+              @search-change="topics.search"
+              placeholder="Topic"
+              label="name"
+              track-by="id"
+          ></vue-mulitiselect>
+        </div>
+        <div class="bg-white my-2 p-2 rounded shadow">
+          <span> Collection </span>
+          <vue-mulitiselect
+              v-model="imageCardGroup.collection"
+              :options="collections.searchResults.value"
+              :multiple="false"
+              :loading="collections.ajaxSearch.value.sending"
+              :searchable="true"
+              :allowEmpty="false"
+              :close-on-select="true"
+              :taggable="false"
+              :createTag="false"
+              @search-change="collections.search"
+              placeholder="Collection"
+              label="name"
+              track-by="id"
+          ></vue-mulitiselect>
+          <p class="text-xs text-gray-400 py-1">When you select a collection, the card will not be displayed on the
+            frontend
+            until the collection is
+            published.</p>
         </div>
         <!--        <?php /**** Tags ***/ ?>-->
         <div class="mt-2 mb-2 bg-white my-2 p-2 rounded shadow">
@@ -192,6 +232,8 @@ import InputEditor from "@/vue-component/InputEditor.vue";
 import InputEditorB from "@/vue-component/InputEditorB.vue";
 import useTableCard from "@/composables/useTableCard";
 import useImageCard from "@/composables/useImageCard";
+import useCollections from "@/composables/useCollections";
+import useTopics from "@/composables/useTopics";
 
 export default defineComponent({
   name: 'AdminImageCard',
@@ -217,6 +259,8 @@ export default defineComponent({
       decks: useDecks(status),
       searchTags: useTagSearch(),
       useImageCard: useImageCard(cardGroupId),
+      topics: useTopics(),
+      collections: useCollections(),
     };
   },
   computed: {

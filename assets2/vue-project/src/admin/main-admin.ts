@@ -54,14 +54,14 @@ function renderVue() {
         //     elem: '.admin-gap-card',
         //     component: AdminGapCard
         // },
-        {
-            elem: '.admin-table-card',
-            component: AdminTableCard
-        },
         // {
-        //     elem: '.admin-image-card',
-        //     component: AdminImageCard
+        //     elem: '.admin-table-card',
+        //     component: AdminTableCard
         // },
+        {
+            elem: '.admin-image-card',
+            component: AdminImageCard
+        },
         // {
         //     elem: '.admin-collections',
         //     component: AdminCollections

@@ -108,19 +108,10 @@ class AjaxHelper {
 	// <editor-fold desc="Image Cards">
 
 	public function ajax_admin_update_settings( $post ): void {
-		// Common::send_error([
-		// 'ajax_admin_update_settings',
-		// 'post' => $post,
-		// ]);
 
 		$all              = $post[ Common::VAR_2 ];
 		$settings         = $all['settings'];
 		$mature_card_days = (int) sanitize_text_field( $settings['mature_card_days'] );
-		// Common::send_error([
-		// 'ajax_admin_update_settings',
-		// 'post' => $post,
-		// '$mature_card_days' => $mature_card_days,
-		// ]);
 		update_option( Settings::OPTION_MATURED_CARD_DAYS, $mature_card_days );
 
 		Common::send_success( 'Saved successfully.' );
@@ -146,15 +137,13 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_create_new_image_card( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_create_new_table_card',
-		// 'post' => $post,
-		// ] );
 
 		$all                 = $post[ Common::VAR_2 ];
 		$e_cards             = $all['cards'];
 		$e_card_group        = $all['cardGroup'];
 		$e_deck              = $e_card_group['deck'];
+		$e_collection        = $e_card_group['collection'];
+		$e_topic             = $e_card_group['topic'];
 		$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
 		$whole_question      = $e_card_group['whole_question'];
 		$whole_question      = wp_json_encode( $whole_question );
@@ -174,6 +163,9 @@ class AjaxHelper {
 		}
 		if ( empty( $e_deck ) ) {
 			Common::send_error( 'Please select a deck' );
+		}
+		if ( empty( $e_topic ) ) {
+			Common::send_error( 'Please select a topic' );
 		}
 		if ( empty( $whole_question ) ) {
 			// Common::send_error( 'Please provide a question' );
@@ -195,6 +187,15 @@ class AjaxHelper {
 		$deck      = Deck::find( $e_deck_id );
 		if ( empty( $deck ) ) {
 			Common::send_error( 'Invalid deck' );
+		}
+		$e_topic_id = $e_topic['id'];
+		$topic      = Topic::find( $e_topic_id );
+		if ( empty( $topic ) ) {
+			Common::send_error( 'Invalid topic' );
+		}
+		$e_collection_id = null;
+		if ( is_array( $e_collection ) ) {
+			$e_collection_id = $e_collection['id'];
 		}
 
 		// Common::send_error( [
@@ -223,6 +224,12 @@ class AjaxHelper {
 		$card_group->image_type     = $image_type;
 		$card_group->deck_id        = $e_deck_id;
 		$card_group->reverse        = $reverse;
+		if ( $e_collection_id ) {
+			$card_group->collection_id = $e_collection_id;
+		}
+		if ( $e_topic_id ) {
+			$card_group->topic_id = $e_topic_id;
+		}
 		$card_group->save();
 		$card_group->tags()->detach();
 		foreach ( $e_tags as $one ) {
@@ -297,15 +304,12 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_update_image_card( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_update_table_card',
-		// 'post' => $post,
-		// ] );
-
 		$all                 = $post[ Common::VAR_2 ];
 		$e_cards             = $all['cards'];
 		$e_card_group        = $all['cardGroup'];
 		$e_deck              = $e_card_group['deck'];
+		$e_collection        = $e_card_group['collection'];
+		$e_topic             = $e_card_group['topic'];
 		$bg_image_id         = (int) sanitize_text_field( $e_card_group['bg_image_id'] );
 		$whole_question      = wp_json_encode( $e_card_group['whole_question'] );
 		$e_set_bg_as_default = $all['set_bg_as_default'];
@@ -324,6 +328,9 @@ class AjaxHelper {
 		}
 		if ( empty( $e_deck ) ) {
 			Common::send_error( 'Please select a deck' );
+		}
+		if ( empty( $e_topic ) ) {
+			Common::send_error( 'Please select a topic' );
 		}
 		if ( empty( $whole_question ) ) {
 			// Common::send_error( 'Please provide a question' );
@@ -352,6 +359,16 @@ class AjaxHelper {
 			Common::send_error( 'Invalid Card group' );
 		}
 
+		$e_topic_id = $e_topic['id'];
+		$topic      = Topic::find( $e_topic_id );
+		if ( empty( $topic ) ) {
+			Common::send_error( 'Invalid topic' );
+		}
+		$e_collection_id = null;
+		if ( is_array( $e_collection ) ) {
+			$e_collection_id = $e_collection['id'];
+		}
+
 		Manager::beginTransaction();
 		$card_group->whole_question = $whole_question;
 		$card_group->scheduled_at   = $schedule_at;
@@ -360,6 +377,12 @@ class AjaxHelper {
 		$card_group->deck_id        = $e_deck_id;
 		$card_group->reverse        = false;
 		$card_group->image_type     = $image_type;
+		if ( $e_collection_id ) {
+			$card_group->collection_id = $e_collection_id;
+		}
+		if ( $e_topic_id ) {
+			$card_group->topic_id = $e_topic_id;
+		}
 		$card_group->save();
 		$card_group->tags()->detach();
 		foreach ( $e_tags as $one ) {
