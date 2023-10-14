@@ -19,8 +19,8 @@ const tableData = ref({
         },
         {
             label: 'Deck',
-            field: 'deck_group',
-            tooltip: 'Deck group',
+            field: 'deck',
+            tooltip: 'Deck',
         },
         {
             label: 'Tags',
@@ -34,14 +34,6 @@ const tableData = ref({
             label: 'Updated At',
             field: 'updated_at',
         },
-        // {
-        //   label: 'Decks',
-        //   field: 'decks',
-        // },
-        // {
-        //   label: 'Cards',
-        //   field: 'cards',
-        // },
     ],
     rows: [],
     isLoading: true,
@@ -70,6 +62,9 @@ const tableData = ref({
         ofLabel: 'of',
         pageLabel: 'page', // for 'pages' mode
         allLabel: 'All',
+        //
+        // mode: 'records',
+        // infoFn: (params) => `my own page ${params.firstRecordOnPage}`,
     },
     searchOptions: {
         enabled: true,
@@ -82,7 +77,7 @@ const tableData = ref({
     },
     //
     post_status: 'publish',
-    selectedRows: [] as Array<_Topic>,
+    selectedRows: [] as Array<_Deck>,
     searchKeyword: '',
 });
 const totals = ref({
@@ -137,14 +132,15 @@ export default function (status = 'publish') {
     tableData.value.post_status = status;
     const editedItemTracker = ref<{ [key: number]: { editCounter: number } }>({});
     let sendOnline = null;
-    let itemToEdit = ref<_Topic>(null as unknown as _Topic);
+    let itemToEdit = ref<_Deck>(null as unknown as _Deck);
     let total = ref<number>(0);
     let newItem = ref({
         name: '',
-        deck: null as unknown as _DeckGroup,
-        tags: [] as Array<_Tag>
+        deck: null as unknown as _Deck,
+        tags: [] as Array<_Tag>,
+        topic: null as unknown as _Topic,
     })
-    let searchResults = ref<Array<_Topic>>([]);
+    let searchResults = ref<Array<_DeckGroup>>([]);
     //
     const create = () => {
         xhrCreateNew();
@@ -246,14 +242,14 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_load_decks",
+            what: "admin_sp_ajax_admin_load_topics",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
             },
             funcSuccess(done: InterFuncSuccess) {
                 handleAjax.stop();
-                const items = done.data.details.decks;
+                const items = done.data.details.topics;
                 const total = done.data.details.total;
                 const theTotals = done.data.totals;
                 console.log({done, items, total, totals});
@@ -282,15 +278,14 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_search_decks",
+            what: "admin_sp_ajax_admin_search_topics",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
             },
             funcSuccess(done: InterFuncSuccess) {
                 handleAjax.stop();
-                const items = done.data;
-                searchResults.value = items;
+                searchResults.value = done.data;
             },
             funcFailue(done) {
                 handleAjax.error(done);
@@ -298,16 +293,16 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrUpdateBatch = (items: Array<_Topic>) => {
+    const xhrUpdateBatch = (items: Array<_Deck>) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxUpdate.value);
         sendOnline = new Server().send_online({
             data: [
                 Store.nonce,
                 {
-                    decks: items,
+                    topics: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_update_decks",
+            what: "admin_sp_ajax_admin_update_topics",
             funcBefore() {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
@@ -321,7 +316,7 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrTrashBatch = (items: Array<_Topic>) => {
+    const xhrTrashBatch = (items: Array<_Deck>) => {
         if (!confirm('Are you sure you want to trash these items?')) {
             return;
         }
@@ -330,10 +325,10 @@ export default function (status = 'publish') {
             data: [
                 Store.nonce,
                 {
-                    decks: items,
+                    topics: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_trash_decks",
+            what: "admin_sp_ajax_admin_trash_topics",
             funcBefore() {
                 handleAjax.start();
             },
@@ -346,7 +341,7 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrDeleteBatch = (items: Array<_Topic>) => {
+    const xhrDeleteBatch = (items: Array<_Deck>) => {
         if (!confirm('Are you sure you want to delete these items? This action is not reversible.')) {
             return;
         }
@@ -355,10 +350,10 @@ export default function (status = 'publish') {
             data: [
                 Store.nonce,
                 {
-                    decks: items,
+                    topics: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_delete_decks",
+            what: "admin_sp_ajax_admin_delete_topics",
             funcBefore() {
                 handleAjax.start();
             },
@@ -390,8 +385,8 @@ export default function (status = 'publish') {
                 handleAjax.success(done);
                 useDeckGroupLists().load();
                 newItem.value.name = '';
-                newItem.value.tags = [];
                 newItem.value.deck = null;
+                newItem.value.tags = [];
                 xhrLoad();
             },
             funcFailue(done) {

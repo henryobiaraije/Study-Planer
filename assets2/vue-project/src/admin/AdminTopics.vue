@@ -14,25 +14,25 @@
     <div class="flex flex-wrap gap-3 px-1 md:px-4">
       <!--    Form   -->
       <div class="form-area flex-1 md:flex-none  md:w-30 ">
-        <form @submit.prevent="decks.create()" class="bg-white rounded p-2">
+        <form @submit.prevent="topics.create()" class="bg-white rounded p-2">
           <label class="tw-simple-input">
-            <span class="tw-title">Deck </span>
-            <input v-model="deckNew.name" name="deck" required type="text">
+            <span class="tw-title">Topic</span>
+            <input v-model="topicNew.name" name="deck" required type="text"/>
           </label>
           <div>
-            <span>Deck Group</span>
+            <span>Deck </span>
             <vue-mulitiselect
-                v-model="deckNew.deckGroup"
-                :options="deckGroups.searchResults.value"
+                v-model="topicNew.deck"
+                :options="decks.searchResults.value"
                 :multiple="false"
-                :loading="deckGroups.ajaxSearch.value.sending"
+                :loading="decks.ajaxSearch.value.sending"
                 :searchable="true"
                 :allowEmpty="false"
                 :close-on-select="true"
                 :taggable="false"
                 :createTag="false"
-                @search-change="deckGroups.search"
-                placeholder="Deck Group"
+                @search-change="decks.search"
+                placeholder="Deck"
                 label="name"
                 track-by="id"
             ></vue-mulitiselect>
@@ -40,7 +40,7 @@
           <div class="mt-2">
             <span>Tags</span>
             <vue-mulitiselect
-                v-model="deckNew.tags"
+                v-model="topicNew.tags"
                 :options="searchTags.results.value"
                 :multiple="true"
                 :loading="searchTags.ajax.value.sending"
@@ -60,88 +60,13 @@
                 button-text="Create"
                 css-classes="button"
                 icon="fa fa-plus"
-                :ajax="decks.ajaxCreate.value">
+                :ajax="topics.ajaxCreate.value">
             </ajax-action>
           </div>
         </form>
       </div>
       <!--    Table   -->
       <div class="table-area flex-1">
-        <vue-good-table
-            :columns="tableDataValue.columns"
-            :mode="'remote'"
-            :rows="tableDataValue.rows"
-            :total-rows="tableDataValue.totalRecords"
-            :compact-mode="true"
-            :line-numbers="true"
-            :is-loading="tableDataValue.isLoading"
-            :pagination-options="tableDataValue.paginationOptions"
-            :search-options="tableDataValue.searchOptions"
-            :sort-options="tableDataValue.sortOption"
-            :select-options="{ enabled: true, selectOnCheckboxOnly: true, }"
-            :theme="''"
-            @page-change="decks.onPageChange"
-            @sort-change="decks.onSortChange"
-            @column-filter="decks.onColumnFilter"
-            @per-page-change="decks.onPerPageChange"
-            @selected-rows-change="decks.onSelect"
-            @search-all="decks.onSearch"
-        >
-          <template slot="table-row" #table-row="props">
-            <div v-if="props.column.field === 'name'">
-              <input @input="decks.onEdit(props.row)" :disabled="props.row.name === 'Uncategorized' || inTrash"
-                     v-model="props.row.name"/>
-              <div v-if="inTrash" class="row-actions">
-                <div class="edit">
-                  <a @click.prevent="decks.openEditModal(props.row,'#modal-edit')"
-                     class="text-blue-500 font-bold"
-                     href="#">
-                    Edit <i class="fa fa-pen-alt"></i></a></div>
-              </div>
-            </div>
-            <div v-else-if="props.column.field === 'deck_group'">
-              <!--              props.row.deck_group.name-->
-              {{ props.row.deck_group ? props.row.deck_group.name : '' }}
-            </div>
-            <div v-else-if="props.column.field === 'tags'">
-              <ul class="" style="min-width: 100px;">
-                <li v-for="(item,itemIndex) in props.row.tags"
-                    class="inline-flex items-center justify-center mr-1 px-2 py-1 text-xs font-bold leading-none text-white bg-gray-500 rounded">
-                  {{ item.name }}
-                </li>
-              </ul>
-            </div>
-            <div v-else-if="props.column.field === 'created_at'">
-              <time-comp :time="props.row.created_at"></time-comp>
-            </div>
-            <div v-else-if="props.column.field === 'updated_at'">
-              <time-comp :time="props.row.updated_at"></time-comp>
-            </div>
-            <span v-else>{{ props.formattedRow[props.column.field] }}</span>
-          </template>
-          <!--          <template slot="table-row" slot-scope="props">-->
-          <!--            <input @input="tableOnEdit(props.row)" v-if="props.column.field === 'name'" v-model="props.row.name"/>-->
-          <!--            <input @input="tableOnEdit(props.row)" v-else-if="props.column.field ==='endpoint'"-->
-          <!--                   v-model="props.row.endpoint"/>-->
-          <!--          </template>-->
-          <div slot="selected-row-actions">
-            <ajax-action-not-form
-                v-if="inTrash"
-                button-text="Delete Selected Permanently "
-                css-classes="button button-link-delete"
-                icon="fa fa-trash"
-                @click="decks.batchDelete()"
-                :ajax="decks.ajaxDelete.value">
-            </ajax-action-not-form>
-            <ajax-action-not-form
-                button-text="Trash Selected "
-                css-classes="button button-link-delete"
-                icon="fa fa-trash"
-                @click="decks.batchTrash()"
-                :ajax="decks.ajaxTrash.value">
-            </ajax-action-not-form>
-          </div>
-        </vue-good-table>
       </div>
     </div>
   </div>
@@ -162,6 +87,7 @@ import TimeComp from "@/vue-component/TimeComp.vue";
 import {VueGoodTable} from 'vue-good-table-next';
 // import the styles
 import 'vue-good-table-next/dist/vue-good-table-next.css'
+import useTopics from "@/composables/useTopics";
 
 export default defineComponent({
   name: 'AdminTopics',
@@ -190,38 +116,36 @@ export default defineComponent({
     const deckGroups = useDeckGroupLists();
     const tagSearch = useTagSearch();
     return {
+      topics: useTopics(),
       decks,
-      deckGroups,
       tagSearch,
       searchTags: useTagSearch(),
     }
   },
   computed: {
     totalActive() {
-      return this.decks.tableData.value.totalRecords;
+      return this.topics.tableData.value.totalRecords;
     },
     totalTrash() {
-      return 0;
+      return this.topics.tableData.value.totalTrashed;
     },
     inTrash() {
       let url = new URL(window.location.href);
       let status = url.searchParams.get("status");
       return status === 'trash';
     },
-    deckNew() {
-      return this.decks.newItem.value;
+    topicNew() {
+      return this.topics.newItem.value;
     },
     tableDataValue() {
-      return this.decks.tableData.value;
+      return this.topics.tableData.value;
     },
   },
   created() {
     jQuery('.all-loading').hide();
-    this.decks.loadItems();
+    this.topics.loadItems();
   },
-  methods: {
-
-  }
+  methods: {}
 });
 
 </script>

@@ -26,10 +26,10 @@ Store.initAdmin({
 
 function renderVue() {
     const elemAndComponent = [
-        // {
-        //     elem: '.admin-topics',
-        //     component: AdminTopics,
-        // },
+        {
+            elem: '.admin-topics',
+            component: AdminTopics,
+        },
         // {
         //     elem: '.admin-groups',
         //     component: AdminDeckGroups

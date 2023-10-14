@@ -279,7 +279,7 @@ export default defineComponent({
     deckToEdit() {
       return this.decks.itemToEdit.value;
     },
-    deckNew() {
+    topicNew() {
       return this.decks.newItem.value;
     },
   },

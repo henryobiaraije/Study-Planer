@@ -4,15 +4,13 @@
 namespace StudyPlanner\Helpers;
 
 use Illuminate\Database\Capsule\Manager;
-use Illuminate\Database\Eloquent\Model;
 use Model\Answered;
 use Model\Card;
 use Model\CardGroup;
-use Model\CardGroups;
 use Model\Deck;
 use Model\DeckGroup;
+use Model\Topic;
 use PDOException;
-use PHPMailer\PHPMailer\Exception;
 use StudyPlanner\Initializer;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
@@ -24,6 +22,7 @@ use function StudyPlanner\get_uncategorized_deck_group_id;
 use function StudyPlanner\get_uncategorized_deck_id;
 
 class AjaxHelper {
+	// <editor-fold desc="General">
 	/**
 	 * @var self $instance
 	 */
@@ -61,12 +60,12 @@ class AjaxHelper {
 		add_action( 'admin_sp_ajax_admin_delete_decks', array( $this, 'ajax_admin_delete_decks' ) );
 		// </editor-fold desc="Deck">
 		// <editor-fold desc="Topics">
-		// add_action( 'admin_sp_ajax_admin_load_decks', array( $this, 'ajax_admin_load_decks' ) );
-		// add_action( 'admin_sp_ajax_admin_search_decks', array( $this, 'ajax_admin_search_decks' ) );
+		add_action( 'admin_sp_ajax_admin_load_topics', array( $this, 'ajax_admin_load_topics' ) );
+		add_action( 'admin_sp_ajax_admin_search_topics', array( $this, 'ajax_admin_search_topics' ) );
 		add_action( 'admin_sp_ajax_admin_create_new_topic', array( $this, 'ajax_admin_create_new_topic' ) );
-		// add_action( 'admin_sp_ajax_admin_update_decks', array( $this, 'ajax_admin_update_decks' ) );
-		// add_action( 'admin_sp_ajax_admin_trash_decks', array( $this, 'ajax_admin_trash_decks' ) );
-		// add_action( 'admin_sp_ajax_admin_delete_decks', array( $this, 'ajax_admin_delete_decks' ) );
+		add_action( 'admin_sp_ajax_admin_update_topics', array( $this, 'ajax_admin_update_topics' ) );
+		add_action( 'admin_sp_ajax_admin_trash_topics', array( $this, 'ajax_admin_trash_topics' ) );
+		add_action( 'admin_sp_ajax_admin_delete_topics', array( $this, 'ajax_admin_delete_topics' ) );
 		// </editor-fold desc="Topics">
 		// <editor-fold desc="Tag">
 		add_action( 'admin_sp_ajax_admin_create_tag', array( $this, 'ajax_admin_create_tag' ) );
@@ -94,7 +93,6 @@ class AjaxHelper {
 		add_action( 'admin_sp_ajax_admin_load_settings', array( $this, 'ajax_admin_load_settings' ) );
 		add_action( 'admin_sp_ajax_admin_update_settings', array( $this, 'ajax_admin_update_settings' ) );
 		// </editor-fold desc="Card">
-
 		// <editor-fold desc="Collections">
 		add_action( 'admin_sp_ajax_admin_load_collections', array( $this, 'ajax_admin_load_collections' ) );
 		add_action( 'admin_sp_ajax_admin_search_collections', array( $this, 'ajax_admin_search_collections' ) );
@@ -104,6 +102,8 @@ class AjaxHelper {
 		add_action( 'admin_sp_ajax_admin_delete_collections', array( $this, 'ajax_admin_delete_collections' ) );
 		// </editor-fold desc="Collections">
 	}
+
+	// </editor-fold desc="General">
 
 	// <editor-fold desc="Image Cards">
 
@@ -454,7 +454,7 @@ class AjaxHelper {
 
 	}
 
-	// <editor-fold desc="/Image Cards">
+	// </editor-fold desc="/Image Cards">
 
 	// <editor-fold desc="Table Cards">
 
@@ -761,7 +761,7 @@ class AjaxHelper {
 
 	}
 
-	// <editor-fold desc="Table Cards">
+	// </editor-fold desc="Table Cards">
 
 	// <editor-fold desc="Gap Cards">
 	public function ajax_admin_update_gap_card( $post ): void {
@@ -2036,36 +2036,176 @@ class AjaxHelper {
 
 		$all  = $post[ Common::VAR_2 ];
 		$name = sanitize_text_field( $all['name'] );
+		$deck = $all['deck'];
 		$tags = $all['tags'];
 
-		$create     = DeckGroup::firstOrCreate( array( 'name' => $name ) );
-		$deck_group = DeckGroup::find( $create->id );
-		$deck_group->tags()->detach();
-		foreach ( $tags as $one ) {
-			$tag = Tag::find( $one['id'] );
-			// $tags = $deck_group->tags();
-			$deck_group->tags()->save( $tag );
-			// $deck_group->tags()->attach($tag);
-			// Common::send_error( [
-			// 'ajax_admin_create_new_deck_group',
-			// 'post'             => $post,
-			// 'toSql'             => $deck_group->tags()->toSql(),
-			// '$deck_group_name' => $deck_group_name,
-			// '$tags'            => $tags,
-			// '$tag'            => $tag,
-			// '$deck_group'      => $deck_group,
-			// ] );
+		if ( empty( $deck ) ) {
+			Common::send_error( 'Please select a deck group' );
 		}
 
-		// Common::send_error( [
-		// 'ajax_admin_create_new_deck_group',
-		// 'post'             => $post,
-		// '$deck_group_name' => $deck_group_name,
-		// '$tags'            => $tags,
-		// '$deck_group'      => $deck_group,
-		// ] );
+		$deck_id = (int) sanitize_text_field( $deck['id'] );
+		try {
+			Manager::beginTransaction();
+			$deck        = Deck::find( $deck_id );
+			$topic       = new Topic();
+			$topic->name = $name;
+			$topic->deck()->associate( $deck );
+			$topic->save();
 
-		Common::send_success( 'Deck group created.' );
+			$topic->tags()->detach();
+			foreach ( $tags as $one ) {
+				$tag = Tag::find( $one['id'] );
+				$topic->tags()->save( $tag );
+			}
+			Manager::commit();
+		} catch ( PDOException $e ) {
+			Common::send_error( 'Item already exists' );
+		}
+
+		Common::send_success( 'Topic created.' );
+	}
+
+	public function ajax_admin_trash_topics( $post ): void {
+
+		$all  = $post[ Common::VAR_2 ];
+		$args = wp_parse_args(
+			$all,
+			array(
+				'topics' => array(),
+			)
+		);
+		foreach ( $args['topics'] as $item ) {
+			$id = (int) sanitize_text_field( $item['id'] );
+			Topic::find( $id )->delete();
+		}
+
+		Common::send_success( 'Trashed successfully.' );
+
+	}
+
+	public function ajax_admin_delete_topics( $post ): void {
+
+		$all  = $post[ Common::VAR_2 ];
+		$args = wp_parse_args(
+			$all,
+			array(
+				'topics' => array(),
+			)
+		);
+
+		foreach ( $args['topics'] as $item ) {
+			Manager::beginTransaction();
+			$id = (int) sanitize_text_field( $item['id'] );
+
+			$deck = Topic::withTrashed()->find( $id );
+			$deck->tags()->detach();
+			$deck->forceDelete();
+			Manager::commit();
+		}
+
+		Common::send_success( 'Deleted successfully.' );
+
+	}
+
+	public function ajax_admin_load_topics( $post ): void {
+
+		$params         = $post[ Common::VAR_2 ]['params'];
+		$per_page       = (int) sanitize_text_field( $params['per_page'] );
+		$page           = (int) sanitize_text_field( $params['page'] );
+		$search_keyword = sanitize_text_field( $params['search_keyword'] );
+		$status         = sanitize_text_field( $params['status'] );
+
+		$topics = Topic::get_topics(
+			array(
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			)
+		);
+		$totals = Topic::get_totals();
+
+		Common::send_success(
+			'Topics loaded.',
+			array(
+				'topics' => $topics,
+				'totals' => $totals,
+			),
+			array(
+				'post' => $post,
+			)
+		);
+	}
+
+	public function ajax_admin_search_topics( $post ): void {
+		$params         = $post[ Common::VAR_2 ]['params'];
+		$per_page       = (int) sanitize_text_field( $params['per_page'] );
+		$page           = (int) sanitize_text_field( $params['page'] );
+		$search_keyword = sanitize_text_field( $params['search_keyword'] );
+		$status         = sanitize_text_field( $params['status'] );
+
+		$items = Topic::get_topic_simple(
+			array(
+				'search'       => $search_keyword,
+				'page'         => $page,
+				'per_page'     => $per_page,
+				'only_trashed' => ( 'trash' === $status ) ? true : false,
+			)
+		);
+
+		Common::send_success( 'Topics found.', $items );
+	}
+
+	public function ajax_admin_update_topics( $post ): void {
+
+		$all = $post[ Common::VAR_2 ];
+
+		$decks = $all['decks'];
+		foreach ( $decks as $one_deck ) {
+			$name          = sanitize_text_field( $one_deck['name'] );
+			$e_deck_group  = $one_deck['deck_group'];
+			$tags          = $one_deck['tags'];
+			$deck_id       = (int) sanitize_text_field( $one_deck['id'] );
+			$deck_group_id = (int) sanitize_text_field( $e_deck_group['id'] );
+
+			if ( empty( $e_deck_group ) ) {
+				Common::send_error( 'Please select a deck group' );
+			}
+
+			$deck = Deck::find( $deck_id );
+			$deck->update(
+				array(
+					'name'          => $name,
+					'deck_group_id' => $deck_group_id,
+				)
+			);
+			// Common::send_error( [
+			// 'ajax_admin_create_new_deck_group',
+			// 'post'           => $post,
+			// '$deck_group_id' => $deck_group_id,
+			// '$tags'          => $tags,
+			// '$name'          => $name,
+			// '$e_deck_group'  => $e_deck_group,
+			// ] );
+			$deck->tags()->detach();
+			foreach ( $tags as $one ) {
+				$tag_id = (int) sanitize_text_field( $one['id'] );
+				$tag    = Tag::find( $tag_id );
+				$deck->tags()->save( $tag );
+				// Common::send_error( [
+				// 'ajax_admin_create_new_deck_group',
+				// 'post'           => $post,
+				// '$deck_group_id' => $deck_group_id,
+				// '$tags'          => $tags,
+				// '$name'          => $name,
+				// '$tag'           => $tag,
+				// '$deck_group'      => $deck_group,
+				// ] );
+			}
+		}
+
+		Common::send_success( 'Saved.' );
+
 	}
 
 	// </editor-fold desc="Topic">

@@ -25,7 +25,6 @@ export interface _Topic {
     name: string;
     trashed: boolean;
     deck: _Deck,
-    tags: Array<_Tag>;
     created_at: string;
     updated_at: boolean,
 }

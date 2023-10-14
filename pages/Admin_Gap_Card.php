@@ -15,7 +15,6 @@ class Admin_Gap_Card {
 	 */
 	private static $instance;
 
-
 	/**
 	 * AdminAuth constructor.
 	 */
@@ -71,10 +70,11 @@ class Admin_Gap_Card {
 		do_action( 'sp_enqueue_default_admin_gap_card' );
 //		\StudyPlanner\load_template( 'admin/admin-gap-card' );
 		echo '<div class="sp admin-gap-card wrap"></div>';
-		echo '<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
+		echo '
+			<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
 				<div style="text-align: center;flex: 12;font-size: 50px;" >
 				<i class="fa fa-spin fa-spinner" ></i ></div >
-			</div >
+			</div>
 		';
 	}
 

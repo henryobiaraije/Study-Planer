@@ -17,7 +17,7 @@ class Topic extends Model {
 
 	use SoftDeletes;
 
-	protected $dates    = array( 'deleted_at' );
+	protected $dates = array( 'deleted_at' );
 	protected $fillable = array( 'name', 'deck_id' );
 
 	public function tags() {
@@ -28,27 +28,11 @@ class Topic extends Model {
 		return $this->hasManyThrough( Card::class, CardGroup::class );
 	}
 
-	public function studies() {
-		return $this->hasMany( Study::class );
+	public function deck() {
+		return $this->belongsTo( Deck::class, 'deck_id' );
 	}
 
-	public function cardGroups() {
-		return $this->hasMany( CardGroup::class );
-	}
-
-	public function deck_group() {
-		return $this->belongsTo( DeckGroup::class, 'deck_group_id' );
-	}
-
-	public function card_group() {
-		return $this->hasMany( CardGroup::class, 'deck_id' );
-	}
-
-	public function card_groups() {
-		return $this->hasMany( CardGroup::class, 'deck_id' );
-	}
-
-	public static function get_deck_simple( $args ): array {
+	public static function get_topic_simple( $args ): array {
 		$default = array(
 			'search'       => '',
 			'page'         => 1,
@@ -68,13 +52,13 @@ class Topic extends Model {
 			->where( 'name', 'like', "%{$args['search']}%" );
 		$offset = ( $args['page'] - 1 );
 		$items  = $items->offset( $offset )
-						->limit( $args['per_page'] )
-						->orderByDesc( 'id' )->get();
+		                ->limit( $args['per_page'] )
+		                ->orderByDesc( 'id' )->get();
 
 		return $items->all();
 	}
 
-	public static function get_decks( $args ): array {
+	public static function get_topics( $args ): array {
 		$default = array(
 			'search'       => '',
 			'page'         => 1,
@@ -84,11 +68,11 @@ class Topic extends Model {
 		);
 		$args    = wp_parse_args( $args, $default );
 		if ( $args['with_trashed'] ) {
-			$deck = self::with( 'tags', 'deck_group' )->withoutTrashed();
+			$deck = self::with( 'tags', 'deck' )->withoutTrashed();
 		} elseif ( $args['only_trashed'] ) {
-			$deck = self::with( 'tags', 'deck_group' )->onlyTrashed();
+			$deck = self::with( 'tags', 'deck' )->onlyTrashed();
 		} else {
-			$deck = self::with( 'tags', 'deck_group' );
+			$deck = self::with( 'tags', 'deck' );
 		}
 		$deck = $deck
 			->where( 'name', 'like', "%{$args['search']}%" );
@@ -96,19 +80,12 @@ class Topic extends Model {
 		$total  = $deck->count();
 		$offset = ( $args['page'] - 1 );
 		$deck   = $deck->offset( $offset )
-					   ->limit( $args['per_page'] )
-					   ->orderByDesc( 'id' )->get();
-
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// '$args'        => $args,
-		// '$deck_groups' => $deck_groups->toSql(),
-		// 'getQuery'     => $deck_groups->getQuery(),
-		// ] );
+		               ->limit( $args['per_page'] )
+		               ->orderByDesc( 'id' )->get();
 
 		return array(
-			'total' => $total,
-			'decks' => $deck->all(),
+			'total'  => $total,
+			'topics' => $deck->all(),
 		);
 	}
 
@@ -118,10 +95,10 @@ class Topic extends Model {
 			'trashed' => 0,
 		);
 		$active  = self::query()
-					   ->selectRaw( Manager::raw( 'count(*) as count' ) )
-					   ->get();
+		               ->selectRaw( Manager::raw( 'count(*) as count' ) )
+		               ->get();
 		$trashed = self::onlyTrashed()
-					   ->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
+		               ->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
 
 		$all['active']  = $active[0]['count'];
 		$all['trashed'] = $trashed[0]['count'];
