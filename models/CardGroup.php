@@ -87,41 +87,19 @@ class CardGroup extends Model {
 			$card_groups = self::with( 'tags' )->withoutTrashed();
 		} elseif ( $args['only_trashed'] ) {
 			$card_groups = self::onlyTrashed()->with( 'tags' );
-			// $card_groups = CardGroup::onlyTrashed();
-			// Common::send_error([
-			// __METHOD__,
-			// '$card_groups tr nl' => $card_groups->toSql(),
-			// 'getBindings'        => $card_groups->getBindings(),
-			// 'get'                => $card_groups->get(),
-			// '$args'              => $args,
-			// ]);
 		} else {
 			$card_groups = self::with( 'tags' );
 		}
 		$card_groups = $card_groups
 			->where( 'name', 'like', "%{$args['search']}%" );
 
-		// Common::send_error([
-		// __METHOD__,
-		// '$card_groups' => $card_groups->toSql(),
-		// 'getBindings' => $card_groups->getBindings(),
-		// 'get' => $card_groups->get(),
-		// '$args' => $args,
-		// ]);
 		$total       = $card_groups->count();
 		$offset      = ( $args['page'] - 1 );
 		$card_groups = $card_groups->offset( $offset )
 		                           ->withCount( 'cards' )
-		                           ->with( 'deck' )
+		                           ->with( 'deck', 'topic', 'collection' )
 		                           ->limit( $args['per_page'] )
 		                           ->orderByDesc( 'id' )->get();
-
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// '$args'        => $args,
-		// '$deck_groups' => $deck_groups->toSql(),
-		// 'getQuery'     => $deck_groups->getQuery(),
-		// ] );
 
 		return array(
 			'total'       => $total,

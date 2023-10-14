@@ -25,13 +25,13 @@
       </div>
     </div>
     <div class="bg-white my-2 p-2 rounded shadow">
-      <!--      <span class="">Scheduled at (optional)</span>-->
-      <!--      <div class="border-1 p-1 px-2 mb-3 mt-0">-->
-      <!--        <label>-->
-      <!--          <span> </span>-->
-      <!--          <input v-model="basicCardGroup.scheduled_at" type="datetime-local" :required="false">-->
-      <!--        </label>-->
-      <!--      </div>-->
+      <span class="">Scheduled at (optional)</span>
+      <div class="border-1 p-1 px-2 mb-3 mt-0">
+        <label>
+          <span> </span>
+          <input v-model="basicCardGroup.scheduled_at" type="datetime-local" :required="false" step="any">
+        </label>
+      </div>
       <div v-if="isEditing" class="flex bg-sp-100 rounded ">
         <div class="rounded bg-white text-black flex-auto m-2 p-1 text-center md:w-full">
           Created:

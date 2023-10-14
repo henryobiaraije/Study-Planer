@@ -46,6 +46,8 @@ export default function (cardGroupId = 0) {
     let cardGroup = ref<_CardGroup>({
         tags: [],
         cards: [],
+        topic: null,
+        collection: null,
         id: 0,
         deck: null,
         reverse: false,
@@ -162,6 +164,8 @@ export default function (cardGroupId = 0) {
                     cardGroup.value.card_group_edit_url = hold.card_group_edit_url;
                     cardGroup.value.reverse = hold.reverse;
                     cardGroup.value.scheduled_at = hold.scheduled_at;
+                    cardGroup.value.topic = hold.topic;
+                    cardGroup.value.collection = hold.collection;
                     items.value = hold.cards;
                     // console.log({hold})
                     resolve(done.data);

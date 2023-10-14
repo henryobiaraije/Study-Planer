@@ -87,6 +87,7 @@ export interface _CardGroup extends _TimeStamps {
     bg_image_id: number;
     deck: _Deck,
     topic: _Topic,
+    collection: _Collection,
     group_type: string;
     card_type?: string;
     tags: Array<_Tag>;
@@ -98,7 +99,6 @@ export interface _CardGroup extends _TimeStamps {
     reverse: boolean;
     cards_count?: number;
     card_group_edit_url?: string;
-    collection?: number;
 }
 
 export interface _ImageItem {
