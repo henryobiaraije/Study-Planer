@@ -20,6 +20,9 @@ module.exports = {
                     '700': 'var(--sp-color-700)',
                     '800': 'var(--sp-color-800)',
                     '900': 'var(--sp-color-900)',
+                    'wp': {
+                        'bg': 'var(--sp-color-wp-bg)',
+                    }
                     // DEFAULT: '#E97225',
                     // '50': '#FADECC',
                     // '100': '#F8D2B9',

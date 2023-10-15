@@ -6,27 +6,30 @@
   <br/>
   <form v-if="showMain" @submit.prevent="gapCard.createOrUpdate()"
         class="assign-topics gap-4 flex flex-col ">
-    <div class="">
-      <span class="text-base block mb-2 font-medium">Topic to assign to* </span>
-      <vue-mulitiselect
-          v-model="assignTopic.assign.value.topicToAssign"
-          :options="topics.searchResults.value"
-          :multiple="false"
-          :loading="topics.ajaxSearch.value.sending"
-          :searchable="true"
-          :allowEmpty="false"
-          :close-on-select="true"
-          :taggable="false"
-          :createTag="false"
-          @search-change="topics.search"
-          placeholder="Topic"
-          label="name"
-          track-by="id"
-      ></vue-mulitiselect>
-    </div>
+
+    <!--  Topic to assign, Group, Deck -->
     <div class="flex flex-col gap-2">
       <p>Filter cards below and add them to the above topic.</p>
       <div class="flex flex-col lg:flex-row gap-2">
+        <!--  Topic to assign -->
+        <div class="flex-1">
+          <span class="text-base block mb-2 font-medium">Topic to assign to* </span>
+          <vue-mulitiselect
+              v-model="assignTopic.assign.value.topicToAssign"
+              :options="topics.searchResults.value"
+              :multiple="false"
+              :loading="topics.ajaxSearch.value.sending"
+              :searchable="true"
+              :allowEmpty="false"
+              :close-on-select="true"
+              :taggable="false"
+              :createTag="false"
+              @search-change="topics.search"
+              placeholder="Topic"
+              label="name"
+              track-by="id"
+          ></vue-mulitiselect>
+        </div>
         <div class="flex-1">
           <span class="text-base block mb-2 font-medium">Group*</span>
           <vue-mulitiselect
@@ -45,6 +48,7 @@
               track-by="id"
           ></vue-mulitiselect>
         </div>
+        <!--  Topic -->
         <div class="flex-1">
           <span class="text-base block mb-2 font-medium">Subject <span class="text-gray-400">(optional)</span></span>
           <vue-mulitiselect
@@ -65,7 +69,9 @@
           ></vue-mulitiselect>
         </div>
       </div>
+      <!--  Topic -->
       <div class="flex flex-col lg:flex-row gap-2 mt-2">
+        <!--  Topic -->
         <div class="lg:w-1/3">
           <span class="text-base block mb-2 font-medium">Topic <span class="text-gray-400">(optional)</span></span>
           <vue-mulitiselect
@@ -116,6 +122,28 @@
           </div>
         </div>
       </div>
+      <!--  Specific cards -->
+      <div class="">
+          <span class="text-base block mb-2 font-medium">Specific Cards <span
+              class="text-gray-400">(optional)</span></span>
+        <vue-mulitiselect
+            v-model="assignTopic.assign.value.topicToAssign"
+            :options="allCards.searchResults.value"
+            :multiple="false"
+            :loading="allCards.ajaxSearch.value.sending"
+            :searchable="true"
+            :allowEmpty="false"
+            :close-on-select="true"
+            :taggable="false"
+            :createTag="false"
+            @search-change="allCards.search"
+            placeholder="Select Cards"
+            label="name"
+            track-by="id"
+        ></vue-mulitiselect>
+      </div>
+      <br />
+      <SelectedCardsAssign :found-cards="foundCards" :selected-cards="selectedCards"/>
     </div>
   </form>
 
@@ -140,10 +168,15 @@ import useCollections from "@/composables/useCollections";
 import type {_AssignTopic} from "@/interfaces/inter-sp";
 import useAssign from "@/composables/useAssign";
 import useDeckGroupLists from "@/composables/useDeckGroupLists";
+import useAllCards from "@/composables/useAllCards";
+import SelectedCardsAssign from "@/components/SelectedCardsAssign.vue";
 
 export default defineComponent({
   name: 'AdminAssignTopics',
-  components: {InputEditorB, InputEditor, PickImage, VueMulitiselect, TimeComp, AjaxAction, HoverNotifications},
+  components: {
+    SelectedCardsAssign,
+    InputEditorB, InputEditor, PickImage, VueMulitiselect, TimeComp, AjaxAction, HoverNotifications
+  },
   props: {},
   data() {
     return {
@@ -160,10 +193,18 @@ export default defineComponent({
       gapCard: useGapCard(),
       topics: useTopics(),
       collections: useCollections(),
-      assignTopic: useAssign()
+      assignTopic: useAssign(),
+      allCards: useAllCards()
     }
   },
-  computed: {},
+  computed: {
+    foundCards() {
+      return [];
+    },
+    selectedCards() {
+      return [];
+    }
+  },
   created() {
     console.log('now created');
     this.topics.load()
