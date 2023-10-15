@@ -7,6 +7,7 @@ import {Store} from "@/static/store";
 import useDeckGroupLists from "@/composables/useDeckGroupLists";
 import Cookies from "js-cookie";
 import {spClientData} from "@/functions";
+import {type _AssignTopic} from "@/interfaces/inter-sp";
 
 declare var bootstrap;
 
@@ -141,6 +142,15 @@ export default function (status = 'publish') {
         topic: null as unknown as _Topic,
     })
     let searchResults = ref<Array<_DeckGroup>>([]);
+    let assignTopic = ref<_AssignTopic>({
+        topicToAssign: null,
+        deck: null,
+        cardTypes: [],
+        group: null,
+        topic: null,
+        individualCards: [],
+        selectedCards: [],
+    });
     //
     const create = () => {
         xhrCreateNew();
@@ -401,12 +411,13 @@ export default function (status = 'publish') {
     // });
 
     return {
-        ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch,
-        total, create, itemToEdit, editedItemTracker, tableData, load, newItem,
-        onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
-        onSortChange, onColumnFilter, updateEditing,
-        batchUpdate, batchDelete, batchTrash,
-        totals, closeEditModal, openEditModal, search, searchResults,
+        // ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch,
+        // total, create, itemToEdit, editedItemTracker, tableData, load, newItem,
+        // onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
+        // onSortChange, onColumnFilter, updateEditing,
+        // batchUpdate, batchDelete, batchTrash,
+        // totals, closeEditModal, openEditModal, search, searchResults,
+        assign: assignTopic
     };
 
 }

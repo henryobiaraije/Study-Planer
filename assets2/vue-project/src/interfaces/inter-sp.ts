@@ -148,3 +148,19 @@ export interface _Collection {
     created_at: string;
     updated_at: boolean,
 }
+
+export interface _AssignTopic {
+    /**
+     * The topic to assign the cards to.
+     */
+    topicToAssign: _Topic,
+    /**
+     * Topics to read from.
+     */
+    topic: null | _Topic,
+    group: null | _DeckGroup,
+    deck: null | _Deck,
+    cardTypes: Array<'basic' | 'gap' | 'table' | 'image'>,
+    individualCards: Array<_Card>,
+    selectedCards: Array<_Card>,
+}

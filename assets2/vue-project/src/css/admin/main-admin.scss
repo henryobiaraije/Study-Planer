@@ -1,7 +1,50 @@
 //@import "bootstrap/scss/bootstrap";
 @import "../admin-default";
+
+:root {
+  //--sp-color-default: '#E97225';
+  --sp-color-default: rgb(233, 114, 37);
+  --sp-color-50: rgb(250, 222, 204);
+  --sp-color-100: rgb(248, 210, 185);
+  --sp-color-200: rgb(244, 186, 148);
+  --sp-color-300: rgb(240, 162, 111);
+  --sp-color-400: rgb(237, 138, 74);
+  --sp-color-500: rgb(233, 114, 37);
+  --sp-color-600: rgb(227, 103, 23);
+  --sp-color-700: rgb(208, 95, 21);
+  --sp-color-800: rgb(190, 86, 19);
+  --sp-color-900: rgb(171, 78, 17);
+
+  //  DEFAULT: '#E97225',
+  //'50': '#FADECC',
+  //'100': '#F8D2B9',
+  //'200': '#F4BA94',
+  //'300': '#F0A26F',
+  //'400': '#ED8A4A',
+  //'500': '#E97225',
+  //'600': '#E36717',
+  //'700': '#D05F15',
+  //'800': '#BE5613',
+  //'900': '#AB4E11',
+}
+
 .admin-topics {
 }
+
 #wpcontent {
   background: #f0f0f0;
+}
+
+#wpcontent {
+  background: #f0f0f0;
+}
+
+.multiselect__input {
+  border: 0 !important;
+}
+
+form.assign-topics {
+  .multiselect__tags {
+    border: 1px solid var(--sp-color-default) !important;
+  }
 }

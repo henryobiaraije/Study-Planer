@@ -1,5 +1,5 @@
 import {createApp} from 'vue'
-import "@/css/admin/admin-topics.scss";
+import "@/css/admin/main-admin.scss"
 import {Store} from "@/static/store";
 import AdminTopics from "@/admin/AdminTopics.vue";
 import {spInitDevTools} from "@/miscelenous/init-dev-tools";
@@ -12,6 +12,7 @@ import AdminGapCard from "@/admin/AdminGapCard.vue";
 import AdminTableCard from "@/admin/AdminTableCard.vue";
 import AdminImageCard from "@/admin/AdminImageCard.vue";
 import AdminCollections from "@/admin/AdminCollections.vue";
+import AdminAssignTopics from "@/admin/AdminAssignTopics.vue";
 
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
@@ -26,10 +27,10 @@ Store.initAdmin({
 
 function renderVue() {
     const elemAndComponent = [
-        {
-            elem: '.admin-topics',
-            component: AdminTopics,
-        },
+        // {
+        //     elem: '.admin-topics',
+        //     component: AdminTopics,
+        // },
         // {
         //     elem: '.admin-groups',
         //     component: AdminDeckGroups
@@ -58,14 +59,18 @@ function renderVue() {
         //     elem: '.admin-table-card',
         //     component: AdminTableCard
         // },
-        {
-            elem: '.admin-image-card',
-            component: AdminImageCard
-        },
+        // {
+        //     elem: '.admin-image-card',
+        //     component: AdminImageCard
+        // },
         // {
         //     elem: '.admin-collections',
         //     component: AdminCollections
         // },
+        {
+            elem: '.admin-assign-topics',
+            component: AdminAssignTopics
+        },
     ] as Array<{ elem: string, component: any }>;
 
     elemAndComponent.forEach((item) => {

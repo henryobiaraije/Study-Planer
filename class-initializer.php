@@ -13,6 +13,7 @@ use StudyPlanner\Helpers\AjaxHelper;
 use StudyPlanner\Helpers\RunOnceHelpers;
 use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
+use StudyPlanner\Pages\Admin_Assign_Topic;
 use StudyPlanner\Pages\Admin_Basic_Card;
 use StudyPlanner\Pages\Admin_All_Cards;
 use StudyPlanner\Pages\Admin_Collections;
@@ -51,11 +52,11 @@ class Initializer {
 	public static $extra_dir;
 	public static $extra_url;
 	// todo change to false later during production
-	public static $debug_mode     = true;
+	public static $debug_mode = true;
 	public static $script_version = 1.0;
-	public static $nonce_key      = 'e5824f4aefs424245g424';
-	public static $ajax_action    = 'sbe_ajax_action_4fef425g424r5q5g6q';
-	public static $localize_id    = 'pereere_dot_com_sp_general_localize_4736';
+	public static $nonce_key = 'e5824f4aefs424245g424';
+	public static $ajax_action = 'sbe_ajax_action_4fef425g424r5q5g6q';
+	public static $localize_id = 'pereere_dot_com_sp_general_localize_4736';
 
 	public static $general_localize = array();
 
@@ -107,6 +108,7 @@ class Initializer {
 		Admin_Image_Card::get_instance();
 		Admin_Settings::get_instance();
 		Admin_Collections::get_instance();
+		Admin_Assign_Topic::get_instance();
 
 		// Localize all added general object
 		add_action( 'wp_footer', array( $this, 'output_localized' ), 10 );
@@ -228,25 +230,25 @@ class Initializer {
 			return;
 		}
 		?>
-		<style>
-			.site-primary-header-wrap {
-				margin: 0;
-			}
+        <style>
+            .site-primary-header-wrap {
+                margin: 0;
+            }
 
-			/*.site-header-primary-section-right site-header-section ast-flex ast-grid-right-section{*/
-			/*    */
-			/*}*/
-			@media (min-width: 900px) {
-				.site-header-primary-section-left.site-header-section.ast-flex.site-header-section-left {
-					justify-content: flex-start;
-				}
+            /*.site-header-primary-section-right site-header-section ast-flex ast-grid-right-section{*/
+            /*    */
+            /*}*/
+            @media (min-width: 900px) {
+                .site-header-primary-section-left.site-header-section.ast-flex.site-header-section-left {
+                    justify-content: flex-start;
+                }
 
-				.site-header-primary-section-right.site-header-section.ast-flex.ast-grid-right-section {
-					justify-content: flex-start;
-				}
-			}
+                .site-header-primary-section-right.site-header-section.ast-flex.ast-grid-right-section {
+                    justify-content: flex-start;
+                }
+            }
 
-		</style>
+        </style>
 		<?php
 	}
 
