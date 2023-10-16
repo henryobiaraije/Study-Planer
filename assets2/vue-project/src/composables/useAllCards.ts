@@ -191,7 +191,6 @@ export default function (status = 'publish') {
         xhrLoad();
     }
 
-
     // const search = (query: string) => {
     //     return xhrSearch(query);
     // }

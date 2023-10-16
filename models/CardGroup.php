@@ -176,7 +176,7 @@ class CardGroup extends Model {
 			'deck_group_id' => null,
 			'deck_id'       => null,
 			'topic_id'      => null,
-			'card_type'     => null,
+			'card_types'    => null,
 			'tags_ids'      => array(),
 		];
 
@@ -221,9 +221,9 @@ class CardGroup extends Model {
 			$card_group_2 = $card_group_2->where( 'topic_id', $args['topic_id'] );
 		}
 
-		if ( $args['card_type'] ) {
-			$card_group   = $card_group->where( 'card_type', $args['card_type'] );
-			$card_group_2 = $card_group_2->where( 'card_type', $args['card_type'] );
+		if ( $args['card_types'] ) {
+			$card_group   = $card_group->whereIn( 'card_type', $args['card_types'] );
+			$card_group_2 = $card_group_2->whereIn( 'card_type', $args['card_types'] );
 		}
 
 		if ( $args['search'] ) {
