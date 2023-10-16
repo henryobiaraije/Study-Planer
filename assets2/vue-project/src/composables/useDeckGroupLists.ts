@@ -273,7 +273,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
                 searchResults.value = done.data;
             },
@@ -297,7 +297,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
             },
             funcFailue(done) {
@@ -322,7 +322,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
@@ -347,7 +347,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },

@@ -22,13 +22,14 @@
     </label>
   </div>
   <div class="cards">
-    <ul class="card-wrapper !list-none !p-0 !m-0">
+    <ul class="card-wrapper !list-none !p-0 !m-0 max-h-300px overflow-y-auto">
       <li v-for="(cardGroup,cardIndex) in cardsToDisplay"
+          class="flex !p-0 !m-0 justify-between items-center hover:bg-sp-50 border-b border-solid border-sp-300"
           key="cardGroup.id"
       >
         <label
             @click="$emit('card-clicked', cardGroup)"
-            class="single-card flex gap-2 hover:bg-sp-50 justify-start items-center py-2 border-b border-solid border-sp-300">
+            class="single-card flex-1 flex gap-2 justify-start items-center py-2 ">
           <!--          <input type="checkbox" :value="cardGroup"-->
           <!--                 @change="cardSelected"-->
           <!--                 v-model="selectedCards">-->
@@ -49,7 +50,13 @@
             </svg>
           </span>
           <span class="card-name block">{{ cardGroup.name }}</span>
+          <span class="bg-gray-300 px-2 py-1 rounded-md">{{ cardGroup.card_type }}</span>
         </label>
+<!--        <svg class="w-6 h-6 text-gray-400 hover:text-black hover:cursor-pointer" xmlns="http://www.w3.org/2000/svg"-->
+<!--             fill="none" viewBox="0 0 24 24" stroke-width="1.5"-->
+<!--             stroke="currentColor">-->
+<!--          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>-->
+<!--        </svg>-->
       </li>
     </ul>
   </div>

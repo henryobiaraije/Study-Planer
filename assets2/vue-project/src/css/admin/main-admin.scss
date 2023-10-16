@@ -64,3 +64,32 @@ form.assign-topics {
     }
   }
 }
+
+.mp-slide-in {
+  position: relative;
+  left: 0;
+  -webkit-animation: spSlideIn 1s cubic-bezier(0.1, 1.04, 0.25, 0.91);
+  -moz-animation: spSlideIn 1s cubic-bezier(0.1, 1.04, 0.25, 0.91);
+  animation: spSlideIn 1s cubic-bezier(0.1, 1.04, 0.25, 0.91);
+  -animation-fill-mode: forwards;
+}
+
+.mp-slide-left {
+  position: relative;
+  left: 0;
+  -webkit-animation: spSlideIn 1s cubic-bezier(0.1, 1.04, 0.25, 0.91);
+  -moz-animation: spSlideIn 1s cubic-bezier(0.1, 1.04, 0.25, 0.91);
+  animation: spSlideIn 1s cubic-bezier(0.1, 1.04, 0.25, 0.91);
+  -animation-fill-mode: forwards;
+  transition: height 4s;
+}
+
+@keyframes spSlideIn {
+  0% {
+    transform: translateX(+100px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}

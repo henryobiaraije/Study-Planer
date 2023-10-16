@@ -132,6 +132,7 @@ class Initialize_Db {
 		$this->create_answer_log();
 		$this->create_table_topics();
 		$this->create_table_collections();
+		$this->create_table_user_cards();
 	}
 
 	public function create_table_deck_group() {
@@ -190,6 +191,22 @@ class Initialize_Db {
 					$table->id();
 					$table->string( 'name' )->unique();
 					$table->foreignId( 'deck_id' )->constrained( SP_TABLE_DECKS )->cascadeOnDelete()->cascadeOnUpdate();
+					$table->softDeletes();
+					$table->timestamps();
+				}
+			);
+		}
+	}
+
+	public function create_table_user_cards(): void {
+		// Deck
+		if ( ! $this->schema_builder->hasTable( SP_TABLE_USER_CARDS ) ) {
+			Capsule::schema()->create(
+				SP_TABLE_USER_CARDS,
+				function ( Blueprint $table ) {
+					$table->id();
+					$table->foreignId( 'user_id' )->constrained( SP_TABLE_USERS )->cascadeOnDelete()->cascadeOnUpdate();
+					$table->foreignId( 'card_group_id' )->constrained( SP_TABLE_CARD_GROUPS )->cascadeOnDelete()->cascadeOnUpdate();
 					$table->softDeletes();
 					$table->timestamps();
 				}

@@ -165,3 +165,4 @@ define( 'SP_TABLE_USERS', $wpdb->prefix . 'users' );
 define( 'SP_TABLE_STUDY_LOG', SP_DB_PREFIX . 'study_log' );
 define( 'SP_TABLE_TOPICS', SP_DB_PREFIX . 'topics' );
 define( 'SP_TABLE_COLLECTIONS', SP_DB_PREFIX . 'collections' );
+define( 'SP_TABLE_USER_CARDS', SP_DB_PREFIX . 'user_cards' );

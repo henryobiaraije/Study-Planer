@@ -16,6 +16,7 @@ use StudyPlanner\Libs\Common;
 use StudyPlanner\Libs\Settings;
 use StudyPlanner\Models\Collections;
 use StudyPlanner\Models\Tag;
+use StudyPlanner\Models\UserCard;
 use function StudyPlanner\get_default_image_display_type;
 use function StudyPlanner\get_mature_card_days;
 use function StudyPlanner\get_uncategorized_deck_group_id;
@@ -101,10 +102,48 @@ class AjaxHelper {
 		add_action( 'admin_sp_ajax_admin_trash_collections', array( $this, 'ajax_admin_trash_collections' ) );
 		add_action( 'admin_sp_ajax_admin_delete_collections', array( $this, 'ajax_admin_delete_collections' ) );
 		// </editor-fold desc="Collections">
-
 		// <editor-fold desc="All Cards">
 		add_action( 'admin_sp_ajax_admin_search_all_cards', array( $this, 'ajax_admin_search_all_cards' ) );
 		// </editor-fold desc="All Cards">
+
+		// <editor-fold desc="User Cards">
+
+		add_action( 'admin_sp_ajax_admin_save_user_cards', array( $this, 'ajax_admin_save_user_cards' ) );
+
+		// </editor-fold desc="User Cards">
+	}
+
+	// </editor-fold desc="General">
+
+	// <editor-fold desc="General">
+
+	public function ajax_admin_save_user_cards( $post ): void {
+		$params        = $post[ Common::VAR_2 ]['params'];
+		$cards_ids     = $params['cards_ids'];
+		$topic_id      = is_array( $params['topic'] ) ? $params['topic']['id'] : null;
+		$deck_id       = is_array( $params['deck'] ) ? $params['deck']['id'] : null;
+		$deck_group_id = is_array( $params['deck_group'] ) ? $params['deck_group']['id'] : null;
+
+		if ( ! is_array( $cards_ids ) ) {
+			Common::send_error( 'Invalid cards ids' );
+		}
+
+		if ( null !== $deck_group_id ) {
+			$deck_group = DeckGroup
+				::find( $deck_group_id )
+				->with( 'decks.card_groups' )
+				->get()->all();
+
+			if ( $deck_group() ) {
+
+			}
+		} elseif ( null !== $deck_id ) {
+
+		} elseif ( null !== $topic_id ) {
+
+		}
+
+		Common::send_success( 'User Cards', $items );
 	}
 
 	// </editor-fold desc="General">
@@ -1938,8 +1977,7 @@ class AjaxHelper {
 		$page            = (int) sanitize_text_field( $params['page'] );
 		$search_keyword  = sanitize_text_field( $params['search_keyword'] );
 		$status          = sanitize_text_field( $params['status'] );
-		$e_deck_group    = sanitize_text_field( $params['deck_group'] );
-		$e_deck_group_id = is_array( $e_deck_group ) ? (int) sanitize_text_field( $e_deck_group['id'] ) : null;
+		$e_deck_group_id = is_array( $params['deck_group'] ) ? (int) sanitize_text_field( $params['deck_group']['id'] ) : null;
 
 		$items = Deck::get_deck_simple(
 			array(
