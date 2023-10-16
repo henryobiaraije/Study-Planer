@@ -144,7 +144,7 @@ export default function (status = 'publish') {
     let total = ref<number>(0);
     let newItem = ref({
         name: '',
-        deckGroup: null as unknown as  _DeckGroup,
+        deckGroup: null as unknown as _DeckGroup,
         tags: [] as Array<_Tag>
     })
     let searchResults = ref<Array<_DeckGroup>>([]);
@@ -167,9 +167,7 @@ export default function (status = 'publish') {
     const load = () => {
         xhrLoad();
     }
-    const search = (query: string) => {
-        xhrSearch(query);
-    }
+
     //
     const onSelect = (items: { selectedRows: Array<_Deck> }) => {
         console.log('selected', {items});
@@ -254,7 +252,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
                 const items = done.data.details.decks;
                 const total = done.data.details.total;
@@ -271,7 +269,7 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrSearch = (query: string) => {
+    const xhrSearch = (query: string, deckGroup: _DeckGroup = null) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
         sendOnline = new Server().send_online({
             data: [
@@ -282,6 +280,7 @@ export default function (status = 'publish') {
                         page: 1,
                         search_keyword: query,
                         status: 'publish',
+                        deck_group: deckGroup,
                     },
                 }
             ],
@@ -290,10 +289,10 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
-                const items = done.data;
-                searchResults.value = items;
+                searchResults.value = done.data.items;
+                tt().totalRecords = done.data.total;
             },
             funcFailue(done) {
                 handleAjax.error(done);
@@ -315,7 +314,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
             },
             funcFailue(done) {
@@ -340,7 +339,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
@@ -365,7 +364,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
@@ -389,7 +388,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 useDeckGroupLists().load();
                 newItem.value.name = '';
@@ -402,6 +401,8 @@ export default function (status = 'publish') {
             },
         });
     };
+
+    const search = xhrSearch;
 
     // onMounted(() => {
     //   tableData.value.post_status = status;

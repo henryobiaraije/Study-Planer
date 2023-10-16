@@ -233,9 +233,12 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<{
+                details: { deck_groups: Array<_DeckGroup>, total: number },
+                totals: { active: number, trashed: number }
+            }>) {
                 handleAjax.stop();
-                const groups = done.data.details.deck_groups;
+                const groups: _DeckGroup[] = done.data.details.deck_groups;
                 const total = done.data.details.total;
                 const theTotals = done.data.totals;
                 console.log({done, groups, total, totals});
@@ -243,6 +246,7 @@ export default function (status = 'publish') {
                 tableData.value.rows = groups;
                 totals.value = theTotals;
                 tt().totalRecords = total;
+                searchResults.value = groups;
             },
             funcFailue(done) {
                 handleAjax.error(done);
@@ -271,8 +275,7 @@ export default function (status = 'publish') {
             },
             funcSuccess(done: InterFuncSuccess) {
                 handleAjax.stop();
-                const groups = done.data;
-                searchResults.value = groups;
+                searchResults.value = done.data;
             },
             funcFailue(done) {
                 handleAjax.error(done);

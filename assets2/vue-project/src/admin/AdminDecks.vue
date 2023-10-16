@@ -154,7 +154,7 @@
                 <span class="tw-title">Deck</span>
                 <input v-model="deckToEdit.name" name="deck_group" required type="text">
               </label>
-              <br />
+              <br/>
               <div>
                 <span>Deck Group</span>
                 <vue-mulitiselect
@@ -173,7 +173,7 @@
                     track-by="id"
                 ></vue-mulitiselect>
               </div>
-              <br />
+              <br/>
               <div>
                 <span>Tags</span>
                 <vue-mulitiselect
@@ -258,6 +258,9 @@ export default defineComponent({
     }
   },
   computed: {
+    deckNew() {
+      return this.decks.newItem.value;
+    },
     totalActive() {
       // return this.deckGroups.tableData.value.totalRecords;
       return this.decks.totals.value.active;

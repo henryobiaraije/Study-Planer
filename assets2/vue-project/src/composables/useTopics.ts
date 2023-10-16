@@ -1,5 +1,5 @@
 import {ref} from "vue";
-import type {_Deck, _DeckGroup, _Tag, _Topic} from "@/interfaces/inter-sp";
+import type {_Deck, _Tag, _Topic, _TopicNew} from "@/interfaces/inter-sp";
 import type {_Ajax} from "@/classes/HandleAjax";
 import {HandleAjax} from "@/classes/HandleAjax";
 import {type InterFuncSuccess, Server} from "@/static/server";
@@ -77,7 +77,7 @@ const tableData = ref({
     },
     //
     post_status: 'publish',
-    selectedRows: [] as Array<_Deck>,
+    selectedRows: [] as Array<_Topic>,
     searchKeyword: '',
 });
 const totals = ref({
@@ -132,15 +132,14 @@ export default function (status = 'publish') {
     tableData.value.post_status = status;
     const editedItemTracker = ref<{ [key: number]: { editCounter: number } }>({});
     let sendOnline = null;
-    let itemToEdit = ref<_Deck>(null as unknown as _Deck);
+    let itemToEdit = ref<_Topic>(null as unknown as _Topic);
     let total = ref<number>(0);
-    let newItem = ref({
+    let newItem = ref<_TopicNew>({
         name: '',
         deck: null as unknown as _Deck,
         tags: [] as Array<_Tag>,
-        topic: null as unknown as _Topic,
     })
-    let searchResults = ref<Array<_DeckGroup>>([]);
+    let searchResults = ref<Array<_Topic>>([]);
     //
     const create = () => {
         xhrCreateNew();
@@ -160,15 +159,13 @@ export default function (status = 'publish') {
     const load = () => {
         return xhrLoad();
     }
-    const search = (query: string) => {
-        xhrSearch(query);
-    }
+
     //
-    const onSelect = (items: { selectedRows: Array<_Deck> }) => {
+    const onSelect = (items: { selectedRows: Array<_Topic> }) => {
         console.log('selected', {items});
         tt().selectedRows = items.selectedRows;
     };
-    const onEdit = (item: _Deck) => {
+    const onEdit = (item: _Topic) => {
         console.log('edited', {item});
         if (undefined === editedItemTracker.value[item.id]) {
             editedItemTracker.value[item.id] = {
@@ -208,7 +205,7 @@ export default function (status = 'publish') {
     const loadItems = () => {
         xhrLoad();
     };
-    const openEditModal = (item: _Deck, modalId: string) => {
+    const openEditModal = (item: _Topic, modalId: string) => {
         itemToEdit.value = item;
         modalEditId.value = modalId;
         const modalElement = jQuery(modalId)[0];
@@ -247,9 +244,9 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
-                const items = done.data.details.topics;
+                const items: _Topic[] = done.data.details.topics;
                 const total = done.data.details.total;
                 const theTotals = done.data.totals;
                 console.log({done, items, total, totals});
@@ -257,6 +254,7 @@ export default function (status = 'publish') {
                 tableData.value.rows = items;
                 totals.value = theTotals;
                 tt().totalRecords = total;
+                searchResults.value = items;
             },
             funcFailue(done) {
                 handleAjax.error(done);
@@ -264,7 +262,7 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrSearch = (query: string) => {
+    const xhrSearch = (query: string, deck: null | _Deck = null) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
         sendOnline = new Server().send_online({
             data: [
@@ -275,6 +273,7 @@ export default function (status = 'publish') {
                         page: 1,
                         search_keyword: query,
                         status: 'publish',
+                        deck: deck,
                     },
                 }
             ],
@@ -283,9 +282,10 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<{ items: Array<_Topic>, total: number }>) {
                 handleAjax.stop();
-                searchResults.value = done.data;
+                searchResults.value = done.data.items;
+                tt().totalRecords = done.data.total;
             },
             funcFailue(done) {
                 handleAjax.error(done);
@@ -293,7 +293,7 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrUpdateBatch = (items: Array<_Deck>) => {
+    const xhrUpdateBatch = (items: Array<_Topic>) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxUpdate.value);
         sendOnline = new Server().send_online({
             data: [
@@ -307,7 +307,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
             },
             funcFailue(done) {
@@ -316,7 +316,7 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrTrashBatch = (items: Array<_Deck>) => {
+    const xhrTrashBatch = (items: Array<_Topic>) => {
         if (!confirm('Are you sure you want to trash these items?')) {
             return;
         }
@@ -332,7 +332,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
@@ -341,7 +341,7 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrDeleteBatch = (items: Array<_Deck>) => {
+    const xhrDeleteBatch = (items: Array<_Topic>) => {
         if (!confirm('Are you sure you want to delete these items? This action is not reversible.')) {
             return;
         }
@@ -357,7 +357,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
@@ -381,7 +381,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 useDeckGroupLists().load();
                 newItem.value.name = '';
@@ -394,6 +394,8 @@ export default function (status = 'publish') {
             },
         });
     };
+
+    const search = xhrSearch;
 
     // onMounted(() => {
     //   tableData.value.post_status = status;

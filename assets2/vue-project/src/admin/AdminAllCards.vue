@@ -52,10 +52,16 @@
             <div v-else-if="props.column.field === 'deck'">
               {{ props.row.deck ? props.row.deck.name : '' }}
             </div>
+            <div v-else-if="props.column.field === 'deck_group'">
+              {{ props.row.deck.deck_group ? props.row.deck.deck_group.name : '-' }}
+            </div>
+            <div v-else-if="props.column.field === 'topic'">
+              {{ props.row.topic ? props.row.topic.name : '-' }}
+            </div>
             <div v-else-if="props.column.field === 'tags'">
               <ul class="" style="min-width: 100px;">
                 <li v-for="(item,itemIndex) in props.row.tags"
-                    class="inline-flex items-center bg-gray-500 justify-center mr-1 px-2 py-1 text-xs font-bold leading-none text-white bg-gray-500 rounded">
+                    class="inline-flex items-center justify-center mr-1 px-2 py-1 text-xs font-bold leading-none text-white bg-gray-500 rounded">
                   {{ item.name }}
                 </li>
               </ul>

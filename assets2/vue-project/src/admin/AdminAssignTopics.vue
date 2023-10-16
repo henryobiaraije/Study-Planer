@@ -6,30 +6,29 @@
   <br/>
   <form v-if="showMain" @submit.prevent="gapCard.createOrUpdate()"
         class="assign-topics gap-4 flex flex-col ">
-
+    <!--  Topic to assign -->
+    <div class="flex-1">
+      <span class="text-base block mb-2 font-medium">Topic to assign to* </span>
+      <vue-mulitiselect
+          v-model="assignTopic.assign.value.topicToAssign"
+          :options="topics.searchResults.value"
+          :multiple="false"
+          :loading="topics.ajaxSearch.value.sending"
+          :searchable="true"
+          :allowEmpty="false"
+          :close-on-select="true"
+          :taggable="false"
+          :createTag="false"
+          @search-change="topics.search"
+          placeholder="Topic"
+          label="name"
+          track-by="id"
+      ></vue-mulitiselect>
+    </div>
     <!--  Topic to assign, Group, Deck -->
     <div class="flex flex-col gap-2">
       <p>Filter cards below and add them to the above topic.</p>
       <div class="flex flex-col lg:flex-row gap-2">
-        <!--  Topic to assign -->
-        <div class="flex-1">
-          <span class="text-base block mb-2 font-medium">Topic to assign to* </span>
-          <vue-mulitiselect
-              v-model="assignTopic.assign.value.topicToAssign"
-              :options="topics.searchResults.value"
-              :multiple="false"
-              :loading="topics.ajaxSearch.value.sending"
-              :searchable="true"
-              :allowEmpty="false"
-              :close-on-select="true"
-              :taggable="false"
-              :createTag="false"
-              @search-change="topics.search"
-              placeholder="Topic"
-              label="name"
-              track-by="id"
-          ></vue-mulitiselect>
-        </div>
         <div class="flex-1">
           <span class="text-base block mb-2 font-medium">Group*</span>
           <vue-mulitiselect
@@ -49,7 +48,7 @@
           ></vue-mulitiselect>
         </div>
         <!--  Topic -->
-        <div class="flex-1">
+        <div v-if="assignTopic.assign.value.group" class="flex-1 mp-slide-in">
           <span class="text-base block mb-2 font-medium">Subject <span class="text-gray-400">(optional)</span></span>
           <vue-mulitiselect
               v-model="assignTopic.assign.value.deck"
@@ -68,11 +67,8 @@
               class="border border-solid border-sp-200"
           ></vue-mulitiselect>
         </div>
-      </div>
-      <!--  Topic -->
-      <div class="flex flex-col lg:flex-row gap-2 mt-2">
         <!--  Topic -->
-        <div class="lg:w-1/3">
+        <div v-if="assignTopic.assign.value.deck" class="lg:w-1/3 mp-slide-in">
           <span class="text-base block mb-2 font-medium">Topic <span class="text-gray-400">(optional)</span></span>
           <vue-mulitiselect
               v-model="assignTopic.assign.value.topic"
@@ -90,6 +86,9 @@
               track-by="id"
           ></vue-mulitiselect>
         </div>
+      </div>
+      <!-- Card types -->
+      <div class="flex flex-col lg:flex-row gap-2 mt-2">
         <div class="lg:w-2/3 flex flex-col">
           <span class="flex-initial text-base block mb-2 font-medium">Card Types<span
               class="text-gray-400"> (optional)</span></span>
@@ -142,10 +141,22 @@
             track-by="id"
         ></vue-mulitiselect>
       </div>
-      <br />
-      <SelectedCardsAssign :found-cards="foundCards" :selected-cards="selectedCards"/>
+      <br/>
+      <SelectedCardsAssign
+          @tab-changed="activeTab = $event"
+          :active-tab="activeTab"
+          @card-clicked="cardSelected($event)"
+          :card-items="cardItems"
+          :selected-cards="selectedCards"
+          :loading="allCards.ajaxSearch.value.sending"
+          :found-count="allCards.tableData.value.totalRecords"
+      />
+      <!--      <pagination v-model="page" :records="500" :per-page="25" @paginate="myCallback"/>-->
     </div>
   </form>
+  <div v-show="'found' === activeTab" class="card-pagination py-2">
+    <pagination :records="allCards.tableData.value.totalRecords" v-model="page" :per-page="2" @paginate="callback"/>
+  </div>
 
   <hover-notifications></hover-notifications>
 </template>
@@ -165,23 +176,29 @@ import InputEditor from "@/vue-component/InputEditor.vue";
 import InputEditorB from "@/vue-component/InputEditorB.vue";
 import useTopics from "@/composables/useTopics";
 import useCollections from "@/composables/useCollections";
-import type {_AssignTopic} from "@/interfaces/inter-sp";
+import type {_AssignTopic, _CardGroup} from "@/interfaces/inter-sp";
 import useAssign from "@/composables/useAssign";
 import useDeckGroupLists from "@/composables/useDeckGroupLists";
 import useAllCards from "@/composables/useAllCards";
 import SelectedCardsAssign from "@/components/SelectedCardsAssign.vue";
+// @ts-ignore
+import Pagination from 'v-pagination-3';
 
 export default defineComponent({
   name: 'AdminAssignTopics',
   components: {
     SelectedCardsAssign,
-    InputEditorB, InputEditor, PickImage, VueMulitiselect, TimeComp, AjaxAction, HoverNotifications
+    InputEditorB, InputEditor, PickImage, VueMulitiselect, TimeComp, AjaxAction, HoverNotifications,
+    Pagination
   },
   props: {},
   data() {
     return {
       pageTitle: 'Assign Topics',
       showMain: false,
+      selectedCards: [] as _CardGroup[],
+      page: 1,
+      activeTab: 'found',
     }
   },
   setup: (props, ctx) => {
@@ -198,37 +215,73 @@ export default defineComponent({
     }
   },
   computed: {
-    foundCards() {
-      return [];
+    cardItems(): _CardGroup[] {
+      return this.allCards.searchResults.value;
     },
-    selectedCards() {
-      return [];
-    }
   },
   created() {
     console.log('now created');
-    this.topics.load()
-    //     .forEach(item => {
-    //   item.then(() => {
     jQuery('.all-loading').hide();
     jQuery('.all-loaded').show();
     this.showMain = true;
-    //   }).catch(() => {
-    //     // jQuery('.all-loading').hide();
-    //     // jQuery('.all-error').show();
-    //   });
-    // })
-    // this.gapCard.load().then(() => {
-    //   jQuery('.all-loading').hide();
-    //   jQuery('.all-loaded').show();
-    //   this.showMain = true;
-    // }).catch(() => {
-    //   jQuery('.all-loading').hide();
-    //   jQuery('.all-error').show();
-    // });
 
+    this.topics.load();
+    this.deckGroup.load();
+    this.decks.search('');
   },
-  methods: {spClientData}
+  methods: {
+    spClientData,
+    searchCards() {
+      this.allCards.search(
+          '',
+          this.assignTopic.assign.value.group,
+          this.assignTopic.assign.value.deck,
+          this.assignTopic.assign.value.topic,
+          this.assignTopic.assign.value.cardTypes
+      );
+    },
+    cardSelected(card: _CardGroup) {
+      // console.log('card selected', {event, target: event.id});
+      const index = this.selectedCards.findIndex((c) => c.id === card.id);
+      if (index === -1) {
+        this.selectedCards.push(card);
+      } else {
+        this.selectedCards.splice(index, 1);
+      }
+    },
+    callback: function (page) {
+      this.page = page;
+      this.allCards.page.value = page;
+      this.searchCards();
+      // console.log(`Page ${page} was selected. Do something about it`);
+    },
+  },
+  // watch
+  watch: {
+    'assignTopic.assign.value.group': function (newVal, oldVal) {
+      this.assignTopic.assign.value.deck = null;
+      this.assignTopic.assign.value.topic = null;
+      this.assignTopic.assign.value.specificCards = [];
+      // this.assignTopic.assign.value.group = newVal;
+      this.decks.search('', this.assignTopic.assign.value.deck);
+      this.searchCards();
+    },
+    'assignTopic.assign.value.deck': function (newVal, oldVal) {
+      this.assignTopic.assign.value.topic = null;
+      this.assignTopic.assign.value.specificCards = [];
+      // this.assignTopic.assign.value.deck = newVal;
+      this.topics.search('', this.assignTopic.assign.value.deck);
+      this.searchCards();
+    },
+    'assignTopic.assign.value.topic': function (newVal, oldVal) {
+      this.assignTopic.assign.value.specificCards = [];
+      // this.assignTopic.assign.value.topic = newVal;
+      this.searchCards();
+    },
+    'assignTopic.assign.value.cardTypes': function (newVal, oldVal) {
+      this.searchCards();
+    },
+  },
 });
 
 </script>

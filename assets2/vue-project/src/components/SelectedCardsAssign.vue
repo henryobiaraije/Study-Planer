@@ -2,37 +2,94 @@
   <div
       class="tabs flex items-center gap-2 relative border-r-0 border-l-0 border-t-0 border-b border-solid border-sp-400">
     <label :class="[tabClassFound]">
-      <input type="radio" name="tab" value="found" v-model="activeTab" style="display: none">
-      <span>Found</span>
+      <input type="radio" name="tab" value="found" @change="$emit('tab-changed','found')"
+             style="display: none">
+      <span class="font-semibold text-sp-900">
+        Found
+        <span v-if="loading" class="w-[20px] h-[20px] text-sp-500">
+          <i class="fa fa-spin fa-spinner"></i></span>
+        <span v-if="!loading">({{ foundCount }})</span>
+      </span>
     </label>
     <label :class="[tabClassSelected]">
-      <input type="radio" name="tab" value="selected" v-model="activeTab" style="display: none">
-      <span>Selected</span>
+      <input type="radio" name="tab" value="selected" @change="$emit('tab-changed','selected')" style="display: none">
+      <span class="font-semibold text-sp-900">
+        Selected
+        <span v-if="loading" class="w-[20px] h-[20px] text-sp-500">
+          <i class="fa fa-spin fa-spinner"></i></span>
+        <span v-if="!loading">({{ selectedCount }})</span>
+      </span>
     </label>
+  </div>
+  <div class="cards">
+    <ul class="card-wrapper !list-none !p-0 !m-0">
+      <li v-for="(cardGroup,cardIndex) in cardsToDisplay"
+          key="cardGroup.id"
+      >
+        <label
+            @click="$emit('card-clicked', cardGroup)"
+            class="single-card flex gap-2 hover:bg-sp-50 justify-start items-center py-2 border-b border-solid border-sp-300">
+          <!--          <input type="checkbox" :value="cardGroup"-->
+          <!--                 @change="cardSelected"-->
+          <!--                 v-model="selectedCards">-->
+          <span class="block icon">
+            <!-- Plus icon -->
+            <svg v-if="!selectedCardIds.includes(cardGroup.id)" class="w-[20px] h-[20px]" fill="none"
+                 stroke="currentColor"
+                 stroke-width="3.5"
+                 viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+            </svg>
+            <!-- Checked icon -->
+            <svg v-else class="w-[20px] h-[20px] text-sp-500" fill="none" stroke="currentColor" stroke-width="3.5"
+                 viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path>
+            </svg>
+          </span>
+          <span class="card-name block">{{ cardGroup.name }}</span>
+        </label>
+      </li>
+    </ul>
   </div>
 </template>
 <script lang="ts">
 
 import {defineComponent} from "vue";
-import type {_Card} from "@/interfaces/inter-sp";
+import type {_CardGroup} from "@/interfaces/inter-sp";
 
 export default defineComponent({
   name: 'SelectedCardsAssign',
   components: {},
+  emits: ['card-clicked', 'tab-changed'],
   props: {
-    foundCards: {
-      type: Array as () => _Card[],
+    cardItems: {
+      type: Array as () => _CardGroup[],
       required: true
     },
     selectedCards: {
-      type: Array as () => _Card[],
+      type: Array as () => _CardGroup[],
       required: true
+    },
+    loading: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    activeTab: {
+      type: String as () => 'found' | 'selected',
+      required: true,
+      default: 'found'
+    },
+    foundCount: {
+      type: Number,
+      required: true,
+      default: 0
     }
   },
   data() {
-    return {
-      activeTab: 'found' as 'found' | 'selected'
-    }
+    return {}
   },
   setup: (props, ctx) => {
     return {}
@@ -53,7 +110,7 @@ export default defineComponent({
         [activeClasses]: isActive,
         [inActiveClasses]: !isActive,
       }
-    }
+    },
   },
   computed: {
     tabClassSelected() {
@@ -62,6 +119,15 @@ export default defineComponent({
     tabClassFound() {
       return this.tabLabelClass('found');
     },
+    selectedCount() {
+      return this.selectedCards.length;
+    },
+    cardsToDisplay(): _CardGroup[] {
+      return this.activeTab === 'found' ? this.cardItems : this.selectedCards;
+    },
+    selectedCardIds(): number[] {
+      return this.selectedCards.map((card: _CardGroup) => card.id);
+    }
   },
   created() {
 

@@ -39,23 +39,45 @@ class Topic extends Model {
 			'per_page'     => 5,
 			'with_trashed' => false,
 			'only_trashed' => false,
+			'deck_id'      => null
 		);
 		$args    = wp_parse_args( $args, $default );
 		if ( $args['with_trashed'] ) {
-			$items = self::withoutTrashed()::with( 'tags' );
+			$items   = self::withoutTrashed()::with( 'tags' );
+			$items_2 = self::withoutTrashed()::with( 'tags' );
 		} elseif ( $args['only_trashed'] ) {
-			$items = self::onlyTrashed();
+			$items   = self::onlyTrashed();
+			$items_2 = self::onlyTrashed();
 		} else {
-			$items = self::with( 'tags' );
+			$items   = self::with( 'tags' );
+			$items_2 = self::with( 'tags' );
 		}
-		$items  = $items
-			->where( 'name', 'like', "%{$args['search']}%" );
+		if ( ! empty( $args['search'] ) ) {
+			$items   = $items
+				->where( 'name', 'like', "%{$args['search']}%" );
+			$items_2 = $items_2
+				->where( 'name', 'like', "%{$args['search']}%" );
+		}
 		$offset = ( $args['page'] - 1 );
-		$items  = $items->offset( $offset )
-		                ->limit( $args['per_page'] )
-		                ->orderByDesc( 'id' )->get();
 
-		return $items->all();
+		if ( $args['deck_id'] ) {
+			$items   = $items->where( 'deck_id', $args['deck_id'] );
+			$items_2 = $items_2->where( 'deck_id', $args['deck_id'] );
+		}
+
+		$items = $items->offset( $offset )
+		               ->limit( $args['per_page'] )
+		               ->orderByDesc( 'id' )->get();
+
+		$all   = $items->all();
+		$total = $items_2->count();
+
+		return array(
+			'items' => $all,
+			'total' => $total,
+		);
+
+//		return $items->all();
 	}
 
 	public static function get_topics( $args ): array {

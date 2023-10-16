@@ -92,6 +92,12 @@
               <input @input="topics.onEdit(props.row)"
                      :disabled="props.row.name === 'Uncategorized' || inTrash"
                      v-model="props.row.name"/>
+              <div v-if="!inTrash" class="row-actions">
+									<span class="edit">
+									<a @click.prevent="topics.openEditModal(props.row,'#modal-edit')" class="text-blue-500 font-bold"
+                     href="#">
+									Edit <i class="fa fa-pen-alt"></i></a>  </span>
+              </div>
             </div>
             <div v-else-if="props.column.field === 'deck'">
               {{ props.row.deck ? props.row.deck.name : '' }}
@@ -134,7 +140,71 @@
           </div>
         </vue-good-table>
       </div>
+
     </div>
+
+    <!--    <?php /** Edit Modal */ ?>-->
+    <div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="exampleModalEdit" aria-hidden="true">
+      <div class="modal-dialog">
+        <form @submit.prevent="topics.updateEditing" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalEdit">Edit Topic</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div v-if="null !== topicToEdit" class="modal-body">
+            <label class="tw-simple-input">
+              <span class="tw-title">Topic</span>
+              <input v-model="topicToEdit.name" name="topic" required type="text"/>
+            </label>
+            <div>
+              <span>Deck </span>
+              <vue-mulitiselect
+                  v-model="topicToEdit.deck"
+                  :options="decks.searchResults.value"
+                  :multiple="false"
+                  :loading="decks.ajaxSearch.value.sending"
+                  :searchable="true"
+                  :allowEmpty="false"
+                  :close-on-select="true"
+                  :taggable="false"
+                  :createTag="false"
+                  @search-change="decks.search"
+                  placeholder="Deck"
+                  label="name"
+                  track-by="id"
+              ></vue-mulitiselect>
+            </div>
+            <div>
+              <span>Tags</span>
+              <vue-mulitiselect
+                  v-model="topicToEdit.tags"
+                  :options="searchTags.results.value"
+                  :multiple="true"
+                  :loading="searchTags.ajax.value.sending"
+                  :searchable="true"
+                  :close-on-select="true"
+                  :taggable="true"
+                  :createTag="false"
+                  @tag="searchTags.addTag"
+                  @search-change="searchTags.search"
+                  placeholder="Tags"
+                  label="name"
+                  track-by="id"
+              ></vue-mulitiselect>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <ajax-action
+                button-text="Update"
+                css-classes="button"
+                icon="fa fa-save"
+                :ajax="topics.ajaxUpdate.value">
+            </ajax-action>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
   <br/>
   <hover-notifications></hover-notifications>
@@ -203,13 +273,16 @@ export default defineComponent({
     topicNew() {
       return this.topics.newItem.value;
     },
+    topicToEdit() {
+      return this.topics.itemToEdit.value;
+    },
     tableDataValue() {
       return this.topics.tableData.value;
     },
   },
   created() {
     jQuery('.all-loading').hide();
-    this.topics.loadItems();
+    this.topics.load();
   },
   methods: {}
 });

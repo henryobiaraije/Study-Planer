@@ -101,9 +101,49 @@ class AjaxHelper {
 		add_action( 'admin_sp_ajax_admin_trash_collections', array( $this, 'ajax_admin_trash_collections' ) );
 		add_action( 'admin_sp_ajax_admin_delete_collections', array( $this, 'ajax_admin_delete_collections' ) );
 		// </editor-fold desc="Collections">
+
+		// <editor-fold desc="All Cards">
+		add_action( 'admin_sp_ajax_admin_search_all_cards', array( $this, 'ajax_admin_search_all_cards' ) );
+		// </editor-fold desc="All Cards">
 	}
 
 	// </editor-fold desc="General">
+
+	//    <editor-fold desc="All Cards">
+	public function ajax_admin_search_all_cards( $post ): void {
+
+		$params         = $post[ Common::VAR_2 ]['params'];
+		$per_page       = (int) sanitize_text_field( $params['per_page'] );
+		$page           = (int) sanitize_text_field( $params['page'] );
+		$search_keyword = sanitize_text_field( $params['search_keyword'] );
+		$status         = sanitize_text_field( $params['status'] );
+		$e_deck_group   = $params['deck_group'];
+		$e_deck         = $params['deck'];
+		$e_topic        = $params['topic'];
+		$e_card_types   = $params['card_types'];
+
+		$deck_group_id = is_array( $e_deck_group ) ? $e_deck_group['id'] : null;
+		$deck_id       = is_array( $e_deck ) ? $e_deck['id'] : null;
+		$topic_id      = is_array( $e_topic ) ? $e_topic['id'] : null;
+		$card_types    = is_array( $e_card_types ) ? $e_card_types : array();
+
+		$items = CardGroup::get_card_groups_simple(
+			array(
+				'search'        => $search_keyword,
+				'page'          => $page,
+				'per_page'      => $per_page,
+				'only_trashed'  => ( 'trash' === $status ) ? true : false,
+				'deck_group_id' => $deck_group_id,
+				'deck_id'       => $deck_id,
+				'topic_id'      => $topic_id,
+				'card_types'    => $card_types,
+			)
+		);
+
+		Common::send_success( 'Cards  found.', $items );
+	}
+
+	//    </editor-fold desc="All Cards">
 
 	// <editor-fold desc="Image Cards">
 
@@ -1537,28 +1577,6 @@ class AjaxHelper {
 				}
 			}
 		}
-		// if ( 'table' === $card_group->card_type ) {
-		// $card_group->whole_question = json_decode( $card_group->whole_question );
-		// foreach ( $card_group->cards as $card ) {
-		// $card->question = json_decode( $card->question );
-		// $card->answer   = json_decode( $card->answer );
-		// }
-		// } elseif ( 'image' === $card_group->card_type ) {
-		// $card_group->whole_question = json_decode( $card_group->whole_question );
-		// foreach ( $card_group->cards as $card ) {
-		// $card->question = json_decode( $card->question );
-		// $card->answer   = json_decode( $card->answer );
-		// }
-		// }
-
-		// $cards = $card_group->cards;
-		// Common::send_error([
-		// 'ajax_admin_create_new_basic_card',
-		// 'post'           => $post,
-		// '$card_group_id' => $card_group_id,
-		// '$card_group'    => $card_group,
-		// '$cards'         => $cards,
-		// ]);
 
 		Common::send_success(
 			'Loaded successfully.',
@@ -1900,17 +1918,6 @@ class AjaxHelper {
 		);
 		$totals = Deck::get_totals();
 
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// 'post'            => $post,
-		// '$params'         => $params,
-		// '$per_page'       => $per_page,
-		// '$page'           => $page,
-		// '$search_keyword' => $search_keyword,
-		// '$deck_groups'    => $deck_groups,
-		// '$status'         => $status,
-		// ] );
-
 		Common::send_success(
 			'Decks loaded.',
 			array(
@@ -1925,48 +1932,26 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_search_decks( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// 'post' => $post,
-		// ] );
 
-		$params         = $post[ Common::VAR_2 ]['params'];
-		$per_page       = (int) sanitize_text_field( $params['per_page'] );
-		$page           = (int) sanitize_text_field( $params['page'] );
-		$search_keyword = sanitize_text_field( $params['search_keyword'] );
-		$status         = sanitize_text_field( $params['status'] );
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// 'post'            => $post,
-		// '$params'         => $params,
-		// '$per_page'       => $per_page,
-		// '$page'           => $page,
-		// '$search_keyword' => $search_keyword,
-		// '$status'         => $status,
-		// ] );
+		$params          = $post[ Common::VAR_2 ]['params'];
+		$per_page        = (int) sanitize_text_field( $params['per_page'] );
+		$page            = (int) sanitize_text_field( $params['page'] );
+		$search_keyword  = sanitize_text_field( $params['search_keyword'] );
+		$status          = sanitize_text_field( $params['status'] );
+		$e_deck_group    = sanitize_text_field( $params['deck_group'] );
+		$e_deck_group_id = is_array( $e_deck_group ) ? (int) sanitize_text_field( $e_deck_group['id'] ) : null;
 
 		$items = Deck::get_deck_simple(
 			array(
-				'search'       => $search_keyword,
-				'page'         => $page,
-				'per_page'     => $per_page,
-				'only_trashed' => ( 'trash' === $status ) ? true : false,
+				'search'        => $search_keyword,
+				'page'          => $page,
+				'per_page'      => $per_page,
+				'only_trashed'  => ( 'trash' === $status ) ? true : false,
+				'deck_group_id' => $e_deck_group_id,
 			)
 		);
 
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// 'post'            => $post,
-		// '$params'         => $params,
-		// '$per_page'       => $per_page,
-		// '$page'           => $page,
-		// '$search_keyword' => $search_keyword,
-		// '$deck_groups'    => $deck_groups,
-		// '$status'         => $status,
-		// ] );
-
 		Common::send_success( 'Decks  found.', $items );
-
 	}
 
 	public function ajax_admin_create_new_deck( $post ): void {
@@ -2185,6 +2170,7 @@ class AjaxHelper {
 		$page           = (int) sanitize_text_field( $params['page'] );
 		$search_keyword = sanitize_text_field( $params['search_keyword'] );
 		$status         = sanitize_text_field( $params['status'] );
+		$e_deck_id      = is_array( $params['deck'] ) ? (int) sanitize_text_field( $params['deck']['id'] ) : null;
 
 		$items = Topic::get_topic_simple(
 			array(
@@ -2192,6 +2178,7 @@ class AjaxHelper {
 				'page'         => $page,
 				'per_page'     => $per_page,
 				'only_trashed' => ( 'trash' === $status ) ? true : false,
+				'deck_id'      => $e_deck_id,
 			)
 		);
 
@@ -2217,8 +2204,8 @@ class AjaxHelper {
 			$topic = Topic::find( $topic_id );
 			$topic->update(
 				array(
-					'name' => $name,
-					'deck' => $deck_id,
+					'name'    => $name,
+					'deck_id' => $deck_id,
 				)
 			);
 			$topic->tags()->detach();

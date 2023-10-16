@@ -49,3 +49,18 @@ form.assign-topics {
     border: 1px solid var(--sp-color-default) !important;
   }
 }
+
+.card-pagination {
+  li {
+    button {
+      &:not(.active) {
+        color: var(--sp-color-default) !important;
+      }
+
+      &.active {
+        background: var(--sp-color-default) !important;
+        border-color: var(--sp-color-default) !important;
+      }
+    }
+  }
+}

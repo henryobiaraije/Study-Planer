@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Events\Dispatcher;
 use PHPMailer\PHPMailer\Exception;
 use StudyPlanner\Initializer;
@@ -97,7 +98,7 @@ class CardGroup extends Model {
 		$offset      = ( $args['page'] - 1 );
 		$card_groups = $card_groups->offset( $offset )
 		                           ->withCount( 'cards' )
-		                           ->with( 'deck', 'topic', 'collection' )
+		                           ->with( 'deck', 'topic', 'collection', 'deck.deck_group' )
 		                           ->limit( $args['per_page'] )
 		                           ->orderByDesc( 'id' )->get();
 
@@ -162,6 +163,93 @@ class CardGroup extends Model {
 		} else {
 			return $this->type;
 		}
+	}
+
+	public static function get_card_groups_simple( $args ): array {
+		$default = [
+			'search'        => '',
+			'page'          => 1,
+			'per_page'      => 5,
+			'with_trashed'  => false,
+			'only_trashed'  => false,
+			//
+			'deck_group_id' => null,
+			'deck_id'       => null,
+			'topic_id'      => null,
+			'card_type'     => null,
+			'tags_ids'      => array(),
+		];
+
+		$args = wp_parse_args( $args, $default );
+		if ( $args['with_trashed'] ) {
+			$card_group   = self::withoutTrashed()::with( 'tags' );
+			$card_group_2 = self::withoutTrashed()::with( 'tags' );
+		} elseif ( $args['only_trashed'] ) {
+			$card_group   = self::onlyTrashed();
+			$card_group_2 = self::onlyTrashed();
+		} else {
+			$card_group   = self::with( 'tags' );
+			$card_group_2 = self::with( 'tags' );
+		}
+
+		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
+		$only_deck       = $args['deck_group_id'] && $args['deck_id'] && ! $args['topic_id'];
+		$only_topic      = $args['deck_group_id'] && $args['deck_id'] && $args['topic_id'];
+
+		if ( $only_deck_group ) {
+			$card_group   = $card_group->where( function ( $query ) use ( $args ) {
+				// sub query, card_group.deck_id in (select id from decks where deck_group_id = 1)
+				$query->whereIn( 'deck_id', function ( Builder $query ) use ( $args ) {
+					$query->select( 'id' )
+					      ->from( SP_TABLE_DECKS )
+					      ->where( 'deck_group_id', $args['deck_group_id'] );
+				} );
+			} );
+			$card_group_2 = $card_group_2->where( function ( $query ) use ( $args ) {
+				// sub query, card_group.deck_id in (select id from decks where deck_group_id = 1)
+				$query->whereIn( 'deck_id', function ( Builder $query ) use ( $args ) {
+					$query->select( 'id' )
+					      ->from( SP_TABLE_DECKS )
+					      ->where( 'deck_group_id', $args['deck_group_id'] );
+				} );
+			} );
+		} elseif ( $only_deck ) {
+			$card_group   = $card_group->where( 'deck_id', $args['deck_id'] );
+			$card_group_2 = $card_group_2->where( 'deck_id', $args['deck_id'] );
+		} elseif ( $only_topic ) {
+			$card_group   = $card_group->where( 'topic_id', $args['topic_id'] );
+			$card_group_2 = $card_group_2->where( 'topic_id', $args['topic_id'] );
+		}
+
+		if ( $args['card_type'] ) {
+			$card_group   = $card_group->where( 'card_type', $args['card_type'] );
+			$card_group_2 = $card_group_2->where( 'card_type', $args['card_type'] );
+		}
+
+		if ( $args['search'] ) {
+			$card_group   = $card_group
+				->where( 'name', 'like', "%{$args['search']}%" );
+			$card_group_2 = $card_group_2
+				->where( 'name', 'like', "%{$args['search']}%" );
+		}
+
+		$offset     = ( $args['page'] - 1 );
+		$all_object = $card_group
+			->offset( $offset )
+			->with( 'deck', 'topic', 'collection' )
+			->limit( $args['per_page'] )
+			->orderByDesc( 'id' );
+
+		$total = $card_group_2
+			->orderByDesc( 'id' )
+			->get()->count();
+
+		$all = $all_object->get()->all();
+
+		return [
+			'items' => $all,
+			'total' => $total,
+		];
 	}
 
 }

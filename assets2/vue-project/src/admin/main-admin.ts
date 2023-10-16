@@ -27,46 +27,46 @@ Store.initAdmin({
 
 function renderVue() {
     const elemAndComponent = [
-        // {
-        //     elem: '.admin-topics',
-        //     component: AdminTopics,
-        // },
-        // {
-        //     elem: '.admin-groups',
-        //     component: AdminDeckGroups
-        // },
-        // {
-        //     elem: '.admin-decks',
-        //     component: AdminDecks
-        // },
-        // {
-        //     elem: '.admin-tags',
-        //     component: AdminTags
-        // },
-        // {
-        //     elem: '.admin-all-cards',
-        //     component: AdminAllCards
-        // },
-        // {
-        //     elem: '.admin-basic-card',
-        //     component: AdminBasicCard
-        // },
-        // {
-        //     elem: '.admin-gap-card',
-        //     component: AdminGapCard
-        // },
-        // {
-        //     elem: '.admin-table-card',
-        //     component: AdminTableCard
-        // },
-        // {
-        //     elem: '.admin-image-card',
-        //     component: AdminImageCard
-        // },
-        // {
-        //     elem: '.admin-collections',
-        //     component: AdminCollections
-        // },
+        {
+            elem: '.admin-topics',
+            component: AdminTopics,
+        },
+        {
+            elem: '.admin-groups',
+            component: AdminDeckGroups
+        },
+        {
+            elem: '.admin-decks',
+            component: AdminDecks
+        },
+        {
+            elem: '.admin-tags',
+            component: AdminTags
+        },
+        {
+            elem: '.admin-all-cards',
+            component: AdminAllCards
+        },
+        {
+            elem: '.admin-basic-card',
+            component: AdminBasicCard
+        },
+        {
+            elem: '.admin-gap-card',
+            component: AdminGapCard
+        },
+        {
+            elem: '.admin-table-card',
+            component: AdminTableCard
+        },
+        {
+            elem: '.admin-image-card',
+            component: AdminImageCard
+        },
+        {
+            elem: '.admin-collections',
+            component: AdminCollections
+        },
         {
             elem: '.admin-assign-topics',
             component: AdminAssignTopics

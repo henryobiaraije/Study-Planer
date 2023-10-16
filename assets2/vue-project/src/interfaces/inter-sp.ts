@@ -27,7 +27,10 @@ export interface _Topic {
     deck: _Deck,
     created_at: string;
     updated_at: boolean,
+    tags: Array<_Tag>;
 }
+
+export type _TopicNew = Partial<_Topic & Pick<_Topic, 'name' | 'deck' | 'tags'>>;
 
 export interface _Tag {
     id: string;
@@ -160,7 +163,9 @@ export interface _AssignTopic {
     topic: null | _Topic,
     group: null | _DeckGroup,
     deck: null | _Deck,
-    cardTypes: Array<'basic' | 'gap' | 'table' | 'image'>,
+    cardTypes: Array<CardType>,
     individualCards: Array<_Card>,
     selectedCards: Array<_Card>,
 }
+
+export type CardType = 'basic' | 'gap' | 'table' | 'image';
