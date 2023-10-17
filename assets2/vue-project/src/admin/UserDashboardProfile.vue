@@ -1,15 +1,15 @@
 <template>
   <div class="user-profile">
-    <div v-if="null !== useUserProfile.profile.value" class="bg-white " style="max-width: 500px;margin: auto;">
+    <div class="bg-white " style="max-width: 500px;margin: auto;">
       <table class="table">
         <tbody>
         <tr>
           <th>Username</th>
-          <td>{{ useUserProfile.profile.value.user_name }}</td>
+          <td>{{ username}} </td>
         </tr>
         <tr>
           <th>Email</th>
-          <td>{{ useUserProfile.profile.value.user_email }}</td>
+          <td>{{ email}} </td>
         </tr>
         </tbody>
       </table>
@@ -19,23 +19,28 @@
 <script lang="ts">
 
 import {defineComponent} from "vue";
-import useUserProfile from "@/composables/useUserProfile";
 
 export default defineComponent({
   name: 'UserDashboardProfile',
   components: {},
-  props: {},
+  props: {
+    username: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {}
   },
   setup: (props, ctx) => {
-    return {
-      useUserProfile: useUserProfile(),
-    }
+    return {}
   },
   computed: {},
   created() {
-
   },
   methods: {}
 });

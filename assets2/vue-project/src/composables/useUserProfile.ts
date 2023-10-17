@@ -28,32 +28,33 @@ export default function () {
     let profile = ref<_UserProfile>(null);
 
 
-    const _loadProfile = () => {
-        xhrLoadProfile();
-    };
     const _updateProfile = () => {
         xhrUpdateProfile();
     }
 
     const xhrLoadProfile = () => {
-
         const handleAjax: HandleAjax = new HandleAjax(ajax);
-        new Server().send_online({
-            data: [
-                spClientData().nonce,
-                {}
-            ],
-            what: "front_sp_ajax_admin_load_user_profile",
-            funcBefore() {
-                handleAjax.start();
-            },
-            funcSuccess(done: InterFuncSuccess<any>) {
-                handleAjax.stop();
-                profile.value = done.data;
-            },
-            funcFailue(done) {
-                handleAjax.stop();
-            },
+        return new Promise((resolve, reject) => {
+            new Server().send_online({
+                data: [
+                    spClientData().nonce,
+                    {}
+                ],
+                what: "front_sp_ajax_admin_load_user_profile",
+                funcBefore() {
+                    handleAjax.start();
+
+                },
+                funcSuccess(done: InterFuncSuccess<any>) {
+                    handleAjax.stop();
+                    profile.value = done.data;
+                    resolve(done);
+                },
+                funcFailue(done) {
+                    handleAjax.stop();
+                    reject(done);
+                },
+            });
         });
     };
     const xhrUpdateProfile = () => {
@@ -78,6 +79,8 @@ export default function () {
             },
         });
     };
+
+    const _loadProfile = xhrLoadProfile;
 
     return {
         ajax,

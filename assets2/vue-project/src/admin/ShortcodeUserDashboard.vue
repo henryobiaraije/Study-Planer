@@ -1,7 +1,7 @@
 <template>
-  <div class="sp sp-sc-ud">
+  <div class="sp sp-sc-ud min-h-[60vh]">
     <!-- Tabs -->
-    <div class="sp-tab flex gap-2 justify-content-center my-4 all-loaded">
+    <div class="sp-tab flex gap-2 justify-center my-4 all-loaded">
       <div class="sp-one-tab ">
         <a :href="getUrl('deck-groups')" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
 			text-decoration-none bg-sp-200"
@@ -31,21 +31,21 @@
     </div>
 
 
-    <div class="all-loaded" style="display: none">
-
-      <!-- Deck groups -->
-      <!--      <div v-if="menu === 'deck-groups'" class="section-deck-groups">-->
-      <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/deck-groups'); ?>-->
-      <!--      </div>-->
-      <!--      <div v-if="menu === 'stats'" class="section-stats">-->
-      <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/stats'); ?>-->
-      <!--      </div>-->
-      <!--      <div v-if="menu === 'settings'" class="section-settings">-->
-      <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/settings'); ?>-->
-      <!--      </div>-->
-      <div v-if="menu === 'profile'" class="section-profile">
-        <UserDashboardProfile/>
-      </div>
+    <!-- Deck groups -->
+    <!--      <div v-if="menu === 'deck-groups'" class="section-deck-groups">-->
+    <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/deck-groups'); ?>-->
+    <!--      </div>-->
+    <!--      <div v-if="menu === 'stats'" class="section-stats">-->
+    <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/stats'); ?>-->
+    <!--      </div>-->
+    <!--      <div v-if="menu === 'settings'" class="section-settings">-->
+    <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/settings'); ?>-->
+    <!--      </div>-->
+    <div v-if="menu === 'profile'" class="section-profile">
+      <UserDashboardProfile
+          :email="userProfile.profile.value ? userProfile.profile.value.user_email : 'loading...'"
+          :username="userProfile.profile.value ? userProfile.profile.value.user_name : 'loading...'"
+      />
     </div>
 
     <!--    <?php /** Question display modal */ ?>-->
@@ -99,7 +99,7 @@ export default defineComponent({
       searchTags: useTagSearch(false),
       userDash: useUserDashboard(),
       timezones: useTimezones(),
-      useUserProfile: useUserProfile(),
+      userProfile: useUserProfile(),
       useStats: useStats()
     }
   },
@@ -129,7 +129,7 @@ export default defineComponent({
       } else if (menu === 'stats') {
         // this.useStats._loadAllStats();
       } else if (menu === 'profile') {
-        this.useUserProfile._loadProfile();
+        this.userProfile._loadProfile();
       }
     },
     getUrl(page: string): string {
@@ -159,7 +159,7 @@ export default defineComponent({
       } else if (menu === 'stats') {
         // this.useStats._loadAllStats();
       } else if (menu === 'profile') {
-        this.useUserProfile._loadProfile();
+        this.userProfile._loadProfile();
       }
     }
   }

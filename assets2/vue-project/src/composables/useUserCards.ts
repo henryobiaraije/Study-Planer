@@ -199,7 +199,6 @@ export default function (status = 'publish') {
     return {
         ajaxSave: ajaxSave, save: xhrSave, form: assignForm,
         oneSpecificCard, assignTopics: xhrAssignTopics, ajaxAssignTopics,
-        ajaxAssignTopics,
     };
 
 }
