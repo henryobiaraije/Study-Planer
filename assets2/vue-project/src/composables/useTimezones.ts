@@ -3,6 +3,7 @@ import type {_Ajax} from "@/classes/HandleAjax";
 import {HandleAjax} from "@/classes/HandleAjax";
 import {type InterFuncSuccess, Server} from "@/static/server";
 import {spClientData} from "@/functions";
+import {toast} from "vue3-toastify";
 
 
 export default function () {
@@ -68,6 +69,7 @@ export default function () {
             },
             funcFailue(done) {
                 handleAjax.stop();
+                toast.error(done.data.message);
             },
         });
     };

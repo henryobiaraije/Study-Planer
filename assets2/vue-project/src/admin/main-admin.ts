@@ -14,6 +14,8 @@ import AdminImageCard from "@/admin/AdminImageCard.vue";
 import AdminCollections from "@/admin/AdminCollections.vue";
 import AdminAssignTopics from "@/admin/AdminAssignTopics.vue";
 import ShortcodeUserDashboard from "@/admin/ShortcodeUserDashboard.vue";
+import 'vue3-toastify/dist/index.css';
+import Vue3Toastify, {toast, type ToastContainerOptions} from "vue3-toastify";
 
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
@@ -83,6 +85,10 @@ function renderVue() {
         if (elem.length) {
             // @ts-ignore
             const app = createApp(item.component);
+            app.use(Vue3Toastify, {
+                autoClose: 4000,
+                position: 'bottom-right'
+            } as ToastContainerOptions);
             app.mount(item.elem);
         }
     });

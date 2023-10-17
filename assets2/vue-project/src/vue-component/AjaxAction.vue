@@ -1,6 +1,13 @@
 <template>
   <component :is="el">
-    <button @click="startSending" :disabled="ajax.sending" type="submit" :class="cssClasses">{{ buttonText }}
+    <button @click="startSending" :disabled="ajax.sending" type="submit"
+            :class="[
+                cssClasses,
+                'border border-solid border-sp-400 px-4 py-2 rounded-md',
+                'bg-sp-500 text-white font-bold',
+                'hover:bg-sp-700 hover:text-white',
+              ]"
+    >{{ buttonText }}
       <i v-if="icon.length > 0 && !ajax.sending" :class="[icon]"></i>
       <i v-if="ajax.sending" class="fa fa-spin fa-spinner"></i>
     </button>

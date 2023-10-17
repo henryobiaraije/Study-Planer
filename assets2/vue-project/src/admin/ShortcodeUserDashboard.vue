@@ -38,16 +38,25 @@
     <!--      <div v-if="menu === 'stats'" class="section-stats">-->
     <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/stats'); ?>-->
     <!--      </div>-->
-    <!--      <div v-if="menu === 'settings'" class="section-settings">-->
-    <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/settings'); ?>-->
-    <!--      </div>-->
-    <div v-if="menu === 'profile'" class="section-profile">
+    <div v-if="menu === 'settings'" class="section-settings">
+      <UserDashboardSettings
+          :user-time-zone="timezones.userTimeZone.value"
+          :the-timezones="timezones.timezones.value ? timezones.timezones.value : []"
+          :loading="timezones.ajax.sending"
+      />
+    </div>
+    <div v-if=" menu===
+      'profile'" class="section-profile">
       <UserDashboardProfile
           :email="userProfile.profile.value ? userProfile.profile.value.user_email : 'loading...'"
           :username="userProfile.profile.value ? userProfile.profile.value.user_name : 'loading...'"
       />
     </div>
 
+    <button
+        @click="testToast"
+    >Test toast
+    </button>
     <!--    <?php /** Question display modal */ ?>-->
     <!--    <div>-->
     <!--      <?php \StudyPlanner\load_template('shortcodes/dashboard/study-complete-modal'); ?>-->
@@ -84,10 +93,12 @@ import useTagSearch from "@/composables/useTagSearch";
 import {CalendarHeatmap} from 'vue3-calendar-heatmap'
 import useStats from "@/composables/useStats";
 import UserDashboardProfile from "@/admin/UserDashboardProfile.vue";
+import UserDashboardSettings from "@/admin/UserDashboardSettings.vue";
+import {toast} from "vue3-toastify";
 
 export default defineComponent({
   name: 'ShortcodeUserDashboard',
-  components: {UserDashboardProfile, HoverNotifications, CalendarHeatmap},
+  components: {UserDashboardSettings, UserDashboardProfile, HoverNotifications, CalendarHeatmap},
   props: {},
   data() {
     return {
@@ -161,6 +172,9 @@ export default defineComponent({
       } else if (menu === 'profile') {
         this.userProfile._loadProfile();
       }
+    },
+    testToast() {
+      toast.success('test toast');
     }
   }
 });

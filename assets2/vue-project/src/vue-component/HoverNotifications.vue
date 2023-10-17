@@ -13,6 +13,8 @@
 import {defineComponent} from "vue";
 import HoverNotificationItem from "@/vue-component/HoverNotificationItem.vue";
 import type {_HoverNotification} from "@/vue-component/enums";
+import {ENUM_NOTIFICATION_TYPE} from "@/vue-component/enums";
+import {toast} from "vue3-toastify";
 
 export default defineComponent({
   name: 'HoverNotifications',
@@ -24,8 +26,14 @@ export default defineComponent({
   created() {
     // console.log('created');
     jQuery('body').on('addNotification', (event, notification: _HoverNotification) => {
-      // console.log('receiving trigger', {notification});
-      this.notifications.push(notification);
+      console.log('receiving trigger', {notification});
+      // this.notifications.push(notification);
+
+      if (notification.type === ENUM_NOTIFICATION_TYPE.SUCCESS) {
+        toast.success(notification.text);
+      } else {
+        toast.error(notification.text);
+      }
     });
   }
 });
