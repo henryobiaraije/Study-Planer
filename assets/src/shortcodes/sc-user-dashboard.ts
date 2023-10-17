@@ -119,6 +119,7 @@ const mGeneral = {
     } else if (menu === 'profile') {
       dis(this).useUserProfile._loadProfile();
     }
+
   },
   getNewAjax(): _Ajax {
     return {

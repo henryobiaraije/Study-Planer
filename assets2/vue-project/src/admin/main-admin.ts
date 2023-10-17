@@ -13,6 +13,7 @@ import AdminTableCard from "@/admin/AdminTableCard.vue";
 import AdminImageCard from "@/admin/AdminImageCard.vue";
 import AdminCollections from "@/admin/AdminCollections.vue";
 import AdminAssignTopics from "@/admin/AdminAssignTopics.vue";
+import ShortcodeUserDashboard from "@/admin/ShortcodeUserDashboard.vue";
 
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
@@ -70,6 +71,10 @@ function renderVue() {
         {
             elem: '.admin-assign-topics',
             component: AdminAssignTopics
+        },
+        {
+            elem: '.sp-user-dashboard',
+            component: ShortcodeUserDashboard
         },
     ] as Array<{ elem: string, component: any }>;
 

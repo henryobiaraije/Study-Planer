@@ -295,7 +295,14 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrSearch = (query: string, deckGroup: null | _DeckGroup = null, deck: null | _Deck = null, topic: null | _Topic = null, cardTypes: [] | CardType[] = []) => {
+    const xhrSearch = (
+        query: string,
+        deckGroup: null | _DeckGroup = null,
+        deck: null | _Deck = null,
+        topic: null | _Topic = null,
+        cardTypes: [] | CardType[] = [],
+
+    ) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
         sendOnline = new Server().send_online({
             data: [

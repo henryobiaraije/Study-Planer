@@ -44,10 +44,60 @@
   border: 0 !important;
 }
 
-form.assign-topics {
-  .multiselect__tags {
-    border: 1px solid var(--sp-color-default) !important;
-  }
+.multiselect__tags {
+  border: 1px solid var(--sp-color-default) !important;
+}
+
+.multiselect__spinner:before, .multiselect__spinner:after {
+  border-color: var(--sp-color-500) transparent transparent !important;
+}
+
+.multiselect__option--highlight {
+  background: var(--sp-color-500) !important;
+}
+.multiselect__option--highlight {
+  background: var(--sp-color-400) !important;
+  outline: none;
+  color: white;
+}
+
+.multiselect__option--highlight:after {
+  content: attr(data-select);
+  background: var(--sp-color-500) !important;
+  color: white;
+}
+
+.multiselect__option--selected {
+  background: #F3F3F3;
+  color: #35495E;
+  font-weight: bold;
+}
+
+.multiselect__option--selected:after {
+  content: attr(data-selected);
+  color: silver;
+}
+
+.multiselect__option--selected.multiselect__option--highlight {
+  background: #FF6A6A;
+  color: #fff;
+}
+
+.multiselect__option--selected.multiselect__option--highlight:after {
+  background: #FF6A6A;
+  content: attr(data-deselect);
+  color: #fff;
+}
+
+.multiselect--disabled {
+  background: #ededed;
+  pointer-events: none;
+}
+
+.multiselect--disabled .multiselect__current,
+.multiselect--disabled .multiselect__select {
+  background: #ededed;
+  color: #a6a6a6;
 }
 
 .card-pagination {

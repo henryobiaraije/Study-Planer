@@ -101,6 +101,13 @@ export default function (status = 'publish') {
         success: false,
         successMessage: '',
     });
+    const ajaxAssignTopics = ref<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
     const theForm = {
         topicToAssign: null as null | _Topic,
         selectedCards: [] as _CardGroup[],
@@ -110,6 +117,7 @@ export default function (status = 'publish') {
         cardTypes: [] as CardType[],
         page: 1,
         activeTab: 'found' as 'found' | 'selected',
+        whatToDo: 'selected_cards' as 'selected_cards' | 'selected_group' | 'selected_deck' | 'selected_topic'
     };
     const assignForm = ref<typeof theForm>(theForm);
     const oneSpecificCard = ref<_CardGroup | null>(null)
@@ -142,6 +150,7 @@ export default function (status = 'publish') {
                         group: assignForm.value.group,
                         deck: assignForm.value.deck,
                         topic: assignForm.value.topic,
+                        what_to_do: assignForm.value.whatToDo,
                     },
                 }
             ],
@@ -158,9 +167,39 @@ export default function (status = 'publish') {
         });
     };
 
+    const xhrAssignTopics = () => {
+        const handleAjax: HandleAjax = new HandleAjax(ajaxAssignTopics.value);
+        return new Server().send_online({
+            data: [
+                spClientData().nonce,
+                {
+                    params: {
+                        cards: assignForm.value.selectedCards,
+                        group: assignForm.value.group,
+                        deck: assignForm.value.deck,
+                        topic: assignForm.value.topic,
+                        what_to_do: assignForm.value.whatToDo,
+                    },
+                }
+            ],
+            what: "admin_sp_ajax_admin_assign_topics",
+            funcBefore() {
+                handleAjax.start();
+            },
+            funcSuccess(done: InterFuncSuccess<any>) {
+                handleAjax.stop();
+            },
+            funcFailue(done) {
+                handleAjax.error(done);
+            },
+        });
+    };
+
+
     return {
         ajaxSave: ajaxSave, save: xhrSave, form: assignForm,
-        oneSpecificCard
+        oneSpecificCard, assignTopics: xhrAssignTopics, ajaxAssignTopics,
+        ajaxAssignTopics,
     };
 
 }

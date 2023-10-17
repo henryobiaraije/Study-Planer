@@ -6,6 +6,7 @@ namespace StudyPlanner\Shortcodes;
 
 use StudyPlanner\Initializer;
 use StudyPlanner\Libs\Common;
+use StudyPlanner\Services\FileService;
 use function StudyPlanner\get_template_path;
 
 /**
@@ -49,9 +50,15 @@ class Short_User_Dashboard {
     }
 
     final public function load_view($attr): string {
-
         do_action('sp_enqueue_scripts_sc_user_dashboard');
-        $html = Common::get_contents(get_template_path('shortcodes/sc-user-dashboard'));
+//        $html = Common::get_contents(get_template_path('shortcodes/sc-user-dashboard'));
+	    $html =  '<div class="sp sp-user-dashboard wrap"></div>';
+	    $html .= '
+			<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
+				<div style="text-align: center;flex: 12;font-size: 50px;" >
+				<i class="fa fa-spin fa-spinner" ></i ></div >
+			</div>
+		';
 
         return $html;
     }
@@ -66,11 +73,13 @@ class Short_User_Dashboard {
 
     final public function register_scripts(): void {
         $dis         = $this;
-        $css         = Initializer::$js_url.'/public/sc-user-dashboard.css';
-        $js          = Initializer::$js_url.'/public/sc-user-dashboard.js';
+//        $css         = Initializer::$js_url.'/public/sc-user-dashboard.css';
+//        $js          = Initializer::$js_url.'/public/sc-user-dashboard.js';
         $d3js        = '//d3js.org/d3.v3.min.js';
         $js_heatmap  = '//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js';
         $css_heatmap = '//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.css';
+	    $js  = FileService::mp_get_js_url( 'main-admin' );
+	    $css = FileService::mp_get_css_url( 'main-admin' );
 
         wp_register_style('sp-sc-user-dashboard', $css, [], Initializer::$script_version);
         wp_register_script('sp-sc-user-dashboard', $js, ['jquery'], Initializer::$script_version, true);

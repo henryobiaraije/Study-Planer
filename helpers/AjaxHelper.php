@@ -123,15 +123,16 @@ class AjaxHelper {
 		$topic_id      = is_array( $params['topic'] ) ? $params['topic']['id'] : null;
 		$deck_id       = is_array( $params['deck'] ) ? $params['deck']['id'] : null;
 		$deck_group_id = is_array( $params['deck_group'] ) ? $params['deck_group']['id'] : null;
+		// 'selected_cards' as 'selected_cards' | 'selected_group' | 'selected_deck' | 'selected_topic'
+		$what_to_do = $params['what_to_do'];
 
-		if ( ! is_array( $cards_ids ) ) {
-			Common::send_error( 'Invalid cards ids' );
-		}
-
-		if ( null !== $deck_group_id ) {
+		if ( 'selected_group' === $what_to_do ) {
+			if ( empty( $deck_group_id ) ) {
+				Common::send_error( 'Please select a deck group' );
+			}
 			$deck_group = DeckGroup
 				::find( $deck_group_id )
-				->with( 'decks.card_groups' )
+				->with( 'decks.card_groups.cards' )
 				->get()->all();
 
 			if ( $deck_group() ) {

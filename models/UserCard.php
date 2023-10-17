@@ -28,7 +28,6 @@ class UserCard extends Model {
 	public function user(): BelongsTo {
 		return $this->belongsTo( User::class, 'user_id' );
 	}
-
 	public function card_group(): BelongsTo {
 		return $this->belongsTo( CardGroup::class, 'card_group_id' );
 	}
