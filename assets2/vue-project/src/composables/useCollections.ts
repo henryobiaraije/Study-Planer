@@ -18,6 +18,21 @@ const tableData = ref({
             tooltip: 'Endpoint Name',
         },
         {
+            label: 'Cards',
+            field: 'cards',
+            tooltip: 'Total Cards',
+        },
+        {
+            label: 'Publish',
+            field: 'publish',
+            tooltip: 'Publish Collection',
+        },
+        {
+            label: 'Delete',
+            field: 'delete',
+            tooltip: 'Delete Collection',
+        },
+        {
             label: 'Created At',
             field: 'created_at',
         },
@@ -119,6 +134,13 @@ export default function (status = 'publish') {
         success: false,
         successMessage: '',
     });
+    const ajaxPublish = ref<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
     const modalEditId = ref('');
     tableData.value.post_status = status;
     const editedItemTracker = ref<{ [key: number]: { editCounter: number } }>({});
@@ -142,9 +164,7 @@ export default function (status = 'publish') {
     const batchTrash = () => {
         xhrTrashBatch(tt().selectedRows);
     }
-    const batchDelete = () => {
-        xhrDeleteBatch(tt().selectedRows);
-    }
+
     const load = () => {
         xhrLoad();
     }
@@ -235,7 +255,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
                 const items = done.data.details.collections;
                 const total = done.data.details.total;
@@ -271,7 +291,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
                 searchResults.value = done.data;
             },
@@ -295,7 +315,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
             },
             funcFailue(done) {
@@ -320,7 +340,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
@@ -345,7 +365,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
@@ -354,6 +374,32 @@ export default function (status = 'publish') {
             },
         });
     };
+    const xhrPublishBatch = (items: Array<_Collection>) => {
+        if (!confirm('Are you sure you want to publish the cards in the collection? This action is not reversible.')) {
+            return;
+        }
+        const handleAjax: HandleAjax = new HandleAjax(ajaxDelete.value);
+        sendOnline = new Server().send_online({
+            data: [
+                Store.nonce,
+                {
+                    decks: items,
+                }
+            ],
+            what: "admin_sp_ajax_admin_publish_collections",
+            funcBefore() {
+                handleAjax.start();
+            },
+            funcSuccess(done: InterFuncSuccess<any>) {
+                handleAjax.success(done);
+                xhrLoad();
+            },
+            funcFailue(done) {
+                handleAjax.error(done);
+            },
+        });
+    };
+
     const xhrCreateNew = () => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
         new Server().send_online({
@@ -367,7 +413,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 useDeckGroupLists().load();
                 newItem.value.name = '';
@@ -378,6 +424,10 @@ export default function (status = 'publish') {
             },
         });
     };
+
+    const batchDelete = () => {
+        xhrDeleteBatch(tt().selectedRows);
+    }
 
     // onMounted(() => {
     //   tableData.value.post_status = status;
@@ -391,6 +441,8 @@ export default function (status = 'publish') {
         onSortChange, onColumnFilter, updateEditing,
         batchUpdate, batchDelete, batchTrash,
         totals, closeEditModal, openEditModal, search, searchResults,
+        delete: xhrDeleteBatch,
+        publish: xhrPublishBatch, ajaxPublish,
     };
 
 }

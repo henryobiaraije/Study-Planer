@@ -2613,10 +2613,6 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_load_collections( $post ): void {
-		// Common::send_error( [
-		// 'ajax_admin_load_deck_group',
-		// 'post' => $post,
-		// ] );
 
 		$params         = $post[ Common::VAR_2 ]['params'];
 		$per_page       = (int) sanitize_text_field( $params['per_page'] );

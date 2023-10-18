@@ -4,11 +4,13 @@
             :class="[
                 cssClasses,
                 'border border-solid border-sp-400 px-4 py-2 rounded-md',
-                'bg-sp-500 text-white font-bold',
-                'hover:bg-sp-700 hover:text-white',
+                '!bg-sp-500 !text-white !font-bold',
+                '!hover:bg-sp-800 !hover:text-white',
               ]"
     >{{ buttonText }}
-      <i v-if="icon.length > 0 && !ajax.sending" :class="[icon]"></i>
+      <template v-if="showIcon">
+        <i v-if="icon.length > 0 && !ajax.sending" :class="[icon]"></i>
+      </template>
       <i v-if="ajax.sending" class="fa fa-spin fa-spinner"></i>
     </button>
   </component>
@@ -48,7 +50,11 @@ const props = defineProps({
   icon: {
     type: String,
     default: ''
-  }
+  },
+  showIcon: {
+    type: Boolean,
+    default: true
+  },
 });
 
 function startSending(event) {

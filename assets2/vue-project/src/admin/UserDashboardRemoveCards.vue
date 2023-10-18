@@ -40,6 +40,7 @@
               <ajax-action
                   button-text="Remove"
                   css-classes="button !px-2 !py-1"
+                  :show-icon="false"
                   icon="fa fa-save"
                   @click="userCards.removeCard(props.row.id)"
                   :ajax="userCards.ajaxRemoveCard.value">

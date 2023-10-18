@@ -17,7 +17,7 @@ class Collections extends Model {
 
 	use SoftDeletes;
 
-	protected $dates    = array( 'deleted_at' );
+	protected $dates = array( 'deleted_at' );
 	protected $fillable = array( 'name' );
 
 	public function cards(): \Illuminate\Database\Eloquent\Relations\HasManyThrough {
@@ -28,12 +28,8 @@ class Collections extends Model {
 		return $this->hasMany( CardGroup::class );
 	}
 
-	public function card_group() {
-		return $this->hasMany( CardGroup::class, 'deck_id' );
-	}
-
 	public function card_groups() {
-		return $this->hasMany( CardGroup::class, 'deck_id' );
+		return $this->hasMany( CardGroup::class, 'collection_id' );
 	}
 
 	public static function get_collections_simple( $args ): array {
@@ -55,8 +51,8 @@ class Collections extends Model {
 		$items  = self::where( 'name', 'like', "%{$args['search']}%" );
 		$offset = ( $args['page'] - 1 );
 		$items  = $items->offset( $offset )
-						->limit( $args['per_page'] )
-						->orderByDesc( 'id' )->get();
+		                ->limit( $args['per_page'] )
+		                ->orderByDesc( 'id' )->get();
 
 		return $items->all();
 	}
@@ -74,9 +70,11 @@ class Collections extends Model {
 
 		$total       = $collections->count();
 		$offset      = ( $args['page'] - 1 );
-		$collections = $collections->offset( $offset )
-								   ->limit( $args['per_page'] )
-								   ->orderByDesc( 'id' )->get();
+		$collections = $collections
+			->offset( $offset )
+			->with( 'card_groups' )
+			->limit( $args['per_page'] )
+			->orderByDesc( 'id' )->get();
 
 		return array(
 			'total'       => $total,
@@ -87,10 +85,10 @@ class Collections extends Model {
 	public static function get_totals(): array {
 		$all     = array();
 		$active  = self::query()
-					   ->selectRaw( Manager::raw( 'count(*) as count' ) )
-					   ->get();
+		               ->selectRaw( Manager::raw( 'count(*) as count' ) )
+		               ->get();
 		$trashed = self::onlyTrashed()
-					   ->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
+		               ->selectRaw( Manager::raw( 'count(*) as count' ) )->get();
 
 		$all['active']  = $active[0]['count'];
 		$all['trashed'] = $trashed[0]['count'];

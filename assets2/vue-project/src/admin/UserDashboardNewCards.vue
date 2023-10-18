@@ -41,6 +41,7 @@
               <ajax-action
                   button-text="Ignore"
                   css-classes="button !px-2 !py-1"
+                  :show-icon="false"
                   icon="fa fa-save"
                   @click="userCards.ignoreCard(props.row.id)"
                   :ajax="userCards.ajaxIgnoreCard.value">

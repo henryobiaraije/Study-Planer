@@ -9,6 +9,14 @@
       Trashed <span class="count">({{ totalTrash }})</span></a>
     </li>
   </ul>
+  <ul>
+    <li>All the cards in these collections will not be shown on the frontend.</li>
+    <li><b>Publish: </b>Publish a collection to make all the cards in collection accessible from the frontend.</li>
+    <li><b>Delete: </b>When you delete a collection, all the cards in that collection will also be published and the
+      collection will be deleted.
+    </li>
+  </ul>
+
   <!--  Body  -->
   <div class="">
     <div class="flex flex-wrap gap-3 px-1 md:px-4">
@@ -65,6 +73,30 @@
             </div>
             <div v-else-if="props.column.field === 'deck_group'">
               {{ props.row.deck_group ? props.row.deck_group.name : '' }}
+            </div>
+            <div v-else-if="props.column.field === 'publish'">
+              <ajax-action
+                  button-text="Remove"
+                  css-classes="button !px-2 !py-1"
+                  icon="fa fa-save"
+                  :show-icon="false"
+                  @click="collections.publish(props.row)"
+                  :ajax="collections.ajaxPublish.value">
+              </ajax-action>
+            </div>
+            <div v-else-if="props.column.field === 'delete'">
+              <ajax-action
+                  button-text="Delete"
+                  css-classes="button !px-2 !py-1"
+                  icon="fa fa-save"
+                  :show-icon="false"
+                  @click="collections.delete([props.row])"
+                  :ajax="collections.ajaxDelete.value">
+              </ajax-action>
+            </div>
+            <div v-else-if="props.column.field === 'cards'">
+              {{ props.row.card_groups ? props.row.card_groups.length : 0 }}
+              {{ props.row.card_groups && props.row.card_groups.length === 1 ? 'Card' : 'Cards' }}
             </div>
             <div v-else-if="props.column.field === 'tags'">
               <ul class="" style="min-width: 100px;">
