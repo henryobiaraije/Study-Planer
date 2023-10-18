@@ -26,7 +26,7 @@
 
     <p>Filter cards below and add them to the above topic.</p>
 
-    <CardSelector/>
+    <CardSelector :user-cards="userCards"/>
 
     <!--  What to do -->
     <div v-if="form.topicToAssign"

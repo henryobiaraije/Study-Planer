@@ -7,6 +7,7 @@ import {Store} from "@/static/store";
 import useDeckGroupLists from "@/composables/useDeckGroupLists";
 import Cookies from "js-cookie";
 import {spClientData} from "@/functions";
+import {toast} from "vue3-toastify";
 
 declare var bootstrap;
 
@@ -202,18 +203,22 @@ export default function (status = 'publish') {
                         deck: assignForm.value.deck,
                         topic: assignForm.value.topic,
                         what_to_do: assignForm.value.whatToDo,
+                        topic_to_assign: assignForm.value.topicToAssign,
                     },
                 }
             ],
             what: "admin_sp_ajax_admin_assign_topics",
             funcBefore() {
+                console.log('before');
                 handleAjax.start();
             },
             funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
+                toast.success(done.message);
             },
             funcFailue(done) {
                 handleAjax.error(done);
+                toast.error(done.message);
             },
         });
     };

@@ -23,6 +23,10 @@ const tableData = ref({
             tooltip: 'Deck',
         },
         {
+            label: 'Cards',
+            field: 'cards',
+        },
+        {
             label: 'Tags',
             field: 'tags',
         },

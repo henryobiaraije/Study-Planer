@@ -102,6 +102,10 @@
             <div v-else-if="props.column.field === 'deck'">
               {{ props.row.deck ? props.row.deck.name : '' }}
             </div>
+            <div v-else-if="props.column.field === 'cards'">
+              {{ props.row.cards ? props.row.cards.length : '0' }}
+              {{ props.row.cards ? props.row.cards.length > 1 ? 'Cards' : 'Card' : 'Card' }}
+            </div>
             <div v-else-if="props.column.field === 'tags'">
               <ul class="" style="min-width: 100px;">
                 <li v-for="(item,itemIndex) in props.row.tags"

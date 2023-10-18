@@ -24,10 +24,11 @@ export default defineComponent({
   }),
   methods: {},
   created() {
-    // console.log('created');
+    console.log('created');
     jQuery('body').on('addNotification', (event, notification: _HoverNotification) => {
       console.log('receiving trigger', {notification});
       // this.notifications.push(notification);
+      console.log('notification', notification);
 
       if (notification.type === ENUM_NOTIFICATION_TYPE.SUCCESS) {
         toast.success(notification.text);

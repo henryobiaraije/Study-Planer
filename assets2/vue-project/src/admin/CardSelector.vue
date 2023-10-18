@@ -155,7 +155,6 @@
                   @paginate="callback"/>
     </div>
 
-
   </div>
 </template>
 <script lang="ts">
@@ -191,7 +190,12 @@ export default defineComponent({
     InputEditorB, InputEditor, PickImage, VueMulitiselect, TimeComp, AjaxAction, HoverNotifications,
     Pagination
   },
-  props: {},
+  props: {
+    userCards: {
+      type: Object as () => ReturnType<typeof useUserCards>,
+      required: true
+    }
+  },
   data() {
     return {
       pageTitle: 'Assign Topics',
@@ -212,7 +216,7 @@ export default defineComponent({
       topics: useTopics(),
       collections: useCollections(),
       allCards: useAllCards(),
-      userCards: useUserCards()
+      // userCards: useUserCards()
     }
   },
   computed: {

@@ -106,10 +106,10 @@ class AjaxHelper {
 		// <editor-fold desc="All Cards">
 		add_action( 'admin_sp_ajax_admin_search_all_cards', array( $this, 'ajax_admin_search_all_cards' ) );
 		// </editor-fold desc="All Cards">
-
 		// <editor-fold desc="User Cards">
 
 		add_action( 'admin_sp_ajax_admin_save_user_cards', array( $this, 'ajax_admin_save_user_cards' ) );
+		add_action( 'admin_sp_ajax_admin_assign_topics', array( $this, 'ajax_admin_assign_topics' ) );
 
 		// </editor-fold desc="User Cards">
 	}
@@ -2701,7 +2701,6 @@ class AjaxHelper {
 
 	}
 
-	// </editor-fold desc="Collections">
 
 	/**
 	 * Publish the cards in these collections by just removing the collection id.
@@ -2726,5 +2725,60 @@ class AjaxHelper {
 	}
 
 	// </editor-fold desc="Collections">
+
+	// <editor-fold desc="User Cards">
+	public function ajax_admin_assign_topics( $post ): void {
+		// 'selected_cards' | 'selected_group' | 'selected_deck' | 'selected_topic'
+		$params            = $post[ Common::VAR_2 ]['params'];
+		$what_to_do        = $params['what_to_do'];
+		$e_group           = $params['group'];
+		$e_deck            = $params['deck'];
+		$e_topic           = $params['topic'];
+		$e_topic_to_assign = $params['topic_to_assign'];
+
+		if ( ! is_array( $e_topic_to_assign ) ) {
+			Common::send_error( 'Please select a topic to assign.' );
+		}
+
+		$topic_id_to_assign = (int) sanitize_text_field( $e_topic_to_assign['id'] );
+
+		$message     = 'Cards assigned to topic.';
+		$card_groups = [];
+		if ( 'selected_cards' === $what_to_do ) {
+//			$card_groups = $all['selected_cards'];
+		} elseif ( 'selected_group' === $what_to_do ) {
+			if ( ! is_array( $e_group ) ) {
+				Common::send_error( 'Please select a group.' );
+			}
+			$deck_group_id = (int) sanitize_text_field( $e_group['id'] );
+
+			// Get card groups under decks that are under this deck group.
+			$card_groups = CardGroup
+				::whereHas(
+					'deck',
+					function ( $query ) use ( $deck_group_id ) {
+						$query->where( 'deck_group_id', '=', $deck_group_id );
+					}
+				)
+				->get();
+			if ( $card_groups ) {
+				// Assign the card groups to $topic to assign.
+				foreach ( $card_groups as $card_group ) {
+					$card_group->topic_id = $topic_id_to_assign;
+					$card_group->save();
+				}
+			}
+			$message = $card_groups->count() . ' card groups assigned to topic.';
+		} elseif ( 'selected_deck' === $what_to_do ) {
+
+		} elseif ( 'selected_topic' === $what_to_do ) {
+
+		}
+
+
+		Common::send_success( $message );
+	}
+
+	// </editor-fold desc="User Cards">
 
 }

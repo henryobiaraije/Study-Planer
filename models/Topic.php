@@ -102,6 +102,7 @@ class Topic extends Model {
 		$total  = $deck->count();
 		$offset = ( $args['page'] - 1 );
 		$deck   = $deck->offset( $offset )
+		               ->with( 'cards' )
 		               ->limit( $args['per_page'] )
 		               ->orderByDesc( 'id' )->get();
 
