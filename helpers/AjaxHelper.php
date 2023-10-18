@@ -2600,7 +2600,7 @@ class AjaxHelper {
 				$card_group->collection_id = null;
 				$card_group->save();
 			}
-			$one_collection->delete();
+			Collections::withTrashed()->find( $one_collection['id'] )->forceDelete();
 		}
 
 		Common::send_success( 'Delete successfully.' );
@@ -2685,12 +2685,16 @@ class AjaxHelper {
 			$name          = sanitize_text_field( $one_collection['name'] );
 			$collection_id = (int) sanitize_text_field( $one_collection['id'] );
 
-			$deck = Collections::find( $collection_id );
-			$deck->update(
+			$collection = Collections
+				::withTrashed()
+				->find( $collection_id );
+			$collection->update(
 				array(
 					'name' => $name,
 				)
 			);
+			// Untrash the collection.
+			$collection->restore();
 		}
 
 		Common::send_success( 'Saved.' );

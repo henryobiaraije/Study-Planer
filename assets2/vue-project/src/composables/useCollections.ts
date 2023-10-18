@@ -317,6 +317,7 @@ export default function (status = 'publish') {
             },
             funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
+                xhrLoad();
             },
             funcFailue(done) {
                 handleAjax.error(done);
