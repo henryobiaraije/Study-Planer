@@ -354,49 +354,57 @@ export default function (status = 'publish') {
             return;
         }
         const handleAjax: HandleAjax = new HandleAjax(ajaxDelete.value);
-        sendOnline = new Server().send_online({
-            data: [
-                Store.nonce,
-                {
-                    decks: items,
-                }
-            ],
-            what: "admin_sp_ajax_admin_delete_collections",
-            funcBefore() {
-                handleAjax.start();
-            },
-            funcSuccess(done: InterFuncSuccess<any>) {
-                handleAjax.success(done);
-                xhrLoad();
-            },
-            funcFailue(done) {
-                handleAjax.error(done);
-            },
+        return new Promise((resolve, reject) => {
+            sendOnline = new Server().send_online({
+                data: [
+                    Store.nonce,
+                    {
+                        decks: items,
+                    }
+                ],
+                what: "admin_sp_ajax_admin_delete_collections",
+                funcBefore() {
+                    handleAjax.start();
+                },
+                funcSuccess(done: InterFuncSuccess<any>) {
+                    handleAjax.success(done);
+                    xhrLoad();
+                    resolve(done);
+                },
+                funcFailue(done) {
+                    handleAjax.error(done);
+                    reject(done);
+                },
+            });
         });
     };
     const xhrPublishBatch = (items: Array<_Collection>) => {
         if (!confirm('Are you sure you want to publish the cards in the collection? This action is not reversible.')) {
             return;
         }
-        const handleAjax: HandleAjax = new HandleAjax(ajaxDelete.value);
-        sendOnline = new Server().send_online({
-            data: [
-                Store.nonce,
-                {
-                    decks: items,
-                }
-            ],
-            what: "admin_sp_ajax_admin_publish_collections",
-            funcBefore() {
-                handleAjax.start();
-            },
-            funcSuccess(done: InterFuncSuccess<any>) {
-                handleAjax.success(done);
-                xhrLoad();
-            },
-            funcFailue(done) {
-                handleAjax.error(done);
-            },
+        const handleAjax: HandleAjax = new HandleAjax(ajaxPublish.value);
+        return new Promise((resolve, reject) => {
+            sendOnline = new Server().send_online({
+                data: [
+                    Store.nonce,
+                    {
+                        collections: items,
+                    }
+                ],
+                what: "admin_sp_ajax_admin_publish_collections",
+                funcBefore() {
+                    handleAjax.start();
+                },
+                funcSuccess(done: InterFuncSuccess<any>) {
+                    handleAjax.success(done);
+                    xhrLoad();
+                    resolve(done);
+                },
+                funcFailue(done) {
+                    handleAjax.error(done);
+                    reject(done);
+                },
+            });
         });
     };
 

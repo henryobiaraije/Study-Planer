@@ -76,12 +76,15 @@
             </div>
             <div v-else-if="props.column.field === 'publish'">
               <ajax-action
-                  button-text="Remove"
+                  button-text="Publish"
                   css-classes="button !px-2 !py-1"
                   icon="fa fa-save"
                   :show-icon="false"
-                  @click="collections.publish(props.row)"
-                  :ajax="collections.ajaxPublish.value">
+                  @click="publish(props.row)"
+                  :ajax="{
+                    ...collections.ajaxPublish.value,
+                    sending: itemsBeingPublished.includes(props.row.id),
+                }">
               </ajax-action>
             </div>
             <div v-else-if="props.column.field === 'delete'">
@@ -90,7 +93,7 @@
                   css-classes="button !px-2 !py-1"
                   icon="fa fa-save"
                   :show-icon="false"
-                  @click="collections.delete([props.row])"
+                  @click="deleteItem(props.row)"
                   :ajax="collections.ajaxDelete.value">
               </ajax-action>
             </div>
@@ -184,6 +187,7 @@ import useDecks from "@/composables/useDecks";
 import useDeckGroupLists from "@/composables/useDeckGroupLists";
 import useTagSearch from "@/composables/useTagSearch";
 import useCollections from "@/composables/useCollections";
+import type {_Collection} from "@/interfaces/inter-sp";
 
 export default defineComponent({
   name: 'AdminCollections',
@@ -202,6 +206,8 @@ export default defineComponent({
       pageTitle: 'Collections',
       activeUrl: 'admin.php?page=study-collections',
       trashUrl: 'admin.php?page=study-collections&status=trash',
+      itemsBeingPublished: [],
+      itemsBeingDeleted: [],
     }
   },
   setup: (props, ctx) => {
@@ -242,7 +248,21 @@ export default defineComponent({
     this.collections.loadItems();
     console.log('created now');
   },
-  methods: {}
+  methods: {
+    publish(item: _Collection) {
+      this.itemsBeingPublished.push(item.id);
+      this.collections.publish([item])
+          ?.finally(() => {
+            this.itemsBeingPublished = this.itemsBeingPublished.filter((id) => id !== item.id);
+          });
+    },
+    deleteItem(item: _Collection) {
+      this.collections.delete([item])
+          ?.finally(() => {
+            this.itemsBeingDeleted = this.itemsBeingDeleted.filter((id) => id !== item.id);
+          });
+    },
+  }
 });
 
 </script>

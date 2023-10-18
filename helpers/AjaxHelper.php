@@ -101,6 +101,7 @@ class AjaxHelper {
 		add_action( 'admin_sp_ajax_admin_update_collections', array( $this, 'ajax_admin_update_collections' ) );
 		add_action( 'admin_sp_ajax_admin_trash_collections', array( $this, 'ajax_admin_trash_collections' ) );
 		add_action( 'admin_sp_ajax_admin_delete_collections', array( $this, 'ajax_admin_delete_collections' ) );
+		add_action( 'admin_sp_ajax_admin_publish_collections', array( $this, 'ajax_admin_publish_collections' ) );
 		// </editor-fold desc="Collections">
 		// <editor-fold desc="All Cards">
 		add_action( 'admin_sp_ajax_admin_search_all_cards', array( $this, 'ajax_admin_search_all_cards' ) );
@@ -2701,6 +2702,30 @@ class AjaxHelper {
 
 		Common::send_success( 'Saved.' );
 
+	}
+
+	// </editor-fold desc="Collections">
+
+	/**
+	 * Publish the cards in these collections by just removing the collection id.
+	 *
+	 * @param $post
+	 *
+	 * @return void
+	 */
+	public function ajax_admin_publish_collections( $post ): void {
+		$all         = $post[ Common::VAR_2 ];
+		$collections = $all['collections'];
+
+		foreach ( $collections as $one_collection ) {
+			$card_groups = CardGroup::where( 'collection_id', '=', $one_collection['id'] )->get();
+			foreach ( $card_groups as $card_group ) {
+				$card_group->collection_id = null;
+				$card_group->save();
+			}
+		}
+
+		Common::send_success( 'Published successfully.' );
 	}
 
 	// </editor-fold desc="Collections">
