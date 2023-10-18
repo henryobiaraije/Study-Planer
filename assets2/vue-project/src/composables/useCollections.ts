@@ -333,7 +333,7 @@ export default function (status = 'publish') {
             data: [
                 Store.nonce,
                 {
-                    decks: items,
+                    collections: items,
                 }
             ],
             what: "admin_sp_ajax_admin_trash_collections",
@@ -359,7 +359,7 @@ export default function (status = 'publish') {
                 data: [
                     Store.nonce,
                     {
-                        decks: items,
+                        collections: items,
                     }
                 ],
                 what: "admin_sp_ajax_admin_delete_collections",

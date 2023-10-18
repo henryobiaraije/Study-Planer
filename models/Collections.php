@@ -58,15 +58,22 @@ class Collections extends Model {
 	}
 
 	public static function get_collections( $args ): array {
-		$default     = array(
+		$default = array(
 			'search'       => '',
 			'page'         => 1,
 			'per_page'     => 5,
 			'with_trashed' => false,
 			'only_trashed' => false,
 		);
-		$args        = wp_parse_args( $args, $default );
-		$collections = self::where( 'name', 'like', "%{$args['search']}%" );
+		$args    = wp_parse_args( $args, $default );
+		if ( $args['with_trashed'] ) {
+			$collection = self::withoutTrashed();
+		} elseif ( $args['only_trashed'] ) {
+			$collection = self::onlyTrashed();
+		} else {
+			$collection = self::query();
+		}
+		$collections = $collection->where( 'name', 'like', "%{$args['search']}%" );
 
 		$total       = $collections->count();
 		$offset      = ( $args['page'] - 1 );

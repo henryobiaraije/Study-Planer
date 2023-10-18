@@ -120,7 +120,7 @@
 				      {{ props.formattedRow[props.column.field] }}
 				    </span>
           </template>
-          <div slot="selected-row-actions">
+          <template #selected-row-actions>
             <ajax-action-not-form
                 v-if="inTrash"
                 button-text="Delete Selected Permanently "
@@ -137,7 +137,7 @@
                 @click="decks.batchTrash()"
                 :ajax="decks.ajaxTrash.value">
             </ajax-action-not-form>
-          </div>
+          </template>
         </vue-good-table>
       </div>
 

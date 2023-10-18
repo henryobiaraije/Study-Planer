@@ -94,7 +94,11 @@
                   icon="fa fa-save"
                   :show-icon="false"
                   @click="deleteItem(props.row)"
-                  :ajax="collections.ajaxDelete.value">
+                  :ajax="{
+                    ...collections.ajaxDelete.value,
+                    sending: itemsBeingDeleted.includes(props.row.id),
+                }"
+              >
               </ajax-action>
             </div>
             <div v-else-if="props.column.field === 'cards'">
@@ -119,7 +123,7 @@
 				      {{ props.formattedRow[props.column.field] }}
 				    </span>
           </template>
-          <div slot="selected-row-actions">
+          <template #selected-row-actions>
             <ajax-action-not-form
                 v-if="inTrash"
                 button-text="Delete Selected Permanently "
@@ -136,7 +140,7 @@
                 @click="collections.batchTrash()"
                 :ajax="collections.ajaxTrash.value">
             </ajax-action-not-form>
-          </div>
+          </template>
         </vue-good-table>
       </div>
 
@@ -204,8 +208,8 @@ export default defineComponent({
   data() {
     return {
       pageTitle: 'Collections',
-      activeUrl: 'admin.php?page=study-collections',
-      trashUrl: 'admin.php?page=study-collections&status=trash',
+      activeUrl: 'admin.php?page=study-planner-collections',
+      trashUrl: 'admin.php?page=study-planner-collections&status=trash',
       itemsBeingPublished: [],
       itemsBeingDeleted: [],
     }
@@ -216,7 +220,7 @@ export default defineComponent({
     const status = searchParams.get('status');
 
     return {
-      collections: useCollections(),
+      collections: useCollections(status),
       searchTags: useTagSearch(),
     }
   },
@@ -257,6 +261,7 @@ export default defineComponent({
           });
     },
     deleteItem(item: _Collection) {
+      this.itemsBeingDeleted.push(item.id);
       this.collections.delete([item])
           ?.finally(() => {
             this.itemsBeingDeleted = this.itemsBeingDeleted.filter((id) => id !== item.id);

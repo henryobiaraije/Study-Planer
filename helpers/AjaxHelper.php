@@ -2575,42 +2575,35 @@ class AjaxHelper {
 		);
 		foreach ( $args['collections'] as $item ) {
 			$id = (int) sanitize_text_field( $item['id'] );
-			Deck::find( $id )->delete();
+			Collections::find( $id )->delete();
 		}
 
 		Common::send_success( 'Trashed successfully.' );
 
 	}
 
+	/**
+	 * Delete the collections and remove the collection id from the card groups.
+	 *
+	 * @param $post
+	 *
+	 * @return void
+	 */
 	public function ajax_admin_delete_collections( $post ): void {
 
-		$all  = $post[ Common::VAR_2 ];
-		$args = wp_parse_args(
-			$all,
-			array(
-				'collections' => array(),
-			)
-		);
+		$all         = $post[ Common::VAR_2 ];
+		$collections = $all['collections'];
 
-		foreach ( $args['collections'] as $item ) {
-			Manager::beginTransaction();
-			$id                    = (int) sanitize_text_field( $item['id'] );
-			$uncategorized_deck_id = get_uncategorized_deck_id();
-			CardGroup::withTrashed()
-			         ->where( 'collection_id', '=', $id )
-			         ->update(
-				         array(
-					         'deck_id' => $uncategorized_deck_id,
-				         )
-			         );
-			$deck = Deck::withTrashed()->find( $id );
-			$deck->tags()->detach();
-			$deck->forceDelete();
-			Manager::commit();
+		foreach ( $collections as $one_collection ) {
+			$card_groups = CardGroup::where( 'collection_id', '=', $one_collection['id'] )->get();
+			foreach ( $card_groups as $card_group ) {
+				$card_group->collection_id = null;
+				$card_group->save();
+			}
+			$one_collection->delete();
 		}
 
-		Common::send_success( 'Deleted successfully.' );
-
+		Common::send_success( 'Delete successfully.' );
 	}
 
 	public function ajax_admin_load_collections( $post ): void {
