@@ -140,9 +140,30 @@
       <!-- Edit Modal -->
       <div class="modal fade" id="modal-edit" tabindex="-1" aria-labelledby="exampleModalEdit" aria-hidden="true">
         <div class="modal-dialog">
+          <form @submit.prevent="collections.updateEditing" class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalEdit">Edit Collection</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div v-if="null !== collectionToEdit" class="modal-body">
+              <label class="tw-simple-input">
+                <span class="tw-title">Collection </span>
+                <input v-model="collectionToEdit.name" name="deck" required type="text">
+              </label>
+            </div>
+            <div class="modal-footer">
+              <div class="mt-3">
+                <ajax-action
+                    button-text="Update"
+                    css-classes="button"
+                    icon="fa fa-plus"
+                    :ajax="collections.ajaxUpdate.value">
+                </ajax-action>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
-
     </div>
   </div>
   <br/>
@@ -212,6 +233,9 @@ export default defineComponent({
     tableDataValue() {
       return this.collections.tableData.value;
     },
+    collectionToEdit() {
+      return this.collections.itemToEdit.value;
+    }
   },
   created() {
     jQuery('.all-loading').hide();
