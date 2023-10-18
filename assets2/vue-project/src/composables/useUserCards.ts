@@ -108,6 +108,29 @@ export default function (status = 'publish') {
         success: false,
         successMessage: '',
     });
+    const ajaxAddCards = ref<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
+    const ajaxIgnoreCard = ref<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
+    const ajaxRemoveCard = ref<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
+
+
     const theForm = {
         topicToAssign: null as null | _Topic,
         selectedCards: [] as _CardGroup[],
@@ -194,11 +217,87 @@ export default function (status = 'publish') {
             },
         });
     };
+    const xhrAddCards = () => {
+        const handleAjax: HandleAjax = new HandleAjax(ajaxAddCards.value);
+        return new Server().send_online({
+            data: [
+                spClientData().nonce,
+                {
+                    params: {
+                        cards: assignForm.value.selectedCards,
+                        group: assignForm.value.group,
+                        deck: assignForm.value.deck,
+                        topic: assignForm.value.topic,
+                        what_to_do: assignForm.value.whatToDo,
+                    },
+                }
+            ],
+            what: "admin_sp_ajax_front_add_user_cards",
+            funcBefore() {
+                handleAjax.start();
+            },
+            funcSuccess(done: InterFuncSuccess<any>) {
+                handleAjax.stop();
+            },
+            funcFailue(done) {
+                handleAjax.error(done);
+            },
+        });
+    };
+    const xhrIgnoreCard = (cardId: number) => {
+        const handleAjax: HandleAjax = new HandleAjax(ajaxIgnoreCard.value);
+        return new Server().send_online({
+            data: [
+                spClientData().nonce,
+                {
+                    params: {
+                        card_id: cardId,
+                    },
+                }
+            ],
+            what: "admin_sp_ajax_front_ignore_card",
+            funcBefore() {
+                handleAjax.start();
+            },
+            funcSuccess(done: InterFuncSuccess<any>) {
+                handleAjax.stop();
+            },
+            funcFailue(done) {
+                handleAjax.error(done);
+            },
+        });
+    };
 
+    const xhrRemoveCard = (cardId: number) => {
+        const handleAjax: HandleAjax = new HandleAjax(ajaxIgnoreCard.value);
+        return new Server().send_online({
+            data: [
+                spClientData().nonce,
+                {
+                    params: {
+                        card_id: cardId,
+                    },
+                }
+            ],
+            what: "admin_sp_ajax_front_remove_card",
+            funcBefore() {
+                handleAjax.start();
+            },
+            funcSuccess(done: InterFuncSuccess<any>) {
+                handleAjax.stop();
+            },
+            funcFailue(done) {
+                handleAjax.error(done);
+            },
+        });
+    };
 
     return {
         ajaxSave: ajaxSave, save: xhrSave, form: assignForm,
         oneSpecificCard, assignTopics: xhrAssignTopics, ajaxAssignTopics,
+        ajaxAddCards, addCards: xhrAddCards,
+        ajaxIgnoreCard, ignoreCard: xhrIgnoreCard,
+        ajaxRemoveCard, removeCard: xhrRemoveCard,
     };
 
 }

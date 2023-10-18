@@ -12,8 +12,8 @@
   <!--  Body  -->
   <div class="">
     <div class="flex flex-wrap gap-3 px-1 md:px-4">
-      <!--    Form   -->
-      <div class="form-area flex-1 md:flex-none  md:w-30 ">
+      <!--    Table   -->
+      <div class="table-area flex-1">
         <vue-good-table
             :columns="tableDataValue.columns"
             :mode="'remote'"
@@ -102,10 +102,6 @@
             </ajax-action-not-form>
           </template>
         </vue-good-table>
-      </div>
-      <!--    Table   -->
-      <div class="table-area flex-1">
-
       </div>
     </div>
   </div>

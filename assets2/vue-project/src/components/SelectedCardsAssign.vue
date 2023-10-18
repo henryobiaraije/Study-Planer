@@ -26,7 +26,7 @@
     <div class="cards">
       <ul class="card-wrapper !list-none !p-0 !m-0 max-h-300px overflow-y-auto shadow">
         <li v-for="(cardGroup,cardIndex) in cardsToDisplay"
-            class="flex !p-0 !m-0 justify-between items-center hover:bg-sp-50 border-b border-solid border-sp-300"
+            class="flex !p-0 !m-0 justify-between items-center hover:bg-sp-50 border-b border-solid border-sp-300 cursor-pointer"
             key="cardGroup.id"
         >
           <label

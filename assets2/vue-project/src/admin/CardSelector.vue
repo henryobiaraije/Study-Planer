@@ -2,7 +2,7 @@
   <div class="assign-topics gap-4 flex flex-col ">
     <!--   Group, Deck, Topic -->
     <div class="flex flex-col gap-3">
-      <div class="flex flex-col lg:flex-row gap-2 ">
+      <div class="flex flex-col lg:flex-row gap-4 ">
         <!--  Group -->
         <div class="flex-1 group ">
           <span class="text-base items-center flex gap-2 w-full mb-2 font-medium">
@@ -31,7 +31,7 @@
           <span class="text-base flex items-center gap-2 w-full mb-2 font-medium">
             <span>Subject <span class="text-gray-400">(optional)</span></span>
             <span @click="clearDeck"
-                  class="hidden  px-2 py-1text-xs font-normal group-hover:inline-block cursor-pointer  hover:bg-gray-400">Clear</span>
+                  class="hidden px-2 py-1 text-xs bg-gray-300 font-normal group-hover:inline-block cursor-pointer hover:bg-gray-400">Clear</span>
           </span>
           <vue-mulitiselect
               v-model="userCards.form.value.deck"
@@ -55,7 +55,7 @@
           <span class="text-base flex items-center gap-2 w-full mb-2 font-medium">
             <span>Topic <span class="text-gray-400">(optional)</span></span>
             <span @click="clearTopic"
-                  class="hidden px-2 py-1 text-xs font-normal group-hover:inline-block cursor-pointer  hover:bg-gray-400">Clear</span>
+                  class="hidden px-2 py-1 text-xs bg-gray-300 font-normal group-hover:inline-block cursor-pointer hover:bg-gray-400">Clear</span>
           </span>
           <vue-mulitiselect
               v-model="userCards.form.value.topic"
@@ -204,7 +204,7 @@ export default defineComponent({
   },
   setup: (props, ctx) => {
     return {
-      decks: useDecks(status),
+      decks: useDecks(),
       deckGroup: useDeckGroupLists(),
       searchTags: useTagSearch(),
       basicCard: useBasicCard(),
@@ -262,18 +262,18 @@ export default defineComponent({
     },
     clearGroup() {
       this.userCards.form.value.group = null;
-      // this.assignTopic.assign.value.deck = null;
-      // this.assignTopic.assign.value.topic = null;
+      this.userCards.form.value.deck = null;
+      this.userCards.form.value.topic = null;
       this.decks.search('');
       this.searchCards();
     },
     clearDeck() {
-      // this.assignTopic.assign.value.deck = null;
-      // this.assignTopic.assign.value.topic = null;
+      this.userCards.form.value.deck = null;
+      this.userCards.form.value.topic = null;
       this.searchCards();
     },
     clearTopic() {
-      // this.assignTopic.assign.value.topic = null;
+      this.userCards.form.value.topic = null;
       this.searchCards();
     },
   },
@@ -283,16 +283,15 @@ export default defineComponent({
       const form = this.userCards.form.value;
       form.deck = null;
       form.topic = null;
-      // form.selectedCards = [];
-      // this.assignTopic.assign.value.group = newVal;
+      this.decks.searchResults.value = [];
+      this.topics.searchResults.value = [];
       this.decks.search('', form.group);
       this.searchCards();
     },
     'userCards.form.value.deck': function (newVal, oldVal) {
       const form = this.userCards.form.value;
       form.topic = null;
-      // this.assignTopic.assign.value.specificCards = [];
-      // this.assignTopic.assign.value.deck = newVal;
+      this.topics.searchResults.value = [];
       this.topics.search('', form.deck);
       this.searchCards();
     },

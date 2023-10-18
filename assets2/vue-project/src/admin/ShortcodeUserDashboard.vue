@@ -2,61 +2,40 @@
   <div class="sp sp-sc-ud min-h-[60vh]">
     <!-- Tabs -->
     <div class="sp-tab flex gap-2 justify-center my-4 all-loaded">
-      <div class="sp-one-tab ">
-        <a :href="getUrl('deck-groups')" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
-			text-decoration-none bg-sp-200"
-           @click.prevent="gotoMenu('deck-groups')"
-           :class="[menu === 'deck-groups' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']"
-        >Deck Groups</a>
+      <div v-for="(item,menuIndex) in menus" class="sp-one-tab ">
+        <a :href="getUrl(item.tag)" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
+			      text-decoration-none bg-sp-200"
+           @click.prevent="gotoMenu(item.tag)"
+           :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
+        >{{ item.title }}</a>
       </div>
-      <div class="sp-one-tab ">
-        <a :href="getUrl('stats')"
-           class="px-2 whitespace-nowrap  md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 hover:text-white focus:text-white cursor-pointer text-decoration-none bg-sp-200"
-           @click.prevent="gotoMenu('stats')"
-           :class="[menu === 'stats' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Stats</a>
-      </div>
-      <div class="sp-one-tab ">
-        <a :href="getUrl('settings')"
-           class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer text-decoration-none bg-sp-200"
-           @click.prevent="gotoMenu('settings')"
-           :class="[menu === 'settings' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Settings</a>
-      </div>
-      <div class="sp-one-tab ">
-        <a :href="getUrl('profile')"
-           class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer text-decoration-none
-			bg-sp-200"
-           @click.prevent="gotoMenu('profile')"
-           :class="[menu === 'profile' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Profile</a>
-      </div>
+      <!--      <div class="sp-one-tab ">-->
+      <!--        <a :href="getUrl('stats')"-->
+      <!--           class="px-2 whitespace-nowrap  md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 hover:text-white focus:text-white cursor-pointer text-decoration-none bg-sp-200"-->
+      <!--           @click.prevent="gotoMenu('stats')"-->
+      <!--           :class="[menu === 'stats' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Stats</a>-->
+      <!--      </div>-->
+      <!--      <div class="sp-one-tab ">-->
+      <!--        <a :href="getUrl('settings')"-->
+      <!--           class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer text-decoration-none bg-sp-200"-->
+      <!--           @click.prevent="gotoMenu('settings')"-->
+      <!--           :class="[menu === 'settings' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Settings</a>-->
+      <!--      </div>-->
+      <!--      <div class="sp-one-tab ">-->
+      <!--        <a :href="getUrl('profile')"-->
+      <!--           class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer text-decoration-none-->
+      <!--			bg-sp-200"-->
+      <!--           @click.prevent="gotoMenu('profile')"-->
+      <!--           :class="[menu === 'profile' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Profile</a>-->
+      <!--      </div>-->
     </div>
 
-
-    <!-- Deck groups -->
-    <!--      <div v-if="menu === 'deck-groups'" class="section-deck-groups">-->
-    <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/deck-groups'); ?>-->
-    <!--      </div>-->
-    <!--      <div v-if="menu === 'stats'" class="section-stats">-->
-    <!--        <?php \StudyPlanner\load_template('shortcodes/dashboard/stats'); ?>-->
-    <!--      </div>-->
-    <div v-if="menu === 'settings'" class="section-settings">
-      <UserDashboardSettings
-          :user-time-zone="timezones.userTimeZone.value"
-          :the-timezones="timezones.timezones.value ? timezones.timezones.value : []"
-          :loading="timezones.ajax.sending"
-      />
-    </div>
-    <div v-if=" menu===
-      'profile'" class="section-profile">
-      <UserDashboardProfile
-          :email="userProfile.profile.value ? userProfile.profile.value.user_email : 'loading...'"
-          :username="userProfile.profile.value ? userProfile.profile.value.user_name : 'loading...'"
-      />
+    <div v-for="(item,itemIndex) in menus" class="section-profile">
+      <template v-if="item.tag === menu">
+        <component :is="item.comp" v-bind="item.props"/>
+      </template>
     </div>
 
-    <button
-        @click="testToast"
-    >Test toast
-    </button>
     <!--    <?php /** Question display modal */ ?>-->
     <!--    <div>-->
     <!--      <?php \StudyPlanner\load_template('shortcodes/dashboard/study-complete-modal'); ?>-->
@@ -78,7 +57,6 @@
     <!--      <?php \StudyPlanner\load_template('shortcodes/dashboard/modal-decks-card-types-chart'); ?>-->
     <!--    </div>-->
 
-
   </div>
   <hover-notifications></hover-notifications>
 </template>
@@ -95,6 +73,9 @@ import useStats from "@/composables/useStats";
 import UserDashboardProfile from "@/admin/UserDashboardProfile.vue";
 import UserDashboardSettings from "@/admin/UserDashboardSettings.vue";
 import {toast} from "vue3-toastify";
+import UserDashboardAddCard from "@/admin/UserDashboardAddCard.vue";
+import UserDashboardNewCards from "@/admin/UserDashboardNewCards.vue";
+import UserDashboardRemoveCards from "@/admin/UserDashboardRemoveCards.vue";
 
 export default defineComponent({
   name: 'ShortcodeUserDashboard',
@@ -102,7 +83,7 @@ export default defineComponent({
   props: {},
   data() {
     return {
-      menu: 'deck-groups',
+      menu: 'study-deck',
     }
   },
   setup: (props, ctx) => {
@@ -114,7 +95,70 @@ export default defineComponent({
       useStats: useStats()
     }
   },
-  computed: {},
+  computed: {
+    menus() {
+      return [
+        // {
+        //   title: 'Deck Groups',
+        //   tag: 'deck-groups'
+        // },
+        {
+          title: 'Study Deck',
+          tag: 'study-deck',
+          comp: null,
+          props: {},
+        },
+        {
+          title: 'Add Cards',
+          tag: 'add-cards',
+          comp: UserDashboardAddCard,
+          props: {},
+        },
+        {
+          title: 'New Cards',
+          tag: 'new-cards',
+          comp: UserDashboardNewCards,
+          props: {},
+        },
+        {
+          title: 'Remove Cards',
+          tag: 'remove-cards',
+          comp: UserDashboardRemoveCards,
+          props: {},
+        },
+        {
+          title: 'Stats',
+          tag: 'stats',
+          comp: null,
+          props: {},
+        },
+        {
+          title: 'Settings',
+          tag: 'settings',
+          comp: UserDashboardSettings,
+          props: {
+            userTimeZone: this.timezones.userTimeZone.value,
+            theTimezones: this.timezones.timezones.value ? this.timezones.timezones.value : [],
+            loading: this.timezones.ajax.sending
+          }
+        },
+        {
+          title: 'Profile',
+          tag: 'profile',
+          comp: UserDashboardProfile,
+          props: {
+            email: this.userProfile.profile.value ? this.userProfile.profile.value.user_email : 'loading...',
+            username: this.userProfile.profile.value ? this.userProfile.profile.value.user_name : 'loading...'
+          }
+        }
+      ] as {
+        title: string,
+        tag: string,
+        comp?: any,
+        props: { [key: string]: any }
+      }[];
+    }
+  },
   created() {
     // this.userDash.load().then(() => {
     //
@@ -173,9 +217,6 @@ export default defineComponent({
         this.userProfile._loadProfile();
       }
     },
-    testToast() {
-      toast.success('test toast');
-    }
   }
 });
 

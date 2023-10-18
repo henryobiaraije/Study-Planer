@@ -55,6 +55,7 @@
 .multiselect__option--highlight {
   background: var(--sp-color-500) !important;
 }
+
 .multiselect__option--highlight {
   background: var(--sp-color-400) !important;
   outline: none;
@@ -92,6 +93,11 @@
 .multiselect--disabled {
   background: #ededed;
   pointer-events: none;
+}
+
+ul.multiselect__content {
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .multiselect--disabled .multiselect__current,
