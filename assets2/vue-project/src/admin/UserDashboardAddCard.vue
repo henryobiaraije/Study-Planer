@@ -7,18 +7,18 @@
       <p class="text-base text-gray-500">Here you can add cards to your study deck.</p>
     </div>
     <br/>
-    <CardSelector/>
+    <CardSelector :user-cards="userCards" :all-cards="allCards"/>
     <br/>
     <p>Add the selected cards to your study deck.</p>
     <ajax-action
+        :disable="userCards.form.value.selectedCards.length < 1"
         button-text="Add Cards"
         css-classes="button"
         icon="fa fa-save"
-        @click="userCards.addCards"
+        @click="addCards"
         :ajax="userCards.ajaxAddCards.value">
     </ajax-action>
   </div>
-
 </template>
 <script lang="ts">
 
@@ -26,6 +26,7 @@ import {defineComponent} from "vue";
 import CardSelector from "@/admin/CardSelector.vue";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useUserCards from "@/composables/useUserCards";
+import useAllCards from "@/composables/useAllCards";
 
 export default defineComponent({
   name: 'UserDashboardAddCard',
@@ -36,13 +37,27 @@ export default defineComponent({
   },
   setup: (props, ctx) => {
     return {
-      userCards: useUserCards()
+      userCards: useUserCards(),
+      allCards: useAllCards(),
     }
   },
   computed: {},
   created() {
   },
-  methods: {}
+  methods: {
+    addCards() {
+      this.userCards.addCards()
+          .then(done => {
+            this.allCards.tableData.value.totalRecords = 0;
+            this.allCards.total.value = 0;
+            this.allCards.tableData.value.rows = [];
+            this.userCards.form.value.selectedCards = [];
+          });
+    }
+  }
 });
 
 </script>
+<!--<style type="scss">-->
+//@import "../../_extra/bootstrap-4/scss/_pagination.scss";
+<!--</style>-->

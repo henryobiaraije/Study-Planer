@@ -141,20 +141,24 @@
           @tab-changed="this.userCards.form.value.activeTab = $event"
           :active-tab="activeTab"
           @card-clicked="cardSelected($event)"
-          :card-items="cardItems"
-          :selected-cards="selectedCards"
+          :card-items="allCards.searchResults.value"
+          :selected-cards="userCards.form.value.selectedCards"
           :loading="allCards.ajaxSearch.value.sending"
           :found-count="allCards.tableData.value.totalRecords"
       />
+
       <!--      <pagination v-model="page" :records="500" :per-page="25" @paginate="myCallback"/>-->
     </div>
 
     <!-- Pagination -->
     <div v-show="'found' === activeTab" class="card-pagination py-2">
-      <pagination itemtype="button" :records="allCards.tableData.value.totalRecords" v-model="form.page" :per-page="10"
-                  @paginate="callback"/>
+      <pagination
+          itemtype="button"
+          :records="allCards.tableData.value.totalRecords"
+          v-model="form.page"
+          :per-page="2"
+          @paginate="callback"/>
     </div>
-
   </div>
 </template>
 <script lang="ts">
@@ -194,6 +198,10 @@ export default defineComponent({
     userCards: {
       type: Object as () => ReturnType<typeof useUserCards>,
       required: true
+    },
+    allCards: {
+      type: Object as () => ReturnType<typeof useAllCards>,
+      required: true
     }
   },
   data() {
@@ -215,7 +223,7 @@ export default defineComponent({
       gapCard: useGapCard(),
       topics: useTopics(),
       collections: useCollections(),
-      allCards: useAllCards(),
+      // allCards: useAllCards(),
       // userCards: useUserCards()
     }
   },

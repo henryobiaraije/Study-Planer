@@ -1,11 +1,12 @@
 <template>
   <component :is="el">
-    <button @click="startSending" :disabled="ajax.sending" type="submit"
+    <button @click="startSending" :disabled="ajax.sending || disable" type="submit"
             :class="[
                 cssClasses,
                 'border border-solid border-sp-400 px-4 py-2 rounded-md',
                 '!bg-sp-500 !text-white !font-bold',
                 '!hover:bg-sp-800 !hover:text-white',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
               ]"
     >{{ buttonText }}
       <template v-if="showIcon">
@@ -55,6 +56,10 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  disable: {
+    type: Boolean,
+    default: false
+  }
 });
 
 function startSending(event) {

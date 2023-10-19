@@ -143,7 +143,7 @@ export default function (status = 'publish') {
         activeTab: 'found' as 'found' | 'selected',
         whatToDo: 'selected_cards' as 'selected_cards' | 'selected_group' | 'selected_deck' | 'selected_topic'
     };
-    const assignForm = ref<typeof theForm>(theForm);
+    const form = ref<typeof theForm>(theForm);
     const oneSpecificCard = ref<_CardGroup | null>(null)
     // selectedCards: [] as _CardGroup[],
     // page: 1,
@@ -152,13 +152,13 @@ export default function (status = 'publish') {
     watchEffect(() => {
         if (oneSpecificCard.value) {
             // assignForm.value.selectedCards = [oneSpecificCard.value];
-            const index = assignForm.value.selectedCards.findIndex((c) => {
+            const index = form.value.selectedCards.findIndex((c) => {
                 return c.id === oneSpecificCard.value?.id
             });
             if (index === -1) {
-                assignForm.value.selectedCards.push(oneSpecificCard.value);
+                form.value.selectedCards.push(oneSpecificCard.value);
             } else {
-                assignForm.value.selectedCards.splice(index, 1);
+                form.value.selectedCards.splice(index, 1);
             }
         }
     });
@@ -170,11 +170,11 @@ export default function (status = 'publish') {
                 spClientData().nonce,
                 {
                     params: {
-                        cards: assignForm.value.selectedCards,
-                        group: assignForm.value.group,
-                        deck: assignForm.value.deck,
-                        topic: assignForm.value.topic,
-                        what_to_do: assignForm.value.whatToDo,
+                        cards: form.value.selectedCards,
+                        group: form.value.group,
+                        deck: form.value.deck,
+                        topic: form.value.topic,
+                        what_to_do: form.value.whatToDo,
                     },
                 }
             ],
@@ -190,7 +190,6 @@ export default function (status = 'publish') {
             },
         });
     };
-
     const xhrAssignTopics = () => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxAssignTopics.value);
         return new Server().send_online({
@@ -198,12 +197,12 @@ export default function (status = 'publish') {
                 spClientData().nonce,
                 {
                     params: {
-                        cards: assignForm.value.selectedCards,
-                        group: assignForm.value.group,
-                        deck: assignForm.value.deck,
-                        topic: assignForm.value.topic,
-                        what_to_do: assignForm.value.whatToDo,
-                        topic_to_assign: assignForm.value.topicToAssign,
+                        cards: form.value.selectedCards,
+                        group: form.value.group,
+                        deck: form.value.deck,
+                        topic: form.value.topic,
+                        what_to_do: form.value.whatToDo,
+                        topic_to_assign: form.value.topicToAssign,
                     },
                 }
             ],
@@ -224,29 +223,38 @@ export default function (status = 'publish') {
     };
     const xhrAddCards = () => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxAddCards.value);
-        return new Server().send_online({
-            data: [
-                spClientData().nonce,
-                {
-                    params: {
-                        cards: assignForm.value.selectedCards,
-                        group: assignForm.value.group,
-                        deck: assignForm.value.deck,
-                        topic: assignForm.value.topic,
-                        what_to_do: assignForm.value.whatToDo,
-                    },
-                }
-            ],
-            what: "admin_sp_ajax_front_add_user_cards",
-            funcBefore() {
-                handleAjax.start();
-            },
-            funcSuccess(done: InterFuncSuccess<any>) {
-                handleAjax.stop();
-            },
-            funcFailue(done) {
-                handleAjax.error(done);
-            },
+        return new Promise((resolve, reject) => {
+            new Server().send_online({
+                data: [
+                    spClientData().nonce,
+                    {
+                        params: {
+                            cards: form.value.selectedCards,
+                        },
+                    }
+                ],
+                what: "admin_sp_ajax_front_add_user_cards",
+                funcBefore() {
+                    handleAjax.start();
+                },
+                funcSuccess(done: InterFuncSuccess<any>) {
+                    handleAjax.stop();
+                    form.value = {
+                        ...form.value,
+                        selectedCards: [],
+                        group: null,
+                        deck: null,
+                        topic: null,
+                    };
+                    toast.success(done.message);
+                    resolve(done);
+                },
+                funcFailue(done) {
+                    handleAjax.error(done);
+                    toast.error(done.message);
+                    reject(done);
+                },
+            });
         });
     };
     const xhrIgnoreCard = (cardId: number) => {
@@ -272,7 +280,6 @@ export default function (status = 'publish') {
             },
         });
     };
-
     const xhrRemoveCard = (cardId: number) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxIgnoreCard.value);
         return new Server().send_online({
@@ -298,7 +305,7 @@ export default function (status = 'publish') {
     };
 
     return {
-        ajaxSave: ajaxSave, save: xhrSave, form: assignForm,
+        ajaxSave: ajaxSave, save: xhrSave, form: form,
         oneSpecificCard, assignTopics: xhrAssignTopics, ajaxAssignTopics,
         ajaxAddCards, addCards: xhrAddCards,
         ajaxIgnoreCard, ignoreCard: xhrIgnoreCard,

@@ -26,7 +26,7 @@
 
     <p>Filter cards below and add them to the above topic.</p>
 
-    <CardSelector :user-cards="userCards"/>
+    <CardSelector :user-cards="userCards" :all-cards="allCards"/>
 
     <!--  What to do -->
     <div v-if="form.topicToAssign"
@@ -51,12 +51,12 @@
         </ajax-action>
       </div>
     </div>
+
   </div>
 
   <hover-notifications></hover-notifications>
 </template>
 <script lang="ts">
-
 
 import {defineComponent} from "vue";
 import CardSelector from "@/admin/CardSelector.vue";
@@ -65,6 +65,7 @@ import VueMulitiselect from "vue-multiselect";
 import useUserCards from "@/composables/useUserCards";
 import useTopics from "@/composables/useTopics";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
+import useAllCards from "@/composables/useAllCards";
 
 export default defineComponent({
   name: 'AdminAssignTopics',
@@ -98,6 +99,7 @@ export default defineComponent({
     return {
       userCards: useUserCards(),
       topics: useTopics(),
+      allCards: useAllCards(),
     }
   },
   computed: {
