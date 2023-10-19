@@ -168,6 +168,8 @@ export default function (status = 'publish') {
     let searchResults = ref<Array<_CardGroup>>([]);
     const _editCounter = ref<{ [key: number]: { counter: number } }>({});
     const page = ref(1);
+    const fromFrontend = ref(false);
+    const forAddToStudyDeck = ref(false);
     //
     const create = () => {
         xhrCreateNew();
@@ -301,7 +303,6 @@ export default function (status = 'publish') {
         deck: null | _Deck = null,
         topic: null | _Topic = null,
         cardTypes: [] | CardType[] = [],
-
     ) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
         sendOnline = new Server().send_online({
@@ -317,6 +318,8 @@ export default function (status = 'publish') {
                         deck: deck,
                         topic: topic,
                         card_types: cardTypes,
+                        from_frontend: fromFrontend.value,
+                        for_add_to_study_deck: forAddToStudyDeck.value
                     },
                 }
             ],
@@ -479,6 +482,7 @@ export default function (status = 'publish') {
         onSortChange, onColumnFilter, updateEditing,
         batchUpdate, batchDelete, batchTrash, batchRestore,
         totals, closeEditModal, openEditModal, search, searchResults,
+        fromFrontend, forAddToStudyDeck,
     };
 
 }

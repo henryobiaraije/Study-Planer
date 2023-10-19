@@ -43,6 +43,8 @@ export default defineComponent({
   },
   computed: {},
   created() {
+    this.allCards.fromFrontend.value = true;
+    this.allCards.forAddToStudyDeck.value = true;
   },
   methods: {
     addCards() {

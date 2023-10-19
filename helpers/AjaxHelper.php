@@ -153,31 +153,42 @@ class AjaxHelper {
 	//    <editor-fold desc="All Cards">
 	public function ajax_admin_search_all_cards( $post ): void {
 
-		$params         = $post[ Common::VAR_2 ]['params'];
-		$per_page       = (int) sanitize_text_field( $params['per_page'] );
-		$page           = (int) sanitize_text_field( $params['page'] );
-		$search_keyword = sanitize_text_field( $params['search_keyword'] );
-		$status         = sanitize_text_field( $params['status'] );
-		$e_deck_group   = $params['deck_group'];
-		$e_deck         = $params['deck'];
-		$e_topic        = $params['topic'];
-		$e_card_types   = $params['card_types'];
+		$params                       = $post[ Common::VAR_2 ]['params'];
+		$per_page                     = (int) sanitize_text_field( $params['per_page'] );
+		$page                         = (int) sanitize_text_field( $params['page'] );
+		$search_keyword               = sanitize_text_field( $params['search_keyword'] );
+		$status                       = sanitize_text_field( $params['status'] );
+		$e_deck_group                 = $params['deck_group'];
+		$e_deck                       = $params['deck'];
+		$e_topic                      = $params['topic'];
+		$e_card_types                 = $params['card_types'];
+		$e_front_end                  = $params['from_frontend'] === true;
+		$e_for_add_to_study_deck      = $params['for_add_to_study_deck'] === true;
+		$e_for_remove_from_study_deck = $params['for_remove_from_study_deck'] === true;
+		$e_for_new_cards              = $params['for_new_cards'] === true;
 
 		$deck_group_id = is_array( $e_deck_group ) ? $e_deck_group['id'] : null;
 		$deck_id       = is_array( $e_deck ) ? $e_deck['id'] : null;
 		$topic_id      = is_array( $e_topic ) ? $e_topic['id'] : null;
 		$card_types    = is_array( $e_card_types ) ? $e_card_types : array();
 
+		$user_id = get_current_user_id();
+
 		$items = CardGroup::get_card_groups_simple(
 			array(
-				'search'        => $search_keyword,
-				'page'          => $page,
-				'per_page'      => $per_page,
-				'only_trashed'  => ( 'trash' === $status ) ? true : false,
-				'deck_group_id' => $deck_group_id,
-				'deck_id'       => $deck_id,
-				'topic_id'      => $topic_id,
-				'card_types'    => $card_types,
+				'search'                     => $search_keyword,
+				'page'                       => $page,
+				'per_page'                   => $per_page,
+				'only_trashed'               => ( 'trash' === $status ) ? true : false,
+				'deck_group_id'              => $deck_group_id,
+				'deck_id'                    => $deck_id,
+				'topic_id'                   => $topic_id,
+				'card_types'                 => $card_types,
+				'from_front_end'             => $e_front_end,
+				'for_add_to_study_deck'      => $e_for_add_to_study_deck,
+				'for_remove_from_study_deck' => $e_for_remove_from_study_deck,
+				'for_new_cards'              => $e_for_new_cards,
+				'user_id'                    => $user_id
 			)
 		);
 
