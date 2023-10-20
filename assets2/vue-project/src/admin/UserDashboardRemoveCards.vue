@@ -32,11 +32,13 @@
       >
         <template slot="table-row" #table-row="props">
           <div v-if="props.column.field === 'name'">
-            <a :href="props.row.card_group_edit_url" class="pb-2"><span>{{ props.row.name }}</span></a>
+            <a :href="props.row.card_group_edit_url" class="pb-2 block"><span>{{ props.row.name }}</span></a>
             <div class="flex gap-2">
               <v-btn
                   color="primary"
                   @click="viewCard(props.row.id)"
+                  variant="outlined"
+                  size="small"
               >
                 View
               </v-btn>
@@ -61,14 +63,24 @@
                   <!--                  </v-card-actions>-->
                 </v-card>
               </v-dialog>
-              <ajax-action
-                  button-text="Remove"
-                  css-classes="button !px-2 !py-1"
-                  :show-icon="false"
-                  icon="fa fa-save"
-                  @click="userCards.removeCard(props.row.id)"
-                  :ajax="userCards.ajaxRemoveCard.value">
-              </ajax-action>
+              <!--              <ajax-action-->
+              <!--                  button-text="Remove"-->
+              <!--                  css-classes="button !px-2 !py-1"-->
+              <!--                  :show-icon="false"-->
+              <!--                  icon="fa fa-save"-->
+              <!--                  @click="userCards.removeCard([props.row.id])"-->
+              <!--                  :ajax="userCards.ajaxRemoveCard.value">-->
+              <!--              </ajax-action>-->
+              <v-btn
+                  color="primary"
+                  @click="removeCard(props.row.id)"
+                  variant="elevated"
+                  size="small"
+                  :loading="userCards.ajaxRemoveCard.value.sending && cardGroupIdsRemoving.includes(props.row.id)"
+                  :disabled="userCards.ajaxRemoveCard.value.sending && cardGroupIdsRemoving.includes(props.row.id)"
+              >
+                Remove
+              </v-btn>
             </div>
           </div>
           <div v-else-if="props.column.field === 'type'">
@@ -179,7 +191,8 @@ export default defineComponent({
       trashUrl: 'admin.php?page=study-planner-deck-cards&status=trash',
       cardsToView: [] as _Card[],
       modalOpenQuestion: null,
-      viewDialog: false
+      viewDialog: false,
+      cardGroupIdsRemoving: [] as number[],
     }
   },
   setup: (props, ctx) => {
@@ -242,33 +255,17 @@ export default defineComponent({
       // this.cardsToView = cardGroup.cards;
       // setTimeout(() => this.openQuestionModal(), 1000);
     },
-    openQuestionModal() {
-      // const modalElement = jQuery('#modal-questions')[0];
-      // const myModal = new bootstrap.Modal(modalElement);
-      // this.modalOpenQuestion = myModal;
-      // myModal.show();
-      // modalElement.addEventListener('shown.bs.modal', function () {
-      //   jQuery('body').append(jQuery(modalElement).parent());
-      //   // studyLogIntervalId.value = setInterval(() => {
-      //   //
-      //   // }, 5000);
-      // });
-      // modalElement.addEventListener('hidden.bs.modal', function () {
-      //   console.log('close question modal');
-      //   // if (currentQuestion.value !== null) {
-      //   //     xhrRecordStudyLog(studyToEdit.value, currentQuestion.value, 'stop');
-      //   // }
-      //   // xhrGetSingleDeckGroup(currentQuestion.value.card_group.deck.id)
-      // });
+    removeCard(cardGroupId: number) {
+      this.cardGroupIdsRemoving.push(cardGroupId);
+      this.userCards.removeCard([cardGroupId])
+          .then((done) => {
+            this.cardGroupIdsRemoving = this.cardGroupIdsRemoving.filter((item) => item !== cardGroupId);
+            this.allCards.search('');
+          })
+          .catch((err) => {
+            this.cardGroupIdsRemoving = this.cardGroupIdsRemoving.filter((item) => item !== cardGroupId);
+          });
     },
-    closeQuestionModal() {
-      // const modalElement = jQuery('#modal-questions')[0];
-      // const myModal = new bootstrap.Modal(modalElement);
-      // _modalOpenQuestion.value.hide();
-      jQuery('#hide-question-moadl').trigger('click');
-      // jQuery('#modal-questions').hide();
-    },
-
   }
 });
 

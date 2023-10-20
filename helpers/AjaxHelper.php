@@ -2788,6 +2788,8 @@ class AjaxHelper {
 		Common::send_success( $message );
 	}
 
+
+
 	// </editor-fold desc="User Cards">
 
 }

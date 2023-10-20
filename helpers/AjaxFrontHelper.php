@@ -16,11 +16,11 @@ use Model\Answered;
 use Model\AnswerLog;
 use Model\Card;
 use Model\CardGroup;
-use Model\CardGroups;
 use Model\Deck;
 use Model\DeckGroup;
 use Model\Study;
 use Model\StudyLog;
+use Model\User;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
 use StudyPlanner\Initializer;
@@ -97,6 +97,7 @@ class AjaxFrontHelper {
 
 		// <editor-fold desc="User Cards ">
 		add_action( 'admin_sp_ajax_front_add_user_cards', array( $this, 'ajax_front_add_user_cards' ) );
+		add_action( 'admin_sp_ajax_front_remove_card', array( $this, 'ajax_front_remove_card' ) );
 		// </editor-fold desc="User Cards ">
 		//        add_action('front_sp_ajax_front_accept_changes', array($this, 'ajax_front_accept_changes'));
 	}
@@ -130,7 +131,6 @@ class AjaxFrontHelper {
 
 	}
 
-	// <editor-fold desc="General">
 	public function ajax_front_add_user_cards( $post ): void {
 		Initializer::verify_post( $post, true );
 
@@ -1356,5 +1356,21 @@ class AjaxFrontHelper {
 	}
 	// </editor-fold desc="Others">
 
+	// <editor-fold desc="User Card">
+	public function ajax_front_remove_card( $post ): void {
+		// 'selected_cards' | 'selected_group' | 'selected_deck' | 'selected_topic'
+		$params = $post[ Common::VAR_2 ]['params'];
+
+		$card_group_ids = $params['card_group_ids'];
+
+		UserCard::where( 'user_id', '=', get_current_user_id() )
+		        ->whereIn( 'card_group_id', $card_group_ids )
+		        ->forceDelete();
+
+
+		Common::send_success( 'Removed successfully' );
+	}
+
+	// </editor-fold desc="User Card">
 
 }

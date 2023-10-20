@@ -280,28 +280,34 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrRemoveCard = (cardId: number) => {
-        const handleAjax: HandleAjax = new HandleAjax(ajaxIgnoreCard.value);
-        return new Server().send_online({
-            data: [
-                spClientData().nonce,
-                {
-                    params: {
-                        card_id: cardId,
-                    },
-                }
-            ],
-            what: "admin_sp_ajax_front_remove_card",
-            funcBefore() {
-                handleAjax.start();
-            },
-            funcSuccess(done: InterFuncSuccess<any>) {
-                handleAjax.stop();
-            },
-            funcFailue(done) {
-                handleAjax.error(done);
-            },
-        });
+    const xhrRemoveCard = (cardIds: number[]) => {
+        const handleAjax: HandleAjax = new HandleAjax(ajaxRemoveCard.value);
+        return new Promise((resolve, reject) => {
+            new Server().send_online({
+                data: [
+                    spClientData().nonce,
+                    {
+                        params: {
+                            card_group_ids: cardIds,
+                        },
+                    }
+                ],
+                what: "admin_sp_ajax_front_remove_card",
+                funcBefore() {
+                    handleAjax.start();
+                },
+                funcSuccess(done: InterFuncSuccess<any>) {
+                    handleAjax.stop();
+                    toast.success(done.message);
+                    resolve(done);
+                },
+                funcFailue(done) {
+                    handleAjax.error(done);
+                    toast.error(done.message);
+                    reject(done);
+                },
+            });
+        })
     };
 
     return {
