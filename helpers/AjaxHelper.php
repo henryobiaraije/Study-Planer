@@ -152,7 +152,6 @@ class AjaxHelper {
 
 	//    <editor-fold desc="All Cards">
 	public function ajax_admin_search_all_cards( $post ): void {
-
 		$params                       = $post[ Common::VAR_2 ]['params'];
 		$per_page                     = (int) sanitize_text_field( $params['per_page'] );
 		$page                         = (int) sanitize_text_field( $params['page'] );
@@ -1193,7 +1192,6 @@ class AjaxHelper {
 			)
 		);
 		$totals         = CardGroup::get_totals();
-
 
 		Common::send_success(
 			'Card group loaded.',

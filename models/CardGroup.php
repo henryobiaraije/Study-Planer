@@ -192,7 +192,12 @@ class CardGroup extends Model {
 			true === $args['from_front_end']
 			&& null === $args['deck_group_id']
 			&& null === $args['deck_id']
-			&& null === $args['topic_id'] ) {
+			&& null === $args['topic_id']
+			&& false === $args['for_add_to_study_deck']
+			&& false === $args['for_remove_from_study_deck']
+			&& false === $args['for_new_cards']
+			&& false === $args['user_id']
+		) {
 			return [
 				'items' => [],
 				'total' => 0,
@@ -265,16 +270,15 @@ class CardGroup extends Model {
 			$card_group_2 = self::query();
 		}
 
-
 		if ( $args['with_trashed'] ) {
 			$card_group   = $card_group->withoutTrashed()::with( 'tags' );
-			$card_group_2 = $card_group->withoutTrashed()::with( 'tags' );
+			$card_group_2 = $card_group_2->withoutTrashed()::with( 'tags' );
 		} elseif ( $args['only_trashed'] ) {
 			$card_group   = $card_group->onlyTrashed();
-			$card_group_2 = $card_group->onlyTrashed();
+			$card_group_2 = $card_group_2->onlyTrashed();
 		} else {
 			$card_group   = $card_group->with( 'tags' );
-			$card_group_2 = $card_group->with( 'tags' );
+			$card_group_2 = $card_group_2->with( 'tags' );
 		}
 
 		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];

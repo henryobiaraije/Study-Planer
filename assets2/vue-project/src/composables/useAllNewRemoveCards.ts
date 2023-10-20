@@ -152,6 +152,10 @@ export default function (status = 'publish') {
     let searchResults = ref<Array<_CardGroup>>([]);
     const _editCounter = ref<{ [key: number]: { counter: number } }>({});
     const page = ref(1);
+    const fromFrontend = ref(false);
+    const forAddToStudyDeck = ref(false);
+    const forRemoveFromStudyDeck = ref(false);
+    const forNewCards = ref(false);
     //
     const create = () => {
         xhrCreateNew();
@@ -300,6 +304,10 @@ export default function (status = 'publish') {
                         deck: deck,
                         topic: topic,
                         card_types: cardTypes,
+                        from_frontend: fromFrontend.value,
+                        for_add_to_study_deck: forAddToStudyDeck.value,
+                        for_remove_from_study_deck: forRemoveFromStudyDeck.value,
+                        for_new_cards: forNewCards.value,
                     },
                 }
             ],
@@ -316,6 +324,12 @@ export default function (status = 'publish') {
                 handleAjax.stop();
                 searchResults.value = done.data.items;
                 tt().totalRecords = done.data.total;
+                tableData.value.rows = done.data.items;
+                totals.value = {
+                    active: done.data.total,
+                    trashed: 0,
+                };
+                tt().isLoading = false;
             },
             funcFailue(done) {
                 handleAjax.error(done);
@@ -323,6 +337,7 @@ export default function (status = 'publish') {
             },
         });
     };
+
     const xhrUpdateBatch = (items: Array<_CardGroup>) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxUpdate.value);
         sendOnline = new Server().send_online({
@@ -462,6 +477,7 @@ export default function (status = 'publish') {
         onSortChange, onColumnFilter, updateEditing,
         batchUpdate, batchDelete, batchTrash, batchRestore,
         totals, closeEditModal, openEditModal, search, searchResults,
+        fromFrontend, forAddToStudyDeck, forRemoveFromStudyDeck, forNewCards,
     };
 
 }

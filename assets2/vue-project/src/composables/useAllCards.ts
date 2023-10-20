@@ -170,6 +170,8 @@ export default function (status = 'publish') {
     const page = ref(1);
     const fromFrontend = ref(false);
     const forAddToStudyDeck = ref(false);
+    const forRemoveFromStudyDeck = ref(false);
+    const forNewCards = ref(false);
     //
     const create = () => {
         xhrCreateNew();
@@ -319,7 +321,9 @@ export default function (status = 'publish') {
                         topic: topic,
                         card_types: cardTypes,
                         from_frontend: fromFrontend.value,
-                        for_add_to_study_deck: forAddToStudyDeck.value
+                        for_add_to_study_deck: forAddToStudyDeck.value,
+                        for_remove_from_study_deck: forRemoveFromStudyDeck.value,
+                        for_new_cards: forNewCards.value,
                     },
                 }
             ],
@@ -482,7 +486,7 @@ export default function (status = 'publish') {
         onSortChange, onColumnFilter, updateEditing,
         batchUpdate, batchDelete, batchTrash, batchRestore,
         totals, closeEditModal, openEditModal, search, searchResults,
-        fromFrontend, forAddToStudyDeck,
+        fromFrontend, forAddToStudyDeck, forRemoveFromStudyDeck, forNewCards,
     };
 
 }

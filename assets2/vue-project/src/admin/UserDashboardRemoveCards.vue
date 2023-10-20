@@ -28,7 +28,7 @@
           @column-filter="allCards.onColumnFilter"
           @per-page-change="allCards.onPerPageChange"
           @selected-rows-change="allCards.onSelect"
-          @search="allCards.onSearch"
+          @search="customSearch"
       >
         <template slot="table-row" #table-row="props">
           <div v-if="props.column.field === 'name'">
@@ -187,11 +187,19 @@ export default defineComponent({
   },
   created() {
     jQuery('.all-loading').hide();
-    this.allCards.loadItems();
+    this.allCards.fromFrontend.value = true;
+    this.allCards.forRemoveFromStudyDeck.value = true;
+    // this.allCards.load();
+    this.allCards.search('')
   },
   methods: {
     createDeckGroup() {
       this.tags.create();
+    },
+    customSearch(query: { searchTerm: string }) {
+      const searchFor = query.searchTerm;
+      console.log({query, searchFor})
+      this.allCards.search(searchFor);
     },
   }
 });
