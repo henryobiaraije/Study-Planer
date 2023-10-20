@@ -32,7 +32,7 @@ class CardGroup extends Model {
 		'reverse',
 		'topic_id'
 	);
-	protected $appends = array( 'card_group_edit_url' );
+	protected $appends = array( 'card_group_edit_url', 'bg_image_url' );
 
 	protected $dates = array( 'deleted_at' );
 
@@ -122,6 +122,15 @@ class CardGroup extends Model {
 		            . '&card-group=' . $this->id;
 
 		return $card_url;
+	}
+
+	public function getBgImageUrlAttribute() {
+		$bg_image_url = '';
+		if ( $this->bg_image_id ) {
+			$bg_image_url = wp_get_attachment_image_url( $this->bg_image_id, 'full' );
+		}
+
+		return $bg_image_url;
 	}
 
 	public static function get_totals(): array {
