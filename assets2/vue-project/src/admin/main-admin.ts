@@ -16,6 +16,37 @@ import AdminAssignTopics from "@/admin/AdminAssignTopics.vue";
 import ShortcodeUserDashboard from "@/admin/ShortcodeUserDashboard.vue";
 import 'vue3-toastify/dist/index.css';
 import Vue3Toastify, {toast, type ToastContainerOptions} from "vue3-toastify";
+import 'vuetify/styles'
+import {createVuetify} from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives';
+
+const myCustomLightTheme = {
+    dark: false,
+    colors: {
+        background: '#FFFFFF',
+        surface: '#FFFFFF',
+        primary: 'rgb(233, 114, 37)',
+        'primary-darken-1': 'rgb(190, 86, 19)',
+        secondary: '#03DAC6',
+        'secondary-darken-1': '#018786',
+        error: '#B00020',
+        info: '#2196F3',
+        success: '#4CAF50',
+        warning: '#FB8C00',
+    },
+};
+
+const vuetify = createVuetify({
+    components,
+    directives,
+    theme: {
+        defaultTheme: 'myCustomLightTheme',
+        themes: {
+            myCustomLightTheme,
+        }
+    }
+});
 
 
 declare var pereere_dot_com_sp_general_localize_4736: any;
@@ -89,6 +120,7 @@ function renderVue() {
                 autoClose: 4000,
                 position: 'bottom-right'
             } as ToastContainerOptions);
+            app.use(vuetify);
             app.mount(item.elem);
         }
     });

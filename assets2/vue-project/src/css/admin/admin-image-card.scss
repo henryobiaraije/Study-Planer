@@ -39,7 +39,7 @@
         cursor: pointer;
         &.show-box {
           background-color: transparent;
-          border: 0;
+          border: 2px solid var(--sp-color-default);
         }
         &.asked-box {
           background-color: #ff7d7a;

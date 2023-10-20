@@ -58,6 +58,11 @@ class Short_User_Dashboard {
 				<div style="text-align: center;flex: 12;font-size: 50px;" >
 				<i class="fa fa-spin fa-spinner" ></i ></div >
 			</div>
+			<style>
+			.v-dialog {
+				  z-index: 9999999999 !important;
+			}
+			</style>
 		';
 
         return $html;

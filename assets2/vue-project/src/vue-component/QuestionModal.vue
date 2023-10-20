@@ -105,10 +105,9 @@
                       </tbody>
                     </v-table>
                   </div>
-
                   <!-- Image Card -->
                   <div v-else-if="'image' === oneCard.card_group.card_type" class="w-full">
-                    <div class="sp-image-question m-auto mb-2 relative">
+                    <div v-show="!showOnlyAnswers && !showCurrentAnswer" class="sp-image-question m-auto mb-2 relative">
                       <div class="image-area" :style="{height: oneCard.question.h+'px' }">
                         <!--                    <div class="image-area" :style="{height: 300+'px' }">-->
                         <div :id="'main-preview-'+oneCard.question.hash"
@@ -125,25 +124,25 @@
                         </div>
                       </div>
                     </div>
-                    <!--                  <div v-show="showCurrentAnswer" class="sp-image-question m-auto ">-->
-                    <!--                    <div class="image-area" :style="{height: currentQuestion.h+'px' }">-->
-                    <!--                      <div :id="'main-preview-'+currentQuestion.hash"-->
-                    <!--                           class="image-area-inner-preview image-card-view ">-->
-                    <!--                									<span v-for="(item2,itemIndex2) in currentQuestion.answer.boxes"-->
-                    <!--                                        style="font-family: 'Montserrat', sans-serif;"-->
-                    <!--                                        :id="'sp-box-preview-'+item2.hash"-->
-                    <!--                                        :class="{'show-box': item2.show, 'hide-box' : item2.hide, 'hide-box' : item2.hide }"-->
-                    <!--                                        :key="item2.hash" class="sp-box-preview">-->
-                    <!--                										<span v-if="item2.imageUrl.length < 2"></span>-->
-                    <!--                										<img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl" alt="">-->
-                    <!--                									</span>-->
-                    <!--                      </div>-->
-                    <!--                    </div>-->
-                    <!--                  </div>-->
-                    <!--                </div>-->
-                    <!--                <div v-if="userDash.ajaxLoadingCard.sending" style="text-align: center;flex: 12;font-size: 50px;"><i-->
-                    <!--                    class="fa fa-spin fa-spinner"></i></div>-->
+                    <div v-show="showCurrentAnswer || showOnlyAnswers" class="sp-image-question m-auto ">
+                      <div class="image-area" :style="{height: oneCard.answer.h+'px' }">
+                        <div :id="'main-preview-'+oneCard.answer.hash"
+                             class="image-area-inner-preview image-card-view ">
+                               <span v-for="(item2,itemIndex2) in oneCard.answer.boxes"
+                                     style="font-family: 'Montserrat', sans-serif;"
+                                     :id="'sp-box-preview-'+item2.hash"
+                                     :class="{'show-box': item2.show, 'hide-box' : item2.hide, 'hide-box' : item2.hide }"
+                                     :key="item2.hash" class="sp-box-preview">
+                                  <span v-if="item2.imageUrl.length < 2"></span>
+                                  <img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl"
+                                       alt="">
+                               </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                  <!--                  <div v-if="userDash.ajaxLoadingCard.sending" style="text-align: center;flex: 12;font-size: 50px;"><i-->
+                  <!--                      class="fa fa-spin fa-spinner"></i></div>-->
                 </div>
               </v-sheet>
             </v-carousel-item>
@@ -242,12 +241,12 @@ export default defineComponent({
     injectImageCardCss(card: _Card) {
       if ('image' === card.card_group.card_type) {
         useImageCard().applyPreviewCss(card.question);
-        // useImageCard().applyPreviewCss(card.answer);
+        useImageCard().applyPreviewCss(card.answer);
 
         // useImageCard().applyPreviewCssOld(card.old_answer);
 
         useImageCard().applyBoxesPreviewCss(card.question.boxes);
-        // useImageCard().applyBoxesPreviewCss(card.answer.boxes);
+        useImageCard().applyBoxesPreviewCss(card.answer.boxes);
 
         // useImageCard().applyBoxesPreviewCss(card.old_question.boxes);
         // useImageCard().applyBoxesPreviewCss(card.old_answer.boxes);

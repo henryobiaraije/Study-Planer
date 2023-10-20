@@ -67,7 +67,7 @@ export interface _Card extends _TimeStamps {
     id?: number;
     hash: string,
     question: any;
-    card_group?: _CardGroup,
+    card_group: _CardGroup,
     answer: any; //string | _TableItem;
     c_number: string;
     x_position?: number;
@@ -92,7 +92,7 @@ export interface _CardGroup extends _TimeStamps {
     topic: _Topic,
     collection: _Collection,
     group_type: string;
-    card_type?: string;
+    card_type: string;
     tags: Array<_Tag>;
     cards: Array<_Card>,
     name: string,
@@ -102,6 +102,8 @@ export interface _CardGroup extends _TimeStamps {
     reverse: boolean;
     cards_count?: number;
     card_group_edit_url?: string;
+    //
+    bg_image_url: string;
 }
 
 export interface _ImageItem {

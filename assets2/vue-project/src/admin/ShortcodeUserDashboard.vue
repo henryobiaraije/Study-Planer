@@ -58,6 +58,7 @@
     <!--    </div>-->
 
   </div>
+<!--  <ModalsContainer/>-->
   <hover-notifications></hover-notifications>
 </template>
 <script lang="ts">
@@ -79,7 +80,7 @@ import UserDashboardRemoveCards from "@/admin/UserDashboardRemoveCards.vue";
 
 export default defineComponent({
   name: 'ShortcodeUserDashboard',
-  components: {UserDashboardSettings, UserDashboardProfile, HoverNotifications, CalendarHeatmap},
+  components: { UserDashboardSettings, UserDashboardProfile, HoverNotifications, CalendarHeatmap},
   props: {},
   data() {
     return {

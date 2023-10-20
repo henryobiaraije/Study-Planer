@@ -334,7 +334,7 @@ class CardGroup extends Model {
 		$offset     = ( $args['page'] - 1 );
 		$all_object = $card_group
 			->offset( $offset )
-			->with( 'deck', 'topic', 'collection' )
+			->with( 'deck', 'topic', 'collection', 'cards' )
 			->limit( $args['per_page'] )
 			->orderByDesc( 'id' );
 
@@ -342,10 +342,28 @@ class CardGroup extends Model {
 			->orderByDesc( 'id' )
 			->get()->count();
 
-		$all = $all_object->get()->all();
+		$all = $all_object->get();
+
+		// Convert table and image card questions and anwers to array.
+		foreach ( $all as $card_group ) {
+			foreach ( $card_group->cards as $card ) {
+				$card_type = $card->card_group->card_type;
+				if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
+					if ( ! is_array( $card->answer ) ) {
+						$card->answer = json_decode( $card->answer );
+					}
+					if ( ! is_array( $card->question ) ) {
+						$card->question = json_decode( $card->question );
+					}
+					if ( ! is_array( $card_group->whole_question ) ) {
+						$card_group->whole_question = json_decode( $card_group->whole_question );
+					}
+				}
+			}
+		}
 
 		return [
-			'items' => $all,
+			'items' => $all->all(),
 			'total' => $total,
 		];
 	}

@@ -12,7 +12,6 @@ import {Store} from "@/static/store";
 import {spClientData} from "@/functions";
 
 declare var bootstrap;
-declare var jQuery: any;
 
 export default function (cardGroupId = 0) {
     const ajax = ref<_Ajax>({
@@ -65,6 +64,10 @@ export default function (cardGroupId = 0) {
         image_type: '' as IMAGE_DISPLAY_TYPE,
         whole_question: null,
         scheduled_at: '',
+        bg_image_url: '',
+        card_type: '',
+        card_group_edit_url: '',
+        cards_count: 0,
     });
     let setBgAsDefault = ref(false);
     const rotateParams = {}
@@ -161,13 +164,13 @@ export default function (cardGroupId = 0) {
         const styleId = 'main-preview-style-' + mainHash;
         // console.log('apllying css3',{_imageItem,mainHash,mainId,styleId});
         const css = `
-      <style id="${styleId}">
-        #${mainId}, .sp-image-question {
-          height: ${_imageItem.h}px;
-          width: ${_imageItem.w}px;
-        } 
-      </style>
-    `;
+          <style id="${styleId}">
+            #${mainId}, .sp-image-question {
+              height: ${_imageItem.h}px;
+              width: ${_imageItem.w}px;
+            } 
+          </style>
+        `;
         jQuery('head').find('#' + styleId).remove();
         jQuery('head').append(css);
     }
@@ -506,7 +509,7 @@ export default function (cardGroupId = 0) {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 window.location = done.data;
             },
@@ -531,7 +534,7 @@ export default function (cardGroupId = 0) {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 // window.location = done.data;
             },
@@ -554,7 +557,7 @@ export default function (cardGroupId = 0) {
                 funcBefore() {
                     handleAjax.start();
                 },
-                funcSuccess(done: InterFuncSuccess) {
+                funcSuccess(done: InterFuncSuccess<any>) {
                     handleAjax.stop();
                     const hold: _CardGroup = done.data.card_group;
                     if (hold.cards.length > 0) {

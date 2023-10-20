@@ -32,11 +32,35 @@
       >
         <template slot="table-row" #table-row="props">
           <div v-if="props.column.field === 'name'">
-            <a :href="props.row.card_group_edit_url"><span>{{ props.row.name }}</span></a>
+            <a :href="props.row.card_group_edit_url" class="pb-2"><span>{{ props.row.name }}</span></a>
             <div class="flex gap-2">
-              <button class="bg-sp-400 text-white font-semibold px-3 py-1 cursor-pointer hover:bg-sp-700">
+              <v-btn
+                  color="primary"
+                  @click="viewCard(props.row.id)"
+              >
                 View
-              </button>
+              </v-btn>
+              <v-dialog
+                  v-model="viewDialog"
+                  width="auto"
+              >
+                <v-card>
+                  <v-card-actions>
+                    <div class="flex flex-row justify-between items-center w-full">
+                      <span class="flex-1 text-xl !font-bold">Cards</span>
+                      <span class="flex-initial"><v-btn color="primary" block @click="viewDialog = false">Close</v-btn></span>
+                    </div>
+                  </v-card-actions>
+                  <QuestionModal
+                      title="Cards"
+                      :cards="cardsToView"
+                      :show-only-answers="true"
+                  />
+                  <!--                  <v-card-actions>-->
+                  <!--                    <v-btn color="primary" block @click="viewDialog = false">Close Dialog</v-btn>-->
+                  <!--                  </v-card-actions>-->
+                </v-card>
+              </v-dialog>
               <ajax-action
                   button-text="Remove"
                   css-classes="button !px-2 !py-1"
@@ -108,7 +132,9 @@
       </vue-good-table>
     </div>
   </div>
+  <div class="sp-modal" v-if="cardsToView.length > 0">
 
+  </div>
 </template>
 <script lang="ts">
 
@@ -129,10 +155,14 @@ import useNewDeckGroup from "@/composables/useNewDeckGroup";
 import useTags from "@/composables/useTags";
 import useAllCards from "@/composables/useAllCards";
 import useAllNewRemoveCards from "@/composables/useAllNewRemoveCards";
+import type {_Card, _CardGroup} from "@/interfaces/inter-sp";
+import QuestionModal from "@/vue-component/QuestionModal.vue";
+import useImageCard from "@/composables/useImageCard";
 
 export default defineComponent({
   name: 'UserDashboardNewCards',
   components: {
+    QuestionModal,
     TimeComp,
     AjaxActionNotForm,
     HoverNotifications,
@@ -147,6 +177,9 @@ export default defineComponent({
       pageTitle: 'All Cards',
       activeUrl: 'admin.php?page=study-planner-deck-cards',
       trashUrl: 'admin.php?page=study-planner-deck-cards&status=trash',
+      cardsToView: [] as _Card[],
+      modalOpenQuestion: null,
+      viewDialog: false
     }
   },
   setup: (props, ctx) => {
@@ -163,6 +196,7 @@ export default defineComponent({
       tags: useTags(status),
       allCards: useAllNewRemoveCards(),
       userCards: useUserCards(),
+      imageCard: useImageCard(),
     }
   },
   computed: {
@@ -201,7 +235,47 @@ export default defineComponent({
       console.log({query, searchFor})
       this.allCards.search(searchFor);
     },
+    viewCard(cardGroupId: number): _CardGroup[] {
+      console.log({cardGroupId});
+      this.cardsToView = this.allCards.tableData.value.rows.find((item: _CardGroup) => item.id === cardGroupId).cards;
+      this.viewDialog = true;
+      // this.cardsToView = cardGroup.cards;
+      // setTimeout(() => this.openQuestionModal(), 1000);
+    },
+    openQuestionModal() {
+      // const modalElement = jQuery('#modal-questions')[0];
+      // const myModal = new bootstrap.Modal(modalElement);
+      // this.modalOpenQuestion = myModal;
+      // myModal.show();
+      // modalElement.addEventListener('shown.bs.modal', function () {
+      //   jQuery('body').append(jQuery(modalElement).parent());
+      //   // studyLogIntervalId.value = setInterval(() => {
+      //   //
+      //   // }, 5000);
+      // });
+      // modalElement.addEventListener('hidden.bs.modal', function () {
+      //   console.log('close question modal');
+      //   // if (currentQuestion.value !== null) {
+      //   //     xhrRecordStudyLog(studyToEdit.value, currentQuestion.value, 'stop');
+      //   // }
+      //   // xhrGetSingleDeckGroup(currentQuestion.value.card_group.deck.id)
+      // });
+    },
+    closeQuestionModal() {
+      // const modalElement = jQuery('#modal-questions')[0];
+      // const myModal = new bootstrap.Modal(modalElement);
+      // _modalOpenQuestion.value.hide();
+      jQuery('#hide-question-moadl').trigger('click');
+      // jQuery('#modal-questions').hide();
+    },
+
   }
 });
 
 </script>
+
+<style>
+.v-model {
+  z-index: 9999999999 !important;
+}
+</style>
