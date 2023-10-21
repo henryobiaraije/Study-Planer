@@ -73,7 +73,7 @@
               <!--              </ajax-action>-->
               <v-btn
                   color="primary"
-                  @click="removeCard(props.row.id)"
+                  @click="removeCard([props.row.id])"
                   variant="elevated"
                   size="small"
                   :loading="userCards.ajaxRemoveCard.value.sending && cardGroupIdsRemoving.includes(props.row.id)"
@@ -87,7 +87,7 @@
             {{ props.row.card_type }}
           </div>
           <div v-else-if="props.column.field === 'cards'">
-            {{ props.row.cards_count }} Cards
+            {{ props.row.cards.length }} Cards
           </div>
           <div v-else-if="props.column.field === 'deck'">
             {{ props.row.deck ? props.row.deck.name : '' }}
@@ -117,29 +117,39 @@
 				    </span>
         </template>
         <template #selected-row-actions>
-          <ajax-action-not-form
-              v-if="inTrash"
-              button-text="Restore Selected  "
-              css-classes="button button-secondary"
-              icon="fa fa-recycle"
-              @click="allCards.batchRestore()"
-              :ajax="allCards.ajaxRestore.value">
-          </ajax-action-not-form>
-          <ajax-action-not-form
-              button-text="Delete Selected Permanently "
-              css-classes="button button-link-delete"
-              icon="fa fa-trash"
-              @click="allCards.batchDelete()"
-              :ajax="allCards.ajaxDelete.value">
-          </ajax-action-not-form>
-          <ajax-action-not-form
-              v-if="!inTrash"
-              button-text="Trash Selected "
-              css-classes="button button-link-delete"
-              icon="fa fa-trash"
-              @click="allCards.batchTrash()"
-              :ajax="allCards.ajaxTrash.value">
-          </ajax-action-not-form>
+          <v-btn
+              color="primary"
+              @click="removeCard(allCards.tableData.value.selectedRows.map((item) => item.id))"
+              variant="elevated"
+              size="small"
+              :loading="userCards.ajaxRemoveCard.value.sending"
+              :disabled="userCards.ajaxRemoveCard.value.sending"
+          >
+            Remove selected
+          </v-btn>
+          <!--          <ajax-action-not-form-->
+          <!--              v-if="inTrash"-->
+          <!--              button-text="Restore Selected  "-->
+          <!--              css-classes="button button-secondary"-->
+          <!--              icon="fa fa-recycle"-->
+          <!--              @click="allCards.batchRestore()"-->
+          <!--              :ajax="allCards.ajaxRestore.value">-->
+          <!--          </ajax-action-not-form>-->
+          <!--          <ajax-action-not-form-->
+          <!--              button-text="Delete Selected Permanently "-->
+          <!--              css-classes="button button-link-delete"-->
+          <!--              icon="fa fa-trash"-->
+          <!--              @click="allCards.batchDelete()"-->
+          <!--              :ajax="allCards.ajaxDelete.value">-->
+          <!--          </ajax-action-not-form>-->
+          <!--          <ajax-action-not-form-->
+          <!--              v-if="!inTrash"-->
+          <!--              button-text="Trash Selected "-->
+          <!--              css-classes="button button-link-delete"-->
+          <!--              icon="fa fa-trash"-->
+          <!--              @click="allCards.batchTrash()"-->
+          <!--              :ajax="allCards.ajaxTrash.value">-->
+          <!--          </ajax-action-not-form>-->
         </template>
       </vue-good-table>
     </div>
@@ -255,15 +265,17 @@ export default defineComponent({
       // this.cardsToView = cardGroup.cards;
       // setTimeout(() => this.openQuestionModal(), 1000);
     },
-    removeCard(cardGroupId: number) {
-      this.cardGroupIdsRemoving.push(cardGroupId);
-      this.userCards.removeCard([cardGroupId])
+    removeCard(cardGroupIds: number[]) {
+      // push without duplicates.
+      this.cardGroupIdsRemoving.push(...cardGroupIds.filter((item) => !this.cardGroupIdsRemoving.includes(item)));
+
+      this.userCards.removeCard(cardGroupIds)
           .then((done) => {
-            this.cardGroupIdsRemoving = this.cardGroupIdsRemoving.filter((item) => item !== cardGroupId);
+            this.cardGroupIdsRemoving = this.cardGroupIdsRemoving.filter((item) => !cardGroupIds.includes(item));
             this.allCards.search('');
           })
           .catch((err) => {
-            this.cardGroupIdsRemoving = this.cardGroupIdsRemoving.filter((item) => item !== cardGroupId);
+            this.cardGroupIdsRemoving = this.cardGroupIdsRemoving.filter((item) => !cardGroupIds.includes(item));
           });
     },
   }

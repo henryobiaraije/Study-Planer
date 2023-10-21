@@ -8,9 +8,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Facades\DB;
 use PHPMailer\PHPMailer\Exception;
 use StudyPlanner\Initializer;
 use StudyPlanner\Libs\Common;
@@ -192,6 +194,9 @@ class CardGroup extends Model {
 			'for_remove_from_study_deck' => false,
 			'for_new_cards'              => false,
 			'user_id'                    => null,
+			'order_by_deck_group_name'   => false,
+			'order_by_deck_name'         => false,
+			'order_by_topic'             => false,
 		];
 
 		$args = wp_parse_args( $args, $default );
@@ -216,12 +221,13 @@ class CardGroup extends Model {
 
 		if ( true === $args['for_add_to_study_deck'] ) {
 			// If for_add_to_study_deck, then return only the cards the user is not studying currently.
-			$card_group   = self::query()
-			                    ->whereNotIn( 'id', function ( Builder $query ) use ( $args ) {
-				                    $query->select( 'card_group_id' )
-				                          ->from( SP_TABLE_USER_CARDS )
-				                          ->where( 'user_id', $args['user_id'] );
-			                    } );
+			$card_group   = self
+				::query()
+				->whereNotIn( 'id', function ( Builder $query ) use ( $args ) {
+					$query->select( 'card_group_id' )
+					      ->from( SP_TABLE_USER_CARDS )
+					      ->where( 'user_id', $args['user_id'] );
+				} );
 			$card_group_2 = self::query()
 			                    ->whereNotIn( 'id', function ( Builder $query ) use ( $args ) {
 				                    $query->select( 'card_group_id' )
@@ -245,35 +251,38 @@ class CardGroup extends Model {
 				} );
 		} elseif ( true === $args['for_new_cards'] ) {
 			// Get the topics of the cards the user is studying.
-			$topics = Topic::query()
-			               ->whereIn( 'id', function ( Builder $query ) use ( $args ) {
-				               $query->whereIn( 'id', function ( Builder $query ) use ( $args ) {
-					               $query->select( 'topic_id' )
-					                     ->from( SP_TABLE_CARD_GROUPS )
-					                     ->whereIn( 'id', function ( Builder $query ) use ( $args ) {
-						                     $query->select( 'card_group_id' )
-						                           ->from( SP_TABLE_USER_CARDS )
-						                           ->where( 'user_id', $args['user_id'] );
-					                     } );
-				               } );
-			               } )
-			               ->get()->all();
+			$topics = Topic
+				::query()
+				->whereIn( 'id', function ( Builder $query ) use ( $args ) {
+					$query->whereIn( 'id', function ( Builder $query ) use ( $args ) {
+						$query->select( 'topic_id' )
+						      ->from( SP_TABLE_CARD_GROUPS )
+						      ->whereIn( 'id', function ( Builder $query ) use ( $args ) {
+							      $query->select( 'card_group_id' )
+							            ->from( SP_TABLE_USER_CARDS )
+							            ->where( 'user_id', $args['user_id'] );
+						      } );
+					} );
+				} )
+				->get()->all();
 
 			// Then, We need only card groups that belong to the topic but are not in the user_cards table.
-			$card_group   = self::query()
-			                    ->whereNotIn( 'id', function ( Builder $query ) use ( $args, $topics ) {
-				                    $query->select( 'card_group_id' )
-				                          ->from( SP_TABLE_USER_CARDS )
-				                          ->where( 'user_id', $args['user_id'] );
-			                    } )
-			                    ->whereIn( 'topic_id', array_column( $topics, 'id' ) );
-			$card_group_2 = self::query()
-			                    ->whereNotIn( 'id', function ( Builder $query ) use ( $args, $topics ) {
-				                    $query->select( 'card_group_id' )
-				                          ->from( SP_TABLE_USER_CARDS )
-				                          ->where( 'user_id', $args['user_id'] );
-			                    } )
-			                    ->whereIn( 'topic_id', array_column( $topics, 'id' ) );
+			$card_group   = self
+				::query()
+				->whereNotIn( 'id', function ( Builder $query ) use ( $args, $topics ) {
+					$query->select( 'card_group_id' )
+					      ->from( SP_TABLE_USER_CARDS )
+					      ->where( 'user_id', $args['user_id'] );
+				} )
+				->whereIn( 'topic_id', array_column( $topics, 'id' ) );
+			$card_group_2 = self
+				::query()
+				->whereNotIn( 'id', function ( Builder $query ) use ( $args, $topics ) {
+					$query->select( 'card_group_id' )
+					      ->from( SP_TABLE_USER_CARDS )
+					      ->where( 'user_id', $args['user_id'] );
+				} )
+				->whereIn( 'topic_id', array_column( $topics, 'id' ) );
 		} else {
 			$card_group   = self::query();
 			$card_group_2 = self::query();
@@ -319,11 +328,13 @@ class CardGroup extends Model {
 			$card_group_2 = $card_group_2->where( 'topic_id', $args['topic_id'] );
 		}
 
+		// Card types.
 		if ( $args['card_types'] ) {
 			$card_group   = $card_group->whereIn( 'card_type', $args['card_types'] );
 			$card_group_2 = $card_group_2->whereIn( 'card_type', $args['card_types'] );
 		}
 
+		// Search.
 		if ( $args['search'] ) {
 			$card_group   = $card_group
 				->where( 'name', 'like', "%{$args['search']}%" );
@@ -331,16 +342,16 @@ class CardGroup extends Model {
 				->where( 'name', 'like', "%{$args['search']}%" );
 		}
 
-		$offset     = ( $args['page'] - 1 );
-		$all_object = $card_group
-			->offset( $offset )
-			->with( 'deck', 'topic', 'collection', 'cards' )
-			->limit( $args['per_page'] )
-			->orderByDesc( 'id' );
+		// Pagination.
+		$offset = ( $args['page'] - 1 );
 
-		$total = $card_group_2
-			->orderByDesc( 'id' )
-			->get()->count();
+		$all_object   = $card_group
+			->with( 'deck.deck_group', 'topic', 'collection', 'cards' );
+		$total_object = $card_group_2;
+
+		$all_object->offset( $offset )
+		           ->limit( $args['per_page'] )
+		           ->orderByDesc( 'id' );
 
 		$all = $all_object->get();
 
@@ -362,10 +373,187 @@ class CardGroup extends Model {
 			}
 		}
 
-		return [
+		$ret = [
 			'items' => $all->all(),
+			'total' => $total_object->get()->count()
+		];
+
+		return $ret;
+	}
+
+
+	/** @noinspection UnknownColumnInspection */
+	public static function get_card_groups_simple_with_ordering( $args ): array {
+		$default = array(
+			'search'                     => '',
+			'page'                       => 1,
+			'per_page'                   => 5,
+			'with_trashed'               => false,
+			'only_trashed'               => false,
+			'deck_group_id'              => null,
+			'deck_id'                    => null,
+			'topic_id'                   => null,
+			'card_types'                 => null,
+			'tags_ids'                   => array(),
+			'from_front_end'             => false,
+			'for_add_to_study_deck'      => false,
+			'for_remove_from_study_deck' => false,
+			'for_new_cards'              => false,
+			'user_id'                    => null,
+			'order_by_deck_group_name'   => false,
+			'order_by_deck_name'         => false,
+			'order_by_topic'             => false,
+		);
+
+		$args = wp_parse_args( $args, $default );
+
+		// if from front end, then either deck_group_id or deck_id or topic_id must be provided.
+		if (
+			true === $args['from_front_end']
+			&& null === $args['deck_group_id']
+			&& null === $args['deck_id']
+			&& null === $args['topic_id']
+			&& false === $args['for_add_to_study_deck']
+			&& false === $args['for_remove_from_study_deck']
+			&& false === $args['for_new_cards']
+			&& false === $args['user_id']
+		) {
+			return [
+				'items' => [],
+				'total' => 0,
+			];
+		}
+
+		// Join tables and apply aliases
+		$query = Manager
+			::table( SP_TABLE_CARD_GROUPS . ' as cg' )
+			->select( 'cg.*', 'd.name as deck_name', 'dg.name as deck_group_name', 't.name as topic_name', 'cl.name as collection_name', 'c.id as card_id', 'uc.id as user_card_id' )
+			->leftJoin( SP_TABLE_DECKS . ' AS d', 'd.id', '=', 'cg.deck_id' )
+			->leftJoin( SP_TABLE_DECK_GROUPS . ' AS dg', 'dg.id', '=', 'd.deck_group_id' )
+			->leftJoin( SP_TABLE_TOPICS . ' AS t', 't.id', '=', 'cg.topic_id' )
+			->leftJoin( SP_TABLE_COLLECTIONS . ' AS cl', 'cl.id', '=', 'cg.collection_id' )
+			->leftJoin( SP_TABLE_CARDS . ' AS c', 'c.card_group_id', '=', 'cg.id' )
+			->leftJoin( SP_TABLE_USER_CARDS . ' AS uc', 'uc.card_group_id', '=', 'cg.id' );
+
+		// Apply conditions based on parameters
+//		if ( $args['from_front_end'] ) {
+//			$query->where( function ( $query ) use ( $args ) {
+//				$query->whereNotNull( 'cg.deck_group_id' )
+//				      ->orWhereNotNull( 'cg.deck_id' )
+//				      ->orWhereNotNull( 'cg.topic_id' )
+//				      ->orWhere( 'uc.for_add_to_study_deck', true )
+//				      ->orWhere( 'uc.for_remove_from_study_deck', true )
+//				      ->orWhere( 'uc.for_new_cards', true )
+//				      ->orWhereNotNull( 'uc.user_id' );
+//			} );
+//		}
+
+		if ( $args['for_add_to_study_deck'] ) {
+			// If for_add_to_study_deck, then return only the cards the user is not studying currently.
+			$query->whereNotIn( 'cg.id', function ( $query ) use ( $args ) {
+				$query->select( 'card_group_id' )
+				      ->from( SP_TABLE_USER_CARDS )
+				      ->where( 'user_id', $args['user_id'] );
+			} );
+		} elseif ( $args['for_remove_from_study_deck'] ) {
+			// If for_remove_from_study_deck, then return only the cards the user is studying currently.
+			$query->whereIn( 'cg.id', function ( $query ) use ( $args ) {
+				$query->select( 'card_group_id' )
+				      ->from( SP_TABLE_USER_CARDS )
+				      ->where( 'user_id', $args['user_id'] );
+			} );
+		} elseif ( $args['for_new_cards'] ) {
+			// Get the topics of the cards the user is studying.
+			$topics = Topic
+				::query()
+				->whereIn( 'id', function ( Builder $query ) use ( $args ) {
+					$query->whereIn( 'id', function ( Builder $query ) use ( $args ) {
+						$query->select( 'topic_id' )
+						      ->from( SP_TABLE_CARD_GROUPS )
+						      ->whereIn( 'id', function ( Builder $query ) use ( $args ) {
+							      $query->select( 'card_group_id' )
+							            ->from( SP_TABLE_USER_CARDS )
+							            ->where( 'user_id', $args['user_id'] );
+						      } );
+					} );
+				} )
+				->get()->all();
+
+			// Then, We need only card groups that belong to the topic but are not in the user_cards table.
+			$query
+				->whereNotIn( 'cg.id', function ( Builder $query ) use ( $args, $topics ) {
+					$query->select( 'card_group_id' )
+					      ->from( SP_TABLE_USER_CARDS )
+					      ->where( 'user_id', $args['user_id'] );
+				} )
+				->whereIn( 'cg.topic_id', array_column( $topics, 'id' ) );
+		}
+
+		if ( $args['with_trashed'] ) {
+//			$query->whereNotNull( 'cg.deleted_at' )->with( 'tags' );
+		} elseif ( $args['only_trashed'] ) {
+			$query->whereNotNull( 'cg.deleted_at' );
+		} else {
+//			$query->with( 'tags' );
+		}
+
+		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
+		$only_deck       = $args['deck_group_id'] && $args['deck_id'] && ! $args['topic_id'];
+		$only_topic      = $args['deck_group_id'] && $args['deck_id'] && $args['topic_id'];
+
+		if ( $only_deck_group ) {
+			// Add conditions for 'only_deck_group'
+			$query->whereIn( 'cg.deck_id', function ( Builder $query ) use ( $args ) {
+				$query->select( 'id' )
+				      ->from( SP_TABLE_DECKS )
+				      ->where( 'deck_group_id', $args['deck_group_id'] );
+			} );
+		} elseif ( $only_deck ) {
+			$query->where( 'cg.deck_id', $args['deck_id'] );
+		} elseif ( $only_topic ) {
+			$query->where( 'cg.topic_id', $args['topic_id'] );
+		}
+
+		// Card types.
+		if ( $args['card_types'] ) {
+			$query->whereIn( 'cg.card_type', $args['card_types'] );
+		}
+
+		// Search.
+		if ( $args['search'] ) {
+			$query->where( 'cg.name', 'like', '%' . $args['search'] . '%' );
+		}
+
+		$offset = ( $args['page'] - 1 ) * $args['per_page'];
+
+		$totalQuery = clone $query; // Clone the query for total count
+		$total      = $totalQuery->count();
+
+		$result = $query
+			->offset( $offset )
+			->limit( $args['per_page'] )
+			->orderBy( 'deck_group_name' )
+			->groupBy( 'deck_group_name', 'deck_name', 'topic_name', 'cg.id' );
+
+		$sql = $result->toSql();
+
+		$all            = $result->get()->all();
+		$card_group_ids = array_column( $all, 'id' );
+
+
+		$card_groups = self
+			::query()
+			->whereIn( 'id', $card_group_ids )
+			->with( 'cards', 'deck.deck_group', 'topic', 'collection' )
+			->get();
+
+		// Process card data as needed
+
+		return [
+			'items' => $card_groups->all(),
 			'total' => $total,
 		];
 	}
+
 
 }

@@ -173,7 +173,7 @@ class AjaxHelper {
 
 		$user_id = get_current_user_id();
 
-		$items = CardGroup::get_card_groups_simple(
+		$items = CardGroup::get_card_groups_simple_with_ordering(
 			array(
 				'search'                     => $search_keyword,
 				'page'                       => $page,
@@ -187,7 +187,10 @@ class AjaxHelper {
 				'for_add_to_study_deck'      => $e_for_add_to_study_deck,
 				'for_remove_from_study_deck' => $e_for_remove_from_study_deck,
 				'for_new_cards'              => $e_for_new_cards,
-				'user_id'                    => $user_id
+				'user_id'                    => $user_id,
+				'order_by_deck_group_name'   => true,
+				'order_by_deck_name'         => true,
+				'order_by_topic'             => true,
 			)
 		);
 
@@ -2787,7 +2790,6 @@ class AjaxHelper {
 
 		Common::send_success( $message );
 	}
-
 
 
 	// </editor-fold desc="User Cards">
