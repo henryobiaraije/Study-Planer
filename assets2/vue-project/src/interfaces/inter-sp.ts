@@ -8,16 +8,18 @@ export interface _DeckGroup {
     tags: Array<_Tag>;
     created_at: string;
     updated_at: boolean,
+    decks: Array<_Deck>;
 }
 
 export interface _Deck {
     id: number;
     name: string;
     trashed: boolean;
-    deck_group: _DeckGroup,
+    card_groups: _CardGroup[],
     tags: Array<_Tag>;
     created_at: string;
     updated_at: boolean,
+    topics: Array<_Topic>;
 }
 
 export interface _Topic {
@@ -28,6 +30,7 @@ export interface _Topic {
     created_at: string;
     updated_at: boolean,
     tags: Array<_Tag>;
+    card_groups: Array<_CardGroup>;
 }
 
 export type _TopicNew = Partial<_Topic & Pick<_Topic, 'name' | 'deck' | 'tags'>>;

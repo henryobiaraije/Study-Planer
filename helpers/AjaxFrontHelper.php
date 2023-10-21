@@ -98,6 +98,7 @@ class AjaxFrontHelper {
 		// <editor-fold desc="User Cards ">
 		add_action( 'admin_sp_ajax_front_add_user_cards', array( $this, 'ajax_front_add_user_cards' ) );
 		add_action( 'admin_sp_ajax_front_remove_card', array( $this, 'ajax_front_remove_card' ) );
+		add_action( 'admin_sp_ajax_front_load_user_cards', array( $this, 'ajax_front_load_user_cards' ) );
 		// </editor-fold desc="User Cards ">
 		//        add_action('front_sp_ajax_front_accept_changes', array($this, 'ajax_front_accept_changes'));
 	}
@@ -1369,6 +1370,18 @@ class AjaxFrontHelper {
 
 
 		Common::send_success( 'Removed successfully' );
+	}
+
+	public function ajax_front_load_user_cards( $post ): void {
+		// 'selected_cards' | 'selected_group' | 'selected_deck' | 'selected_topic'
+		$params = $post[ Common::VAR_2 ]['params'];
+		Initializer::verify_post( $post, true );
+
+		$user_id           = get_current_user_id();
+		$user_card_details = UserCard
+			::get_user_cards( $user_id );
+
+		Common::send_success( 'Removed successfully', $user_card_details );
 	}
 
 	// </editor-fold desc="User Card">

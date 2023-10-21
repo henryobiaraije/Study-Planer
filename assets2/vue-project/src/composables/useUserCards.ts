@@ -1,10 +1,9 @@
-import {ref, watch, watchEffect} from "vue";
+// @ts-ignore
+import {Ref, ref, watch, watchEffect} from "vue";
 import type {_Card, _CardGroup, _Deck, _DeckGroup, _Tag, _Topic, CardType} from "@/interfaces/inter-sp";
 import type {_Ajax} from "@/classes/HandleAjax";
 import {HandleAjax} from "@/classes/HandleAjax";
 import {type InterFuncSuccess, Server} from "@/static/server";
-import {Store} from "@/static/store";
-import useDeckGroupLists from "@/composables/useDeckGroupLists";
 import Cookies from "js-cookie";
 import {spClientData} from "@/functions";
 import {toast} from "vue3-toastify";
@@ -130,7 +129,13 @@ export default function (status = 'publish') {
         success: false,
         successMessage: '',
     });
-
+    const ajaxLoadUserCard = ref<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
 
     const theForm = {
         topicToAssign: null as null | _Topic,
@@ -148,6 +153,7 @@ export default function (status = 'publish') {
     // selectedCards: [] as _CardGroup[],
     // page: 1,
     // activeTab: 'found',
+    const userDeckGroups = ref<_DeckGroup[]>([]) as Ref<_DeckGroup[]>;
 
     watchEffect(() => {
         if (oneSpecificCard.value) {
@@ -309,6 +315,33 @@ export default function (status = 'publish') {
             });
         })
     };
+    const xhrLoadUserCards = () => {
+        const handleAjax: HandleAjax = new HandleAjax(ajaxLoadUserCard.value);
+        return new Promise((resolve, reject) => {
+            new Server().send_online({
+                data: [
+                    spClientData().nonce,
+                    {
+                        params: {},
+                    }
+                ],
+                what: "admin_sp_ajax_front_load_user_cards",
+                funcBefore() {
+                    handleAjax.start();
+                },
+                funcSuccess(done: InterFuncSuccess<{ deck_groups: Array<_DeckGroup> }>) {
+                    handleAjax.stop();
+                    userDeckGroups.value = done.data.deck_groups;
+                    resolve(done);
+                },
+                funcFailue(done) {
+                    handleAjax.error(done);
+                    toast.error(done.message);
+                    reject(done);
+                },
+            });
+        })
+    };
 
     return {
         ajaxSave: ajaxSave, save: xhrSave, form: form,
@@ -316,6 +349,7 @@ export default function (status = 'publish') {
         ajaxAddCards, addCards: xhrAddCards,
         ajaxIgnoreCard, ignoreCard: xhrIgnoreCard,
         ajaxRemoveCard, removeCard: xhrRemoveCard,
+        ajaxLoadUserCard, loadUserCards: xhrLoadUserCards, userDeckGroups,
     };
 
 }

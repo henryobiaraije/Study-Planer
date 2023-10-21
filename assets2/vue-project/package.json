@@ -34,6 +34,7 @@
     "vuetify": "^3.3.22"
   },
   "devDependencies": {
+    "@mdi/font": "^7.3.67",
     "@tsconfig/node18": "^18.2.2",
     "@types/jquery": "^3.5.24",
     "@types/jsdom": "^21.1.3",

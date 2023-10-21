@@ -28,7 +28,11 @@ class Topic extends Model {
 		return $this->hasManyThrough( Card::class, CardGroup::class );
 	}
 
-	public function deck() {
+	public function card_groups() {
+		return $this->hasMany( CardGroup::class, 'topic_id' );
+	}
+
+	public function deck(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
 		return $this->belongsTo( Deck::class, 'deck_id' );
 	}
 

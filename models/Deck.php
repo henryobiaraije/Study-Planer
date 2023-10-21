@@ -41,6 +41,10 @@ class Deck extends Model {
 		return $this->belongsTo( DeckGroup::class, 'deck_group_id' );
 	}
 
+	public function topics(): \Illuminate\Database\Eloquent\Relations\HasMany {
+		return $this->hasMany( Topic::class );
+	}
+
 	public function card_group() {
 		return $this->hasMany( CardGroup::class, 'deck_id' );
 	}
@@ -118,9 +122,10 @@ class Deck extends Model {
 
 		$total  = $deck->count();
 		$offset = ( $args['page'] - 1 );
-		$deck   = $deck->offset( $offset )
-		               ->limit( $args['per_page'] )
-		               ->orderByDesc( 'id' )->get();
+		$deck   = $deck
+			->offset( $offset )
+			->limit( $args['per_page'] )
+			->orderByDesc( 'id' )->get();
 
 //			Common::send_error( [
 //				'ajax_admin_load_deck_group',

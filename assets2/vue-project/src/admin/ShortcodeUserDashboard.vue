@@ -58,7 +58,7 @@
     <!--    </div>-->
 
   </div>
-<!--  <ModalsContainer/>-->
+  <!--  <ModalsContainer/>-->
   <hover-notifications></hover-notifications>
 </template>
 <script lang="ts">
@@ -77,10 +77,11 @@ import {toast} from "vue3-toastify";
 import UserDashboardAddCard from "@/admin/UserDashboardAddCard.vue";
 import UserDashboardNewCards from "@/admin/UserDashboardNewCards.vue";
 import UserDashboardRemoveCards from "@/admin/UserDashboardRemoveCards.vue";
+import UserDashboardStudyDeck from "@/admin/UserDashboardStudyDeck .vue";
 
 export default defineComponent({
   name: 'ShortcodeUserDashboard',
-  components: { UserDashboardSettings, UserDashboardProfile, HoverNotifications, CalendarHeatmap},
+  components: {UserDashboardSettings, UserDashboardProfile, HoverNotifications, CalendarHeatmap},
   props: {},
   data() {
     return {
@@ -106,7 +107,7 @@ export default defineComponent({
         {
           title: 'Study Deck',
           tag: 'study-deck',
-          comp: null,
+          comp: UserDashboardStudyDeck,
           props: {},
         },
         {
