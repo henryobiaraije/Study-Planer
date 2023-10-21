@@ -18,6 +18,11 @@ const tableData = ref({
             tooltip: 'Endpoint Name',
         },
         {
+            label: 'Deck Group',
+            field: 'deck_group',
+            tooltip: 'Deck Group',
+        },
+        {
             label: 'Deck',
             field: 'deck',
             tooltip: 'Deck',

@@ -8,8 +8,8 @@
               class="header-title-icon flex flex-1 justify-start items-center gap-2 cursor-pointer"
               :class="[cssLeftRight.left]"
           >
-            <div class="sp-icon flex-initial px-2 text-gray-400">
-              <v-icon v-if="!showChildren" left>
+            <div v-if="'card_group' !== theItem.childrenType" class="sp-icon flex-initial px-2 text-gray-400">
+              <v-icon v-if="!showChildren " left>
                 mdi-chevron-down
               </v-icon>
               <v-icon v-if="showChildren" left>
@@ -103,7 +103,7 @@ export default defineComponent({
       let childrenType = childrenMap[Object.keys(item).find(key => key in childrenMap)] || 'card_group';
 
       const childrenMapNames = {
-        'decks': 'deck',
+        'decks': 'subject',
         'topics': 'topic',
         'card_groups': 'cards',
       };

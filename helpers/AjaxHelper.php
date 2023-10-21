@@ -2187,7 +2187,6 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_load_topics( $post ): void {
-
 		$params         = $post[ Common::VAR_2 ]['params'];
 		$per_page       = (int) sanitize_text_field( $params['per_page'] );
 		$page           = (int) sanitize_text_field( $params['page'] );
