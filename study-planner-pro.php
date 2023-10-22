@@ -7,8 +7,8 @@
  */
 
 
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
 }
 /**
  * Plugin Description
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
  * @wordpress-plugin
  * Plugin Name:       Study Planner Pro
  * Plugin URI:        https://www.pereere.com/wordpress-plugins/study-planner-pro
- * Description:       Comes with admin dashboard to create deck groups, decks, cards. It also comes with an user dashboard where users can plan and study the cards with built in statistics
+ * Description:       Comes with admin dashboard to create deck groups, decks, cards. It also comes with an user dashboard where users can plan and study the cards with built in statistics. User Dashboard shortcode <code>[sp_pro_user_dashboard]</code>.
  * Version:           3.0.1
  * Author:            Pereere Codes
  * Author URI:        https://www.pereere.com/
@@ -43,9 +43,9 @@ Initialize_Db::get_instance();
 $initializer = Initializer::get_instance();
 
 
-register_activation_hook(__FILE__, [$initializer, 'on_activate']);
-register_deactivation_hook(__FILE__, [$initializer, 'on_deactivate']);
-register_uninstall_hook(__FILE__, [Initializer::class, 'on_uninstall']);
+register_activation_hook( __FILE__, [ $initializer, 'on_activate' ] );
+register_deactivation_hook( __FILE__, [ $initializer, 'on_deactivate' ] );
+register_uninstall_hook( __FILE__, [ Initializer::class, 'on_uninstall' ] );
 
 
 

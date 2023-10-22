@@ -54,9 +54,9 @@ class Initializer {
 	// todo change to false later during production
 	public static $debug_mode = true;
 	public static $script_version = 1.0;
-	public static $nonce_key = 'e5824f4aefs424245g424';
-	public static $ajax_action = 'sbe_ajax_action_4fef425g424r5q5g6q';
-	public static $localize_id = 'pereere_dot_com_sp_general_localize_4736';
+	public static $nonce_key = 'e5824f448200111383345g424';
+	public static $ajax_action = 'sp_pro_ajax_action_4fef425g424r5q5g6q';
+	public static $localize_id = 'pereere_dot_com_sp_pro_general_localize_4736';
 
 	public static $general_localize = array();
 

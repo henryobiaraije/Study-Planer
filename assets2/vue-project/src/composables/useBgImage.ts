@@ -63,7 +63,7 @@ export default function () {
                     id,
                 }
             ],
-            what: "admin_sp_ajax_admin_load_image_attachment",
+            what: "admin_sp_pro_ajax_admin_load_image_attachment",
             funcBefore() {
                 handleAjax.start();
             },

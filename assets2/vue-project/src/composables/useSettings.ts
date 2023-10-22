@@ -83,7 +83,7 @@ export default function (cardGroupId = 0) {
           settings: settings.value,
         }
       ],
-      what: "admin_sp_ajax_admin_update_settings",
+      what: "admin_sp_pro_ajax_admin_update_settings",
       funcBefore() {
         handleAjax.start();
       },
@@ -106,7 +106,7 @@ export default function (cardGroupId = 0) {
             // card_group_id: cardGroupId,
           }
         ],
-        what: "admin_sp_ajax_admin_load_settings",
+        what: "admin_sp_pro_ajax_admin_load_settings",
         funcBefore() {
           handleAjax.start();
         },

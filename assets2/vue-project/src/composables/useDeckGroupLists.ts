@@ -228,7 +228,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_load_deck_group",
+            what: "admin_sp_pro_ajax_admin_load_deck_group",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -268,7 +268,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_search_deck_group",
+            what: "admin_sp_pro_ajax_admin_search_deck_group",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -292,7 +292,7 @@ export default function (status = 'publish') {
                     deck_groups: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_update_deck_group",
+            what: "admin_sp_pro_ajax_admin_update_deck_group",
             funcBefore() {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
@@ -318,7 +318,7 @@ export default function (status = 'publish') {
                     deck_groups: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_trash_deck_group",
+            what: "admin_sp_pro_ajax_admin_trash_deck_group",
             funcBefore() {
                 handleAjax.start();
             },
@@ -343,7 +343,7 @@ export default function (status = 'publish') {
                     deck_groups: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_delete_deck_group",
+            what: "admin_sp_pro_ajax_admin_delete_deck_group",
             funcBefore() {
                 handleAjax.start();
             },

@@ -27,7 +27,7 @@ export default function () {
                     tags: newTags.value,
                 }
             ],
-            what: "admin_sp_ajax_admin_create_new_deck_group",
+            what: "admin_sp_pro_ajax_admin_create_new_deck_group",
             funcBefore() {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;

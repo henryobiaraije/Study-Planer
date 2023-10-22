@@ -162,7 +162,7 @@ export default function (cardGroupId = 0) {
                     set_bg_as_default: setBgAsDefault.value,
                 }
             ],
-            what: "admin_sp_ajax_admin_create_new_table_card",
+            what: "admin_sp_pro_ajax_admin_create_new_table_card",
             funcBefore() {
                 handleAjax.start();
             },
@@ -187,7 +187,7 @@ export default function (cardGroupId = 0) {
                     set_bg_as_default: setBgAsDefault.value,
                 }
             ],
-            what: "admin_sp_ajax_admin_update_table_card",
+            what: "admin_sp_pro_ajax_admin_update_table_card",
             funcBefore() {
                 handleAjax.start();
             },
@@ -210,7 +210,7 @@ export default function (cardGroupId = 0) {
                         card_group_id: cardGroupId,
                     }
                 ],
-                what: "admin_sp_ajax_admin_load_basic_card",
+                what: "admin_sp_pro_ajax_admin_load_basic_card",
                 funcBefore() {
                     handleAjax.start();
                 },

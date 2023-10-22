@@ -250,7 +250,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_load_collections",
+            what: "admin_sp_pro_ajax_admin_load_collections",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -286,7 +286,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_search_collections",
+            what: "admin_sp_pro_ajax_admin_search_collections",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -310,7 +310,7 @@ export default function (status = 'publish') {
                     collections: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_update_collections",
+            what: "admin_sp_pro_ajax_admin_update_collections",
             funcBefore() {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
@@ -337,7 +337,7 @@ export default function (status = 'publish') {
                     collections: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_trash_collections",
+            what: "admin_sp_pro_ajax_admin_trash_collections",
             funcBefore() {
                 handleAjax.start();
             },
@@ -363,7 +363,7 @@ export default function (status = 'publish') {
                         collections: items,
                     }
                 ],
-                what: "admin_sp_ajax_admin_delete_collections",
+                what: "admin_sp_pro_ajax_admin_delete_collections",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -392,7 +392,7 @@ export default function (status = 'publish') {
                         collections: items,
                     }
                 ],
-                what: "admin_sp_ajax_admin_publish_collections",
+                what: "admin_sp_pro_ajax_admin_publish_collections",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -418,7 +418,7 @@ export default function (status = 'publish') {
                     name: newItem.value.name,
                 }
             ],
-            what: "admin_sp_ajax_admin_create_new_collection",
+            what: "admin_sp_pro_ajax_admin_create_new_collection",
             funcBefore() {
                 handleAjax.start();
             },

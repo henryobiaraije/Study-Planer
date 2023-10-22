@@ -197,7 +197,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_save_user_cards",
+            what: "admin_sp_pro_ajax_admin_save_user_cards",
             funcBefore() {
                 handleAjax.start();
             },
@@ -225,7 +225,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_assign_topics",
+            what: "admin_sp_pro_ajax_admin_assign_topics",
             funcBefore() {
                 console.log('before');
                 handleAjax.start();
@@ -252,7 +252,7 @@ export default function (status = 'publish') {
                         },
                     }
                 ],
-                what: "admin_sp_ajax_front_add_user_cards",
+                what: "admin_sp_pro_ajax_front_add_user_cards",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -287,7 +287,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_front_ignore_card",
+            what: "admin_sp_pro_ajax_front_ignore_card",
             funcBefore() {
                 handleAjax.start();
             },
@@ -311,7 +311,7 @@ export default function (status = 'publish') {
                         },
                     }
                 ],
-                what: "admin_sp_ajax_front_remove_card",
+                what: "admin_sp_pro_ajax_front_remove_card",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -338,7 +338,7 @@ export default function (status = 'publish') {
                         params: {},
                     }
                 ],
-                what: "admin_sp_ajax_front_load_user_cards",
+                what: "admin_sp_pro_ajax_front_load_user_cards",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -368,7 +368,7 @@ export default function (status = 'publish') {
                         },
                     }
                 ],
-                what: "admin_sp_ajax_front_load_user_debug_form",
+                what: "admin_sp_pro_ajax_front_load_user_debug_form",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -398,7 +398,7 @@ export default function (status = 'publish') {
                         },
                     }
                 ],
-                what: "admin_sp_ajax_front_save_user_debug_form",
+                what: "admin_sp_pro_ajax_front_save_user_debug_form",
                 funcBefore() {
                     handleAjax.start();
                 },

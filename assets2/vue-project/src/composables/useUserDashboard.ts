@@ -241,7 +241,7 @@ export default function (status = 'publish') {
                         },
                     }
                 ],
-                what: "front_sp_ajax_front_get_deck_groups",
+                what: "front_sp_pro_ajax_front_get_deck_groups",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -272,7 +272,7 @@ export default function (status = 'publish') {
                         action: action,
                     }
                 ],
-                what: "front_sp_ajax_front_record_study_log",
+                what: "front_sp_pro_ajax_front_record_study_log",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -300,7 +300,7 @@ export default function (status = 'publish') {
                         study: study
                     }
                 ],
-                what: "front_sp_ajax_front_get_today_questions_in_study",
+                what: "front_sp_pro_ajax_front_get_today_questions_in_study",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -329,7 +329,7 @@ export default function (status = 'publish') {
                         study: study
                     }
                 ],
-                what: "front_sp_ajax_front_create_study",
+                what: "front_sp_pro_ajax_front_create_study",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -360,7 +360,7 @@ export default function (status = 'publish') {
                         card_whole: card,
                     }
                 ],
-                what: "front_sp_ajax_front_mark_answer",
+                what: "front_sp_pro_ajax_front_mark_answer",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -393,7 +393,7 @@ export default function (status = 'publish') {
                         currentQuestion
                     }
                 ],
-                what: "front_sp_ajax_front_accept_changes",
+                what: "front_sp_pro_ajax_front_accept_changes",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -425,7 +425,7 @@ export default function (status = 'publish') {
                         card_id: card.id,
                     }
                 ],
-                what: "front_sp_ajax_front_mark_answer_on_hold",
+                what: "front_sp_pro_ajax_front_mark_answer_on_hold",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -459,7 +459,7 @@ export default function (status = 'publish') {
                         answer
                     }
                 ],
-                what: "front_sp_ajax_front_mark_answer_on_hold",
+                what: "front_sp_pro_ajax_front_mark_answer_on_hold",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -490,7 +490,7 @@ export default function (status = 'publish') {
                         deck_id: deckId,
                     }
                 ],
-                what: "front_sp_ajax_front_get_single_deck_group",
+                what: "front_sp_pro_ajax_front_get_single_deck_group",
                 funcBefore() {
                     handleAjax.start();
                 },

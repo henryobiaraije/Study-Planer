@@ -40,7 +40,7 @@ export default function () {
                     spClientData().nonce,
                     {}
                 ],
-                what: "front_sp_ajax_admin_load_user_profile",
+                what: "front_sp_pro_ajax_admin_load_user_profile",
                 funcBefore() {
                     handleAjax.start();
 
@@ -67,7 +67,7 @@ export default function () {
                     // timezone: userTimeZone.value,
                 }
             ],
-            what: "front_sp_ajax_admin_update_user_timezone",
+            what: "front_sp_pro_ajax_admin_update_user_timezone",
             funcBefore() {
                 handleAjax.start();
             },

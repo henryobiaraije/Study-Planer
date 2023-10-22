@@ -248,7 +248,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_load_topics",
+            what: "admin_sp_pro_ajax_admin_load_topics",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -286,7 +286,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_search_topics",
+            what: "admin_sp_pro_ajax_admin_search_topics",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -311,7 +311,7 @@ export default function (status = 'publish') {
                     topics: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_update_topics",
+            what: "admin_sp_pro_ajax_admin_update_topics",
             funcBefore() {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
@@ -337,7 +337,7 @@ export default function (status = 'publish') {
                     topics: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_trash_topics",
+            what: "admin_sp_pro_ajax_admin_trash_topics",
             funcBefore() {
                 handleAjax.start();
             },
@@ -362,7 +362,7 @@ export default function (status = 'publish') {
                     topics: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_delete_topics",
+            what: "admin_sp_pro_ajax_admin_delete_topics",
             funcBefore() {
                 handleAjax.start();
             },
@@ -386,7 +386,7 @@ export default function (status = 'publish') {
                     tags: newItem.value.tags,
                 }
             ],
-            what: "admin_sp_ajax_admin_create_new_topic",
+            what: "admin_sp_pro_ajax_admin_create_new_topic",
             funcBefore() {
                 handleAjax.start();
             },

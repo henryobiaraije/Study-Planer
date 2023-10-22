@@ -247,7 +247,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_load_decks",
+            what: "admin_sp_pro_ajax_admin_load_decks",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -284,7 +284,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_search_decks",
+            what: "admin_sp_pro_ajax_admin_search_decks",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -309,7 +309,7 @@ export default function (status = 'publish') {
                     decks: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_update_decks",
+            what: "admin_sp_pro_ajax_admin_update_decks",
             funcBefore() {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
@@ -335,7 +335,7 @@ export default function (status = 'publish') {
                     decks: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_trash_decks",
+            what: "admin_sp_pro_ajax_admin_trash_decks",
             funcBefore() {
                 handleAjax.start();
             },
@@ -360,7 +360,7 @@ export default function (status = 'publish') {
                     decks: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_delete_decks",
+            what: "admin_sp_pro_ajax_admin_delete_decks",
             funcBefore() {
                 handleAjax.start();
             },
@@ -384,7 +384,7 @@ export default function (status = 'publish') {
                     tags: newItem.value.tags,
                 }
             ],
-            what: "admin_sp_ajax_admin_create_new_deck",
+            what: "admin_sp_pro_ajax_admin_create_new_deck",
             funcBefore() {
                 handleAjax.start();
             },

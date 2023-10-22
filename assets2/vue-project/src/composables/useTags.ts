@@ -198,7 +198,7 @@ export default function (status = 'publish') {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_load_tags",
+            what: "admin_sp_pro_ajax_admin_load_tags",
             funcBefore() {
                 handleAjax.start();
                 tt().isLoading = true;
@@ -229,7 +229,7 @@ export default function (status = 'publish') {
                     name: newName.value,
                 }
             ],
-            what: "admin_sp_ajax_admin_create_tag",
+            what: "admin_sp_pro_ajax_admin_create_tag",
             funcBefore() {
                 handleAjax.start();
             },
@@ -252,7 +252,7 @@ export default function (status = 'publish') {
                     tags: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_update_tags",
+            what: "admin_sp_pro_ajax_admin_update_tags",
             funcBefore() {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
@@ -278,7 +278,7 @@ export default function (status = 'publish') {
                     items: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_trash_tags",
+            what: "admin_sp_pro_ajax_admin_trash_tags",
             funcBefore() {
                 handleAjax.start();
             },
@@ -303,7 +303,7 @@ export default function (status = 'publish') {
                     items: items,
                 }
             ],
-            what: "admin_sp_ajax_admin_delete_tags",
+            what: "admin_sp_pro_ajax_admin_delete_tags",
             funcBefore() {
                 handleAjax.start();
             },

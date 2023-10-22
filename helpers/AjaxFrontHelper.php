@@ -62,49 +62,49 @@ class AjaxFrontHelper {
 
 	private function init_ajax(): void {
 		// <editor-fold desc="Others">
-		add_action( 'front_sp_ajax_front_get_deck_groups', array( $this, 'ajax_front_get_deck_groups' ) );
-		add_action( 'front_sp_ajax_front_create_study', array( $this, 'ajax_front_create_study' ) );
-		add_action( 'front_sp_ajax_front_get_today_questions_in_study', array(
+		add_action( 'front_sp_pro_ajax_front_get_deck_groups', array( $this, 'ajax_front_get_deck_groups' ) );
+		add_action( 'front_sp_pro_ajax_front_create_study', array( $this, 'ajax_front_create_study' ) );
+		add_action( 'front_sp_pro_ajax_front_get_today_questions_in_study', array(
 			$this,
 			'ajax_front_get_today_questions_in_study'
 		) );
-		add_action( 'front_sp_ajax_admin_get_timezones', array( $this, 'ajax_admin_get_timezones' ) );
-		add_action( 'front_sp_ajax_admin_update_user_timezone', array( $this, 'ajax_admin_update_user_timezone' ) );
-		add_action( 'front_sp_ajax_front_mark_answer', array( $this, 'ajax_front_mark_answer' ) );
-		add_action( 'front_sp_ajax_front_mark_answer_on_hold', array( $this, 'ajax_front_mark_answer_on_hold' ) );
-		add_action( 'front_sp_ajax_front_load_stats_forecast', array( $this, 'ajax_front_load_stats_forecast' ) );
-		add_action( 'front_sp_ajax_front_load_stats_review_time', array( $this, 'ajax_front_load_stats_review_time' ) );
-		add_action( 'front_sp_ajax_front_get_single_deck_group', array( $this, 'ajax_front_get_single_deck_group' ) );
-		add_action( 'front_sp_ajax_front_record_study_log', array( $this, 'ajax_front_record_study_log' ) );
-		add_action( 'front_sp_ajax_front_load_stats_chart_added', array( $this, 'ajax_front_load_stats_chart_added' ) );
-		add_action( 'front_sp_ajax_front_load_stats_chart_interval', array(
+		add_action( 'front_sp_pro_ajax_admin_get_timezones', array( $this, 'ajax_admin_get_timezones' ) );
+		add_action( 'front_sp_pro_ajax_admin_update_user_timezone', array( $this, 'ajax_admin_update_user_timezone' ) );
+		add_action( 'front_sp_pro_ajax_front_mark_answer', array( $this, 'ajax_front_mark_answer' ) );
+		add_action( 'front_sp_pro_ajax_front_mark_answer_on_hold', array( $this, 'ajax_front_mark_answer_on_hold' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_forecast', array( $this, 'ajax_front_load_stats_forecast' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_review_time', array( $this, 'ajax_front_load_stats_review_time' ) );
+		add_action( 'front_sp_pro_ajax_front_get_single_deck_group', array( $this, 'ajax_front_get_single_deck_group' ) );
+		add_action( 'front_sp_pro_ajax_front_record_study_log', array( $this, 'ajax_front_record_study_log' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_chart_added', array( $this, 'ajax_front_load_stats_chart_added' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_chart_interval', array(
 			$this,
 			'ajax_front_load_stats_chart_interval'
 		) );
-		add_action( 'front_sp_ajax_front_load_stats_chart_answer_buttons', array(
+		add_action( 'front_sp_pro_ajax_front_load_stats_chart_answer_buttons', array(
 			$this,
 			'ajax_front_load_stats_chart_answer_buttons'
 		) );
-		add_action( 'front_sp_ajax_front_load_stats_hourly_breakdown', array(
+		add_action( 'front_sp_pro_ajax_front_load_stats_hourly_breakdown', array(
 			$this,
 			'ajax_front_load_stats_hourly_breakdown'
 		) );
-		add_action( 'front_sp_ajax_admin_load_user_profile', array( $this, 'ajax_admin_load_user_profile' ) );
-		add_action( 'front_sp_ajax_front_load_stats_progress_chart', array(
+		add_action( 'front_sp_pro_ajax_admin_load_user_profile', array( $this, 'ajax_admin_load_user_profile' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_progress_chart', array(
 			$this,
 			'ajax_front_load_stats_progress_chart'
 		) );
-		add_action( 'front_sp_ajax_front_load_stats_card_types', array( $this, 'ajax_front_load_stats_card_types' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_card_types', array( $this, 'ajax_front_load_stats_card_types' ) );
 		// </editor-fold desc="Others">
 
 		// <editor-fold desc="User Cards ">
-		add_action( 'admin_sp_ajax_front_add_user_cards', array( $this, 'ajax_front_add_user_cards' ) );
-		add_action( 'admin_sp_ajax_front_remove_card', array( $this, 'ajax_front_remove_card' ) );
-		add_action( 'admin_sp_ajax_front_load_user_cards', array( $this, 'ajax_front_load_user_cards' ) );
-		add_action( 'admin_sp_ajax_front_save_user_debug_form', array( $this, 'ajax_front_save_user_debug_form' ) );
-		add_action( 'admin_sp_ajax_front_load_user_debug_form', array( $this, 'ajax_front_load_user_debug_form' ) );
+		add_action( 'admin_sp_pro_ajax_front_add_user_cards', array( $this, 'ajax_front_add_user_cards' ) );
+		add_action( 'admin_sp_pro_ajax_front_remove_card', array( $this, 'ajax_front_remove_card' ) );
+		add_action( 'admin_sp_pro_ajax_front_load_user_cards', array( $this, 'ajax_front_load_user_cards' ) );
+		add_action( 'admin_sp_pro_ajax_front_save_user_debug_form', array( $this, 'ajax_front_save_user_debug_form' ) );
+		add_action( 'admin_sp_pro_ajax_front_load_user_debug_form', array( $this, 'ajax_front_load_user_debug_form' ) );
 		// </editor-fold desc="User Cards ">
-		//        add_action('front_sp_ajax_front_accept_changes', array($this, 'ajax_front_accept_changes'));
+		//        add_action('front_sp_pro_ajax_front_accept_changes', array($this, 'ajax_front_accept_changes'));
 	}
 
 	public function ajax_admin_load_user_profile( $post ): void {
@@ -263,7 +263,7 @@ class AjaxFrontHelper {
 	public function ajax_front_load_stats_hourly_breakdown( $post ): void {
 		Initializer::verify_post( $post, true );
 		//        Common::send_error([
-		//            'front_sp_ajax_front_load_stats_hourly_breakdown',
+		//            'front_sp_pro_ajax_front_load_stats_hourly_breakdown',
 		//            'post' => $post,
 		//        ]);
 
@@ -501,10 +501,6 @@ class AjaxFrontHelper {
 
 	public function ajax_front_mark_answer( $post ): void {
 		Initializer::verify_post( $post );
-		//        Common::send_error([
-		//            __METHOD__,
-		//            'post' => $post,
-		//        ]);
 
 		$all                    = $post[ Common::VAR_2 ];
 		$study_id               = (int) sanitize_text_field( $all['study_id'] );
@@ -541,10 +537,6 @@ class AjaxFrontHelper {
 		$answered_as_new     = false;
 		$answered_as_revised = false;
 
-		//        $_answered_before = Answered
-		//            ::where('card_id', '=', $card_id)
-		//            ->
-		//            ->first();
 		$_answered_before = Answered
 			::where( 'card_id', '=', $card_id )
 			->where( 'study_id', '=', $study_id )
@@ -563,27 +555,11 @@ class AjaxFrontHelper {
 			->orderByDesc( 'id' )
 			->get()->first();
 
-		//        Common::send_error([
-		//            'ajax_front_get_question',
-		//            'post'                 => $post,
-		//            '$study_log'           => $study_log,
-		//            '$study_id'            => $study_id,
-		//            '$study'               => $study,
-		//            '$grade'               => $grade,
-		//            '$card'                => $card,
-		//            '$all_grades'          => $all_grades,
-		//            '$answer'              => $answer,
-		//            '$card_group'          => $card_group,
-		//            '$answered_as_revised' => $answered_as_revised,
-		//        ]);
-
 		Manager::beginTransaction();
 
 		$answer = Answered::create( [
 			'study_id'            => $study_id,
 			'card_id'             => $card_id,
-//			'answer'              => '',//$e_answer,
-//			'question'            => '',//$e_question,
 			'grade'               => $grade,
 			'answered_as_new'     => $answered_as_new,
 			'answered_as_revised' => $answered_as_revised,
@@ -591,21 +567,6 @@ class AjaxFrontHelper {
 			//				'next_due_at' => Common::getDateTime( - 7 ),
 		] );
 		$study_log->forceDelete();
-		//			$answer = Answered::create( [
-		//				'study_id'    => $study_id,
-		//				'card_id'     => $card_id,
-		//				'answer'      => $answer,
-		//				'grade'       => $grade,
-		//				'next_due_at' => Common::getDateTime( - 4 ),
-		//			] );
-		//			$answer = Answered::create( [
-		//				'study_id'    => $study_id,
-		//				'card_id'     => $card_id,
-		//				'answer'      => $answer,
-		//				'grade'       => $grade,
-		//				'next_due_at' => Common::getDateTime(-1),
-		//			] );
-
 		$old_log = AnswerLog
 			::where( 'study_id', '=', $study_id )
 			->where( 'card_id', '=', $card_id )
@@ -639,21 +600,6 @@ class AjaxFrontHelper {
 
 			Manager::commit();
 
-//            Common::send_error([
-//                'ajax_front_get_question',
-//                'post'           => $post,
-//                '$study_id'      => $study_id,
-//                '$study'         => $study,
-//                '$old_log'       => $old_log,
-//                '$grade'         => $grade,
-//                '$card'          => $card,
-//                '$study_log'     => $study_log,
-//                '$e_question'    => $e_question,
-//                '$e_answer'      => $e_answer,
-//                '$all_grades'    => $all_grades,
-//                '$answer'        => $answer,
-//                '$next_due_date' => $next_due_date,
-//            ]);
 			Common::send_success( 'Answered.', [
 				'debug_display' => $next_due_date['debug_display'],
 				'next_interval' => $next_due_date['next_interval'],

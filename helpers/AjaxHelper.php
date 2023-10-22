@@ -45,71 +45,71 @@ class AjaxHelper {
 
 	private function init_ajax() {
 		// <editor-fold desc="Deck Group">
-		add_action( 'admin_sp_ajax_admin_create_new_deck_group', array( $this, 'ajax_admin_create_new_deck_group' ) );
-		add_action( 'admin_sp_ajax_admin_update_deck_group', array( $this, 'ajax_admin_update_deck_group' ) );
-		add_action( 'admin_sp_ajax_admin_load_deck_group', array( $this, 'ajax_admin_load_deck_group' ) );
-		add_action( 'admin_sp_ajax_admin_search_deck_group', array( $this, 'ajax_admin_search_deck_group' ) );
-		add_action( 'admin_sp_ajax_admin_delete_deck_group', array( $this, 'ajax_admin_delete_deck_group' ) );
-		add_action( 'admin_sp_ajax_admin_trash_deck_group', array( $this, 'ajax_admin_trash_deck_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_deck_group', array( $this, 'ajax_admin_create_new_deck_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_deck_group', array( $this, 'ajax_admin_update_deck_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_deck_group', array( $this, 'ajax_admin_load_deck_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_search_deck_group', array( $this, 'ajax_admin_search_deck_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_delete_deck_group', array( $this, 'ajax_admin_delete_deck_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_trash_deck_group', array( $this, 'ajax_admin_trash_deck_group' ) );
 		// </editor-fold desc="Deck Group">
 		// <editor-fold desc="Deck">
-		add_action( 'admin_sp_ajax_admin_load_decks', array( $this, 'ajax_admin_load_decks' ) );
-		add_action( 'admin_sp_ajax_admin_search_decks', array( $this, 'ajax_admin_search_decks' ) );
-		add_action( 'admin_sp_ajax_admin_create_new_deck', array( $this, 'ajax_admin_create_new_deck' ) );
-		add_action( 'admin_sp_ajax_admin_update_decks', array( $this, 'ajax_admin_update_decks' ) );
-		add_action( 'admin_sp_ajax_admin_trash_decks', array( $this, 'ajax_admin_trash_decks' ) );
-		add_action( 'admin_sp_ajax_admin_delete_decks', array( $this, 'ajax_admin_delete_decks' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_decks', array( $this, 'ajax_admin_load_decks' ) );
+		add_action( 'admin_sp_pro_ajax_admin_search_decks', array( $this, 'ajax_admin_search_decks' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_deck', array( $this, 'ajax_admin_create_new_deck' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_decks', array( $this, 'ajax_admin_update_decks' ) );
+		add_action( 'admin_sp_pro_ajax_admin_trash_decks', array( $this, 'ajax_admin_trash_decks' ) );
+		add_action( 'admin_sp_pro_ajax_admin_delete_decks', array( $this, 'ajax_admin_delete_decks' ) );
 		// </editor-fold desc="Deck">
 		// <editor-fold desc="Topics">
-		add_action( 'admin_sp_ajax_admin_load_topics', array( $this, 'ajax_admin_load_topics' ) );
-		add_action( 'admin_sp_ajax_admin_search_topics', array( $this, 'ajax_admin_search_topics' ) );
-		add_action( 'admin_sp_ajax_admin_create_new_topic', array( $this, 'ajax_admin_create_new_topic' ) );
-		add_action( 'admin_sp_ajax_admin_update_topics', array( $this, 'ajax_admin_update_topics' ) );
-		add_action( 'admin_sp_ajax_admin_trash_topics', array( $this, 'ajax_admin_trash_topics' ) );
-		add_action( 'admin_sp_ajax_admin_delete_topics', array( $this, 'ajax_admin_delete_topics' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_topics', array( $this, 'ajax_admin_load_topics' ) );
+		add_action( 'admin_sp_pro_ajax_admin_search_topics', array( $this, 'ajax_admin_search_topics' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_topic', array( $this, 'ajax_admin_create_new_topic' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_topics', array( $this, 'ajax_admin_update_topics' ) );
+		add_action( 'admin_sp_pro_ajax_admin_trash_topics', array( $this, 'ajax_admin_trash_topics' ) );
+		add_action( 'admin_sp_pro_ajax_admin_delete_topics', array( $this, 'ajax_admin_delete_topics' ) );
 		// </editor-fold desc="Topics">
 		// <editor-fold desc="Tag">
-		add_action( 'admin_sp_ajax_admin_create_tag', array( $this, 'ajax_admin_create_tag' ) );
-		add_action( 'admin_sp_ajax_admin_update_tags', array( $this, 'ajax_admin_update_tags' ) );
-		add_action( 'admin_sp_ajax_admin_load_tags', array( $this, 'ajax_admin_load_tags' ) );
-		add_action( 'admin_sp_ajax_admin_search_tags', array( $this, 'ajax_admin_search_tags' ) );
-		add_action( 'admin_sp_ajax_admin_trash_tags', array( $this, 'ajax_admin_trash_tags' ) );
-		add_action( 'admin_sp_ajax_admin_delete_tags', array( $this, 'ajax_admin_delete_tags' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_tag', array( $this, 'ajax_admin_create_tag' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_tags', array( $this, 'ajax_admin_update_tags' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_tags', array( $this, 'ajax_admin_load_tags' ) );
+		add_action( 'admin_sp_pro_ajax_admin_search_tags', array( $this, 'ajax_admin_search_tags' ) );
+		add_action( 'admin_sp_pro_ajax_admin_trash_tags', array( $this, 'ajax_admin_trash_tags' ) );
+		add_action( 'admin_sp_pro_ajax_admin_delete_tags', array( $this, 'ajax_admin_delete_tags' ) );
 		// </editor-fold desc="Tag">
 		// <editor-fold desc="Others">
-		add_action( 'admin_sp_ajax_admin_create_new_basic_card', array( $this, 'ajax_admin_create_new_basic_card' ) );
-		add_action( 'admin_sp_ajax_admin_load_image_attachment', array( $this, 'ajax_admin_load_image_attachment' ) );
-		add_action( 'admin_sp_ajax_admin_load_basic_card', array( $this, 'ajax_admin_load_basic_card' ) );
-		add_action( 'admin_sp_ajax_admin_trash_cards', array( $this, 'ajax_admin_trash_cards' ) );
-		add_action( 'admin_sp_ajax_admin_restore_card_group', array( $this, 'ajax_admin_restore_card_group' ) );
-		add_action( 'admin_sp_ajax_admin_delete_card_group', array( $this, 'ajax_admin_delete_card_group' ) );
-		add_action( 'admin_sp_ajax_admin_update_basic_card', array( $this, 'admin_update_basic_card' ) );
-		add_action( 'admin_sp_ajax_admin_load_cards_groups', array( $this, 'ajax_admin_load_cards_groups' ) );
-		add_action( 'admin_sp_ajax_admin_create_new_gap_card', array( $this, 'ajax_admin_create_new_gap_card' ) );
-		add_action( 'admin_sp_ajax_admin_update_gap_card', array( $this, 'ajax_admin_update_gap_card' ) );
-		add_action( 'admin_sp_ajax_admin_update_table_card', array( $this, 'ajax_admin_update_table_card' ) );
-		add_action( 'admin_sp_ajax_admin_update_image_card', array( $this, 'ajax_admin_update_image_card' ) );
-		add_action( 'admin_sp_ajax_admin_create_new_table_card', array( $this, 'ajax_admin_create_new_table_card' ) );
-		add_action( 'admin_sp_ajax_admin_create_new_image_card', array( $this, 'ajax_admin_create_new_image_card' ) );
-		add_action( 'admin_sp_ajax_admin_load_settings', array( $this, 'ajax_admin_load_settings' ) );
-		add_action( 'admin_sp_ajax_admin_update_settings', array( $this, 'ajax_admin_update_settings' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_basic_card', array( $this, 'ajax_admin_create_new_basic_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_image_attachment', array( $this, 'ajax_admin_load_image_attachment' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_basic_card', array( $this, 'ajax_admin_load_basic_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_trash_cards', array( $this, 'ajax_admin_trash_cards' ) );
+		add_action( 'admin_sp_pro_ajax_admin_restore_card_group', array( $this, 'ajax_admin_restore_card_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_delete_card_group', array( $this, 'ajax_admin_delete_card_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_basic_card', array( $this, 'admin_update_basic_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_cards_groups', array( $this, 'ajax_admin_load_cards_groups' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_gap_card', array( $this, 'ajax_admin_create_new_gap_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_gap_card', array( $this, 'ajax_admin_update_gap_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_table_card', array( $this, 'ajax_admin_update_table_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_image_card', array( $this, 'ajax_admin_update_image_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_table_card', array( $this, 'ajax_admin_create_new_table_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_image_card', array( $this, 'ajax_admin_create_new_image_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_settings', array( $this, 'ajax_admin_load_settings' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_settings', array( $this, 'ajax_admin_update_settings' ) );
 		// </editor-fold desc="Card">
 		// <editor-fold desc="Collections">
-		add_action( 'admin_sp_ajax_admin_load_collections', array( $this, 'ajax_admin_load_collections' ) );
-		add_action( 'admin_sp_ajax_admin_search_collections', array( $this, 'ajax_admin_search_collections' ) );
-		add_action( 'admin_sp_ajax_admin_create_new_collection', array( $this, 'ajax_admin_create_new_collection' ) );
-		add_action( 'admin_sp_ajax_admin_update_collections', array( $this, 'ajax_admin_update_collections' ) );
-		add_action( 'admin_sp_ajax_admin_trash_collections', array( $this, 'ajax_admin_trash_collections' ) );
-		add_action( 'admin_sp_ajax_admin_delete_collections', array( $this, 'ajax_admin_delete_collections' ) );
-		add_action( 'admin_sp_ajax_admin_publish_collections', array( $this, 'ajax_admin_publish_collections' ) );
+		add_action( 'admin_sp_pro_ajax_admin_load_collections', array( $this, 'ajax_admin_load_collections' ) );
+		add_action( 'admin_sp_pro_ajax_admin_search_collections', array( $this, 'ajax_admin_search_collections' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_collection', array( $this, 'ajax_admin_create_new_collection' ) );
+		add_action( 'admin_sp_pro_ajax_admin_update_collections', array( $this, 'ajax_admin_update_collections' ) );
+		add_action( 'admin_sp_pro_ajax_admin_trash_collections', array( $this, 'ajax_admin_trash_collections' ) );
+		add_action( 'admin_sp_pro_ajax_admin_delete_collections', array( $this, 'ajax_admin_delete_collections' ) );
+		add_action( 'admin_sp_pro_ajax_admin_publish_collections', array( $this, 'ajax_admin_publish_collections' ) );
 		// </editor-fold desc="Collections">
 		// <editor-fold desc="All Cards">
-		add_action( 'admin_sp_ajax_admin_search_all_cards', array( $this, 'ajax_admin_search_all_cards' ) );
+		add_action( 'admin_sp_pro_ajax_admin_search_all_cards', array( $this, 'ajax_admin_search_all_cards' ) );
 		// </editor-fold desc="All Cards">
 		// <editor-fold desc="User Cards">
 
-		add_action( 'admin_sp_ajax_admin_save_user_cards', array( $this, 'ajax_admin_save_user_cards' ) );
-		add_action( 'admin_sp_ajax_admin_assign_topics', array( $this, 'ajax_admin_assign_topics' ) );
+		add_action( 'admin_sp_pro_ajax_admin_save_user_cards', array( $this, 'ajax_admin_save_user_cards' ) );
+		add_action( 'admin_sp_pro_ajax_admin_assign_topics', array( $this, 'ajax_admin_assign_topics' ) );
 
 		// </editor-fold desc="User Cards">
 	}

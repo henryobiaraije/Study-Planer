@@ -16,6 +16,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="d4143a8c-a125-49e2-9f55-c9562161eaeb" name="staging.medabc.eu" url="http://ftp.medabc.eu">
+        <fileTransfer host="ftp.medabc.eu" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

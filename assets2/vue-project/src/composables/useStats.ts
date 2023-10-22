@@ -1567,7 +1567,7 @@ export default function (status = 'publish') {
                         year: chartProgressChartYear.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_progress_chart",
+                what: "front_sp_pro_ajax_front_load_stats_progress_chart",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -1594,7 +1594,7 @@ export default function (status = 'publish') {
                         span: forecastSpan.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_forecast",
+                what: "front_sp_pro_ajax_front_load_stats_forecast",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -1621,7 +1621,7 @@ export default function (status = 'publish') {
                         span: reviewTimeSpan.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_review_time",
+                what: "front_sp_pro_ajax_front_load_stats_review_time",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -1648,7 +1648,7 @@ export default function (status = 'publish') {
                         span: chartAddedTimeSpan.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_chart_added",
+                what: "front_sp_pro_ajax_front_load_stats_chart_added",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -1675,7 +1675,7 @@ export default function (status = 'publish') {
                         span: chartIntervalTimeSpan.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_chart_interval",
+                what: "front_sp_pro_ajax_front_load_stats_chart_interval",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -1702,7 +1702,7 @@ export default function (status = 'publish') {
                         span: chartAnswerButtonsTimeSpan.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_chart_answer_buttons",
+                what: "front_sp_pro_ajax_front_load_stats_chart_answer_buttons",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -1729,7 +1729,7 @@ export default function (status = 'publish') {
                         span: reviewCountSpan.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_review_time",
+                what: "front_sp_pro_ajax_front_load_stats_review_time",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -1756,7 +1756,7 @@ export default function (status = 'publish') {
                         date: chartHourlyBreakdownDate.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_hourly_breakdown",
+                what: "front_sp_pro_ajax_front_load_stats_hourly_breakdown",
                 funcBefore() {
                     handleAjax.start();
                 },
@@ -1784,7 +1784,7 @@ export default function (status = 'publish') {
                         date: chartCardTypesSpan.value,
                     }
                 ],
-                what: "front_sp_ajax_front_load_stats_card_types",
+                what: "front_sp_pro_ajax_front_load_stats_card_types",
                 funcBefore() {
                     handleAjax.start();
                 },

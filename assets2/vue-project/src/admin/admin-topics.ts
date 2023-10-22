@@ -4,8 +4,8 @@ import {Store} from "@/static/store";
 import AdminTopics from "@/admin/AdminTopics.vue";
 import {spInitDevTools} from "@/miscelenous/init-dev-tools";
 
-declare var pereere_dot_com_sp_general_localize_4736: any;
-const localize = pereere_dot_com_sp_general_localize_4736;
+declare var pereere_dot_com_sp_pro_general_localize_4736: any;
+const localize = pereere_dot_com_sp_pro_general_localize_4736;
 Store.initAdmin({
     serverUrl: localize.ajax_url,
     actionString: localize.ajax_action,

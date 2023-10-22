@@ -40,7 +40,7 @@ class Short_User_Dashboard {
 		//   add_action('init', array($this, 'init'));
 		add_action( 'init', function () {
 			if ( ( ! wp_doing_ajax() ) && ( ! is_admin() ) ) {
-				add_shortcode( 'sp_user_dashboard', [ $this, 'load_view' ] );
+				add_shortcode( 'sp_pro_user_dashboard', [ $this, 'load_view' ] );
 			}
 		} );
 	}

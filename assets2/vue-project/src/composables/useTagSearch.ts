@@ -48,7 +48,7 @@ export default function (canCreate = true) {
                     },
                 }
             ],
-            what: "admin_sp_ajax_admin_search_tags",
+            what: "admin_sp_pro_ajax_admin_search_tags",
             funcBefore() {
                 handleAjax.start();
             },
@@ -77,7 +77,7 @@ export default function (canCreate = true) {
                     name: query,
                 }
             ],
-            what: "admin_sp_ajax_admin_create_tag",
+            what: "admin_sp_pro_ajax_admin_create_tag",
             funcBefore() {
                 handleAjax.start();
             },
