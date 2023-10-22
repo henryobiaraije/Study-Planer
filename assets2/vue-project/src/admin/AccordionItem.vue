@@ -58,18 +58,18 @@
       <v-card>
         <v-card-actions>
           <div class="flex flex-row justify-between items-center w-full">
-            <span class="flex-1 text-xl !font-bold">Cards</span>
+            <span class="flex-1 text-xl !font-bold">Study Cards</span>
             <span class="flex-initial"><v-btn color="primary" block @click="viewDialog = false">Close</v-btn></span>
           </div>
         </v-card-actions>
         <QuestionModal
-            title="Cards"
+            title="Study Cards"
             :cards="cardsToView"
-            :show-only-answers="true"
+            :show-only-answers="false"
+            purpose="study"
         />
       </v-card>
     </v-dialog>
-
   </div>
 </template>
 <script lang="ts">

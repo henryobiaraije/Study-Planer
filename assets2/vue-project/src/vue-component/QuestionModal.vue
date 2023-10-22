@@ -155,12 +155,15 @@
           </v-carousel>
 
           <!-- <editor-fold desc="Prev & Next"> -->
-          <div class="">
+          <div v-if="'preview' === purpose" class="">
             <div class="flex justify-space-around align-center py-4">
               <v-btn
                   color="primary"
                   @click="prev()"
               >
+                <v-icon left>
+                  mdi-chevron-left
+                </v-icon>
                 Prev
               </v-btn>
               <span class="text-xl font-semibold">{{ index + 1 }}/{{ cards.length }}</span>
@@ -169,6 +172,9 @@
                   @click="next()"
               >
                 Next
+                <v-icon left>
+                  mdi-chevron-right
+                </v-icon>
               </v-btn>
             </div>
             <p class="flex-1 w-full py-4 text-center text-base text-gray-500">You can use left and right arrow keys to
@@ -176,61 +182,67 @@
           </div>
           <!-- </editor-fold desc="Prev & Next"> -->
 
-          <!-- <editor-fold desc="Buttons (Show Answer | Hold)"> -->
-          <div class="flex flex-wrap gap-4 justify-center align-center py-4">
-            <v-btn
-                color="primary"
-                @click="prev()"
-            >
-              Show
-            </v-btn>
-            <v-btn
-                color="primary"
-                @click="next()"
-            >
-              Hold
-            </v-btn>
-          </div>
-          <!-- </editor-fold desc="Buttons (Show Answer | Hold)"> -->
+          <template v-if="'study' === purpose">
+            <p class="text-xl font-semibold text-center py-2">{{ index + 1 }}/{{ cards.length }}</p>
 
-          <!-- <editor-fold desc="Buttons (Again | Hard | Good | Easy)"> -->
-          <div class="">
-            <div class="flex flex-wrap gap-4 justify-center align-center py-4">
-
-              <v-btn
-                  color="primary"
-                  @keyup.1="answer('again')"
-                  @click="answer('again')"
-              >
-                Again (1)
-              </v-btn>
-              <v-btn
-                  color="primary"
-                  @keyup.2="answer('hard')"
-                  @click="answer('hard')"
-              >
-                Hard (2)
-              </v-btn>
-              <v-btn
-                  color="primary"
-                  @keyup.3="answer('good')"
-                  @click="answer('good')"
-              >
-                Good (3)
-              </v-btn>
-              <v-btn
-                  color="primary"
-                  @keyup.4="answer('easy')"
-                  @click="answer('easy')"
-              >
-                Easy (4)
-              </v-btn>
+            <!-- <editor-fold desc="Buttons (Show Answer | Hold)"> -->
+            <div v-if="!showCurrentAnswer">
+              <div class="flex flex-wrap gap-4 justify-center align-center py-4">
+                <v-btn
+                    color="primary"
+                    @click="showAnswer()"
+                >
+                  Show (1)
+                </v-btn>
+                <v-btn
+                    color="primary"
+                    @click="again()"
+                >
+                  Hold (2)
+                </v-btn>
+              </div>
+              <p class="text-base text-gray-500 text-center py-2">You can also use the numbers 1 and 2 for
+                selections.</p>
             </div>
-            <p class="text-base text-gray-500 text-center py-2">You can also use the numbers 1,2,3, and 4 for
-              selections.</p>
-          </div>
-          <!-- </editor-fold desc="Buttons (Again | Hard | Good | Easy)"> -->
+            <!-- </editor-fold desc="Buttons (Show Answer | Hold)"> -->
 
+            <!-- <editor-fold desc="Buttons (Again | Hard | Good | Easy)"> -->
+            <div v-if="showCurrentAnswer" class="">
+              <div class="flex flex-wrap gap-4 justify-center align-center py-4">
+                <v-btn
+                    color="primary"
+                    @keyup.1="answer('again')"
+                    @click="answer('again')"
+                >
+                  Again (1)
+                </v-btn>
+                <v-btn
+                    color="primary"
+                    @keyup.2="answer('hard')"
+                    @click="answer('hard')"
+                >
+                  Hard (2)
+                </v-btn>
+                <v-btn
+                    color="primary"
+                    @keyup.3="answer('good')"
+                    @click="answer('good')"
+                >
+                  Good (3)
+                </v-btn>
+                <v-btn
+                    color="primary"
+                    @keyup.4="answer('easy')"
+                    @click="answer('easy')"
+                >
+                  Easy (4)
+                </v-btn>
+              </div>
+              <p class="text-base text-gray-500 text-center py-2">You can also use the numbers 1,2,3, and 4 for
+                selections.</p>
+            </div>
+            <!-- </editor-fold desc="Buttons (Again | Hard | Good | Easy)"> -->
+          </template>
         </div>
       </div>
     </form>
@@ -248,7 +260,7 @@ import useImageCard from "@/composables/useImageCard";
 export default defineComponent({
   computed: {
     currentQuestion(): _Card {
-      return this.cards[this.questionIndex];
+      return this.cards[this.index];
     },
   },
   methods: {
@@ -286,30 +298,58 @@ export default defineComponent({
     },
     answer(answer: string) {
       console.log(answer)
+      if ('again' === answer) {
+        this.again();
+      } else {
+        this.next();
+      }
       // this.showCurrentAnswer = false;
-      // this.next();
+
     },
     handleKeyup(event: KeyboardEvent) {
       console.log(event);
-      if (event.key === 'ArrowLeft') {
-        this.prev();
+      if ('preview' === this.purpose) {
+        if (event.key === 'ArrowLeft') {
+          this.prev();
+        }
+        if (event.key === 'ArrowRight') {
+          this.next();
+        }
+      } else if ('study' === this.purpose) {
+        if (this.showCurrentAnswer) {
+          if (event.key === '1') {
+            this.again();
+          }
+          if (event.key === '2') {
+            this.answer('hard');
+          }
+          if (event.key === '3') {
+            this.answer('good');
+          }
+          if (event.key === '4') {
+            this.answer('easy');
+          }
+        } else {
+          if (event.key === '1') {
+            this.showAnswer();
+          }
+          if (event.key === '2') {
+            this.answer('hold')
+          }
+        }
       }
-      if (event.key === 'ArrowRight') {
-        this.next();
-      }
-      if (event.key === '1') {
-        this.answer('again');
-      }
-      if (event.key === '2') {
-        this.answer('hard');
-      }
-      if (event.key === '3') {
-        this.answer('good');
-      }
-      if (event.key === '4') {
-        this.answer('easy');
-      }
-    }
+    },
+    showAnswer() {
+      this.showCurrentAnswer = true;
+    },
+    again() {
+      // HOld, push the card to the end.
+      const currentCard = this.cards[this.index];
+      this.cards.push(currentCard);
+
+      this.showCurrentAnswer = false;
+      this.next();
+    },
   },
   setup: (props, ctx) => {
     return {
@@ -324,7 +364,7 @@ export default defineComponent({
   },
   data() {
     return {
-      questionIndex: 0,
+      // questionIndex: 0,
       showCurrentAnswer: false,
       showGrade: false,
       index: 0
@@ -348,6 +388,11 @@ export default defineComponent({
       required: false,
       default: false,
     },
+    purpose: {
+      type: String as () => 'preview' | 'study',
+      required: false,
+      default: 'preview',
+    }
   },
   mounted() {
     document.addEventListener('keydown', this.handleKeyup);
