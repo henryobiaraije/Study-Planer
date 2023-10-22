@@ -2,7 +2,7 @@
   <div class="one-accordion-item">
     <div class="accordion-header" :class="[top && !showChildren ? 'pb-2':'']">
       <!-- Header -->
-      <div class="sp-deck-group-header">
+      <div class="sp-deck-group-header border-b border-gray-100">
         <div @click="toggle('.decks-'+theItem.id)" class="sp-header-title flex">
           <div
               class="header-title-icon flex flex-1 justify-start items-center gap-2 cursor-pointer"
@@ -41,12 +41,34 @@
     </div>
     <!-- Body -->
     <div v-if="showChildren" class="accordion-body" :class="[top && showChildren ? 'pb-2' : '']">
-      <template v-for="(child,childIndex) in theItem.children">
-        <AccordionItem :item="child">
-        </AccordionItem>
+      <template v-if="'topic' !== theItem.itemType">
+        <template v-for="(child,childIndex) in theItem.children">
+          <AccordionItem :item="child">
+          </AccordionItem>
+        </template>
       </template>
       <!--      <slot name="body"></slot>-->
     </div>
+
+    <!-- Body -->
+    <v-dialog
+        v-model="viewDialog"
+        width="auto"
+    >
+      <v-card>
+        <v-card-actions>
+          <div class="flex flex-row justify-between items-center w-full">
+            <span class="flex-1 text-xl !font-bold">Cards</span>
+            <span class="flex-initial"><v-btn color="primary" block @click="viewDialog = false">Close</v-btn></span>
+          </div>
+        </v-card-actions>
+        <QuestionModal
+            title="Cards"
+            :cards="cardsToView"
+            :show-only-answers="true"
+        />
+      </v-card>
+    </v-dialog>
 
   </div>
 </template>
@@ -58,10 +80,12 @@ import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useUserCards from "@/composables/useUserCards";
 import useAllCards from "@/composables/useAllCards";
 import type {_CardGroup, _Deck, _DeckGroup, _Topic} from "@/interfaces/inter-sp";
+import QuestionModal from "@/vue-component/QuestionModal.vue";
+import {_Card} from "@/interfaces/inter-sp";
 
 export default defineComponent({
   name: 'AccordionItem',
-  components: {AjaxAction, CardSelector},
+  components: {QuestionModal, AjaxAction, CardSelector},
   props: {
     item: {
       type: Object as () => _DeckGroup | _Deck | _Topic | _CardGroup,
@@ -75,6 +99,8 @@ export default defineComponent({
   data() {
     return {
       showChildren: false,
+      viewDialog: false,
+      cardsToView: [] as _Card[],
     }
   },
   setup: (props, ctx) => {
@@ -107,17 +133,21 @@ export default defineComponent({
         'topics': 'topic',
         'card_groups': 'cards',
       };
-      let childrenTypeName = childrenMapNames[Object.keys(item).find(key => key in childrenMapNames)] || 'card_group';
 
+      let childrenTypeName = childrenMapNames[Object.keys(item).find(key => key in childrenMapNames)] || 'card_group';
       // console.log({childrenType: childrenType, map: childrenMap, item});
 
-      let childrenLength = item[childrenType + 's'].length;
+      let childrenLength = 0;
+
       if ('card_groups' === childrenType) {
         childrenLength = item[childrenType + 's'].reduce((acc, cardGroup) => {
           return acc + cardGroup.cards.length;
         }, 0);
+      } else {
+        childrenLength = item[childrenType + 's']?.length || 0;
       }
 
+      // console.log({itemType, childrenType, item: this.item});
       // debugger;
       return {
         id,
@@ -151,10 +181,10 @@ export default defineComponent({
       let left = 'bg-sp-200 hover:bg-sp-300 ';
       let right = 'bg-sp-100 ';
       if (theItem.itemType === 'deck') {
-        left = 'bg-blue-200 hover:bg-blue-200 ';
+        left = 'bg-blue-200 hover:bg-blue-300 ';
         right = 'bg-blue-100 ';
       } else if (theItem.itemType === 'topic') {
-        left = 'bg-gray-200 hover:bg-gray-200 ';
+        left = 'bg-gray-200 hover:bg-gray-300 ';
         right = 'bg-gray-000 ';
       }
       return {
@@ -168,10 +198,22 @@ export default defineComponent({
   methods: {
     toggle(selector: string) {
       this.showChildren = !this.showChildren;
+      this.viewCard();
       // const el = document.querySelector(selector);
       // if (el) {
       //   el.style.display = (el.style.display === 'none') ? 'block' : 'none';
       // }
+    },
+    viewCard(): _CardGroup[] {
+      if ('topic' !== this.theItem.itemType) {
+        return;
+      }
+      // this.cardsToView = topic.card_groups.
+      this.viewDialog = true;
+      this.cardsToView = (this.item as _Topic).card_groups.reduce((acc, cardGroup) => {
+        return acc.concat(cardGroup.cards);
+      }, [] as _Card[]);
+      // setTimeout(() => this.openQuestionModal(), 1000);
     },
   }
 });

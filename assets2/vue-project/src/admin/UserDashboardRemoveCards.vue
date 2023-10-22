@@ -58,19 +58,8 @@
                       :cards="cardsToView"
                       :show-only-answers="true"
                   />
-                  <!--                  <v-card-actions>-->
-                  <!--                    <v-btn color="primary" block @click="viewDialog = false">Close Dialog</v-btn>-->
-                  <!--                  </v-card-actions>-->
                 </v-card>
               </v-dialog>
-              <!--              <ajax-action-->
-              <!--                  button-text="Remove"-->
-              <!--                  css-classes="button !px-2 !py-1"-->
-              <!--                  :show-icon="false"-->
-              <!--                  icon="fa fa-save"-->
-              <!--                  @click="userCards.removeCard([props.row.id])"-->
-              <!--                  :ajax="userCards.ajaxRemoveCard.value">-->
-              <!--              </ajax-action>-->
               <v-btn
                   color="primary"
                   @click="removeCard([props.row.id])"

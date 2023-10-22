@@ -99,15 +99,12 @@
 									Edit <i class="fa fa-pen-alt"></i></a>  </span>
               </div>
             </div>
-
-
             <div v-else-if="props.column.field === 'deck'">
               {{ props.row.deck ? props.row.deck.name : '' }}
             </div>
             <div v-else-if="props.column.field === 'deck_group'">
               {{ props.row.deck?.deck_group ? props.row.deck.deck_group.name : '' }}
             </div>
-
             <div v-else-if="props.column.field === 'cards'">
               {{ props.row.cards ? props.row.cards.length : '0' }}
               {{ props.row.cards ? props.row.cards.length > 1 ? 'Cards' : 'Card' : 'Card' }}

@@ -30,7 +30,7 @@
                   <!--                  {{ slide }} Slide-->
                   <!--                </div>-->
 
-                  <!-- Basic Card -->
+                  <!-- <editor-fold desc="Basic Card"> -->
                   <div v-if="'basic' === currentQuestion?.card_group.card_type"
                        class="sp-basic-question w-full text-center"
                        style="font-family: 'Montserrat', sans-serif;">
@@ -42,7 +42,9 @@
                          v-html="(currentQuestion.card_group.reverse) ? currentQuestion.question : currentQuestion.answer"
                          class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
                   </div>
-                  <!-- Gap Card -->
+                  <!-- </editor-fold desc="Basic Card"> -->
+
+                  <!-- <editor-fold desc="Gap Card"> -->
                   <div v-else-if="'gap' === currentQuestion.card_group.card_type"
                        class="sp-gap-question w-full text-center ">
                     <div v-show="!showCurrentAnswer && !showOnlyAnswers"
@@ -54,7 +56,9 @@
                          style="font-family: 'Montserrat', sans-serif;"
                          class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
                   </div>
-                  <!-- Table Card -->
+                  <!-- </editor-fold desc="Gap Card"> -->
+
+                  <!-- <editor-fold desc="Table Card"> -->
                   <div v-else-if="'table' === currentQuestion.card_group.card_type"
                        class="sp-table-question m-auto w-full">
                     <!--                  <table v-show="!showCurrentAnswer"-->
@@ -105,7 +109,10 @@
                       </tbody>
                     </v-table>
                   </div>
-                  <!-- Image Card -->
+                  <!-- </editor-fold desc="Table Card"> -->
+
+
+                  <!-- <editor-fold desc="Image Card"> -->
                   <div v-else-if="'image' === oneCard.card_group.card_type" class="w-full">
                     <div v-show="!showOnlyAnswers && !showCurrentAnswer" class="sp-image-question m-auto mb-2 relative">
                       <div class="image-area" :style="{height: oneCard.question.h+'px' }">
@@ -141,27 +148,89 @@
                       </div>
                     </div>
                   </div>
-                  <!--                  <div v-if="userDash.ajaxLoadingCard.sending" style="text-align: center;flex: 12;font-size: 50px;"><i-->
-                  <!--                      class="fa fa-spin fa-spinner"></i></div>-->
+                  <!-- </editor-fold desc="Image Card"> -->
                 </div>
               </v-sheet>
             </v-carousel-item>
           </v-carousel>
-          <div class="d-flex justify-space-around align-center py-4">
+
+          <!-- <editor-fold desc="Prev & Next"> -->
+          <div class="">
+            <div class="flex justify-space-around align-center py-4">
+              <v-btn
+                  color="primary"
+                  @click="prev()"
+              >
+                Prev
+              </v-btn>
+              <span class="text-xl font-semibold">{{ index + 1 }}/{{ cards.length }}</span>
+              <v-btn
+                  color="primary"
+                  @click="next()"
+              >
+                Next
+              </v-btn>
+            </div>
+            <p class="flex-1 w-full py-4 text-center text-base text-gray-500">You can use left and right arrow keys to
+              move through the cards</p>
+          </div>
+          <!-- </editor-fold desc="Prev & Next"> -->
+
+          <!-- <editor-fold desc="Buttons (Show Answer | Hold)"> -->
+          <div class="flex flex-wrap gap-4 justify-center align-center py-4">
             <v-btn
                 color="primary"
                 @click="prev()"
             >
-              Prev
+              Show
             </v-btn>
-            <span class="text-xl font-semibold">{{ index + 1 }}/{{ cards.length }}</span>
             <v-btn
                 color="primary"
                 @click="next()"
             >
-              Next
+              Hold
             </v-btn>
           </div>
+          <!-- </editor-fold desc="Buttons (Show Answer | Hold)"> -->
+
+          <!-- <editor-fold desc="Buttons (Again | Hard | Good | Easy)"> -->
+          <div class="">
+            <div class="flex flex-wrap gap-4 justify-center align-center py-4">
+
+              <v-btn
+                  color="primary"
+                  @keyup.1="answer('again')"
+                  @click="answer('again')"
+              >
+                Again (1)
+              </v-btn>
+              <v-btn
+                  color="primary"
+                  @keyup.2="answer('hard')"
+                  @click="answer('hard')"
+              >
+                Hard (2)
+              </v-btn>
+              <v-btn
+                  color="primary"
+                  @keyup.3="answer('good')"
+                  @click="answer('good')"
+              >
+                Good (3)
+              </v-btn>
+              <v-btn
+                  color="primary"
+                  @keyup.4="answer('easy')"
+                  @click="answer('easy')"
+              >
+                Easy (4)
+              </v-btn>
+            </div>
+            <p class="text-base text-gray-500 text-center py-2">You can also use the numbers 1,2,3, and 4 for
+              selections.</p>
+          </div>
+          <!-- </editor-fold desc="Buttons (Again | Hard | Good | Easy)"> -->
+
         </div>
       </div>
     </form>
@@ -177,48 +246,10 @@ import type {_Card} from "@/interfaces/inter-sp";
 import useImageCard from "@/composables/useImageCard";
 
 export default defineComponent({
-  name: 'QuestionModal',
-  components: {
-    'ajax-action': AjaxAction,
-  },
-  props: {
-    title: {
-      type: String,
-      required: true,
-    },
-    cards: {
-      type: Array as () => _Card[],
-      required: true,
-    },
-    showOnlyAnswers: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      questionIndex: 0,
-      showCurrentAnswer: false,
-      showGrade: false,
-      index: 0
-    }
-  },
-  setup: (props, ctx) => {
-    return {
-      // userDash: useUserDashboard(),
-    }
-  },
   computed: {
     currentQuestion(): _Card {
       return this.cards[this.questionIndex];
     },
-  },
-  created() {
-    const card = this.cards[this.index];
-    setTimeout(() => {
-      this.injectImageCardCss(card);
-    }, 100);
   },
   methods: {
     _showAnswer() {
@@ -252,7 +283,77 @@ export default defineComponent({
         // useImageCard().applyBoxesPreviewCss(card.old_answer.boxes);
         // useImageCard().applyBoxesPreviewCssOld(card.old_answer.boxes);
       }
+    },
+    answer(answer: string) {
+      console.log(answer)
+      // this.showCurrentAnswer = false;
+      // this.next();
+    },
+    handleKeyup(event: KeyboardEvent) {
+      console.log(event);
+      if (event.key === 'ArrowLeft') {
+        this.prev();
+      }
+      if (event.key === 'ArrowRight') {
+        this.next();
+      }
+      if (event.key === '1') {
+        this.answer('again');
+      }
+      if (event.key === '2') {
+        this.answer('hard');
+      }
+      if (event.key === '3') {
+        this.answer('good');
+      }
+      if (event.key === '4') {
+        this.answer('easy');
+      }
     }
+  },
+  setup: (props, ctx) => {
+    return {
+      // userDash: useUserDashboard(),
+    }
+  },
+  created() {
+    const card = this.cards[this.index];
+    setTimeout(() => {
+      this.injectImageCardCss(card);
+    }, 100);
+  },
+  data() {
+    return {
+      questionIndex: 0,
+      showCurrentAnswer: false,
+      showGrade: false,
+      index: 0
+    }
+  },
+  name: 'QuestionModal',
+  components: {
+    'ajax-action': AjaxAction,
+  },
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    cards: {
+      type: Array as () => _Card[],
+      required: true,
+    },
+    showOnlyAnswers: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+  mounted() {
+    document.addEventListener('keydown', this.handleKeyup);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyup);
   }
 });
 
