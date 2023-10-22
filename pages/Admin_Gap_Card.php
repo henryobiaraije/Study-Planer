@@ -1,10 +1,10 @@
 <?php
 
-namespace StudyPlanner\Pages;
+namespace StudyPlannerPro\Pages;
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Services\FileService;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Services\FileService;
 
 /**
  * Class Admin_Gap_Card
@@ -55,7 +55,7 @@ class Admin_Gap_Card {
 	public function add_admin_menu(): void {
 
 		add_submenu_page(
-			'study-planner',
+			'study-planner-pro',
 			'Gap Card',
 			'Gap Card',
 			'manage_options',
@@ -68,7 +68,7 @@ class Admin_Gap_Card {
 
 	public function load_view(): void {
 		do_action( 'sp_enqueue_default_admin_gap_card' );
-//		\StudyPlanner\load_template( 'admin/admin-gap-card' );
+//		\StudyPlannerPro\load_template( 'admin/admin-gap-card' );
 		echo '<div class="sp admin-gap-card wrap"></div>';
 		echo '
 			<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >

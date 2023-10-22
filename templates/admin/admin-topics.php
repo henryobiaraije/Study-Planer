@@ -2,8 +2,8 @@
 /**
  * Template file for topics.
  */
-$active_url = 'admin.php?page=study-planner-topics';
-$trash_url = 'admin.php?page=study-planner-topics&status=trash';
+$active_url = 'admin.php?page=study-planner-pro-topics';
+$trash_url = 'admin.php?page=study-planner-pro-topics&status=trash';
 $page_title = 'Topics';
 $status = filter_input(INPUT_GET, 'status');
 $in_trash = false;

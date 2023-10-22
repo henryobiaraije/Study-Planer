@@ -1,11 +1,11 @@
 <?php
 
-namespace StudyPlanner;
+namespace StudyPlannerPro;
 
 use DateTime;
-use StudyPlanner\Db\Initialize_Db;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Libs\Settings;
+use StudyPlannerPro\Db\Initialize_Db;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Libs\Settings;
 
 function load_template( $template ) {
 	require __DIR__ . '/templates/' . $template . '.php';
@@ -145,6 +145,34 @@ function get_card_group_background_image( $cg_image_id ) {
 	}
 
 	return $image_url;
+}
+
+/**
+ * Save user's debug form data.
+ *
+ * @param int $user_id
+ * @param string $current_study_date
+ */
+function sp_save_user_debug_form( int $user_id, string $current_study_date ): void {
+	update_user_meta( $user_id, Settings::UM_CURRENT_STUDY_DATE, $current_study_date );
+}
+
+/**
+ * Get user's debug form data.
+ *
+ * @param int $user_id
+ *
+ * @return array
+ */
+function sp_get_user_debug_form( int $user_id ): array {
+	$current_study_date = get_user_meta( $user_id, Settings::UM_CURRENT_STUDY_DATE, true );
+	if ( empty( $current_study_date ) ) {
+		$current_study_date = Common::getDate();
+	}
+
+	return array(
+		'current_study_date' => $current_study_date,
+	);
 }
 
 

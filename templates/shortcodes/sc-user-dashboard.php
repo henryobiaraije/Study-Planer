@@ -1,6 +1,6 @@
 <?php
 
-use StudyPlanner\Libs\Common;
+use StudyPlannerPro\Libs\Common;
 
 global $wp;
 $current_url = home_url($wp->request);
@@ -51,38 +51,38 @@ $url_settings = $current_url.'?'.http_build_query(array_merge($_GET, array("dash
 
         <?php /** Deck groups */ ?>
         <div v-if="menu === 'deck-groups'" class="section-deck-groups">
-            <?php \StudyPlanner\load_template('shortcodes/dashboard/deck-groups'); ?>
+            <?php \StudyPlannerPro\load_template('shortcodes/dashboard/deck-groups'); ?>
         </div>
         <div v-if="menu === 'stats'" class="section-stats">
-            <?php \StudyPlanner\load_template('shortcodes/dashboard/stats'); ?>
+            <?php \StudyPlannerPro\load_template('shortcodes/dashboard/stats'); ?>
         </div>
         <div v-if="menu === 'settings'" class="section-settings">
-            <?php \StudyPlanner\load_template('shortcodes/dashboard/settings'); ?>
+            <?php \StudyPlannerPro\load_template('shortcodes/dashboard/settings'); ?>
         </div>
         <div v-if="menu === 'profile'" class="section-profile">
-            <?php \StudyPlanner\load_template('shortcodes/dashboard/profile'); ?>
+            <?php \StudyPlannerPro\load_template('shortcodes/dashboard/profile'); ?>
         </div>
     </div>
 
     <?php /** Question display modal */ ?>
     <div>
-        <?php \StudyPlanner\load_template('shortcodes/dashboard/study-complete-modal'); ?>
+        <?php \StudyPlannerPro\load_template('shortcodes/dashboard/study-complete-modal'); ?>
     </div>
 
 
     <?php /** Edit Study Modal */ ?>
     <div>
-        <?php \StudyPlanner\load_template('shortcodes/dashboard/study-modal'); ?>
+        <?php \StudyPlannerPro\load_template('shortcodes/dashboard/study-modal'); ?>
     </div>
 
     <?php /** Question display modal */ ?>
     <div>
-        <?php \StudyPlanner\load_template('shortcodes/dashboard/question-modal'); ?>
+        <?php \StudyPlannerPro\load_template('shortcodes/dashboard/question-modal'); ?>
     </div>
 
     <?php /** Modal Chart Deck's card type */ ?>
     <div>
-        <?php \StudyPlanner\load_template('shortcodes/dashboard/modal-decks-card-types-chart'); ?>
+        <?php \StudyPlannerPro\load_template('shortcodes/dashboard/modal-decks-card-types-chart'); ?>
     </div>
 
 

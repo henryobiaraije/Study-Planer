@@ -1,13 +1,13 @@
 <?php
 
 
-	namespace StudyPlanner\Pages;
+	namespace StudyPlannerPro\Pages;
 
-	use StudyPlanner\StudyPlanner;
-	use StudyPlanner\Includes\Libs\Common;
-	use StudyPlanner\Interfaces\AdminPageInterface;
-	use StudyPlanner\Libs\Settings;
-	use StudyPlanner\Models\Link;
+	use StudyPlannerPro\StudyPlannerPro;
+	use StudyPlannerPro\Includes\Libs\Common;
+	use StudyPlannerPro\Interfaces\AdminPageInterface;
+	use StudyPlannerPro\Libs\Settings;
+	use StudyPlannerPro\Models\Link;
 
 	/**
 		* Class BookBundles
@@ -83,11 +83,11 @@
 
 		public function register_scripts() : void {
 			$dis = $this;
-			$css = StudyPlanner::$css_url . '/public/sc-search-bar.css';
-			$js  = StudyPlanner::$js_url . '/public/sc-search-bar.js';
+			$css = StudyPlannerPro::$css_url . '/public/sc-search-bar.css';
+			$js  = StudyPlannerPro::$js_url . '/public/sc-search-bar.js';
 
-			wp_register_style( 'sbe-search-bar', $css, [], StudyPlanner::$script_version );
-			wp_register_script( 'sbe-search-bar', $js, [ 'jquery' ], StudyPlanner::$script_version, true );
+			wp_register_style( 'sbe-search-bar', $css, [], StudyPlannerPro::$script_version );
+			wp_register_script( 'sbe-search-bar', $js, [ 'jquery' ], StudyPlannerPro::$script_version, true );
 
 			// enqueue the scripts
 			add_action( 'sbe_enqueue_scripts_sc_search_bar', function () use ( $dis ) {

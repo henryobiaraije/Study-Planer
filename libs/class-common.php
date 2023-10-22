@@ -3,10 +3,10 @@
  *  Plugin. Common functions.
  *
  * @class   Common
- * @package StudyPlanner/Includes/Libs
+ * @package StudyPlannerPro/Includes/Libs
  */
 
-namespace StudyPlanner\Libs;
+namespace StudyPlannerPro\Libs;
 
 defined('ABSPATH') || exit;
 
@@ -151,7 +151,7 @@ class Common {
         }
         if (!$forget_nonce || $must_be_admin) {
             $nonce = $post[Common::VAR_1];
-            if (!wp_verify_nonce($nonce, StudyPlanner::$nonce_key)) {
+            if (!wp_verify_nonce($nonce, StudyPlannerPro::$nonce_key)) {
                 Common::send_error('Session Expired. Please reload page.');
             }
         }

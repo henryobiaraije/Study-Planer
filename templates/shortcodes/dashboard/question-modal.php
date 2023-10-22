@@ -23,7 +23,7 @@ if (!is_user_logged_in()) {
 				</div>
 				<div class="modal-body" style="background-color: #fff">
 					<div class="mb-4">
-			  <?php \StudyPlanner\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>
+			  <?php \StudyPlannerPro\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>
 					</div>
 					<div v-if="null !== currentQuestion && !currentQuestion.has_updated" class="sp-question min-h-[65vh] flex align-items-center overflow-x-auto moxal-y-hidden"
 					     style="background-repeat: no-repeat;background-size: cover;"

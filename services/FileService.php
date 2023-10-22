@@ -3,9 +3,9 @@
  * File service class.
  */
 
-namespace StudyPlanner\Services;
+namespace StudyPlannerPro\Services;
 
-use StudyPlanner\Initializer;
+use StudyPlannerPro\Initializer;
 
 class FileService {
 

@@ -4,21 +4,44 @@
       <table class="table">
         <tbody>
         <tr>
-          <th>Username</th>
-          <td>{{ username}} </td>
+          <th @click="showForm = showForm + 1">Username</th>
+          <td>{{ username }}</td>
         </tr>
         <tr>
           <th>Email</th>
-          <td>{{ email}} </td>
+          <td>{{ email }}</td>
         </tr>
         </tbody>
       </table>
     </div>
   </div>
+  <form v-show="showForm > 3"
+        @submit.prevent="userCard.saveDebugForm()"
+  >
+    <v-responsive
+        class=""
+        max-width="344"
+    >
+      <v-text-field
+          label="Study Date"
+          hide-details="auto"
+          v-model="userCard.debugForm.value.current_study_date"
+          type="date"
+      ></v-text-field>
+    </v-responsive>
+    <br/>
+    <v-btn
+        color="primary"
+        type="submit"
+        :loading="userCard.ajaxLoadDebugForm.value.sending"
+    >Save
+    </v-btn>
+  </form>
 </template>
 <script lang="ts">
 
 import {defineComponent} from "vue";
+import useUserCards from "@/composables/useUserCards";
 
 export default defineComponent({
   name: 'UserDashboardProfile',
@@ -34,13 +57,18 @@ export default defineComponent({
     }
   },
   data() {
-    return {}
+    return {
+      showForm: 0,
+    }
   },
   setup: (props, ctx) => {
-    return {}
+    return {
+      userCard: useUserCards()
+    }
   },
   computed: {},
   created() {
+    this.userCard.loadDebugForm();
   },
   methods: {}
 });

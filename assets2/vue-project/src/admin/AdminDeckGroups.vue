@@ -138,8 +138,8 @@ export default defineComponent({
   data() {
     return {
       pageTitle: 'Deck Groups',
-      activeUrl: 'admin.php?page=study-planner-deck-groups',
-      trashUrl: 'admin.php?page=study-planner-deck-groups&status=trash',
+      activeUrl: 'admin.php?page=study-planner-pro-deck-groups',
+      trashUrl: 'admin.php?page=study-planner-pro-deck-groups&status=trash',
     }
   },
   setup: (props, ctx) => {

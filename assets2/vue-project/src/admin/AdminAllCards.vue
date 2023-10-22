@@ -141,8 +141,8 @@ export default defineComponent({
   data() {
     return {
       pageTitle: 'All Cards',
-      activeUrl: 'admin.php?page=study-planner-deck-cards',
-      trashUrl: 'admin.php?page=study-planner-deck-cards&status=trash',
+      activeUrl: 'admin.php?page=study-planner-pro-deck-cards',
+      trashUrl: 'admin.php?page=study-planner-pro-deck-cards&status=trash',
     }
   },
   setup: (props, ctx) => {

@@ -3,7 +3,7 @@
  * Front end ajax helper file
  */
 
-namespace StudyPlanner\Helpers;
+namespace StudyPlannerPro\Helpers;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,19 +23,21 @@ use Model\StudyLog;
 use Model\User;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Models\Tag;
-use StudyPlanner\Models\UserCard;
-use StudyPlanner\Services\Card_Due_Date_Service;
-use function StudyPlanner\get_all_card_grades;
-use function StudyPlanner\get_card_group_background_image;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Models\Tag;
+use StudyPlannerPro\Models\UserCard;
+use StudyPlannerPro\Services\Card_Due_Date_Service;
+use function StudyPlannerPro\get_all_card_grades;
+use function StudyPlannerPro\get_card_group_background_image;
+use function StudyPlannerPro\sp_get_user_debug_form;
+use function StudyPlannerPro\sp_save_user_debug_form;
 
 /**
  * Class AjaxFrontHelper
  *
- * @package StudyPlanner\Helpers
+ * @package StudyPlannerPro\Helpers
  */
 class AjaxFrontHelper {
 	// <editor-fold desc="General">
@@ -99,6 +101,8 @@ class AjaxFrontHelper {
 		add_action( 'admin_sp_ajax_front_add_user_cards', array( $this, 'ajax_front_add_user_cards' ) );
 		add_action( 'admin_sp_ajax_front_remove_card', array( $this, 'ajax_front_remove_card' ) );
 		add_action( 'admin_sp_ajax_front_load_user_cards', array( $this, 'ajax_front_load_user_cards' ) );
+		add_action( 'admin_sp_ajax_front_save_user_debug_form', array( $this, 'ajax_front_save_user_debug_form' ) );
+		add_action( 'admin_sp_ajax_front_load_user_debug_form', array( $this, 'ajax_front_load_user_debug_form' ) );
 		// </editor-fold desc="User Cards ">
 		//        add_action('front_sp_ajax_front_accept_changes', array($this, 'ajax_front_accept_changes'));
 	}
@@ -1382,6 +1386,26 @@ class AjaxFrontHelper {
 			::get_user_cards( $user_id );
 
 		Common::send_success( 'Removed successfully', $user_card_details );
+	}
+
+	public function ajax_front_save_user_debug_form( $post ): void {
+		$params = $post[ Common::VAR_2 ]['params'];
+		Initializer::verify_post( $post, true );
+		$current_study_date = $params['current_study_date'];
+		$user_id            = get_current_user_id();
+
+		sp_save_user_debug_form( $user_id, $current_study_date );
+
+		Common::send_success( 'Saved' );
+	}
+
+	public function ajax_front_load_user_debug_form( $post ): void {
+		Initializer::verify_post( $post, true );
+		$user_id = get_current_user_id();
+
+		$user_debug_form = sp_get_user_debug_form( $user_id );
+
+		Common::send_success( 'loaded user debug info', $user_debug_form );
 	}
 
 	// </editor-fold desc="User Card">

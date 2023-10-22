@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Events\Dispatcher;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Models\Tag;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Models\Tag;
 
 class Card extends Model {
 	protected $table = SP_TABLE_CARDS;

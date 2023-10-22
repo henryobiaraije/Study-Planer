@@ -9,8 +9,8 @@ if (!defined('ABSPATH')) {
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Models\Tag;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Models\Tag;
 
 class AnswerLog extends Model {
     protected $table = SP_TABLE_ANSWER_LOG;

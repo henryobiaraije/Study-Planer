@@ -1,14 +1,14 @@
 <?php
 
-namespace StudyPlanner\Pages;
+namespace StudyPlannerPro\Pages;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Services\FileService;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Services\FileService;
 
 /**
  * Class AdminDeck
@@ -56,7 +56,7 @@ class AdminDeck {
 	 */
 	public function add_admin_menu(): void {
 		add_submenu_page(
-			'study-planner',
+			'study-planner-pro',
 			'Decks',
 			'Decks',
 			'manage_options',
@@ -69,7 +69,7 @@ class AdminDeck {
 
 	public function load_view(): void {
 		do_action( 'sp_enqueue_default_admin_decks' );
-		// \StudyPlanner\load_template( 'admin/admin-decks' );
+		// \StudyPlannerPro\load_template( 'admin/admin-decks' );
 		echo '<div class="sp admin-decks wrap"></div>';
 		echo '<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
 				<div style="text-align: center;flex: 12;font-size: 50px;" >

@@ -1,7 +1,7 @@
 <?php
 
-	use StudyPlanner\Initializer;
-	use StudyPlanner\Libs\Settings;
+	use StudyPlannerPro\Initializer;
+	use StudyPlannerPro\Libs\Settings;
 
 	$active_url = Initializer::get_admin_url( Settings::SLUG_ALL_CARDS );
 	$trash_url  = $active_url . '&status=trash';

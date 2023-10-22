@@ -10,8 +10,8 @@ use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Models\Tag;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Models\Tag;
 
 class StudyLog extends Model
 {

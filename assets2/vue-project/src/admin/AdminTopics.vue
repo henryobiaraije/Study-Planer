@@ -247,8 +247,8 @@ export default defineComponent({
   data() {
     return {
       pageTitle: 'Topics',
-      activeUrl: 'admin.php?page=study-planner-topics',
-      trashUrl: 'admin.php?page=study-planner-topics&status=trash',
+      activeUrl: 'admin.php?page=study-planner-pro-topics',
+      trashUrl: 'admin.php?page=study-planner-pro-topics&status=trash',
       value: null,
       options: ['list', 'of', 'options'],
       selected: null,

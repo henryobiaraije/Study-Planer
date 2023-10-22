@@ -1,13 +1,13 @@
 <?php
 
 
-namespace StudyPlanner\Shortcodes;
+namespace StudyPlannerPro\Shortcodes;
 
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Services\FileService;
-use function StudyPlanner\get_template_path;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Services\FileService;
+use function StudyPlannerPro\get_template_path;
 
 /**
  * Class BookBundles

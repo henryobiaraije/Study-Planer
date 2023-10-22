@@ -136,6 +136,14 @@ export default function (status = 'publish') {
         success: false,
         successMessage: '',
     });
+    const ajaxLoadDebugForm = ref<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
+
 
     const theForm = {
         topicToAssign: null as null | _Topic,
@@ -154,6 +162,11 @@ export default function (status = 'publish') {
     // page: 1,
     // activeTab: 'found',
     const userDeckGroups = ref<_DeckGroup[]>([]) as Ref<_DeckGroup[]>;
+    const debugForm = ref<{
+        current_study_date: string,
+    }>({
+        current_study_date: '',
+    });
 
     watchEffect(() => {
         if (oneSpecificCard.value) {
@@ -343,6 +356,67 @@ export default function (status = 'publish') {
         })
     };
 
+    const xhrLoadUserDebugForm = () => {
+        const handleAjax: HandleAjax = new HandleAjax(ajaxLoadUserCard.value);
+        return new Promise((resolve, reject) => {
+            new Server().send_online({
+                data: [
+                    spClientData().nonce,
+                    {
+                        params: {
+                            ...debugForm.value,
+                        },
+                    }
+                ],
+                what: "admin_sp_ajax_front_load_user_debug_form",
+                funcBefore() {
+                    handleAjax.start();
+                },
+                funcSuccess(done: InterFuncSuccess<{
+                    current_study_date: string
+                }>) {
+                    handleAjax.stop();
+                    resolve(done);
+                    debugForm.value.current_study_date = done.data.current_study_date
+                },
+                funcFailue(done) {
+                    handleAjax.error(done);
+                    reject(done);
+                },
+            });
+        })
+    };
+    const xhrSaveUserDebugForm = () => {
+        const handleAjax: HandleAjax = new HandleAjax(ajaxLoadUserCard.value);
+        return new Promise((resolve, reject) => {
+            new Server().send_online({
+                data: [
+                    spClientData().nonce,
+                    {
+                        params: {
+                            ...debugForm.value,
+                        },
+                    }
+                ],
+                what: "admin_sp_ajax_front_save_user_debug_form",
+                funcBefore() {
+                    handleAjax.start();
+                },
+                funcSuccess(done: InterFuncSuccess<{
+                    date: string
+                }>) {
+                    handleAjax.stop();
+                    resolve(done);
+                },
+                funcFailue(done) {
+                    handleAjax.error(done);
+                    reject(done);
+                },
+            });
+        })
+    };
+
+
     return {
         ajaxSave: ajaxSave, save: xhrSave, form: form,
         oneSpecificCard, assignTopics: xhrAssignTopics, ajaxAssignTopics,
@@ -350,6 +424,7 @@ export default function (status = 'publish') {
         ajaxIgnoreCard, ignoreCard: xhrIgnoreCard,
         ajaxRemoveCard, removeCard: xhrRemoveCard,
         ajaxLoadUserCard, loadUserCards: xhrLoadUserCards, userDeckGroups,
+        ajaxLoadDebugForm, loadDebugForm: xhrLoadUserDebugForm, debugForm, saveDebugForm: xhrSaveUserDebugForm,
     };
 
 }

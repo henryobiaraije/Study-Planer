@@ -1,10 +1,10 @@
 <?php
 
-namespace StudyPlanner\Pages;
+namespace StudyPlannerPro\Pages;
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Services\FileService;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Services\FileService;
 
 /**
  * Class AdminEndpoints
@@ -53,7 +53,7 @@ class AdminDeckGroups {
 	 */
 	public function add_admin_menu(): void {
 		add_submenu_page(
-			'study-planner',
+			'study-planner-pro',
 			'Deck Groups',
 			'Deck Groups',
 			'manage_options',
@@ -72,7 +72,7 @@ class AdminDeckGroups {
 				<i class="fa fa-spin fa-spinner" ></i ></div >
 			</div >
 		';
-		// \StudyPlanner\load_template( 'admin/deck-groups' );
+		// \StudyPlannerPro\load_template( 'admin/deck-groups' );
 	}
 
 	public function get_page_data(): array {

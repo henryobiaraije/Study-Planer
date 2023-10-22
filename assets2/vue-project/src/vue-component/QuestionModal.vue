@@ -3,7 +3,7 @@
   <div class="admin-image-card">
     <form @submit.prevent="" class="modal-content min-w-[90vh]" style="height: 100%;">
       <div class="mb-4">
-        <!--              <?php \StudyPlanner\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>-->
+        <!--              <?php \StudyPlannerPro\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>-->
       </div>
       <div v-if="null !== currentQuestion && !currentQuestion.has_updated"
            class="sp-question min-h-[65vh] flex align-items-center overflow-x-auto moxal-y-hidden"

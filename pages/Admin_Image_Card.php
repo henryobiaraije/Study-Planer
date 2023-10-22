@@ -3,12 +3,12 @@
  * Image card controller
  */
 
-namespace StudyPlanner\Pages;
+namespace StudyPlannerPro\Pages;
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Services\FileService;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Services\FileService;
 
 /**
  * Class Admin_Image_Card
@@ -80,7 +80,7 @@ class Admin_Image_Card {
 	public function add_admin_menu(): void {
 
 		add_submenu_page(
-			'study-planner',
+			'study-planner-pro',
 			'Image Card',
 			'Image Card',
 			'manage_options',
@@ -93,7 +93,7 @@ class Admin_Image_Card {
 
 	public function load_view(): void {
 		do_action( 'sp_enqueue_default_admin_image_card' );
-		// \StudyPlanner\load_template( 'admin/admin-image-card' );
+		// \StudyPlannerPro\load_template( 'admin/admin-image-card' );
 		echo '<div class="sp admin-image-card wrap"></div>';
 		echo '<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
 				<div style="text-align: center;flex: 12;font-size: 50px;" >

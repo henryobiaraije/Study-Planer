@@ -10,12 +10,12 @@ use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Models\Collections;
-use StudyPlanner\Models\Tag;
-use function StudyPlanner\get_card_group_background_image;
-use function StudyPlanner\get_uncategorized_deck_group_id;
-use function StudyPlanner\get_uncategorized_deck_id;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Models\Collections;
+use StudyPlannerPro\Models\Tag;
+use function StudyPlannerPro\get_card_group_background_image;
+use function StudyPlannerPro\get_uncategorized_deck_group_id;
+use function StudyPlannerPro\get_uncategorized_deck_id;
 
 class DeckGroup extends Model {
 	protected $table = SP_DB_PREFIX . 'deck_groups';

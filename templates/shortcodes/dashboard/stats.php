@@ -1,6 +1,6 @@
 <?php
 
-use StudyPlanner\Libs\Common;
+use StudyPlannerPro\Libs\Common;
 
 $years = [];
 for ($a = 0; $a < 10; $a++) {
@@ -380,7 +380,7 @@ $current_year = date('Y');
                         <label class="m-2 cursor-pointer border-1 border-gray-300 py-2 px-4 rounded">
                             <span class="font-bold">Select a date:</span>
                             <input @change="useStats._loadChartHourlyBreakDown" v-model="useStats.chartHourlyBreakdownDate.value"
-                                   class="border-1  px-2 border-gray-500" max="<?php echo \StudyPlanner\Libs\Common::getDate(); ?>"
+                                   class="border-1  px-2 border-gray-500" max="<?php echo \StudyPlannerPro\Libs\Common::getDate(); ?>"
                                    name="forecast_span" value="one_month" type="date"></label>
                     </form>
                     <div v-show="useStats.chartHourlyBreakdownDate.value.length > 3" class="chart-review-time" style="min-height: 350px">

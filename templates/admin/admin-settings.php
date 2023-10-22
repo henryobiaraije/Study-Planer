@@ -1,7 +1,7 @@
 <?php
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Settings;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Settings;
 
 
 ?>

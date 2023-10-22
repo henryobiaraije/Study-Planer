@@ -1,10 +1,10 @@
 <?php
 
-namespace StudyPlanner\Pages;
+namespace StudyPlannerPro\Pages;
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Services\FileService;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Services\FileService;
 
 /**
  * Class Admin_Basic_Card
@@ -56,7 +56,7 @@ class Admin_Basic_Card {
 	public function add_admin_menu(): void {
 
 		add_submenu_page(
-			'study-planner',
+			'study-planner-pro',
 			'Basic Card',
 			'Basic Card',
 			'manage_options',
@@ -69,7 +69,7 @@ class Admin_Basic_Card {
 
 	public function load_view(): void {
 		do_action( 'sp_enqueue_default_admin_basic_card' );
-//		\StudyPlanner\load_template( 'admin/admin-basic-card' );
+//		\StudyPlannerPro\load_template( 'admin/admin-basic-card' );
 		echo '<div class="sp admin-basic-card wrap"></div>';
 		echo '<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
 				<div style="text-align: center;flex: 12;font-size: 50px;" >

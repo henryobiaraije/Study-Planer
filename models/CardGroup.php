@@ -14,11 +14,11 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\DB;
 use PHPMailer\PHPMailer\Exception;
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Models\Collections;
-use StudyPlanner\Models\Tag;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Models\Collections;
+use StudyPlannerPro\Models\Tag;
 
 class CardGroup extends Model {
 	protected $table = SP_TABLE_CARD_GROUPS;

@@ -1,7 +1,7 @@
 <?php
 
-	$active_url = 'admin.php?page=study-planner-decks';
-	$trash_url  = 'admin.php?page=study-planner-decks&status=trash';
+	$active_url = 'admin.php?page=study-planner-pro-decks';
+	$trash_url  = 'admin.php?page=study-planner-pro-decks&status=trash';
 	$page_title = 'Decks';
 	$status     = filter_input( INPUT_GET, 'status' );
 	$in_trash   = false;

@@ -1,6 +1,6 @@
 <?php
-	$active_url = 'admin.php?page=study-planner-tags';
-	$trash_url  = 'admin.php?page=study-planner-tags&status=trash';
+	$active_url = 'admin.php?page=study-planner-pro-tags';
+	$trash_url  = 'admin.php?page=study-planner-pro-tags&status=trash';
 	$page_title = 'Tags';
 	$status     = filter_input( INPUT_GET, 'status' );
 	$in_trash   = false;

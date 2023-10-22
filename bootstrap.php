@@ -14,7 +14,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Model\Deck;
 use Model\DeckGroup;
-use StudyPlanner\Libs\Settings;
+use StudyPlannerPro\Libs\Settings;
 
 $capsule = new Capsule();
 $capsule->addConnection(

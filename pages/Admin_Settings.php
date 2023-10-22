@@ -1,9 +1,9 @@
 <?php
 
-namespace StudyPlanner\Pages;
+namespace StudyPlannerPro\Pages;
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Settings;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Settings;
 
 /**
  * Class Admin_Basic_Card
@@ -53,7 +53,7 @@ class Admin_Settings {
     public function add_admin_menu(): void {
 
         add_submenu_page(
-            'study-planner',
+            'study-planner-pro',
             'Settings',
             'Settings',
             'manage_options',
@@ -66,7 +66,7 @@ class Admin_Settings {
 
     public function load_view(): void {
         do_action('sp_enqueue_default_admin_settings');
-        \StudyPlanner\load_template('admin/admin-settings');
+        \StudyPlannerPro\load_template('admin/admin-settings');
     }
 
     public function get_page_data(): array {

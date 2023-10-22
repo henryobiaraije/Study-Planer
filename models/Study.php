@@ -18,21 +18,21 @@
 	use Illuminate\Support\Str;
 	use PDOException;
 	use Staudenmeir\EloquentHasManyDeep\HasRelationships;
-	use StudyPlanner\Helpers\ChartAddedHelper;
-	use StudyPlanner\Helpers\ChartAnswerButtonsHelper;
-	use StudyPlanner\Helpers\ChartCardTypes;
-	use StudyPlanner\Helpers\ChartForecastHelper;
-	use StudyPlanner\Helpers\ChartHourlyBreakDown;
-	use StudyPlanner\Helpers\ChartIntervalHelper;
-	use StudyPlanner\Helpers\ChartProgress;
-	use StudyPlanner\Helpers\ChartReviewHelper;
-	use StudyPlanner\Libs\Common;
-	use StudyPlanner\Libs\Settings;
-	use StudyPlanner\Models\Tag;
-	use function StudyPlanner\get_mature_card_days;
-	use function StudyPlanner\get_user_timezone_date_early_morning_today;
-	use function StudyPlanner\get_user_timezone_date_midnight_today;
-	use function StudyPlanner\get_user_timezone_minutes_to_add;
+	use StudyPlannerPro\Helpers\ChartAddedHelper;
+	use StudyPlannerPro\Helpers\ChartAnswerButtonsHelper;
+	use StudyPlannerPro\Helpers\ChartCardTypes;
+	use StudyPlannerPro\Helpers\ChartForecastHelper;
+	use StudyPlannerPro\Helpers\ChartHourlyBreakDown;
+	use StudyPlannerPro\Helpers\ChartIntervalHelper;
+	use StudyPlannerPro\Helpers\ChartProgress;
+	use StudyPlannerPro\Helpers\ChartReviewHelper;
+	use StudyPlannerPro\Libs\Common;
+	use StudyPlannerPro\Libs\Settings;
+	use StudyPlannerPro\Models\Tag;
+	use function StudyPlannerPro\get_mature_card_days;
+	use function StudyPlannerPro\get_user_timezone_date_early_morning_today;
+	use function StudyPlannerPro\get_user_timezone_date_midnight_today;
+	use function StudyPlannerPro\get_user_timezone_minutes_to_add;
 
 	class Study extends Model {
 		protected $table = SP_TABLE_STUDY;

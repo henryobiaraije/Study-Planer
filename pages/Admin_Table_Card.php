@@ -3,11 +3,11 @@
  * Table card controller
  */
 
-namespace StudyPlanner\Pages;
+namespace StudyPlannerPro\Pages;
 
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Services\FileService;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Services\FileService;
 
 /**
  * Class Admin_Table_Card
@@ -59,7 +59,7 @@ class Admin_Table_Card {
 	public function add_admin_menu(): void {
 
 		add_submenu_page(
-			'study-planner',
+			'study-planner-pro',
 			'Table Card',
 			'Table Card',
 			'manage_options',
@@ -72,7 +72,7 @@ class Admin_Table_Card {
 
 	public function load_view(): void {
 		do_action( 'sp_enqueue_default_admin_table_card' );
-		// \StudyPlanner\load_template( 'admin/admin-table-card' );
+		// \StudyPlannerPro\load_template( 'admin/admin-table-card' );
 		echo '<div class="sp admin-table-card wrap"></div>';
 		echo '<div class="all-loading" style="width: 100%;height: 400px;display: flex;align-items: center;" >
 				<div style="text-align: center;flex: 12;font-size: 50px;" >

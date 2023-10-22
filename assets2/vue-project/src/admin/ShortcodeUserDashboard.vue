@@ -38,23 +38,23 @@
 
     <!--    <?php /** Question display modal */ ?>-->
     <!--    <div>-->
-    <!--      <?php \StudyPlanner\load_template('shortcodes/dashboard/study-complete-modal'); ?>-->
+    <!--      <?php \StudyPlannerPro\load_template('shortcodes/dashboard/study-complete-modal'); ?>-->
     <!--    </div>-->
 
 
     <!--    <?php /** Edit Study Modal */ ?>-->
     <!--    <div>-->
-    <!--      <?php \StudyPlanner\load_template('shortcodes/dashboard/study-modal'); ?>-->
+    <!--      <?php \StudyPlannerPro\load_template('shortcodes/dashboard/study-modal'); ?>-->
     <!--    </div>-->
 
     <!--    <?php /** Question display modal */ ?>-->
     <!--    <div>-->
-    <!--      <?php \StudyPlanner\load_template('shortcodes/dashboard/question-modal'); ?>-->
+    <!--      <?php \StudyPlannerPro\load_template('shortcodes/dashboard/question-modal'); ?>-->
     <!--    </div>-->
 
     <!--    <?php /** Modal Chart Deck's card type */ ?>-->
     <!--    <div>-->
-    <!--      <?php \StudyPlanner\load_template('shortcodes/dashboard/modal-decks-card-types-chart'); ?>-->
+    <!--      <?php \StudyPlannerPro\load_template('shortcodes/dashboard/modal-decks-card-types-chart'); ?>-->
     <!--    </div>-->
 
   </div>

@@ -208,8 +208,8 @@ export default defineComponent({
   data() {
     return {
       pageTitle: 'Collections',
-      activeUrl: 'admin.php?page=study-planner-collections',
-      trashUrl: 'admin.php?page=study-planner-collections&status=trash',
+      activeUrl: 'admin.php?page=study-planner-pro-collections',
+      trashUrl: 'admin.php?page=study-planner-pro-collections&status=trash',
       itemsBeingPublished: [],
       itemsBeingDeleted: [],
     }

@@ -240,8 +240,8 @@ export default defineComponent({
   data() {
     return {
       pageTitle: 'Deck',
-      activeUrl: 'admin.php?page=study-planner-decks',
-      trashUrl: 'admin.php?page=study-planner-decks&status=trash',
+      activeUrl: 'admin.php?page=study-planner-pro-decks',
+      trashUrl: 'admin.php?page=study-planner-pro-decks&status=trash',
     }
   },
   setup: (props, ctx) => {

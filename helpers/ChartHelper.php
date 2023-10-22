@@ -3,7 +3,7 @@
 	 * File to handle chart data sourcing
 	 */
 
-	namespace StudyPlanner\Helpers;
+	namespace StudyPlannerPro\Helpers;
 
 	if ( ! defined( 'ABSPATH' ) ) {
 		exit;
@@ -21,17 +21,17 @@
 	use Model\Study;
 	use PDOException;
 	use PHPMailer\PHPMailer\Exception;
-	use StudyPlanner\Initializer;
-	use StudyPlanner\Libs\Common;
-	use StudyPlanner\Libs\Settings;
-	use StudyPlanner\Models\Tag;
-	use StudyPlanner\Services\Card_Due_Date_Service;
-	use function StudyPlanner\get_all_card_grades;
+	use StudyPlannerPro\Initializer;
+	use StudyPlannerPro\Libs\Common;
+	use StudyPlannerPro\Libs\Settings;
+	use StudyPlannerPro\Models\Tag;
+	use StudyPlannerPro\Services\Card_Due_Date_Service;
+	use function StudyPlannerPro\get_all_card_grades;
 
 	/**
 	 * Class ChartHelper
 	 *
-	 * @package StudyPlanner\Helpers
+	 * @package StudyPlannerPro\Helpers
 	 */
 	class ChartHelper {
 

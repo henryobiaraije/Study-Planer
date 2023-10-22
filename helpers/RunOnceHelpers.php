@@ -3,7 +3,7 @@
  * Front end ajax helper file
  */
 
-namespace StudyPlanner\Helpers;
+namespace StudyPlannerPro\Helpers;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -24,19 +24,19 @@ use Model\Study;
 use Model\StudyLog;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Models\Tag;
-use StudyPlanner\Services\Card_Due_Date_Service;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Models\Tag;
+use StudyPlannerPro\Services\Card_Due_Date_Service;
 use Symfony\Component\Console\Helper\Table;
-use function StudyPlanner\get_all_card_grades;
-use function StudyPlanner\get_card_group_background_image;
+use function StudyPlannerPro\get_all_card_grades;
+use function StudyPlannerPro\get_card_group_background_image;
 
 /**
  * Class RunOnceHelpers
  *
- * @package StudyPlanner\Helpers
+ * @package StudyPlannerPro\Helpers
  */
 class RunOnceHelpers {
     /**

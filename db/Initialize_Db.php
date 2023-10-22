@@ -1,7 +1,7 @@
 <?php
 
 
-namespace StudyPlanner\Db;
+namespace StudyPlannerPro\Db;
 
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -12,10 +12,10 @@ use Model\Deck;
 use Model\DeckGroup;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
-use StudyPlanner\Libs\Settings;
+use StudyPlannerPro\Libs\Settings;
 
-use function StudyPlanner\get_default_image_display_type;
-use function StudyPlanner\print_log;
+use function StudyPlannerPro\get_default_image_display_type;
+use function StudyPlannerPro\print_log;
 
 class Initialize_Db {
 	private static $instance;

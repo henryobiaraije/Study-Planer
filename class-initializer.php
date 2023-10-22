@@ -3,29 +3,29 @@
  * The initializer file
  */
 
-namespace StudyPlanner;
+namespace StudyPlannerPro;
 
 use Illuminate\Database\Capsule\Manager;
 use Model\DeckGroup;
-use StudyPlanner\Db\Initialize_Db;
-use StudyPlanner\Helpers\AjaxFrontHelper;
-use StudyPlanner\Helpers\AjaxHelper;
-use StudyPlanner\Helpers\RunOnceHelpers;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Pages\Admin_Assign_Topic;
-use StudyPlanner\Pages\Admin_Basic_Card;
-use StudyPlanner\Pages\Admin_All_Cards;
-use StudyPlanner\Pages\Admin_Collections;
-use StudyPlanner\Pages\Admin_Gap_Card;
-use StudyPlanner\Pages\Admin_Image_Card;
-use StudyPlanner\Pages\Admin_Settings;
-use StudyPlanner\Pages\Admin_Table_Card;
-use StudyPlanner\Pages\Admin_Tags;
-use StudyPlanner\Pages\AdminDeck;
-use StudyPlanner\Pages\AdminDeckGroups;
-use StudyPlanner\Pages\AdminTopics;
-use StudyPlanner\Shortcodes\Short_User_Dashboard;
+use StudyPlannerPro\Db\Initialize_Db;
+use StudyPlannerPro\Helpers\AjaxFrontHelper;
+use StudyPlannerPro\Helpers\AjaxHelper;
+use StudyPlannerPro\Helpers\RunOnceHelpers;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Pages\Admin_Assign_Topic;
+use StudyPlannerPro\Pages\Admin_Basic_Card;
+use StudyPlannerPro\Pages\Admin_All_Cards;
+use StudyPlannerPro\Pages\Admin_Collections;
+use StudyPlannerPro\Pages\Admin_Gap_Card;
+use StudyPlannerPro\Pages\Admin_Image_Card;
+use StudyPlannerPro\Pages\Admin_Settings;
+use StudyPlannerPro\Pages\Admin_Table_Card;
+use StudyPlannerPro\Pages\Admin_Tags;
+use StudyPlannerPro\Pages\AdminDeck;
+use StudyPlannerPro\Pages\AdminDeckGroups;
+use StudyPlannerPro\Pages\AdminTopics;
+use StudyPlannerPro\Shortcodes\Short_User_Dashboard;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit(); // exit if accessed directly
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Initializes the plugin
  *
- * @package StudyPlanner
+ * @package StudyPlannerPro
  */
 class Initializer {
 	public static $plugin_dir;
@@ -216,13 +216,16 @@ class Initializer {
 
 	public function add_admin_menu(): void {
 		add_menu_page(
-			'Study Planner',
-			'Study Planner',
+			'Study Planner Pro',
+			'Study Planner Pro',
 			'manage_options',
-			'study-planner',
+			'study-planner-pro',
 			array( $this, 'load_sections_page' ),
 			'dashicons-welcome-learn-more'
 		);
+
+		// Remove the first menu item.
+		remove_submenu_page( 'study-planner-pro', 'study-planner-pro' );
 	}
 
 	public function add_menu_style() {
@@ -373,7 +376,7 @@ class Initializer {
 		}
 
 		wp_enqueue_script( 'jquery' );
-		$base = 'study-planner-';
+		$base = 'study-planner-pro-';
 		if ( $in_localhost ) {
 			$js_vue          = self::$extra_url . '/vue.js';
 			$js_bootstrap    = self::$extra_url . '/bootstrap-5/js/bootstrap.js';

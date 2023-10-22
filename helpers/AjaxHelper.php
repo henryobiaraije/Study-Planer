@@ -1,7 +1,7 @@
 <?php
 
 
-namespace StudyPlanner\Helpers;
+namespace StudyPlannerPro\Helpers;
 
 use Illuminate\Database\Capsule\Manager;
 use Model\Answered;
@@ -11,16 +11,16 @@ use Model\Deck;
 use Model\DeckGroup;
 use Model\Topic;
 use PDOException;
-use StudyPlanner\Initializer;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Libs\Settings;
-use StudyPlanner\Models\Collections;
-use StudyPlanner\Models\Tag;
-use StudyPlanner\Models\UserCard;
-use function StudyPlanner\get_default_image_display_type;
-use function StudyPlanner\get_mature_card_days;
-use function StudyPlanner\get_uncategorized_deck_group_id;
-use function StudyPlanner\get_uncategorized_deck_id;
+use StudyPlannerPro\Initializer;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Models\Collections;
+use StudyPlannerPro\Models\Tag;
+use StudyPlannerPro\Models\UserCard;
+use function StudyPlannerPro\get_default_image_display_type;
+use function StudyPlannerPro\get_mature_card_days;
+use function StudyPlannerPro\get_uncategorized_deck_group_id;
+use function StudyPlannerPro\get_uncategorized_deck_id;
 
 class AjaxHelper {
 	// <editor-fold desc="General">

@@ -1,6 +1,6 @@
 <?php
 
-namespace StudyPlanner\Models;
+namespace StudyPlannerPro\Models;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -15,10 +15,10 @@ use Model\CardGroup;
 use Model\Deck;
 use Model\DeckGroup;
 use Model\User;
-use StudyPlanner\Libs\Common;
-use StudyPlanner\Models\Tag;
-use function StudyPlanner\get_uncategorized_deck_group_id;
-use function StudyPlanner\get_uncategorized_deck_id;
+use StudyPlannerPro\Libs\Common;
+use StudyPlannerPro\Models\Tag;
+use function StudyPlannerPro\get_uncategorized_deck_group_id;
+use function StudyPlannerPro\get_uncategorized_deck_id;
 
 class UserCard extends Model {
 	protected $table = SP_TABLE_USER_CARDS;

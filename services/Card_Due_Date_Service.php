@@ -3,7 +3,7 @@
 	 * Service to get card next due date, e.t.c
 	 */
 
-	namespace StudyPlanner\Services;
+	namespace StudyPlannerPro\Services;
 
 	if ( ! defined( 'ABSPATH' ) ) {
 		exit;
@@ -14,12 +14,12 @@
 	use Model\Answered;
 	use Model\Card;
 	use Model\Study;
-	use StudyPlanner\Libs\Common;
+	use StudyPlannerPro\Libs\Common;
 
 	/**
 	 * Class Card_Due_Date_Service
 	 *
-	 * @package StudyPlanner\Services
+	 * @package StudyPlannerPro\Services
 	 */
 	class Card_Due_Date_Service {
 

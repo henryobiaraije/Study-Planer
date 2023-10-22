@@ -4,7 +4,7 @@
 	 * Tag Model
 	 */
 
-	namespace StudyPlanner\Models;
+	namespace StudyPlannerPro\Models;
 
 	use Illuminate\Database\Capsule\Manager;
 	use Illuminate\Database\Eloquent\Model;
