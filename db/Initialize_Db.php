@@ -16,6 +16,7 @@ use StudyPlannerPro\Libs\Settings;
 
 use function StudyPlannerPro\get_default_image_display_type;
 use function StudyPlannerPro\print_log;
+use function StudyPlannerPro\sp_get_db_prefix;
 
 class Initialize_Db {
 	private static $instance;
@@ -367,6 +368,35 @@ class Initialize_Db {
 					$table->boolean( 'study_all_on_hold' );
 					$table->softDeletes();
 					$table->timestamps();
+				}
+			);
+		}
+
+		// Remove deck_id constraint.
+		$schema_builder = $this->schema_builder;
+
+		$foreignKeys       = Capsule
+			::schema()
+			->getConnection()
+			->getDoctrineSchemaManager()
+			->listTableForeignKeys( SP_TABLE_STUDY );
+		$foreign_key_exist = false;
+		// Check if the constraint exists before dropping it.
+
+		foreach ( $foreignKeys as $foreignKey ) {
+			$local = $foreignKey->getLocalColumns();
+			if ( 'deck_id' === $local[0] ) {
+				$foreign_key_exist = true;
+				break;
+			}
+		}
+
+		if ( $foreign_key_exist ) {
+			Capsule::schema()->table(
+				SP_TABLE_STUDY,
+				function ( Blueprint $table ) {
+					$prefix = sp_get_db_prefix();
+					$table->dropForeign( [ $prefix . 'study_deck_id_foreign' ] );
 				}
 			);
 		}
