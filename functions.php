@@ -3,6 +3,7 @@
 namespace StudyPlannerPro;
 
 use DateTime;
+use Model\Study;
 use StudyPlannerPro\Db\Initialize_Db;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Libs\Settings;
@@ -164,20 +165,62 @@ function sp_save_user_debug_form( int $user_id, string $current_study_date ): vo
  *
  * @return array
  */
-function sp_get_user_debug_form( int $user_id ): array {
+function sp_get_user_debug_form( int $user_id = null ): array {
+	if ( null === $user_id ) {
+		$user_id = get_current_user_id();
+	}
+
 	$current_study_date = get_user_meta( $user_id, Settings::UM_CURRENT_STUDY_DATE, true );
 	if ( empty( $current_study_date ) ) {
-		$current_study_date = Common::getDate();
+		$current_study_date = Common::getDateTime();
 	}
+
+	// format to: 2020-12-31 23:59:59.
+	$current_study_date = date( 'Y-m-d H:i:s', strtotime( $current_study_date ) );
 
 	return array(
 		'current_study_date' => $current_study_date,
 	);
 }
 
+/**
+ * Get user's study object.
+ * Only one study object per user.
+ *
+ * @param int $user_id The user ID.
+ *
+ * @return Study
+ */
+function sp_get_user_study( int $user_id ): Study {
+	$study = Study::where( 'user_id', $user_id )->first();
+	if ( empty( $study ) ) {
+		$study                    = new Study();
+		$study->no_to_revise      = 0;
+		$study->no_of_new         = 0;
+		$study->no_on_hold        = 0;
+		$study->revise_all        = 0;
+		$study->study_all_new     = 0;
+		$study->study_all_on_hold = 0;
+		$study->user_id           = $user_id;
+		$study->deck_id           = 0;
+		$study->all_tags          = 0;
+
+		$study->save();
+	}
+
+	return $study;
+
+}
+
+function sp_get_db_prefix() {
+	global $wpdb;
+
+	return $wpdb->prefix . 'sp_';
+}
+
 
 global $wpdb;
-$prefix = $wpdb->prefix . 'sp_';
+$prefix = sp_get_db_prefix();
 define( 'SP_DB_PREFIX', $prefix );
 define( 'SP_TABLE_DECK_GROUPS', SP_DB_PREFIX . 'deck_groups' );
 define( 'SP_TABLE_TAGS', SP_DB_PREFIX . 'tags' );

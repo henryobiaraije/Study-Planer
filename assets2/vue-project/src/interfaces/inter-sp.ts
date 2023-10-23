@@ -147,6 +147,8 @@ export interface _Localize {
         page_topics: string;
         site_url: string;
     }
+    user_study_deck_id: number;
+    user_study: _Study;
 }
 
 export interface _Collection {

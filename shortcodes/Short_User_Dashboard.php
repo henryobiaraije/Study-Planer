@@ -4,10 +4,12 @@
 namespace StudyPlannerPro\Shortcodes;
 
 
+use Model\Study;
 use StudyPlannerPro\Initializer;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Services\FileService;
 use function StudyPlannerPro\get_template_path;
+use function StudyPlannerPro\sp_get_user_study;
 
 /**
  * Class BookBundles
@@ -82,7 +84,14 @@ class Short_User_Dashboard {
 	}
 
 	public function localize_data(): void {
-		//			Bra_Size_Calculator::add_to_localize( 'calculator_settings', $this->get_page_data() );
+		$study = sp_get_user_study( get_current_user_id() );
+		if ( $study instanceof Study ) {
+			Initializer::add_to_localize( 'user_study_deck_id', $study->id );
+			Initializer::add_to_localize( 'user_study', $study );
+		} else {
+			Initializer::add_to_localize( 'user_study_deck_id', 0 );
+			Initializer::add_to_localize( 'user_study', null );
+		}
 	}
 
 	final public function register_scripts(): void {

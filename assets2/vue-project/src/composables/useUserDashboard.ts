@@ -365,7 +365,7 @@ export default function (status = 'publish') {
                     handleAjax.start();
                 },
                 funcSuccess(done: InterFuncSuccess<any>) {
-                    handleAjax.stop();
+                    // handleAjax.stop();
                     lastAnsweredDebugData.value = done.data.debug_display;
                     // const nextInterval: number  = done.data.next_interval;
                     // if (1 > nextInterval) {
@@ -375,7 +375,7 @@ export default function (status = 'publish') {
                     resolve(0);
                 },
                 funcFailue(done) {
-                    handleAjax.error(done);
+                    // handleAjax.error(done);
                     reject();
                 },
             });
@@ -532,6 +532,7 @@ export default function (status = 'publish') {
         currentQuestion, answeredCount,
         showCurrentAnswer, showGrade, _hold, _acceptChanges,
         _showAnswer, _markAnswer, lastAnsweredDebugData,
+        xhrRecordStudyLog, xhrMarkAnswer, xhrMarkAnswerOnHold
     };
 
 }

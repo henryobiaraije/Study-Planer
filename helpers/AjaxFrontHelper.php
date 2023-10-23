@@ -73,10 +73,19 @@ class AjaxFrontHelper {
 		add_action( 'front_sp_pro_ajax_front_mark_answer', array( $this, 'ajax_front_mark_answer' ) );
 		add_action( 'front_sp_pro_ajax_front_mark_answer_on_hold', array( $this, 'ajax_front_mark_answer_on_hold' ) );
 		add_action( 'front_sp_pro_ajax_front_load_stats_forecast', array( $this, 'ajax_front_load_stats_forecast' ) );
-		add_action( 'front_sp_pro_ajax_front_load_stats_review_time', array( $this, 'ajax_front_load_stats_review_time' ) );
-		add_action( 'front_sp_pro_ajax_front_get_single_deck_group', array( $this, 'ajax_front_get_single_deck_group' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_review_time', array(
+			$this,
+			'ajax_front_load_stats_review_time'
+		) );
+		add_action( 'front_sp_pro_ajax_front_get_single_deck_group', array(
+			$this,
+			'ajax_front_get_single_deck_group'
+		) );
 		add_action( 'front_sp_pro_ajax_front_record_study_log', array( $this, 'ajax_front_record_study_log' ) );
-		add_action( 'front_sp_pro_ajax_front_load_stats_chart_added', array( $this, 'ajax_front_load_stats_chart_added' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_chart_added', array(
+			$this,
+			'ajax_front_load_stats_chart_added'
+		) );
 		add_action( 'front_sp_pro_ajax_front_load_stats_chart_interval', array(
 			$this,
 			'ajax_front_load_stats_chart_interval'
@@ -94,7 +103,10 @@ class AjaxFrontHelper {
 			$this,
 			'ajax_front_load_stats_progress_chart'
 		) );
-		add_action( 'front_sp_pro_ajax_front_load_stats_card_types', array( $this, 'ajax_front_load_stats_card_types' ) );
+		add_action( 'front_sp_pro_ajax_front_load_stats_card_types', array(
+			$this,
+			'ajax_front_load_stats_card_types'
+		) );
 		// </editor-fold desc="Others">
 
 		// <editor-fold desc="User Cards ">
@@ -359,12 +371,18 @@ class AjaxFrontHelper {
 
 	// <editor-fold desc="Dashboard Actions">
 
+	/**
+	 * Used to track how long it took the user to answer a question.
+	 * Once the question is opened, the "start" study log is recorded.
+	 * Then when the answer is submitted, the study log's datetime is used as the $start_time is deleted.
+	 * Then the study_log's datetime - answer's datetime is used to calculate the time it took to answer.
+	 *
+	 * @param $post
+	 *
+	 * @return void
+	 */
 	public function ajax_front_record_study_log( $post ): void {
 		Initializer::verify_post( $post, true );
-		//        Common::send_error([
-		//            'ajax_front_record_study_log',
-		//            'post' => $post,
-		//        ]);
 
 		$all      = $post[ Common::VAR_2 ];
 		$study_id = (int) sanitize_text_field( $all['study_id'] );
@@ -407,28 +425,12 @@ class AjaxFrontHelper {
 			'action'   => $action,
 		] );
 
-		//        Common::send_error([
-		//            'ajax_front_load_stats_forecast',
-		//            'post'           => $post,
-		//            '$new_study_log' => $new_study_log,
-		//            '$last_log'      => $last_log,
-		//            '$study'         => $study,
-		//            '$card'          => $card,
-		//            '$action'        => $action,
-		//        ]);
-
 
 		Common::send_success( 'Log recorded' );
-
-
 	}
 
 	public function ajax_front_mark_answer_on_hold( $post ): void {
 		Initializer::verify_post( $post );
-		//			Common::send_error( [
-		//				__METHOD__,
-		//				'post' => $post,
-		//			] );
 
 		$all      = $post[ Common::VAR_2 ];
 		$study_id = (int) sanitize_text_field( $all['study_id'] );
@@ -481,22 +483,6 @@ class AjaxFrontHelper {
 		$study_log->forceDelete();
 		Manager::commit();
 		Common::send_success( 'On hold marked' );
-		//			$answer = Answered::create( [
-		//				'study_id'    => $study_id,
-		//				'card_id'     => $card_id,
-		//				'answer'      => $answer,
-		//				'grade'       => $grade,
-		//				'next_due_at' => Common::getDateTime( - 4 ),
-		//			] );
-		//			$answer = Answered::create( [
-		//				'study_id'    => $study_id,
-		//				'card_id'     => $card_id,
-		//				'answer'      => $answer,
-		//				'grade'       => $grade,
-		//				'next_due_at' => Common::getDateTime(-1),
-		//			] );
-
-
 	}
 
 	public function ajax_front_mark_answer( $post ): void {
@@ -525,10 +511,7 @@ class AjaxFrontHelper {
 		if ( ! in_array( $grade, $all_grades ) ) {
 			Common::send_error( 'Invalid grade.' );
 		}
-		$deck = $study->deck;
-		if ( empty( $deck ) ) {
-			Common::send_error( 'Invalid deck. Probably delete' );
-		}
+
 		$card_group = $card->card_group;
 		if ( empty( $card_group ) ) {
 			Common::send_error( 'Invalid card group. Probably delete' );
@@ -537,6 +520,7 @@ class AjaxFrontHelper {
 		$answered_as_new     = false;
 		$answered_as_revised = false;
 
+		// Check if answered before.
 		$_answered_before = Answered
 			::where( 'card_id', '=', $card_id )
 			->where( 'study_id', '=', $study_id )
@@ -564,7 +548,6 @@ class AjaxFrontHelper {
 			'answered_as_new'     => $answered_as_new,
 			'answered_as_revised' => $answered_as_revised,
 			'started_at'          => $study_log->created_at,
-			//				'next_due_at' => Common::getDateTime( - 7 ),
 		] );
 		$study_log->forceDelete();
 		$old_log = AnswerLog
@@ -799,10 +782,6 @@ class AjaxFrontHelper {
 	 * @param $post
 	 */
 	public function ajax_front_get_today_questions_in_study( $post ): void {
-		//			Common::send_error( [
-		//				'ajax_front_get_question',
-		//				'post' => $post,
-		//			] );
 
 		$all      = $post[ Common::VAR_2 ]['study'];
 		$study_id = (int) sanitize_text_field( $all['id'] );
@@ -907,14 +886,6 @@ class AjaxFrontHelper {
 			//                '$study_id'              => $study_id,
 			//            ]);
 		}
-		//			$all_cards = $user_cards_new['cards'] + $user_cards_revise['cards'];
-
-		//        Common::send_error([
-		//            'ajax_front_create_study',
-		//            'post'                   => $post,
-		//            'Manager::getQueryLog()' => Manager::getQueryLog(),
-		//        ]);
-
 
 		Common::send_success( 'Cards loaded.', [
 			'user_cards' => [

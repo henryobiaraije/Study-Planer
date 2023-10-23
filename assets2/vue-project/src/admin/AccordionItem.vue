@@ -131,7 +131,7 @@ export default defineComponent({
       const childrenMapNames = {
         'decks': 'subject',
         'topics': 'topic',
-        'card_groups': 'cards',
+        'card_groups': 'card',
       };
 
       let childrenTypeName = childrenMapNames[Object.keys(item).find(key => key in childrenMapNames)] || 'card_group';
@@ -139,8 +139,12 @@ export default defineComponent({
 
       let childrenLength = 0;
 
-      if ('card_groups' === childrenType) {
+      // console.log({itemType, childrenType, item: this.item});
+
+      if ('card_group' === childrenType) {
+        // console.log('card_groups..', {item});
         childrenLength = item[childrenType + 's'].reduce((acc, cardGroup) => {
+          // console.log({acc, cardGroup});
           return acc + cardGroup.cards.length;
         }, 0);
       } else {

@@ -26,8 +26,18 @@
           label="Study Date"
           hide-details="auto"
           v-model="userCard.debugForm.value.current_study_date"
-          type="date"
+          type="datetime-local"
       ></v-text-field>
+      <!--      <v-datetime-picker-->
+      <!--          label="Current Date"-->
+      <!--          v-model="userCard.debugForm.value.current_study_date"-->
+      <!--      ></v-datetime-picker>-->
+      <!--      <VueDatePicker-->
+      <!--          v-model="userCard.debugForm.value.current_study_date"-->
+      <!--          text-input-->
+      <!--      ></VueDatePicker>-->
+      <!--      <input type="datetime-local" v-model="selectedDateTime">-->
+      <!--      <VueDatePicker v-model="date"></VueDatePicker>-->
     </v-responsive>
     <br/>
     <v-btn

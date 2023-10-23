@@ -9,7 +9,7 @@
            class="sp-question min-h-[65vh] flex align-items-center overflow-x-auto moxal-y-hidden"
            style="background-repeat: no-repeat;background-size: cover;"
            :style="{'background-image' : 'url('+currentQuestion?.card_group?.bg_image_url+')'}">
-        <div class="flex flex-col gap-2 w-full">
+        <div v-if="!allAnswered" class="flex flex-col gap-2 w-full">
           <v-carousel
               height="400"
               hide-delimiters
@@ -111,7 +111,6 @@
                   </div>
                   <!-- </editor-fold desc="Table Card"> -->
 
-
                   <!-- <editor-fold desc="Image Card"> -->
                   <div v-else-if="'image' === oneCard.card_group.card_type" class="w-full">
                     <div v-show="!showOnlyAnswers && !showCurrentAnswer" class="sp-image-question m-auto mb-2 relative">
@@ -138,7 +137,7 @@
                                <span v-for="(item2,itemIndex2) in oneCard.answer.boxes"
                                      style="font-family: 'Montserrat', sans-serif;"
                                      :id="'sp-box-preview-'+item2.hash"
-                                     :class="{'show-box': item2.show, 'hide-box' : item2.hide, 'hide-box' : item2.hide }"
+                                     :class="{'show-box': item2.show, 'hide-box' : item2.hide }"
                                      :key="item2.hash" class="sp-box-preview">
                                   <span v-if="item2.imageUrl.length < 2"></span>
                                   <img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl"
@@ -196,7 +195,7 @@
                 </v-btn>
                 <v-btn
                     color="primary"
-                    @click="again()"
+                    @click="hold()"
                 >
                   Hold (2)
                 </v-btn>
@@ -243,7 +242,18 @@
             </div>
             <!-- </editor-fold desc="Buttons (Again | Hard | Good | Easy)"> -->
           </template>
+
         </div>
+        <v-alert
+            v-if="allAnswered"
+            type="success"
+            border="start"
+            variant="tonal"
+            color="deep-purple-accent-4"
+            title="Congratulations"
+        >
+          You have successfully completed the study session for this topic for today.
+        </v-alert>
       </div>
     </form>
   </div>
@@ -256,6 +266,7 @@ import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useUserDashboard from "@/composables/useUserDashboard";
 import type {_Card} from "@/interfaces/inter-sp";
 import useImageCard from "@/composables/useImageCard";
+import {spClientData} from "@/functions";
 
 export default defineComponent({
   computed: {
@@ -267,12 +278,28 @@ export default defineComponent({
     _showAnswer() {
       this.showCurrentAnswer = true;
     },
+    _hideAnswer() {
+      this.showCurrentAnswer = false;
+    },
     next() {
+      // Hide answer.
+      this._hideAnswer();
+
+      // If all cards are answered, show the success message.
+      if (this.index === this.cards.length - 1) {
+        this.allAnswered = true;
+        return;
+      }
+
+      // Update the index.
       this.index = Math.min(this.index + 1, this.cards.length - 1)
+
+      // Add image card css.
       const card = this.cards[this.index];
       setTimeout(() => {
         this.injectImageCardCss(card);
       }, 100);
+      this.recordStudyLogStart();
     },
     prev() {
       this.index = Math.max(this.index - 1, 0)
@@ -280,6 +307,14 @@ export default defineComponent({
       setTimeout(() => {
         this.injectImageCardCss(card);
       }, 100);
+    },
+    recordStudyLogStart() {
+      if ('study' === this.purpose) {
+        this.userDash.xhrRecordStudyLog(spClientData().user_study, this.cards[this.index], 'start');
+      }
+    },
+    recordStudyLogStop() {
+      this.userDash.xhrRecordStudyLog(spClientData().user_study, this.cards[this.index], 'stop');
     },
     injectImageCardCss(card: _Card) {
       if ('image' === card.card_group.card_type) {
@@ -296,18 +331,26 @@ export default defineComponent({
         // useImageCard().applyBoxesPreviewCssOld(card.old_answer.boxes);
       }
     },
-    answer(answer: string) {
-      console.log(answer)
-      if ('again' === answer) {
+    answer(grade: string) {
+      // console.log(grade)
+      const card = this.cards[this.index];
+      this.userDash
+          .xhrMarkAnswer(
+              spClientData().user_study,
+              card,
+              grade,
+              card.answer,
+              card.question
+          );
+
+      if ('again' === grade) {
         this.again();
       } else {
         this.next();
       }
-      // this.showCurrentAnswer = false;
-
     },
     handleKeyup(event: KeyboardEvent) {
-      console.log(event);
+      // console.log(event);
       if ('preview' === this.purpose) {
         if (event.key === 'ArrowLeft') {
           this.prev();
@@ -350,10 +393,21 @@ export default defineComponent({
       this.showCurrentAnswer = false;
       this.next();
     },
+    hold() {
+      // HOld, push the card to the end.
+      const currentCard = this.cards[this.index];
+      this
+          .userDash
+          .xhrMarkAnswerOnHold(
+              spClientData().user_study,
+              currentCard
+          );
+      this.next();
+    },
   },
   setup: (props, ctx) => {
     return {
-      // userDash: useUserDashboard(),
+      userDash: useUserDashboard(),
     }
   },
   created() {
@@ -361,13 +415,15 @@ export default defineComponent({
     setTimeout(() => {
       this.injectImageCardCss(card);
     }, 100);
+    this.recordStudyLogStart();
   },
   data() {
     return {
       // questionIndex: 0,
       showCurrentAnswer: false,
       showGrade: false,
-      index: 0
+      index: 0,
+      allAnswered: false,
     }
   },
   name: 'QuestionModal',
