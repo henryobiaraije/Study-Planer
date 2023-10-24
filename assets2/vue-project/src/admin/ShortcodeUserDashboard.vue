@@ -1,33 +1,35 @@
 <template>
   <div class="sp sp-sc-ud min-h-[60vh]">
     <!-- Mobile Tabs -->
-    <div class="hidden">
+    <div class="">
       <div class="flex justify-space-around gap-3">
         <div class="few-items flex-initial">
           <div class="sp-tab flex gap-2 justify-center items-center my-4 all-loaded">
-            <template v-for="(item,menuIndex) in menus">
+            <template v-for="(item,menuIndex) in mobileMenus">
               <div class="sp-one-tab ">
-                <template v-if="2 > menuIndex">
-                  <a :href="getUrl(item.tag)" class="px-2 block whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
+                <a :href="getUrl(item.tag)" class="px-2 block whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
 			                text-decoration-none bg-sp-200"
-                     @click.prevent="gotoMenu(item.tag)"
-                     :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
-                  >{{ item.title }}</a>
-                </template>
+                   @click.prevent="gotoMenu(item.tag)"
+                   :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
+                >{{ item.title }}</a>
               </div>
             </template>
             <div class="other-items flex items-end flex-initial">
               <v-btn id="menu-activator"
-                     color="bg-sp-100" icon="mdi-menu" size="small"></v-btn>
+                     color="primary" icon="mdi-menu" size="small"></v-btn>
 
               <v-menu activator="#menu-activator">
                 <v-list>
                   <v-list-item
-                      v-for="(item, index) in menus"
+                      v-for="(item, index) in otherMobileMenu"
                       :key="index"
                       :value="index"
+                      active-color="primary"
                   >
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    <v-list-item-title
+                        @click.prevent="gotoMenu(item.tag)"
+                    >{{ item.title }}
+                    </v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -156,6 +158,18 @@ export default defineComponent({
         comp?: any,
         props: { [key: string]: any }
       }[];
+    },
+    mobileMenus() {
+      return [
+        this.menus[0],
+        'study-deck' === this.menu ?
+            this.menus.find((item) => item.tag === 'add-cards')
+            : this.menus.find((item) => item.tag === this.menu),
+      ];
+    },
+    otherMobileMenu() {
+      // Exclude current mobileMenus from menus.
+      return this.menus.filter((item) => !this.mobileMenus.includes(item));
     }
   },
   created() {
@@ -185,6 +199,7 @@ export default defineComponent({
       } else if (menu === 'profile') {
         this.userProfile._loadProfile();
       }
+
     },
     getUrl(page: string): string {
       const currentUrl = window.location.href;

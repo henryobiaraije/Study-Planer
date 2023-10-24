@@ -133,18 +133,19 @@ class UserCard extends Model {
 	 * @return array
 	 */
 	public static function get_all_last_answered_user_cards( int $user_id, int $user_study_id ): array {
-		$card_answered = Answered::query()
-		                         ->with(
-			                         array(
-				                         'card',
-				                         'study' => function ( $q ) use ( $user_study_id ) {
-					                         $q->where( 'id', '=', $user_study_id );
-				                         },
-			                         )
-		                         )
-		                         ->groupBy( 'card_id' )
-		                         ->orderBy( 'created_at', 'desc' )
-		                         ->get()->all();
+		$card_answered = Answered
+			::query()
+			->with(
+				array(
+					'card',
+					'study' => function ( $q ) use ( $user_study_id ) {
+						$q->where( 'id', '=', $user_study_id );
+					},
+				)
+			)
+			->groupBy( 'card_id' )
+			->orderBy( 'created_at', 'desc' )
+			->get()->all();
 
 		/**
 		 * @var string $today
@@ -164,18 +165,18 @@ class UserCard extends Model {
 			}
 			$cards[]    = $card;
 			$card_ids[] = $card->id;
-			if ( $answered->status === 'on_hold' ) {
+			$grade      = $answered->grade;
+			if ( $grade === 'hold' ) {
 				$cards_on_hold[] = $card;
 			} else {
 				$cards_in_revision[] = $card;
 			}
 
 			// Check if card is due today.
-
 			$card_due_date = $answered->next_due_at;
 			// e.i. if due date is today or before today.
 			if ( strtotime( $card_due_date ) <= strtotime( date( 'Y-m-d', strtotime( $today ) ) ) ) {
-				if ( $answered->status === 'on_hold' ) {
+				if ( $answered->grade === 'hold' ) {
 					$cards_on_hold_and_due[] = $card;
 				} else {
 					$cards_in_revision_and_due[] = $card;
