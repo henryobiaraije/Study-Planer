@@ -3,7 +3,7 @@
     <div class="accordion-header" :class="[top && !showChildren ? 'pb-2':'']">
       <!-- Header -->
       <div class="sp-deck-group-header border-b border-gray-100">
-        <div @click="toggle()" class="sp-header-title flex">
+        <div @click="toggle()" class="sp-header-title lg:flex">
           <div
               class="header-title-icon flex flex-1 justify-start items-center gap-2 cursor-pointer"
               :class="[cssLeftRight.left]"
@@ -23,10 +23,13 @@
               {{ theItem.childrenLength }} {{ theItem.childrenTypeName }}{{ theItem.plural }}
             </div>
           </div>
-          <div class="sp-deck-count flex-1 flex items-center justify-space-around py-1"
+          <div class="sp-deck-count lg:flex items-center justify-space-around py-1"
                :class="[cssLeftRight.right]"
           >
-            <template v-for="(stat,statKey) in stats">
+            <div v-if="!inMobile" class="sp-deck-count flex-1 flex items-center justify-space-around py-1"
+                 :class="[cssLeftRight.right]"
+            >
+              <template v-for="(stat,statKey) in stats">
               <span class="on-hold bg-white font-semibold flex gap-2 justify-center ">
                 <span class="text-sm px-2 py-1">{{ stat.title }}:</span>
                 <span
@@ -34,7 +37,17 @@
                     :class="[cssLeftRight.left]"
                 >{{ stat.count }}</span>
               </span>
-            </template>
+              </template>
+            </div>
+            <div v-if="inMobile" class="mobile-stats flex justify-between px-2">
+              <div
+                  v-for="(stat,statKey) in stats"
+                  class="flex flex-row gap-1 items-center"
+              >
+                <span class="text-sm text-gray-500">{{ stat.title }}: </span>
+                <span class="text-base font-semibold text-black">{{ stat.count }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -105,6 +118,7 @@ export default defineComponent({
       showChildren: false,
       viewDialog: false,
       cardsToView: [] as _Card[],
+      windowWidth: window.innerWidth,
     }
   },
   setup: (props, ctx) => {
@@ -114,6 +128,10 @@ export default defineComponent({
     }
   },
   computed: {
+    inMobile(): boolean {
+      // in mobile reactive.
+      return this.windowWidth < 768;
+    },
     cardsCount(): number {
       let count = 0;
       const item = this.item;
@@ -313,8 +331,12 @@ export default defineComponent({
     },
   },
   created() {
+    window.addEventListener('resize', this.updateWindowWidth);
   },
   methods: {
+    updateWindowWidth() {
+      this.windowWidth = window.innerWidth;
+    },
     toggle() {
       this.showChildren = !this.showChildren;
       this.viewCard();
@@ -341,7 +363,10 @@ export default defineComponent({
       if (!newShow) {
         this.userCards.loadUserCards();
       }
-    }
+    },
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.updateWindowWidth);
   }
 });
 

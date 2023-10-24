@@ -7,7 +7,7 @@
           <div class="sp-tab flex gap-2 justify-center items-center my-4 all-loaded">
             <template v-for="(item,menuIndex) in mobileMenus">
               <div class="sp-one-tab ">
-                <a :href="getUrl(item.tag)" class="px-2 block whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
+                <a :href="getUrl(item.tag)" class="px-2 block whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-lg hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
 			                text-decoration-none bg-sp-200"
                    @click.prevent="gotoMenu(item.tag)"
                    :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
