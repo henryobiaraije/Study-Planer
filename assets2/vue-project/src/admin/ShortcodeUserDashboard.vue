@@ -1,7 +1,7 @@
 <template>
   <div class="sp sp-sc-ud min-h-[60vh]">
     <!-- Mobile Tabs -->
-    <div class="">
+    <div v-if="inMobile" class="">
       <div class="flex justify-space-around gap-3">
         <div class="few-items flex-initial">
           <div class="sp-tab flex gap-2 justify-center items-center my-4 all-loaded">
@@ -40,7 +40,7 @@
     </div>
 
     <!-- Desktop Tabs -->
-    <div class="sp-tab flex gap-2 justify-center my-4 all-loaded">
+    <div v-if="!inMobile" class="sp-tab flex gap-2 justify-center my-4 all-loaded">
       <div v-for="(item,menuIndex) in menus" class="sp-one-tab ">
         <a :href="getUrl(item.tag)" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
 			      text-decoration-none bg-sp-200"
@@ -170,6 +170,9 @@ export default defineComponent({
     otherMobileMenu() {
       // Exclude current mobileMenus from menus.
       return this.menus.filter((item) => !this.mobileMenus.includes(item));
+    },
+    inMobile() {
+      return window.innerWidth < 768;
     }
   },
   created() {
