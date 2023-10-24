@@ -411,15 +411,15 @@ export default defineComponent({
     }
   },
   created() {
+    // Shuffle the cards.
+    this.cards = this.cards.sort(() => Math.random() - 0.5);
+    console.log('Shuffled cards', this.cards);
+
     const card = this.cards[this.index];
     setTimeout(() => {
       this.injectImageCardCss(card);
     }, 100);
     this.recordStudyLogStart();
-
-    // Shuffle the cards.
-    this.cards = this.cards.sort(() => Math.random() - 0.5);
-    console.log('Shuffled cards', this.cards);
   },
   data() {
     return {

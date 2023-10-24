@@ -14,7 +14,6 @@ $current_year = date('Y');
     <div class="stats-forecast ">
         <div class="stats-body">
 
-
             <?php /**** Progress Chart   *****/ ?>
             <div class="one-chart shadow p-2 m-2 mb-4 rounded position-relative min-h-[300px]">
                 <h4 class="text-center m-0 bold font-bold fs-4">Progress Chart</h4>
@@ -450,4 +449,5 @@ $current_year = date('Y');
 
         </div>
     </div>
+
 </div>

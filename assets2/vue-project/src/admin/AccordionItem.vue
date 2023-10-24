@@ -23,7 +23,7 @@
               {{ theItem.childrenLength }} {{ theItem.childrenTypeName }}{{ theItem.plural }}
             </div>
           </div>
-          <div class="sp-deck-count lg:flex items-center justify-space-around py-1"
+          <div class="sp-deck-count lg:flex flex-1 items-center justify-space-around py-1"
                :class="[cssLeftRight.right]"
           >
             <div v-if="!inMobile" class="sp-deck-count flex-1 flex items-center justify-space-around py-1"

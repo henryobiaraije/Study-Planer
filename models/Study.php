@@ -839,19 +839,15 @@ class Study extends Model {
 	public static function get_user_stats_progress_chart( $user_id, $year ) {
 		$measure_start_time = microtime( true );
 		//        $matured_cards = self::get_user_matured_card_ids($user_id);
-		$graphable = [
-			'heading'              => [],
-			'days_and_count'       => [],
-			'total_daily_average'  => [],
-			'total_daily_percent'  => [],
-			'total_longest_streak' => [],
-			'total_current_streak' => [],
-		];
+		$graphable = array(
+			'heading'              => array(),
+			'days_and_count'       => array(),
+			'total_daily_average'  => array(),
+			'total_daily_percent'  => array(),
+			'total_longest_streak' => array(),
+			'total_current_streak' => array(),
+		);
 
-		//        $forecast_all_answers_within_a_date = ChartProgress::get_all_answers_count_by_day([
-		//            'user_id' => $user_id,
-		//            "year"    => $year,
-		//        ])['answers'];
 		$days_learnt_count  = ChartProgress::get_days_learnt_count( [
 			'user_id' => $user_id,
 			"year"    => $year,
@@ -881,16 +877,7 @@ class Study extends Model {
 			$_date_minus_1day         = $_date_minus_1day->format( 'Y-m-d' );
 			$current_streak_is_broken = ( $previous_date !== $_date_minus_1day );
 			$previous_date            = $one->the_date;
-			//            Common::send_error([
-			//                __METHOD__,
-			//                '$key'                      => $key,
-			//                '$previous_date'            => $previous_date,
-			//                '$days_learned'             => $days_learned,
-			//                '$days_learnt_count'        => $days_learnt_count,
-			//                '$current_streak_is_broken' => $current_streak_is_broken,
-			//                '$days_learnt_streak'       => $days_learnt_streak,
-			//                '$_date_minus_1day'         => $_date_minus_1day,
-			//            ]);
+
 			if ( $current_streak_is_broken ) {
 				$streak_store[] = [
 					'broken'            => true,
@@ -904,16 +891,6 @@ class Study extends Model {
 				$current_streak = [];
 			}
 			$current_streak[] = $one;
-			//            Common::send_error([
-			//                __METHOD__,
-			//                '$key'                => $key,
-			//                '$day_number'         => $day_number,
-			//                '$days_learned'       => $days_learned,
-			//                //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
-			//                '$days_learnt_count'  => $days_learnt_count,
-			//                '$days_learnt_streak' => $days_learnt_streak,
-			//            ]);
-
 		}
 
 		$graphable['days_and_count']       = $days_learnt_count['answers'];
@@ -922,39 +899,10 @@ class Study extends Model {
 		$graphable['total_longest_streak'] = count( $longest_streak );
 		$graphable['total_current_streak'] = count( $current_streak );
 
-
-		//        Common::send_error([
-		//            __METHOD__,
-		//            '$days_learned'       => $days_learned,
-		//            //            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
-		//            '$days_learnt_count'  => $days_learnt_count,
-		//            '$days_learnt_streak' => $days_learnt_streak,
-		//            '$longest_streak'     => $longest_streak,
-		//            '$streak_store'       => $streak_store,
-		//            '$current_streak'     => $current_streak,
-		//            '$graphable'          => $graphable,
-		//        ]);
-
 		$measure_end_time                       = microtime( true );
 		$measure_execution_time                 = ( $measure_end_time - $measure_start_time );
 		$graphable['zz_measure_execution_time'] = $measure_execution_time;
 		$graphable['zz_debug']                  = self::$sp_debug;
-
-		//        Common::send_error([
-		//            '$start_date'                         => $start_date,
-		//            '$end_date'                           => $end_date,
-		//            '$span'                               => $span,
-		//            '$graphable'                          => $graphable,
-		//            '$total_time_hours'                   => $total_time_hours,
-		//            '$no_of_days'                         => $total_no_of_days,
-		//            '$total_answers_count'                => $total_answers_count,
-		//            '$total_days_studied'                 => $total_days_studied,
-		//            '$days'                               => $days,
-		//            '$__a_count'                          => $__a_count,
-		//            '$days_not_learnt'                    => $days_not_learnt,
-		//            '$forecast_all_answers_within_a_date' => $forecast_all_answers_within_a_date,
-		//            'Manager::getQueryLog()'              => Manager::getQueryLog(),
-		//        ]);
 
 		return [
 			'graphable' => $graphable,

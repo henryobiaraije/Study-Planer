@@ -75,20 +75,43 @@ class UserCard extends Model {
 		);
 
 		// Remove uncategorized deck group.
-		$deck_groups->where( 'id', '!=', $deck_group_uncategorized_id );
+		$deck_groups = $deck_groups->where( 'id', '!=', $deck_group_uncategorized_id );
 
 		// Remove uncategorized deck.
-		$deck_groups->whereHas(
+		$deck_groups = $deck_groups->whereHas(
 			'decks',
 			function ( $query ) use ( $deck_uncategorized_id ) {
 				$query->where( 'id', '!=', $deck_uncategorized_id );
 			}
-		);
+		)->get();
 
-		// Must have some cards.
+		// encode all questions in deck groups.
+		foreach ( $deck_groups as $deck_group ) {
+			foreach ( $deck_group->decks as $deck ) {
+				foreach ( $deck->topics as $topic ) {
+					foreach ( $topic->card_groups as $card_group ) {
+						foreach ( $card_group->cards as $card ) {
+							$card_type = $card->card_group->card_type;
+							if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
+								if ( ! is_array( $card->answer ) ) {
+									$card->answer = json_decode( $card->answer );
+								}
+								if ( ! is_array( $card->question ) ) {
+									$card->question = json_decode( $card->question );
+								}
+								if ( ! is_array( $card_group->whole_question ) ) {
+									$card_group->whole_question = json_decode( $card_group->whole_question );
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 
 		return array(
-			'deck_groups'       => $deck_groups->get()->all(),
+			'deck_groups'       => $deck_groups->all(),
 			'new_card_ids'      => $new_cards['card_ids'],
 			'on_hold_card_ids'  => $last_answered_card_ids['on_hold_and_due_ids'],
 			'revision_card_ids' => $last_answered_card_ids['revision_and_due_ids'],

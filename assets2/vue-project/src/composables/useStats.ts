@@ -1459,16 +1459,11 @@ export default function (status = 'publish') {
     }
 
     const _loadProgressChart = () => {
-        // if (null === statsForecast.value) {
         xhrLoadProgressChart().then((res) => {
-            console.log('Show now');
             _initChartProgressChart();
         }).catch(() => {
-            // todo remove later
-            console.log('Show now');
             _initChartProgressChart();
         });
-        // }
     }
     const _loadForecast = () => {
         // if (null === statsForecast.value) {
@@ -1540,14 +1535,14 @@ export default function (status = 'publish') {
     }
     const _loadAllStats = () => {
         _loadProgressChart();
-        _loadForecast();
-        _loadReviewCount();
-        _loadReviewTime();
-        _loadChartAdded();
-        _loadChartIntervals();
-        _loadChartAnswerButtons();
-        _loadChartHourlyBreakDown();
-        _loadCardTypes();
+        // _loadForecast();
+        // _loadReviewCount();
+        // _loadReviewTime();
+        // _loadChartAdded();
+        // _loadChartIntervals();
+        // _loadChartAnswerButtons();
+        // _loadChartHourlyBreakDown();
+        // _loadCardTypes();
     }
 
     watch(progressSelectedColor, (current, old) => {
@@ -1578,7 +1573,6 @@ export default function (status = 'publish') {
                 },
                 funcFailue(done) {
                     handleAjax.stop();
-                    // handleAjax.error(done);
                     reject();
                 },
             });

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Models\Tag;
+use function StudyPlannerPro\sp_get_user_debug_form;
 
 class Answered extends Model {
 	protected $table = SP_TABLE_ANSWERED;
@@ -33,13 +34,15 @@ class Answered extends Model {
 		'rejected_at',
 		'started_at',
 		'stopped_at',
+		'created_at',
+		'updated_at'
 	];
 
 	protected $dates = [
 		'next_due_at' => 'datetime:Y-m-d H:i:s',
 		'rejected_at' => 'datetime:Y-m-d H:i:s',
-		'created_at'  => 'datetime:Y-m-d H:i:s',
-		'updated_at'  => 'datetime:Y-m-d H:i:s',
+//		'created_at'  => 'datetime:Y-m-d H:i:s',
+//		'updated_at'  => 'datetime:Y-m-d H:i:s',
 	];
 
 	protected $casts = [
