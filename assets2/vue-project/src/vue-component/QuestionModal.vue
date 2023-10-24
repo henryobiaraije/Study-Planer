@@ -416,6 +416,10 @@ export default defineComponent({
       this.injectImageCardCss(card);
     }, 100);
     this.recordStudyLogStart();
+
+    // Shuffle the cards.
+    this.cards = this.cards.sort(() => Math.random() - 0.5);
+    console.log('Shuffled cards', this.cards);
   },
   data() {
     return {
