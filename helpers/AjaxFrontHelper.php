@@ -1300,7 +1300,7 @@ class AjaxFrontHelper {
 
 		$user_id           = get_current_user_id();
 		$user_card_details = UserCard
-			::get_user_cards( $user_id );
+			::get_user_cards_to_study( $user_id );
 
 		Common::send_success( 'Removed successfully', $user_card_details );
 	}

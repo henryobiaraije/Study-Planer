@@ -43,7 +43,7 @@
     <div v-if="showChildren" class="accordion-body" :class="[top && showChildren ? 'pb-2' : '']">
       <template v-if="'topic' !== theItem.itemType">
         <template v-for="(child,childIndex) in theItem.children">
-          <AccordionItem :item="child">
+          <AccordionItem :user-cards="userCards" :item="child">
           </AccordionItem>
         </template>
       </template>
@@ -95,6 +95,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    userCards: {
+      type: Object as () => ReturnType<typeof useUserCards>,
+      required: true,
+    },
   },
   data() {
     return {
@@ -105,11 +109,121 @@ export default defineComponent({
   },
   setup: (props, ctx) => {
     return {
-      userCards: useUserCards(),
+      // userCards: useUserCards(),
       allCards: useAllCards(),
     }
   },
   computed: {
+    cardsCount(): number {
+      let count = 0;
+      const item = this.item;
+      const theItem = this.theItem;
+      if ('deck_group' === theItem.itemType) {
+        count = (item as _DeckGroup).decks.reduce((acc, deck) => {
+          return acc + deck.topics.reduce((acc, topic) => {
+            return acc + topic.card_groups.reduce((acc, cardGroup) => {
+              return acc + cardGroup.cards.length;
+            }, 0);
+          }, 0);
+        }, 0);
+      } else if ('deck' === theItem.itemType) {
+        count = (item as _Deck).topics.reduce((acc, topic) => {
+          return acc + topic.card_groups.reduce((acc, cardGroup) => {
+            return acc + cardGroup.cards.length;
+          }, 0);
+        }, 0);
+      } else if ('topic' === theItem.itemType) {
+        count = (item as _Topic).card_groups.reduce((acc, cardGroup) => {
+          return acc + cardGroup.cards.length;
+        }, 0);
+      }
+
+      return count;
+    },
+    cardsCountByType(): { newCards: number, revision: number, onHold: number } {
+      const counts = {
+        newCards: 0,
+        revision: 0,
+        onHold: 0,
+      };
+
+      const item = this.item;
+      const theItem = this.theItem;
+      const userCards = this.userCards;
+      const newCardIds: number[] = userCards.newCardIds.value;
+      const revisionCardIds: number[] = userCards.revisionCardIds.value;
+      const holdCardIds: number[] = userCards.onHoldCardIds.value;
+
+      if ('deck_group' === theItem.itemType) {
+        counts.newCards = (item as _DeckGroup).decks.reduce((acc, deck) => {
+          return acc + deck.topics.reduce((acc, topic) => {
+            return acc + topic.card_groups.reduce((acc, cardGroup) => {
+              return acc + cardGroup.cards.reduce((acc, card) => {
+                return acc + (newCardIds.includes(card.id as number) ? 1 : 0);
+              }, 0);
+            }, 0);
+          }, 0);
+        }, 0);
+        counts.revision = (item as _DeckGroup).decks.reduce((acc, deck) => {
+          return acc + deck.topics.reduce((acc, topic) => {
+            return acc + topic.card_groups.reduce((acc, cardGroup) => {
+              return acc + cardGroup.cards.reduce((acc, card) => {
+                return acc + (revisionCardIds.includes(card.id as number) ? 1 : 0);
+              }, 0);
+            }, 0);
+          }, 0);
+        }, 0);
+        counts.onHold = (item as _DeckGroup).decks.reduce((acc, deck) => {
+          return acc + deck.topics.reduce((acc, topic) => {
+            return acc + topic.card_groups.reduce((acc, cardGroup) => {
+              return acc + cardGroup.cards.reduce((acc, card) => {
+                return acc + (holdCardIds.includes(card.id as number) ? 1 : 0);
+              }, 0);
+            }, 0);
+          }, 0);
+        }, 0);
+      } else if ('deck' === theItem.itemType) {
+        counts.newCards = (item as _Deck).topics.reduce((acc, topic) => {
+          return acc + topic.card_groups.reduce((acc, cardGroup) => {
+            return acc + cardGroup.cards.reduce((acc, card) => {
+              return acc + (newCardIds.includes(card.id as number) ? 1 : 0);
+            }, 0);
+          }, 0);
+        }, 0);
+        counts.revision = (item as _Deck).topics.reduce((acc, topic) => {
+          return acc + topic.card_groups.reduce((acc, cardGroup) => {
+            return acc + cardGroup.cards.reduce((acc, card) => {
+              return acc + (revisionCardIds.includes(card.id as number) ? 1 : 0);
+            }, 0);
+          }, 0);
+        }, 0);
+        counts.onHold = (item as _Deck).topics.reduce((acc, topic) => {
+          return acc + topic.card_groups.reduce((acc, cardGroup) => {
+            return acc + cardGroup.cards.reduce((acc, card) => {
+              return acc + (holdCardIds.includes(card.id as number) ? 1 : 0);
+            }, 0);
+          }, 0);
+        }, 0);
+      } else if ('topic' === theItem.itemType) {
+        counts.newCards = (item as _Topic).card_groups.reduce((acc, cardGroup) => {
+          return acc + cardGroup.cards.reduce((acc, card) => {
+            return acc + (newCardIds.includes(card.id as number) ? 1 : 0);
+          }, 0);
+        }, 0);
+        counts.revision = (item as _Topic).card_groups.reduce((acc, cardGroup) => {
+          return acc + cardGroup.cards.reduce((acc, card) => {
+            return acc + (revisionCardIds.includes(card.id as number) ? 1 : 0);
+          }, 0);
+        }, 0);
+        counts.onHold = (item as _Topic).card_groups.reduce((acc, cardGroup) => {
+          return acc + cardGroup.cards.reduce((acc, card) => {
+            return acc + (holdCardIds.includes(card.id as number) ? 1 : 0);
+          }, 0);
+        }, 0);
+      }
+
+      return counts;
+    },
     theItem() {
       const item = this.item;
       const id = item.id;
@@ -168,15 +282,15 @@ export default defineComponent({
       return {
         onHold: {
           title: 'On hold',
-          count: 0,
+          count: this.cardsCountByType.onHold,
         },
         revision: {
           title: 'Revision',
-          count: 0,
+          count: this.cardsCountByType.revision,
         },
         newCards: {
           title: 'New Cards',
-          count: 0,
+          count: this.cardsCountByType.newCards,
         },
       }
     },

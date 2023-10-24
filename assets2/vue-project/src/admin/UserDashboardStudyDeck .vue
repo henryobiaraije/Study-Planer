@@ -3,7 +3,7 @@
     <v-progress-linear v-if="userCards.ajaxLoadUserCard.value.sending" color="primary"
                        indeterminate></v-progress-linear>
     <template v-for="(group,groupIndex) in userDeckGroups">
-      <AccordionItem :item="group" :top="true">
+      <AccordionItem :user-cards="userCards" :item="group" :top="true">
         <!--        <template v-slot:body v-for="(deck,deckIndex) in group.decks">-->
         <!--          <AccordionItem :item="deck">-->
         <!--            <template v-slot:body v-for="(cardGroup,cardGroupIndex) in deck.card_groups">-->
