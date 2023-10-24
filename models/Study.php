@@ -314,13 +314,6 @@ class Study extends Model {
 			} else {
 				$end_date = $newest_answer_query->get()->first()->next_due_at;
 			}
-			//            Common::send_error([
-			//                __METHOD__,
-			//                '$newest_answer_query sql' => $newest_answer_query->toSql(),
-			//                '$_date ' => $_date,
-			//                '$newest_answer_query sql getBindings' => $newest_answer_query->getBindings(),
-			//                '$newest_answer_query get' => $newest_answer_query->get(),
-			//            ]);
 		}
 		if ( 'all' !== $span ) {
 			$end_date = $_date->format( 'Y-m-d H:i:s' );
@@ -375,23 +368,6 @@ class Study extends Model {
 				$days[ $day_diff_today ]['y']['count'] ++;
 				$days[ $day_diff_today ]['y']['answers'][] = $answer;
 			}
-
-			//            Common::send_error([
-			//                '$no_to_revise'                  => $no_to_revise,
-			//                '$answer'                        => $answer,
-			//                '$no_on_hold'                    => $no_on_hold,
-			//                '$revise_all'                    => $revise_all,
-			//                '$study_all_on_hold'             => $study_all_on_hold,
-			//                '$day_dif'                       => $day_dif,
-			//                '$start_date'                    => $start_date,
-			//                '$end_date'                      => $end_date,
-			//                '$span'                          => $span,
-			//                '$no_of_days'                    => $no_of_days,
-			//                '$days'                          => $days,
-			//                '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
-			//                '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
-			//                'Manager::getQueryLog()'         => Manager::getQueryLog(),
-			//            ]);
 		}
 
 		// Form young cards from new cards and spread them by no_of_new per study
@@ -399,11 +375,7 @@ class Study extends Model {
 		$card_groups  = collect( $forecast_new_cards_to_study )
 			->pluck( 'card_groups' );
 		foreach ( $card_groups as $_card_group ) {
-			$all_new_cards = $_card_group->pluck( 'cards' )->flatten();
-			//            Common::send_error([
-			//                '$hold_studies'  => $hold_studies,
-			//                '$all_new_cards' => $all_new_cards,
-			//            ]);
+			$all_new_cards  = $_card_group->pluck( 'cards' )->flatten();
 			$_new_day_index = 0;
 			foreach ( $all_new_cards as $key => $new_card ) {
 				$study         = $new_card->study;
@@ -437,17 +409,6 @@ class Study extends Model {
 					$days[0]['y']['count'] ++;
 					$days[0]['y']['new_cards'][] = $new_card;
 				} else {
-					//                if (1 === $key) {
-					//                    Common::send_error([
-					//                        __METHOD__,
-					//                        '$key'            => $key,
-					//                        '$hold_studies'   => $hold_studies,
-					//                        '$_new_day_index' => $_new_day_index,
-					//                        '$study_id'       => $study_id,
-					//                        '$no_of_new'      => $no_of_new,
-					//                        'count count'     => $hold_studies[$study_id][$_new_day_index]['count'],
-					//                    ]);
-					//                }
 					if ( $hold_studies[ $study_id ][ $_new_day_index ]['count'] >= $no_of_new ) {
 						$_new_day_index ++;
 					}
@@ -475,33 +436,12 @@ class Study extends Model {
 					$days[ $_new_day_index ]['y']['count'] ++;
 					$days[ $_new_day_index ]['y']['new_cards'][] = $new_card;
 				}
-				//            if (3 === $key) {
-				//                Common::send_error([
-				//                    __METHOD__,
-				//                    '$key'            => $key,
-				//                    '$hold_studies'   => $hold_studies,
-				//                    '$_new_day_index' => $_new_day_index,
-				//                    '$study_id'       => $study_id,
-				//                    '$no_of_new'      => $no_of_new,
-				//                ]);
-				//            }
 			}
 		}
 
 
 		$cumulative_count = 0;
 		foreach ( $days as $key => $day ) {
-			//            if (0 === $key) {
-			//                $graphable['y'][]                    = 0;
-			//                $graphable['m'][]                    = 0;
-			//                $cumulative_count                    += 0;
-			//                $graphable['total_reviews']          += 0;
-			//                $graphable['cumulative'][]           = $cumulative_count;
-			//                $graphable['y_debug']['answers'][]   = $day['m']['answers'];
-			//                $graphable['y_debug']['new_cards'][] = $day['y']['new_cards'];
-			//                $graphable['m_debug']['answers'][]   = $day['m']['answers'];
-			//                continue;
-			//            }
 			$graphable['y'][]                    = $day['y']['count'];
 			$graphable['m'][]                    = $day['m']['count'];
 			$cumulative_count                    += ( $day['m']['count'] + $day['y']['count'] );
@@ -517,27 +457,9 @@ class Study extends Model {
 		$graphable['average'] = $graphable['total_reviews'] / $no_of_days;
 		$graphable['average'] = number_format( $graphable['average'], 2 );
 
-		//        Common::send_error([
-		//            '$hold_studies'                  => $hold_studies,
-		//            '$study_all_new'                 => $study_all_new,
-		//            '$card_groups'                   => $card_groups,
-		//            '$_new_day_index'                => $_new_day_index,
-		//            '$all_new_cards'                 => $all_new_cards,
-		//            '$start_date'                    => $start_date,
-		//            '$end_date'                      => $end_date,
-		//            '$span'                          => $span,
-		//            '$graphable'                     => $graphable,
-		//            '$no_of_days'                    => $no_of_days,
-		//            '$days'                          => $days,
-		//            '$forecast_new_cards_to_study'   => $forecast_new_cards_to_study,
-		//            '$forecast_all_answers_distinct' => $forecast_all_answers_distinct,
-		//            'Manager::getQueryLog()'         => Manager::getQueryLog(),
-		//        ]);
-
 		return [
 			'graphable' => $graphable,
 		];
-
 
 	}
 

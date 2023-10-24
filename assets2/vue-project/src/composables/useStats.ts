@@ -80,6 +80,16 @@ interface _ReviewGraphable {
         answer: Array<any>;
         new_cards: Array<any>;
     };
+    //
+    days_studied_percent: string;
+    days_studied_count: string;
+    total_days: string;
+    average_if_studied_per_day: string;
+    formed_total_time: string;
+    average_time_for_days_studied_minutes: string;
+    average_time_if_studied_every_day_minutes: string;
+    average_answered_cards_per_seconds_time: string;
+    average_answer_cards_per_minute: string;
 }
 
 interface _ChartAddedGraphable {
@@ -118,6 +128,8 @@ interface _ChartIntervalGraphable {
     heading: Array<string>;
     day_diffs: Array<number>;
     day_diff_percentages: Array<number>;
+    day_diff_average: string;
+    longest_interval: string;
 }
 
 interface _ChartHourlyBreakdownGraphable {
@@ -1535,14 +1547,14 @@ export default function (status = 'publish') {
     }
     const _loadAllStats = () => {
         _loadProgressChart();
-        // _loadForecast();
-        // _loadReviewCount();
-        // _loadReviewTime();
-        // _loadChartAdded();
-        // _loadChartIntervals();
-        // _loadChartAnswerButtons();
-        // _loadChartHourlyBreakDown();
-        // _loadCardTypes();
+        _loadForecast();
+        _loadReviewCount();
+        _loadReviewTime();
+        _loadChartAdded();
+        _loadChartIntervals();
+        _loadChartAnswerButtons();
+        _loadChartHourlyBreakDown();
+        _loadCardTypes();
     }
 
     watch(progressSelectedColor, (current, old) => {

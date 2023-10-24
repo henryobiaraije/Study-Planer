@@ -222,10 +222,6 @@ class AjaxFrontHelper {
 
 	public function ajax_front_load_stats_forecast( $post ): void {
 		Initializer::verify_post( $post, true );
-		//			Common::send_error( [
-		//				'ajax_front_load_stats_forecast',
-		//				'post' => $post,
-		//			] );
 
 		$all     = $post[ Common::VAR_2 ];
 		$span    = sanitize_text_field( $all['span'] );
@@ -233,11 +229,6 @@ class AjaxFrontHelper {
 		$user_id = get_current_user_id();
 
 		$forecast = Study::get_user_card_forecast( $user_id, $span );
-		//        Common::send_error([
-		//            'ajax_front_load_stats_forecast',
-		//            'post'  => $post,
-		//            '$span' => $span,
-		//        ]);
 
 		Common::send_success( 'Forecast here', $forecast );
 
