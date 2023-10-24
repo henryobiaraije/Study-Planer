@@ -47,36 +47,52 @@ class UserCard extends Model {
 		$user_study    = sp_get_user_study( $user_id );
 		$user_study_id = $user_study->id;
 
-		$all_user_cards = self::get_all_user_cards( $user_id );
-		$answered       = self::get_all_answered_user_cards( $user_id, $user_study_id );
-		$new_cards      = self::get_new_cards( $user_id, $user_study_id, $answered['card_ids'] );
-
+		$all_user_cards         = self::get_all_user_cards( $user_id );
+		$last_answered_card_ids = self::get_all_last_answered_user_cards( $user_id, $user_study_id );
+		$new_cards              = self::get_new_cards( $user_id, $user_study_id, $last_answered_card_ids['card_ids'] );
+		// $cards_on_hold          = self::get_cards_on_hold_for_today(
+		// $user_id,
+		// $user_study_id,
+		// $last_answered_card_ids['on_hold_and_due']
+		// );
 
 		// Get cards organized by deck groups, decks, topics and card_groups.
-		$deck_groups = DeckGroup
-			::with( [
-				'decks.topics.card_groups.cards' => function ( $q ) use ( $new_cards ) {
-					$q->whereIn( 'id', $new_cards['card_ids'] );
-				}
-			] );
+		$deck_groups = DeckGroup::with(
+			array(
+				'decks.topics.card_groups.cards' => function ( $q ) use ( $new_cards, $last_answered_card_ids ) {
+					$q->whereIn(
+						'id',
+						array_values(
+							array_merge(
+								$new_cards['card_ids'],
+								$last_answered_card_ids['on_hold_and_due_ids'],
+								$last_answered_card_ids['revision_and_due_ids']
+							)
+						)
+					);
+				},
+			)
+		);
 
 		// Remove uncategorized deck group.
 		$deck_groups->where( 'id', '!=', $deck_group_uncategorized_id );
 
 		// Remove uncategorized deck.
-		$deck_groups->whereHas( 'decks', function ( $query ) use ( $deck_uncategorized_id ) {
-			$query->where( 'id', '!=', $deck_uncategorized_id );
-		} );
+		$deck_groups->whereHas(
+			'decks',
+			function ( $query ) use ( $deck_uncategorized_id ) {
+				$query->where( 'id', '!=', $deck_uncategorized_id );
+			}
+		);
 
 		// Must have some cards.
 
-
-		return [
+		return array(
 			'deck_groups'       => $deck_groups->get()->all(),
 			'new_card_ids'      => $new_cards['card_ids'],
-			'on_hold_card_ids'  => [],
-			'revision_card_ids' => [],
-		];
+			'on_hold_card_ids'  => $last_answered_card_ids['on_hold_and_due_ids'],
+			'revision_card_ids' => $last_answered_card_ids['revision_and_due_ids'],
+		);
 	}
 
 	/**
@@ -87,14 +103,13 @@ class UserCard extends Model {
 	 * @return array
 	 */
 	public static function get_all_user_cards( int $user_id ): array {
-		$user_cards = self
-			::query()
-			->with( 'card_group.cards' )
-			->where( 'user_id', '=', $user_id )
-			->get()->all();
+		$user_cards = self::query()
+		                  ->with( 'card_group.cards' )
+		                  ->where( 'user_id', '=', $user_id )
+		                  ->get()->all();
 
-		$cards    = [];
-		$card_ids = [];
+		$cards    = array();
+		$card_ids = array();
 		foreach ( $user_cards as $user_card ) {
 			$card_group               = $user_card->card_group;
 			$cards[ $card_group->id ] = $card_group->cards;
@@ -110,28 +125,38 @@ class UserCard extends Model {
 	}
 
 	/**
-	 * Get all answered user cards.
+	 * Get all answered last answered cards.
 	 *
 	 * @param int $user_id The user's id.
 	 * @param int $user_study_id The user's study id.
 	 *
 	 * @return array
 	 */
-	public static function get_all_answered_user_cards( int $user_id, int $user_study_id ): array {
+	public static function get_all_last_answered_user_cards( int $user_id, int $user_study_id ): array {
+		$card_answered = Answered::query()
+		                         ->with(
+			                         array(
+				                         'card',
+				                         'study' => function ( $q ) use ( $user_study_id ) {
+					                         $q->where( 'id', '=', $user_study_id );
+				                         },
+			                         )
+		                         )
+		                         ->groupBy( 'card_id' )
+		                         ->orderBy( 'created_at', 'desc' )
+		                         ->get()->all();
 
-		$card_answered = Answered
-			::query()
-			->with( [
-				'card',
-				'study' => function ( $q ) use ( $user_study_id ) {
-					$q->where( 'id', '=', $user_study_id );
-				}
-			] )
-			->groupBy( 'card_id' )
-			->get()->all();
+		/**
+		 * @var string $today
+		 */
+		$today = Common::getDateTime();
 
-		$cards    = [];
-		$card_ids = [];
+		$cards                     = array();
+		$card_ids                  = array();
+		$cards_on_hold             = array();
+		$cards_on_hold_and_due     = array();
+		$cards_in_revision         = array();
+		$cards_in_revision_and_due = array();
 		foreach ( $card_answered as $answered ) {
 			$card = $answered->card;
 			if ( ! $card ) {
@@ -139,11 +164,44 @@ class UserCard extends Model {
 			}
 			$cards[]    = $card;
 			$card_ids[] = $card->id;
+			if ( $answered->status === 'on_hold' ) {
+				$cards_on_hold[] = $card;
+			} else {
+				$cards_in_revision[] = $card;
+			}
+
+			// Check if card is due today.
+
+			$card_due_date = $answered->next_due_at;
+			// e.i. if due date is today or before today.
+			if ( strtotime( $card_due_date ) <= strtotime( date( 'Y-m-d', strtotime( $today ) ) ) ) {
+				if ( $answered->status === 'on_hold' ) {
+					$cards_on_hold_and_due[] = $card;
+				} else {
+					$cards_in_revision_and_due[] = $card;
+				}
+			}
 		}
 
 		return array(
-			'cards'    => $cards,
-			'card_ids' => $card_ids,
+			'cards'                => $cards,
+			'card_ids'             => $card_ids,
+			'on_hold'              => $cards_on_hold,
+			'on_hold_and_due'      => $cards_on_hold_and_due,
+			'on_hold_and_due_ids'  => array_map(
+				static function ( $card ) {
+					return $card->id;
+				},
+				$cards_on_hold_and_due
+			),
+			'revision'             => $cards_in_revision,
+			'revision_and_due'     => $cards_in_revision_and_due,
+			'revision_and_due_ids' => array_map(
+				static function ( $card ) {
+					return $card->id;
+				},
+				$cards_in_revision_and_due
+			),
 		);
 	}
 
@@ -152,32 +210,32 @@ class UserCard extends Model {
 	 *
 	 * @param int $user_id The user's id.
 	 * @param int $user_study_id The user's study id.
-	 * @param array $answered_card_ids The card ids that has been answered.
+	 * @param array $last_answered_card_ids The last answered card ids.
 	 *
 	 * @return int[]
 	 */
-	public static function get_new_cards( int $user_id, int $user_study_id, array $answered_card_ids = [] ): array {
+	public static function get_new_cards( int $user_id, int $user_study_id, array $last_answered_card_ids = array() ): array {
 
 		$user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
 		$user_timezone_midnight_today      = get_user_timezone_date_midnight_today( $user_id );
 		$all_users_card                    = self::get_all_user_cards( $user_id );
 
-		$card_groups = self
-			::query()
-			->where( 'user_id', '=', $user_id )
-			->with( [
-				'card_group.cards' => function ( $query ) use ( $all_users_card, $answered_card_ids ) {
-					// Exclude all cards that has been Answered before.
-					$query
-						->whereIn( 'id', $all_users_card['card_ids'] )
-						->whereNotIn( 'id', $answered_card_ids );
-				}
-			] )->get()->all();
-
+		$card_groups = self::query()
+		                   ->where( 'user_id', '=', $user_id )
+		                   ->with(
+			                   array(
+				                   'card_group.cards' => function ( $query ) use ( $all_users_card, $last_answered_card_ids ) {
+					                   // Exclude all cards that has been Answered before.
+					                   $query
+						                   ->whereIn( 'id', $all_users_card['card_ids'] )
+						                   ->whereNotIn( 'id', $last_answered_card_ids );
+				                   },
+			                   )
+		                   )->get()->all();
 
 		// return card ids.
-		$card_ids = [];
-		$cards    = [];
+		$card_ids = array();
+		$cards    = array();
 		foreach ( $card_groups as $user_card ) {
 			foreach ( $user_card->card_group->cards as $card ) {
 				$card_ids[] = $card->id;
@@ -190,6 +248,94 @@ class UserCard extends Model {
 			'card_ids' => $card_ids,
 		);
 	}
+
+	/**
+	 * Get all cards on hold for today.
+	 *
+	 * @param int $user_id The user's id.
+	 * @param int $user_study_id The user's study id.
+	 * @param array $last_answered_card_ids_on_hold_and_due The last answered card ids that are on hold and are due.
+	 *
+	 * @return int[]
+	 */
+	public static function get_cards_on_hold_for_today( int $user_id, int $user_study_id, array $last_answered_card_ids_on_hold_and_due = array() ): array {
+		// $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
+		// $user_timezone_midnight_today      = get_user_timezone_date_midnight_today( $user_id );
+		$all_users_card = self::get_all_user_cards( $user_id );
+
+		$card_groups = self::query()
+		                   ->where( 'user_id', '=', $user_id )
+		                   ->with(
+			                   array(
+				                   'card_group.cards' => function ( $query ) use ( $all_users_card, $last_answered_card_ids_on_hold_and_due ) {
+					                   // Exclude all cards that has been Answered before.
+					                   $query
+						                   ->whereIn( 'id', $last_answered_card_ids_on_hold_and_due );
+				                   },
+			                   )
+		                   )
+		                   ->get()->all();
+
+		// return card ids.
+		$card_ids = array();
+		$cards    = array();
+		foreach ( $card_groups as $user_card ) {
+			foreach ( $user_card->card_group->cards as $card ) {
+				$card_ids[] = $card->id;
+				$cards[]    = $card;
+			}
+		}
+
+		return array(
+			'cards'    => $cards,
+			'card_ids' => $card_ids,
+		);
+	}
+
+
+	/**
+	 * Get all cards in revision for today.
+	 *
+	 * @param int $user_id The user's id.
+	 * @param int $user_study_id The user's study id.
+	 * @param array $last_answered_card_ids_in_revision_and_due The last answered card ids that are on hold and are due.
+	 *
+	 * @return int[]
+	 */
+	public static function get_cards_in_revision_for_today( int $user_id, int $user_study_id, array $last_answered_card_ids_in_revision_and_due = array() ): array {
+		// $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
+		// $user_timezone_midnight_today      = get_user_timezone_date_midnight_today( $user_id );
+		$all_users_card = self::get_all_user_cards( $user_id );
+
+		$card_groups = self::query()
+		                   ->where( 'user_id', '=', $user_id )
+		                   ->with(
+			                   array(
+				                   'card_group.cards' => function ( $query ) use ( $all_users_card, $last_answered_card_ids_in_revision_and_due ) {
+					                   // Exclude all cards that has been Answered before.
+					                   $query
+						                   ->whereIn( 'id', $last_answered_card_ids_in_revision_and_due );
+				                   },
+			                   )
+		                   )
+		                   ->get()->all();
+
+		// return card ids.
+		$card_ids = array();
+		$cards    = array();
+		foreach ( $card_groups as $user_card ) {
+			foreach ( $user_card->card_group->cards as $card ) {
+				$card_ids[] = $card->id;
+				$cards[]    = $card;
+			}
+		}
+
+		return array(
+			'cards'    => $cards,
+			'card_ids' => $card_ids,
+		);
+	}
+
 
 }
 

@@ -273,7 +273,6 @@ export default defineComponent({
     currentQuestion(): _Card {
       return this.cards[this.index];
     },
-
   },
   methods: {
     _showAnswer() {

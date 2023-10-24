@@ -362,12 +362,12 @@ export default function (status = 'publish') {
                 }>) {
                     handleAjax.stop();
                     userDeckGroups.value = sortCardByCardCountOnGroups(done.data.deck_groups);
-                    // newCardIds.value = done.data.new_card_ids;
-                    // onHoldCardIds.value = done.data.on_hold_card_ids;
-                    // revisionCardIds.value = done.data.revision_card_ids;
-                    newCardIds.value = [42, 43];
-                    onHoldCardIds.value = [44, 45];
-                    revisionCardIds.value = [46];
+                    newCardIds.value = done.data.new_card_ids;
+                    onHoldCardIds.value = done.data.on_hold_card_ids;
+                    revisionCardIds.value = done.data.revision_card_ids;
+                    // newCardIds.value = [42, 43];
+                    // onHoldCardIds.value = [44, 45];
+                    // revisionCardIds.value = [46];
 
                     resolve(done);
                 },
@@ -411,7 +411,8 @@ export default function (status = 'publish') {
         })
     };
     const xhrSaveUserDebugForm = () => {
-        const handleAjax: HandleAjax = new HandleAjax(ajaxLoadUserCard.value);
+
+        const handleAjax: HandleAjax = new HandleAjax(ajaxLoadDebugForm.value);
         return new Promise((resolve, reject) => {
             new Server().send_online({
                 data: [

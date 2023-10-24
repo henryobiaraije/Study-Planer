@@ -193,6 +193,7 @@ export default defineComponent({
         counts.revision = (item as _Deck).topics.reduce((acc, topic) => {
           return acc + topic.card_groups.reduce((acc, cardGroup) => {
             return acc + cardGroup.cards.reduce((acc, card) => {
+
               return acc + (revisionCardIds.includes(card.id as number) ? 1 : 0);
             }, 0);
           }, 0);

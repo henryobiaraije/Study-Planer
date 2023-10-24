@@ -1,6 +1,43 @@
 <template>
   <div class="sp sp-sc-ud min-h-[60vh]">
-    <!-- Tabs -->
+    <!-- Mobile Tabs -->
+    <div class="hidden">
+      <div class="flex justify-space-around gap-3">
+        <div class="few-items flex-initial">
+          <div class="sp-tab flex gap-2 justify-center items-center my-4 all-loaded">
+            <template v-for="(item,menuIndex) in menus">
+              <div class="sp-one-tab ">
+                <template v-if="2 > menuIndex">
+                  <a :href="getUrl(item.tag)" class="px-2 block whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
+			                text-decoration-none bg-sp-200"
+                     @click.prevent="gotoMenu(item.tag)"
+                     :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
+                  >{{ item.title }}</a>
+                </template>
+              </div>
+            </template>
+            <div class="other-items flex items-end flex-initial">
+              <v-btn id="menu-activator"
+                     color="bg-sp-100" icon="mdi-menu" size="small"></v-btn>
+
+              <v-menu activator="#menu-activator">
+                <v-list>
+                  <v-list-item
+                      v-for="(item, index) in menus"
+                      :key="index"
+                      :value="index"
+                  >
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Tabs -->
     <div class="sp-tab flex gap-2 justify-center my-4 all-loaded">
       <div v-for="(item,menuIndex) in menus" class="sp-one-tab ">
         <a :href="getUrl(item.tag)" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
@@ -9,25 +46,6 @@
            :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
         >{{ item.title }}</a>
       </div>
-      <!--      <div class="sp-one-tab ">-->
-      <!--        <a :href="getUrl('stats')"-->
-      <!--           class="px-2 whitespace-nowrap  md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400 hover:text-white focus:text-white cursor-pointer text-decoration-none bg-sp-200"-->
-      <!--           @click.prevent="gotoMenu('stats')"-->
-      <!--           :class="[menu === 'stats' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Stats</a>-->
-      <!--      </div>-->
-      <!--      <div class="sp-one-tab ">-->
-      <!--        <a :href="getUrl('settings')"-->
-      <!--           class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer text-decoration-none bg-sp-200"-->
-      <!--           @click.prevent="gotoMenu('settings')"-->
-      <!--           :class="[menu === 'settings' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Settings</a>-->
-      <!--      </div>-->
-      <!--      <div class="sp-one-tab ">-->
-      <!--        <a :href="getUrl('profile')"-->
-      <!--           class="px-2 whitespace-nowrap text-sp-800 md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer text-decoration-none-->
-      <!--			bg-sp-200"-->
-      <!--           @click.prevent="gotoMenu('profile')"-->
-      <!--           :class="[menu === 'profile' ? 'font-bold bg-sp-500 text-white' : 'text-sp-800']">Profile</a>-->
-      <!--      </div>-->
     </div>
 
     <div v-for="(item,itemIndex) in menus" class="section-profile">
@@ -35,27 +53,6 @@
         <component :is="item.comp" v-bind="item.props"/>
       </template>
     </div>
-
-    <!--    <?php /** Question display modal */ ?>-->
-    <!--    <div>-->
-    <!--      <?php \StudyPlannerPro\load_template('shortcodes/dashboard/study-complete-modal'); ?>-->
-    <!--    </div>-->
-
-
-    <!--    <?php /** Edit Study Modal */ ?>-->
-    <!--    <div>-->
-    <!--      <?php \StudyPlannerPro\load_template('shortcodes/dashboard/study-modal'); ?>-->
-    <!--    </div>-->
-
-    <!--    <?php /** Question display modal */ ?>-->
-    <!--    <div>-->
-    <!--      <?php \StudyPlannerPro\load_template('shortcodes/dashboard/question-modal'); ?>-->
-    <!--    </div>-->
-
-    <!--    <?php /** Modal Chart Deck's card type */ ?>-->
-    <!--    <div>-->
-    <!--      <?php \StudyPlannerPro\load_template('shortcodes/dashboard/modal-decks-card-types-chart'); ?>-->
-    <!--    </div>-->
 
   </div>
   <!--  <ModalsContainer/>-->
