@@ -27,6 +27,7 @@
           hide-details="auto"
           v-model="userCard.debugForm.value.current_study_date"
           type="datetime-local"
+          :loading="userCard.ajaxLoadDebugForm.value.sending"
       ></v-text-field>
       <!--      <v-datetime-picker-->
       <!--          label="Current Date"-->
