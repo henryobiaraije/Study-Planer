@@ -42,7 +42,7 @@
     <!-- Desktop Tabs -->
     <div v-if="!inMobile" class="sp-tab flex gap-2 justify-center my-4 all-loaded">
       <div v-for="(item,menuIndex) in menus" class="sp-one-tab ">
-        <a :href="getUrl(item.tag)" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-2xl hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
+        <a :href="getUrl(item.tag)" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-lg hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
 			      text-decoration-none bg-sp-200"
            @click.prevent="gotoMenu(item.tag)"
            :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
@@ -77,6 +77,7 @@ import UserDashboardAddCard from "@/admin/UserDashboardAddCard.vue";
 import UserDashboardNewCards from "@/admin/UserDashboardNewCards.vue";
 import UserDashboardRemoveCards from "@/admin/UserDashboardRemoveCards.vue";
 import UserDashboardStudyDeck from "@/admin/UserDashboardStudyDeck .vue";
+import UserDashboardStats from "@/admin/UserDashboardStats.vue";
 
 export default defineComponent({
   name: 'ShortcodeUserDashboard',
@@ -85,6 +86,7 @@ export default defineComponent({
   data() {
     return {
       menu: 'study-deck',
+      windowWidth: window.innerWidth,
     }
   },
   setup: (props, ctx) => {
@@ -97,6 +99,10 @@ export default defineComponent({
     }
   },
   computed: {
+    inMobile(): boolean {
+      // in mobile reactive.
+      return this.windowWidth < 768;
+    },
     menus() {
       return [
         // {
@@ -130,7 +136,7 @@ export default defineComponent({
         {
           title: 'Stats',
           tag: 'stats',
-          comp: null,
+          comp: UserDashboardStats,
           props: {},
         },
         {
@@ -171,9 +177,6 @@ export default defineComponent({
       // Exclude current mobileMenus from menus.
       return this.menus.filter((item) => !this.mobileMenus.includes(item));
     },
-    inMobile() {
-      return window.innerWidth < 768;
-    }
   },
   created() {
     // this.userDash.load().then(() => {
@@ -187,8 +190,12 @@ export default defineComponent({
      @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;1,300&display=swap');
     </style>`
     );
+    window.addEventListener('resize', this.updateWindowWidth);
   },
   methods: {
+    updateWindowWidth() {
+      this.windowWidth = window.innerWidth;
+    },
     generalInit() {
       const key = 'dashboard-page';
       const url = new URL(window.location.href);
@@ -234,6 +241,9 @@ export default defineComponent({
         this.userProfile._loadProfile();
       }
     },
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.updateWindowWidth);
   }
 });
 
