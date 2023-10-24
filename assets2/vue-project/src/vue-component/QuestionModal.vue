@@ -20,10 +20,10 @@
             <v-carousel-item
                 v-for="(oneCard, cardIndex) in cards"
                 :key="cardIndex"
-                :src="oneCard.card_group.bg_image_url"
             >
               <v-sheet
                   height="100%"
+                  style="background: transparent !important;"
               >
                 <div class="d-flex fill-height justify-center align-center">
                   <!--                <div class="text-h2">-->
