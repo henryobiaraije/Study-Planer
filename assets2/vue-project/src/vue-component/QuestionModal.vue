@@ -1,7 +1,7 @@
 <template>
   <!--  <div class="sp sp-modal">-->
   <div class="admin-image-card">
-    <form @submit.prevent="" class="modal-content min-w-[90vh]" style="height: 100%;">
+    <form @submit.prevent="" class="modal-content min-w-[90vw]" style="height: 100%;">
       <div class="mb-4">
         <!--              <?php \StudyPlannerPro\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>-->
       </div>
@@ -245,7 +245,7 @@
 
         </div>
         <v-alert
-            v-if="allAnswered"
+            v-if="allAnswered && 'study' === purpose"
             type="success"
             border="start"
             variant="tonal"

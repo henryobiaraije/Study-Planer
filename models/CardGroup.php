@@ -547,6 +547,24 @@ class CardGroup extends Model {
 			->with( 'cards', 'deck.deck_group', 'topic', 'collection' )
 			->get();
 
+		// Convert table and image card questions and anwers to array.
+		foreach ( $card_groups as $card_group ) {
+			foreach ( $card_group->cards as $card ) {
+				$card_type = $card->card_group->card_type;
+				if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
+					if ( ! is_array( $card->answer ) ) {
+						$card->answer = json_decode( $card->answer );
+					}
+					if ( ! is_array( $card->question ) ) {
+						$card->question = json_decode( $card->question );
+					}
+					if ( ! is_array( $card_group->whole_question ) ) {
+						$card_group->whole_question = json_decode( $card_group->whole_question );
+					}
+				}
+			}
+		}
+
 		// Process card data as needed
 
 		return [
