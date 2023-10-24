@@ -3,7 +3,7 @@
     <div class="accordion-header" :class="[top && !showChildren ? 'pb-2':'']">
       <!-- Header -->
       <div class="sp-deck-group-header border-b border-gray-100">
-        <div @click="toggle('.decks-'+theItem.id)" class="sp-header-title flex">
+        <div @click="toggle()" class="sp-header-title flex">
           <div
               class="header-title-icon flex flex-1 justify-start items-center gap-2 cursor-pointer"
               :class="[cssLeftRight.left]"
@@ -23,7 +23,7 @@
               {{ theItem.childrenLength }} {{ theItem.childrenTypeName }}{{ theItem.plural }}
             </div>
           </div>
-          <div class="sp-deck-count bg-sp-100 flex-1 flex items-center justify-space-around py-1"
+          <div class="sp-deck-count flex-1 flex items-center justify-space-around py-1"
                :class="[cssLeftRight.right]"
           >
             <template v-for="(stat,statKey) in stats">
@@ -224,7 +224,6 @@ export default defineComponent({
 
       return counts;
     },
-
     theItem() {
       const item = this.item;
       const id = item.id;
@@ -303,8 +302,8 @@ export default defineComponent({
         left = 'bg-blue-200 hover:bg-blue-300 ';
         right = 'bg-blue-100 ';
       } else if (theItem.itemType === 'topic') {
-        left = 'bg-gray-200 hover:bg-gray-300 ';
-        right = 'bg-gray-000 ';
+        left = 'bg-amber-accent-1 hover:bg-gray-300 ';
+        right = 'bg-amber ';
       }
       return {
         left,
@@ -315,7 +314,7 @@ export default defineComponent({
   created() {
   },
   methods: {
-    toggle(selector: string) {
+    toggle() {
       this.showChildren = !this.showChildren;
       this.viewCard();
       // const el = document.querySelector(selector);
@@ -334,6 +333,14 @@ export default defineComponent({
       }, [] as _Card[]);
       // setTimeout(() => this.openQuestionModal(), 1000);
     },
+  },
+  watch: {
+    // watch for when viewDialog changes.
+    viewDialog(newShow, oldShow) {
+      if (!newShow) {
+        this.userCards.loadUserCards();
+      }
+    }
   }
 });
 
