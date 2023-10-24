@@ -224,6 +224,7 @@ export default defineComponent({
 
       return counts;
     },
+
     theItem() {
       const item = this.item;
       const id = item.id;

@@ -361,7 +361,7 @@ export default function (status = 'publish') {
                     revision_card_ids: number[],
                 }>) {
                     handleAjax.stop();
-                    userDeckGroups.value = done.data.deck_groups;
+                    userDeckGroups.value = sortCardByCardCountOnGroups(done.data.deck_groups);
                     // newCardIds.value = done.data.new_card_ids;
                     // onHoldCardIds.value = done.data.on_hold_card_ids;
                     // revisionCardIds.value = done.data.revision_card_ids;
@@ -440,6 +440,64 @@ export default function (status = 'publish') {
         })
     };
 
+    function sortCardByCardCountOnGroups(groups: _DeckGroup[]): _DeckGroup[] {
+        // Sort the decks in these groups.
+        groups = groups.map((group) => {
+            group.decks = sortCardByCardCountOnDecks(group.decks);
+            return group;
+        });
+
+        // Sort on group level, on decks level and on the topics level.
+        return groups.sort((a, b) => {
+            return b.decks.reduce((acc, deck) => {
+                return acc + deck.topics.reduce((acc, topic) => {
+                    topic = sortCardByCardCountOnTopics([topic])[0];
+                    return acc + topic.card_groups.reduce((acc, cardGroup) => {
+                        return acc + cardGroup.cards.length;
+                    }, 0);
+                }, 0);
+            }, 0) - a.decks.reduce((acc, deck) => {
+                return acc + deck.topics.reduce((acc, topic) => {
+                    topic = sortCardByCardCountOnTopics([topic])[0];
+                    return acc + topic.card_groups.reduce((acc, cardGroup) => {
+                        return acc + cardGroup.cards.length;
+                    }, 0);
+                }, 0);
+            }, 0);
+        });
+    }
+
+    function sortCardByCardCountOnDecks(decks: _Deck[]): _Deck[] {
+        // Sort the topics in these decks.
+        decks = decks.map((deck) => {
+            deck.topics = sortCardByCardCountOnTopics(deck.topics);
+            return deck;
+        });
+
+        // Sort on group level, on decks level and on the topics level.
+        return decks.sort((a, b) => {
+            return b.topics.reduce((acc, topic) => {
+                return acc + topic.card_groups.reduce((acc, cardGroup) => {
+                    return acc + cardGroup.cards.length;
+                }, 0);
+            }, 0) - a.topics.reduce((acc, topic) => {
+                return acc + topic.card_groups.reduce((acc, cardGroup) => {
+                    return acc + cardGroup.cards.length;
+                }, 0);
+            }, 0);
+        });
+    }
+
+    function sortCardByCardCountOnTopics(topics: _Topic[]): _Topic[] {
+        // Sort on group level, on decks level and on the topics level.
+        return topics.sort((a, b) => {
+            return b.card_groups.reduce((acc, cardGroup) => {
+                return acc + cardGroup.cards.length;
+            }, 0) - a.card_groups.reduce((acc, cardGroup) => {
+                return acc + cardGroup.cards.length;
+            }, 0);
+        });
+    }
 
     return {
         ajaxSave: ajaxSave, save: xhrSave, form: form,
