@@ -489,12 +489,26 @@ class CardGroup extends Model {
 			$user_study             = sp_get_user_study( $args['user_id'] );
 			$user_study_id          = $user_study->id;
 			$last_answered_card_ids = UserCard::get_all_last_answered_user_cards( $args['user_id'], $user_study_id );
-			$new_cards              = UserCard::get_new_cards( $args['user_id'], $user_study_id, $last_answered_card_ids['card_ids'] );
+//			$new_cards_not_answered_but_added = UserCard::get_new_cards_not_answered_but_added( $args['user_id'], $user_study_id, $last_answered_card_ids['card_ids'] );
 			$ignored_card_group_ids = sp_get_user_ignored_card_group_ids( $args['user_id'] );
 
-			// Then, We need only card groups that belong to the topic but are not in the user_cards table.
+			$_card_groups_ids_being_studied =
+				UserCard
+					::query()
+					->where( 'user_id', $args['user_id'] )
+					->get()->pluck( 'card_group_id' )->all();
+
+			$topic_ids_being_studied =
+				CardGroup
+					::query()
+					->whereIn( 'id', $_card_groups_ids_being_studied )
+					->get()->pluck( 'topic_id' )
+					->unique()->all();
+
 			$query
-				->whereIn( 'cg.id', $new_cards['card_group_ids'] )
+				// Then limit the topics to card groups that belong to the topics the user is studying.
+				->whereIn( 't.id', $topic_ids_being_studied )
+				// Also exclude the card groups the user ignored.
 				->whereNotIn( 'cg.id', $ignored_card_group_ids );
 		}
 

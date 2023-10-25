@@ -49,7 +49,7 @@ class UserCard extends Model {
 
 		$all_user_cards         = self::get_all_user_cards( $user_id );
 		$last_answered_card_ids = self::get_all_last_answered_user_cards( $user_id, $user_study_id );
-		$new_cards              = self::get_new_cards( $user_id, $user_study_id, $last_answered_card_ids['card_ids'] );
+		$new_cards              = self::get_new_cards_not_answered_but_added( $user_id, $user_study_id, $last_answered_card_ids['card_ids'] );
 		// $cards_on_hold          = self::get_cards_on_hold_for_today(
 		// $user_id,
 		// $user_study_id,
@@ -238,7 +238,7 @@ class UserCard extends Model {
 	 *
 	 * @return int[]
 	 */
-	public static function get_new_cards( int $user_id, int $user_study_id, array $last_answered_card_ids = array() ): array {
+	public static function get_new_cards_not_answered_but_added( int $user_id, int $user_study_id, array $last_answered_card_ids = array() ): array {
 
 		$user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
 		$user_timezone_midnight_today      = get_user_timezone_date_midnight_today( $user_id );
@@ -261,11 +261,13 @@ class UserCard extends Model {
 		$card_ids       = array();
 		$cards          = array();
 		$card_group_ids = array();
+		$topic_ids      = array();
 		foreach ( $card_groups as $user_card ) {
 			foreach ( $user_card->card_group->cards as $card ) {
 				$card_ids[]       = $card->id;
 				$cards[]          = $card;
 				$card_group_ids[] = $user_card->card_group->id;
+				$topic_ids[]      = $user_card->card_group->topic_id ?? 0;
 			}
 		}
 
@@ -273,6 +275,7 @@ class UserCard extends Model {
 			'cards'          => $cards,
 			'card_ids'       => $card_ids,
 			'card_group_ids' => $card_group_ids,
+			'topic_ids'      => $topic_ids,
 		);
 	}
 

@@ -76,7 +76,7 @@
                 </v-btn>
                 <v-btn
                     color="primary"
-                    @click="addCards([props.row.id])"
+                    @click="addCards([props.row])"
                     variant="elevated"
                     size="small"
                     :loading="userCards.ajaxAddCard.value.sending && cardGroupIdsAdd.includes(props.row.id)"
