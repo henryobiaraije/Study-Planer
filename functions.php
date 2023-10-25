@@ -189,9 +189,12 @@ function sp_get_user_debug_form( int $user_id = null ): array {
  *
  * @param int $user_id The user ID.
  *
- * @return Study
+ * @return null|Study The study object.
  */
-function sp_get_user_study( int $user_id ): Study {
+function sp_get_user_study( int $user_id ): ?Study {
+	if ( empty( $user_id ) ) {
+		return null;
+	}
 	$study = Study::where( 'user_id', $user_id )->first();
 	if ( empty( $study ) ) {
 		$study                    = new Study();
@@ -216,6 +219,79 @@ function sp_get_db_prefix() {
 	global $wpdb;
 
 	return $wpdb->prefix . 'sp_';
+}
+
+/**
+ * Add card group ids to user ignored card group ids.
+ *
+ * @param int $user_id The user ID.
+ * @param array $ignored_card_group_ids The card group IDs to be added.
+ *
+ * @return void
+ */
+function sp_save_user_ignored_card_groups( int $user_id, array $ignored_card_group_ids ) {
+	$user_ignored_card_group_ids = (array) get_user_meta( $user_id, Settings::UM_IGNORED_CARD_GROUP_IDS, true );
+	if ( empty( $user_ignored_card_group_ids ) ) {
+		$user_ignored_card_group_ids = [];
+	}
+
+	foreach ( $ignored_card_group_ids as $card_id ) {
+		if ( ! in_array( $card_id, $user_ignored_card_group_ids ) ) {
+			$user_ignored_card_group_ids[] = $card_id;
+		}
+	}
+
+	update_user_meta( $user_id, Settings::UM_IGNORED_CARD_GROUP_IDS, $user_ignored_card_group_ids );
+
+}
+
+/**
+ * Add card group ids to user ignored card group ids.
+ *
+ * @param int $user_id The user ID.
+ * @param array $ignored_card_group_ids The card group IDs to be removed.
+ *
+ * @return void
+ */
+function sp_remove_user_ignored_card_groups( int $user_id, array $ignored_card_group_ids ) {
+	$user_ignored_card_group_ids = (array) get_user_meta( $user_id, Settings::UM_IGNORED_CARD_GROUP_IDS, true );
+	if ( empty( $user_ignored_card_group_ids ) ) {
+		$user_ignored_card_group_ids = [];
+	}
+
+	foreach ( $ignored_card_group_ids as $card_id ) {
+		if ( in_array( $card_id, $user_ignored_card_group_ids ) ) {
+			$key = array_search( $card_id, $user_ignored_card_group_ids, true );
+			unset( $user_ignored_card_group_ids[ $key ] );
+		}
+	}
+
+	update_user_meta( $user_id, Settings::UM_IGNORED_CARD_GROUP_IDS, $user_ignored_card_group_ids );
+}
+
+/**
+ * Get user ignored card group ids.
+ *
+ * @param int $user_id The user id.
+ *
+ * @return int[]
+ */
+function sp_get_user_ignored_card_group_ids( int $user_id ): array {
+	$user_ignored_card_group_ids = get_user_meta( $user_id, Settings::UM_IGNORED_CARD_GROUP_IDS, true );
+	if ( empty( $user_ignored_card_group_ids ) || ! is_array( $user_ignored_card_group_ids ) ) {
+
+
+		$user_ignored_card_group_ids = [];
+	}
+
+	// make sure non of the card group ids are 0 or empty.
+	foreach ( $user_ignored_card_group_ids as $key => $card_group_id ) {
+		if ( empty( $card_group_id ) ) {
+			unset( $user_ignored_card_group_ids[ $key ] );
+		}
+	}
+
+	return $user_ignored_card_group_ids;
 }
 
 

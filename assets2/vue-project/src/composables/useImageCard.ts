@@ -191,7 +191,7 @@ export default function (cardGroupId = 0) {
             jQuery('head').find('#' + styleId).remove();
             jQuery('head').append(css);
         } catch (e) {
-            console.error("Catch  applyPreviewCssOld", {e});
+            // console.error("Catch  applyPreviewCssOld", {e});
         }
 
     }
@@ -200,7 +200,7 @@ export default function (cardGroupId = 0) {
             const hash = box.hash;
             const id = 'sp-box-preview-' + hash;
             const styleId = 'sp-box-preview-style-' + id;
-            console.log('apllying box new', {boxes, box, hash, id, styleId});
+            // console.log('apllying box new', {boxes, box, hash, id, styleId});
             const css = `
               <style id="${styleId}">
                 #${id}{
@@ -260,12 +260,12 @@ export default function (cardGroupId = 0) {
         const newBoxes = [];
         let flagSet = false;
         oldBoxes.forEach((box: _ImageBox, i) => {
-            console.log('count ' + i);
+            // console.log('count ' + i);
             if (i < index) {
                 newBoxes.push(box);
-                console.log('Less than', {i, index, newBoxes, len: newBoxes.length, box, oldBoxes});
+                // console.log('Less than', {i, index, newBoxes, len: newBoxes.length, box, oldBoxes});
             } else if (i === index) {
-                console.log('Equals ', {i, index, newBoxes, box, oldBoxes});
+                // console.log('Equals ', {i, index, newBoxes, box, oldBoxes});
                 // if(index > oldBoxes.length - 1 ){
                 //
                 // }
@@ -275,11 +275,11 @@ export default function (cardGroupId = 0) {
                     newBoxes.push(imageItem.value.boxes[index]);
                     flagSet = true;
                 }
-                console.log('Greater than ', {i, index, newBoxes, oldBoxes, flagSet, box});
+                // console.log('Greater than ', {i, index, newBoxes, oldBoxes, flagSet, box});
                 newBoxes.push(box);
             }
         });
-        console.log('bring to front', {index, current: currentBox.value, oldBoxes});
+        // console.log('bring to front', {index, current: currentBox.value, oldBoxes});
         imageItem.value.boxes = newBoxes;
         _addBoxEvents();
     };
@@ -323,7 +323,7 @@ export default function (cardGroupId = 0) {
                     stop: (event, ui) => {
                         const width = ui.size.width;
                         const height = ui.size.height;
-                        console.log('box stop resize', {event, ui, width, height});
+                        // console.log('box stop resize', {event, ui, width, height});
                         _boxDropped({
                             hash: hash,
                             w: width,
@@ -338,7 +338,7 @@ export default function (cardGroupId = 0) {
                         const hash = target.attr('data-hash');
                         const top = ui.position.top;
                         const left = ui.position.left;
-                        console.log('box stop', {event, ui, target, hash, top, left});
+                        // console.log('box stop', {event, ui, target, hash, top, left});
                         _boxDropped({
                             hash: hash,
                             top,
@@ -367,10 +367,10 @@ export default function (cardGroupId = 0) {
                     start: function (event, ui) {
                     },
                     stop: function (event, ui) {
-                        console.log('rotation stop', {event, ui});
+                        // console.log('rotation stop', {event, ui});
                         const angle = ui.angle.current;
                         // const height = ui.size.height;
-                        console.log('box stop rotate', {event, ui, angle});
+                        // console.log('box stop rotate', {event, ui, angle});
                         _boxDropped({
                             hash: hash,
                             angle: angle,
@@ -382,18 +382,18 @@ export default function (cardGroupId = 0) {
         }, 500);
     }
     const _addEvents = () => {
-        console.log('Creating new event');
+        // console.log('Creating new event');
         try {
             // @ts-ignore
             jQuery('.image-area-inner').resizable("destroy");
         } catch (e) {
-            console.error('Cant destroy main', {e});
+            // console.error('Cant destroy main', {e});
         }
         // @ts-ignore
         jQuery('.image-area-inner').resizable({
             autoHide: true,
             stop: function (event, ui) {
-                console.log({event, ui});
+                // console.log({event, ui});
                 const width = ui.size.width;
                 const height = ui.size.height;
                 _mainDropped(width, height);
@@ -430,7 +430,7 @@ export default function (cardGroupId = 0) {
         jQuery('#image-menu-action').hide();
     }
     const _openActionMenu = (box: _ImageBox) => {
-        console.log('_openActionMenu', {box});
+        // console.log('_openActionMenu', {box});
         // currentTableData.value.row = row;
         // currentTableData.value.col = col;
         currentBox.value = box;
@@ -438,7 +438,7 @@ export default function (cardGroupId = 0) {
         const targetId = '#action-box-' + box.hash;
         const target = document.querySelector(targetId);
         const tooltip = document.querySelector('#image-menu-action');
-        console.log({target, tooltip, targetId});
+        // console.log({target, tooltip, targetId});
         const popperInstance = createPopper(target, tooltip as HTMLElement);
     };
 
@@ -465,7 +465,7 @@ export default function (cardGroupId = 0) {
             box.top = args?.top || box.top;
             box.left = args?.left || box.left;
             box.angle = args?.angle || box.angle;
-            console.log('_boxDropped', {imageItem, box});
+            // console.log('_boxDropped', {imageItem, box});
         }
         applyCss();
     }
@@ -563,7 +563,7 @@ export default function (cardGroupId = 0) {
                     if (hold.cards.length > 0) {
                         // item.value = hold.cards[0];
                     }
-                    console.log({hold});
+                    // console.log({hold});
                     // cardGroup.value = hold;
                     cardGroup.value.whole_question = hold.whole_question;
                     imageItem.value = hold.whole_question;

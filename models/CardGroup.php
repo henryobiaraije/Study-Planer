@@ -19,6 +19,9 @@ use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Libs\Settings;
 use StudyPlannerPro\Models\Collections;
 use StudyPlannerPro\Models\Tag;
+use StudyPlannerPro\Models\UserCard;
+use function StudyPlannerPro\sp_get_user_ignored_card_group_ids;
+use function StudyPlannerPro\sp_get_user_study;
 
 class CardGroup extends Model {
 	protected $table = SP_TABLE_CARD_GROUPS;
@@ -482,29 +485,17 @@ class CardGroup extends Model {
 			} );
 		} elseif ( $args['for_new_cards'] ) {
 			// Get the topics of the cards the user is studying.
-			$topics = Topic
-				::query()
-				->whereIn( 'id', function ( Builder $query ) use ( $args ) {
-					$query->whereIn( 'id', function ( Builder $query ) use ( $args ) {
-						$query->select( 'topic_id' )
-						      ->from( SP_TABLE_CARD_GROUPS )
-						      ->whereIn( 'id', function ( Builder $query ) use ( $args ) {
-							      $query->select( 'card_group_id' )
-							            ->from( SP_TABLE_USER_CARDS )
-							            ->where( 'user_id', $args['user_id'] );
-						      } );
-					} );
-				} )
-				->get()->all();
+
+			$user_study             = sp_get_user_study( $args['user_id'] );
+			$user_study_id          = $user_study->id;
+			$last_answered_card_ids = UserCard::get_all_last_answered_user_cards( $args['user_id'], $user_study_id );
+			$new_cards              = UserCard::get_new_cards( $args['user_id'], $user_study_id, $last_answered_card_ids['card_ids'] );
+			$ignored_card_group_ids = sp_get_user_ignored_card_group_ids( $args['user_id'] );
 
 			// Then, We need only card groups that belong to the topic but are not in the user_cards table.
 			$query
-				->whereNotIn( 'cg.id', function ( Builder $query ) use ( $args, $topics ) {
-					$query->select( 'card_group_id' )
-					      ->from( SP_TABLE_USER_CARDS )
-					      ->where( 'user_id', $args['user_id'] );
-				} )
-				->whereIn( 'cg.topic_id', array_column( $topics, 'id' ) );
+				->whereIn( 'cg.id', $new_cards['card_ids'] )
+				->whereNotIn( 'cg.id', $ignored_card_group_ids );
 		}
 
 		if ( $args['with_trashed'] ) {
@@ -557,7 +548,6 @@ class CardGroup extends Model {
 
 		$all            = $result->get()->all();
 		$card_group_ids = array_column( $all, 'id' );
-
 
 		$card_groups = self
 			::query()

@@ -152,7 +152,6 @@ export default function (status = 'publish') {
     });
 
 
-
     const theForm = {
         topicToAssign: null as null | _Topic,
         selectedCards: [] as _CardGroup[],
@@ -299,7 +298,7 @@ export default function (status = 'publish') {
             });
         });
     };
-    const xhrIgnoreCard = (cardIds: number[]) => {
+    const xhrIgnoreCard = (cardGroupIds: number[]) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxIgnoreCard.value);
         return new Promise((resolve, reject) => {
             new Server().send_online({
@@ -307,7 +306,7 @@ export default function (status = 'publish') {
                     spClientData().nonce,
                     {
                         params: {
-                            card_ids: cardIds,
+                            card_group_ids: cardGroupIds,
                         },
                     }
                 ],

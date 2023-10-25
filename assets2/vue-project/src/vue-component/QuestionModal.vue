@@ -155,26 +155,43 @@
 
           <!-- <editor-fold desc="Prev & Next"> -->
           <div v-if="'preview' === purpose" class="">
-            <div class="flex justify-space-around align-center py-4">
-              <v-btn
-                  color="primary"
-                  @click="prev()"
-              >
+            <div class="flex justify-space-around flex-wrap lg:flex-nowrap align-center py-4">
+              <span class="flex-1 text-center">
+                <v-btn
+                    :disabled="index === 0"
+                    color="primary"
+                    @click="prev()"
+                >
                 <v-icon left>
                   mdi-chevron-left
                 </v-icon>
                 Prev
               </v-btn>
-              <span class="text-xl font-semibold">{{ index + 1 }}/{{ cards.length }}</span>
-              <v-btn
-                  color="primary"
-                  @click="next()"
-              >
+              </span>
+              <div class="flex flex-1 gap-4 justify-center items-center">
+                <span class="text-xl font-semibold">{{ index + 1 }}/{{ cards.length }}</span>
+                <span v-if="inAddQuestions" class="flex-initial">
+                  <v-switch
+                      v-model="userCards.form.value.selectedCards"
+                      color="primary"
+                      hide-details
+                      :value="cards[index].card_group"
+                      label="Selected"
+                  ></v-switch>
+                </span>
+              </div>
+              <span class="flex-1 text-center">
+                <v-btn
+                    :disabled="index === (cards.length - 1)"
+                    color="primary"
+                    @click="next()"
+                >
                 Next
                 <v-icon left>
                   mdi-chevron-right
                 </v-icon>
               </v-btn>
+              </span>
             </div>
             <p class="flex-1 w-full py-4 text-center text-base text-gray-500">You can use left and right arrow keys to
               move through the cards</p>
@@ -264,15 +281,20 @@
 import {defineComponent} from "vue";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useUserDashboard from "@/composables/useUserDashboard";
-import type {_Card} from "@/interfaces/inter-sp";
+import type {_Card, _CardGroup} from "@/interfaces/inter-sp";
 import useImageCard from "@/composables/useImageCard";
 import {spClientData} from "@/functions";
+import useUserCards from "@/composables/useUserCards";
+import useMyStore from "@/composables/useMyStore";
 
 export default defineComponent({
   computed: {
     currentQuestion(): _Card {
       return this.cards[this.index];
     },
+    inAddQuestions() {
+      return this.myStore.store.inAddCards;
+    }
   },
   methods: {
     _showAnswer() {
@@ -282,18 +304,18 @@ export default defineComponent({
       this.showCurrentAnswer = false;
     },
     next() {
-      // Hide answer.
-      this._hideAnswer();
-
       // If all cards are answered, show the success message.
-      if (this.index === this.cards.length - 1) {
+      const dontIncrease = this.index === (this.cards.length - 1);
+      if (dontIncrease) {
         this.allAnswered = true;
         return;
       }
 
+      // Hide answer.
+      this._hideAnswer();
+
       // Update the index.
       this.index = Math.min(this.index + 1, this.cards.length - 1)
-
       // Add image card css.
       const card = this.cards[this.index];
       setTimeout(() => {
@@ -408,12 +430,20 @@ export default defineComponent({
   setup: (props, ctx) => {
     return {
       userDash: useUserDashboard(),
+      myStore: useMyStore(),
     }
   },
   created() {
-    // Shuffle the cards.
-    this.cards = this.cards.sort(() => Math.random() - 0.5);
-    console.log('Shuffled cards', this.cards);
+    // Shuffle the cards only when the purpose is study.
+    if ('study' === this.purpose) {
+      this.cards = this.cards.sort(() => Math.random() - 0.5);
+      console.log('Shuffled cards', this.cards);
+    }
+
+    // Set the index to start when the purpose is preview.
+    if ('preview' === this.purpose) {
+      this.index = this.indexToStart;
+    }
 
     const card = this.cards[this.index];
     setTimeout(() => {
@@ -452,7 +482,21 @@ export default defineComponent({
       type: String as () => 'preview' | 'study',
       required: false,
       default: 'preview',
-    }
+    },
+    userCards: {
+      type: Object as () => ReturnType<typeof useUserCards>,
+      required: true
+    },
+    selectedCards: {
+      type: Array as () => _CardGroup[],
+      required: false,
+      default: () => [],
+    },
+    indexToStart: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   mounted() {
     document.addEventListener('keydown', this.handleKeyup);

@@ -1,4 +1,4 @@
-import {createApp} from 'vue'
+import {createApp, reactive} from 'vue'
 import "@/css/admin/main-admin.scss"
 import {Store} from "@/static/store";
 import AdminTopics from "@/admin/AdminTopics.vue";
@@ -20,7 +20,6 @@ import 'vuetify/styles'
 import {createVuetify} from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives';
-
 
 const myCustomLightTheme = {
     dark: false,

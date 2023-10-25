@@ -27,6 +27,7 @@ import CardSelector from "@/admin/CardSelector.vue";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useUserCards from "@/composables/useUserCards";
 import useAllCards from "@/composables/useAllCards";
+import useMyStore from "@/composables/useMyStore";
 
 export default defineComponent({
   name: 'UserDashboardAddCard',
@@ -39,10 +40,12 @@ export default defineComponent({
     return {
       userCards: useUserCards(),
       allCards: useAllCards(),
+      myStore: useMyStore(),
     }
   },
   computed: {},
   created() {
+    this.myStore.store.inAddCards = true;
     this.allCards.fromFrontend.value = true;
     this.allCards.forAddToStudyDeck.value = true;
   },
@@ -56,6 +59,9 @@ export default defineComponent({
             this.userCards.form.value.selectedCards = [];
           });
     }
+  },
+  beforeUnmount() {
+    this.myStore.store.inAddCards = false;
   }
 });
 

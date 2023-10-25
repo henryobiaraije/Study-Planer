@@ -171,6 +171,7 @@ import useAllCards from "@/composables/useAllCards";
 import useAllNewRemoveCards from "@/composables/useAllNewRemoveCards";
 import QuestionModal from "@/vue-component/QuestionModal.vue";
 import {_Card, _CardGroup} from "@/interfaces/inter-sp";
+import useMyStore from "@/composables/useMyStore";
 
 export default defineComponent({
   name: 'UserDashboardNewCards',
@@ -210,6 +211,7 @@ export default defineComponent({
       tags: useTags(status),
       allCards: useAllNewRemoveCards(),
       userCards: useUserCards(),
+      myStore: useMyStore(),
     }
   },
   computed: {
@@ -234,7 +236,8 @@ export default defineComponent({
   },
   created() {
     jQuery('.all-loading').hide();
-    this.allCards.loadItems();
+    this.allCards.forNewCards.value = true;
+    this.allCards.search('');
   },
   methods: {
     viewCard(cardGroupId: number): _CardGroup[] {
@@ -274,8 +277,6 @@ export default defineComponent({
           });
     },
   },
-
-
 });
 
 </script>

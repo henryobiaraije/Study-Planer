@@ -40,7 +40,7 @@ class Settings {
 	// User meta
 	public const UM_USER_TIMEZONE = 'sp_user_timezone';
 	public const UM_CURRENT_STUDY_DATE = 'sp_current_study_date';
-
+	public const UM_IGNORED_CARD_GROUP_IDS = 'sp_ignored_card_group_ids';
 
 	public static function um_variable_link( $link_id ) {
 		return "asl_variable_link_id_$link_id";

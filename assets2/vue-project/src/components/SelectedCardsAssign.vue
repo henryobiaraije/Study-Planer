@@ -31,35 +31,72 @@
           key="cardGroup.id"
       >
         <label
-            @click="$emit('card-clicked', cardGroup)"
-            class="single-card px-2 flex-1 flex gap-2 justify-start items-center py-2 ">
-          <!--          <input type="checkbox" :value="cardGroup"-->
-          <!--                 @change="cardSelected"-->
-          <!--                 v-model="selectedCards">-->
-          <span class="block icon">
-            <!-- Plus icon -->
-            <svg v-if="!selectedCardIds.includes(cardGroup.id)" class="w-[20px] h-[20px]" fill="none"
-                 stroke="currentColor"
-                 stroke-width="3.5"
-                 viewBox="0 0 24 24"
-                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
-            </svg>
-            <!-- Checked icon -->
-            <svg v-else class="w-[20px] h-[20px] text-sp-500" fill="none" stroke="currentColor" stroke-width="3.5"
-                 viewBox="0 0 24 24"
-                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path>
-            </svg>
+
+            class="single-card cursor-pointer group px-2 flex-1 flex gap-2 justify-between items-center ">
+          <span class="single-card px-2 flex-1 flex gap-2 justify-start items-center ">
+            <span class="block flex-initial icon p-2 hover:bg-sp-300 rounded-full "
+                  @click="$emit('card-clicked', cardGroup)"
+            >
+              <!-- Plus icon -->
+              <svg v-if="!selectedCardIds.includes(cardGroup.id)" class="w-[20px] h-[20px]" fill="none"
+                   stroke="currentColor"
+                   stroke-width="3.5"
+                   viewBox="0 0 24 24"
+                   xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 4.5v15m7.5-7.5h-15"></path>
+              </svg>
+              <!-- Checked icon -->
+              <svg v-else class="w-[20px] h-[20px] text-sp-500" fill="none" stroke="currentColor" stroke-width="3.5"
+                   viewBox="0 0 24 24"
+                   xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4.5 12.75l6 6 9-13.5"></path>
+              </svg>
+            </span>
+            <span
+                @click="viewCard(cardGroup.id)"
+                class="px-2 py-2 flex-1 flex gap-2 justify-start items-center ">
+              <span class="card-name block ">{{ cardGroup.name }}</span>
+              <span class="bg-gray-300 px-2 py-1 rounded-md">{{ cardGroup.card_type }}</span>
+            </span>
           </span>
-          <span class="card-name block">{{ cardGroup.name }}</span>
-          <span class="bg-gray-300 px-2 py-1 rounded-md">{{ cardGroup.card_type }}</span>
+<!--          <span class="bg-gray-300 px-2 py-1 rounded-md lg:hidden group-hover:inline-block">{{ cardGroup.cards.length }} Cards</span>-->
+          <v-chip
+              class="ma-2"
+              color="primary"
+          >
+            {{ cardGroup.cards.length }} Cards
+          </v-chip>
         </label>
-        <!--        <svg class="w-6 h-6 text-gray-400 hover:text-black hover:cursor-pointer" xmlns="http://www.w3.org/2000/svg"-->
-        <!--             fill="none" viewBox="0 0 24 24" stroke-width="1.5"-->
-        <!--             stroke="currentColor">-->
-        <!--          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>-->
-        <!--        </svg>-->
+        <v-dialog
+            v-model="viewDialog"
+            width="auto"
+        >
+          <v-card>
+            <v-card-actions>
+              <div class="flex flex-row justify-between items-center w-full">
+                <span class="flex-1 text-xl !font-bold">Cards</span>
+                <span class="flex-initial">
+                          <v-btn color="primary" block @click="viewDialog = false">Close</v-btn>
+                        </span>
+              </div>
+            </v-card-actions>
+            <QuestionModal
+                title="Cards"
+                :cards="cardsToView"
+                :index-to-start="carouselCardIndexToStart"
+                :show-only-answers="true"
+                :user-cards="userCards"
+                @card-selected="(cardGroupId:number) => $emit('card-clicked', cardItems.find((item) => item.id === cardGroupId))"
+                :for-add-cards="true"
+            />
+          </v-card>
+        </v-dialog>
       </li>
     </ul>
   </div>
@@ -94,10 +131,14 @@
 
 import {defineComponent} from "vue";
 import type {_CardGroup} from "@/interfaces/inter-sp";
+import QuestionModal from "@/vue-component/QuestionModal.vue";
+import {_Card} from "@/interfaces/inter-sp";
+import useUserCards from "@/composables/useUserCards";
+import useMyStore from "@/composables/useMyStore";
 
 export default defineComponent({
   name: 'SelectedCardsAssign',
-  components: {},
+  components: {QuestionModal},
   emits: ['card-clicked', 'tab-changed'],
   props: {
     cardItems: {
@@ -122,15 +163,57 @@ export default defineComponent({
       type: Number,
       required: true,
       default: 0
-    }
+    },
+    userCards: {
+      type: Object as () => ReturnType<typeof useUserCards>,
+      required: true
+    },
   },
   data() {
-    return {}
+    return {
+      cardsToView: [] as _Card[],
+      viewDialog: false,
+      /**
+       * So that we can set the card to show first in the question carousel when in AddCards page.
+       */
+      carouselCardIndexToStart: 0,
+    }
   },
   setup: (props, ctx) => {
-    return {}
+    return {
+      myStore: useMyStore(),
+    }
   },
   methods: {
+    viewCard(cardGroupId: number): _CardGroup[] {
+
+      if (this.myStore.store.inAddCards) {
+        // Display all cards in all groups if in AddCards page.
+        let cartsCountTillToStart = 0;
+        let stopCounting = false;
+        const cards: _Card[] = [];
+
+        this.cardItems.forEach(group => {
+
+          if (cardGroupId === group.id) {
+            stopCounting = true;
+          }
+
+          if (stopCounting) {
+            // Continue to increase the index to start until we reach the current group.
+            cartsCountTillToStart += group.cards.length;
+          }
+
+          group.cards.forEach(card => cards.push(card));
+        });
+
+        this.carouselCardIndexToStart = cartsCountTillToStart - 1;
+        this.cardsToView = cards;
+      } else {
+        this.cardsToView = this.cardItems.find((item: _CardGroup) => item.id === cardGroupId).cards;
+      }
+      this.viewDialog = true;
+    },
     tabLabelClass(tab: 'found' | 'selected') {
       const activeClasses =
           [

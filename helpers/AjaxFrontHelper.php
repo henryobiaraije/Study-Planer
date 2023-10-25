@@ -33,6 +33,7 @@ use function StudyPlannerPro\get_all_card_grades;
 use function StudyPlannerPro\get_card_group_background_image;
 use function StudyPlannerPro\sp_get_user_debug_form;
 use function StudyPlannerPro\sp_save_user_debug_form;
+use function StudyPlannerPro\sp_save_user_ignored_card_groups;
 
 /**
  * Class AjaxFrontHelper
@@ -115,6 +116,7 @@ class AjaxFrontHelper {
 		add_action( 'admin_sp_pro_ajax_front_load_user_cards', array( $this, 'ajax_front_load_user_cards' ) );
 		add_action( 'admin_sp_pro_ajax_front_save_user_debug_form', array( $this, 'ajax_front_save_user_debug_form' ) );
 		add_action( 'admin_sp_pro_ajax_front_load_user_debug_form', array( $this, 'ajax_front_load_user_debug_form' ) );
+		add_action( 'admin_sp_pro_ajax_front_ignore_cards', array( $this, 'ajax_front_ignore_cards' ) );
 		// </editor-fold desc="User Cards ">
 		//        add_action('front_sp_pro_ajax_front_accept_changes', array($this, 'ajax_front_accept_changes'));
 	}
@@ -961,6 +963,18 @@ class AjaxFrontHelper {
 		Common::send_success( 'loaded user debug info', $user_debug_form );
 	}
 
+	public function ajax_front_ignore_cards( $post ): void {
+		Initializer::verify_post( $post, true );
+		$user_id        = get_current_user_id();
+		$params         = $post[ Common::VAR_2 ]['params'];
+		$card_group_ids = $params['card_group_ids'];
+
+		sp_save_user_ignored_card_groups( $user_id, $card_group_ids );
+
+		Common::send_success( 'Cards Removed' );
+	}
+
 	// </editor-fold desc="User Card">
+
 
 }

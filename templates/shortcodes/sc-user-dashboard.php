@@ -10,7 +10,6 @@ $url_stats    = $current_url.'?'.http_build_query(array_merge($_GET, array("dash
 $url_profile  = $current_url.'?'.http_build_query(array_merge($_GET, array("dashboard-page" => "profile")));
 $url_settings = $current_url.'?'.http_build_query(array_merge($_GET, array("dashboard-page" => "settings")));
 
-
 ?>
 
 

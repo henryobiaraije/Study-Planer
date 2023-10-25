@@ -14,7 +14,7 @@
               v-model="userCards.form.value.group"
               :options="deckGroup.searchResults.value"
               :multiple="false"
-              :loading="deckGroup.ajaxSearch.value.sending"
+              :loading="deckGroup.ajaxSearch.value.sending || deckGroup.ajax.value.sending"
               :searchable="true"
               :allowEmpty="false"
               :close-on-select="true"
@@ -143,6 +143,7 @@
           @card-clicked="cardSelected($event)"
           :card-items="allCards.searchResults.value"
           :selected-cards="userCards.form.value.selectedCards"
+          :user-cards="userCards"
           :loading="allCards.ajaxSearch.value.sending"
           :found-count="allCards.tableData.value.totalRecords"
       />
@@ -156,7 +157,7 @@
           itemtype="button"
           :records="allCards.tableData.value.totalRecords"
           v-model="form.page"
-          :per-page="2"
+          :per-page="perPage"
           @paginate="callback"/>
     </div>
   </div>
@@ -185,6 +186,7 @@ import SelectedCardsAssign from "@/components/SelectedCardsAssign.vue";
 import Pagination from 'v-pagination-3';
 import useUserCards from "@/composables/useUserCards";
 import UseUserCards from "@/composables/useUserCards";
+import Cookies from "js-cookie";
 
 
 export default defineComponent({
@@ -202,7 +204,8 @@ export default defineComponent({
     allCards: {
       type: Object as () => ReturnType<typeof useAllCards>,
       required: true
-    }
+    },
+
   },
   data() {
     return {
@@ -239,7 +242,10 @@ export default defineComponent({
     },
     form() {
       return this.userCards.form.value;
-    }
+    },
+    perPage() {
+      return Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 2;
+    },
   },
   created() {
     console.log('now created');
@@ -264,7 +270,7 @@ export default defineComponent({
       );
     },
     cardSelected(card: _CardGroup) {
-      this.userCards.oneSpecificCard.value = card;
+      this.userCards.oneSpecificCard.value = card; // This will trigger the watch in useUserCards to add the card to the selected cards.
     },
     callback: function (page) {
       this.page = page;

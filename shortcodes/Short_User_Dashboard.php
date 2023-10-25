@@ -52,6 +52,15 @@ class Short_User_Dashboard {
 	}
 
 	final public function load_view( $attr ): string {
+		if ( ! is_user_logged_in() ) {
+			$login_url = wp_login_url( get_permalink() );
+
+			return sprintf( "<div class='sp sp-user-not-logged-in wrap' >
+					<p>Please <a href='%s' >login</a> to view this page.</p>
+				</div>",
+				$login_url
+			);
+		}
 		do_action( 'sp_enqueue_scripts_sc_user_dashboard' );
 //        $html = Common::get_contents(get_template_path('shortcodes/sc-user-dashboard'));
 		$html = '<div class="sp sp-user-dashboard wrap"></div>';
@@ -95,6 +104,9 @@ class Short_User_Dashboard {
 	}
 
 	final public function register_scripts(): void {
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
 		$dis = $this;
 //        $css         = Initializer::$js_url.'/public/sc-user-dashboard.css';
 //        $js          = Initializer::$js_url.'/public/sc-user-dashboard.js';
