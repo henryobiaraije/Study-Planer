@@ -143,6 +143,14 @@ export default function (status = 'publish') {
         success: false,
         successMessage: '',
     });
+    const ajaxAddCard = ref<_Ajax>({
+        sending: false,
+        error: false,
+        errorMessage: '',
+        success: false,
+        successMessage: '',
+    });
+
 
 
     const theForm = {
@@ -252,7 +260,7 @@ export default function (status = 'publish') {
             },
         });
     };
-    const xhrAddCards = () => {
+    const xhrAddCards = (cardGroups: _CardGroup[] = []) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxAddCards.value);
         return new Promise((resolve, reject) => {
             new Server().send_online({
@@ -260,7 +268,10 @@ export default function (status = 'publish') {
                     spClientData().nonce,
                     {
                         params: {
-                            cards: form.value.selectedCards,
+                            cards: [
+                                ...form.value.selectedCards,
+                                ...cardGroups
+                            ]
                         },
                     }
                 ],
@@ -288,27 +299,33 @@ export default function (status = 'publish') {
             });
         });
     };
-    const xhrIgnoreCard = (cardId: number) => {
+    const xhrIgnoreCard = (cardIds: number[]) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxIgnoreCard.value);
-        return new Server().send_online({
-            data: [
-                spClientData().nonce,
-                {
-                    params: {
-                        card_id: cardId,
-                    },
-                }
-            ],
-            what: "admin_sp_pro_ajax_front_ignore_card",
-            funcBefore() {
-                handleAjax.start();
-            },
-            funcSuccess(done: InterFuncSuccess<any>) {
-                handleAjax.stop();
-            },
-            funcFailue(done) {
-                handleAjax.error(done);
-            },
+        return new Promise((resolve, reject) => {
+            new Server().send_online({
+                data: [
+                    spClientData().nonce,
+                    {
+                        params: {
+                            card_ids: cardIds,
+                        },
+                    }
+                ],
+                what: "admin_sp_pro_ajax_front_ignore_cards",
+                funcBefore() {
+                    handleAjax.start();
+                },
+                funcSuccess(done: InterFuncSuccess<any>) {
+                    handleAjax.stop();
+                    toast.success(done.message);
+                    resolve(done);
+                },
+                funcFailue(done) {
+                    handleAjax.error(done);
+                    toast.error(done.message);
+                    reject(done);
+                },
+            });
         });
     };
     const xhrRemoveCard = (cardIds: number[]) => {
@@ -508,7 +525,7 @@ export default function (status = 'publish') {
         ajaxRemoveCard, removeCard: xhrRemoveCard,
         ajaxLoadUserCard, loadUserCards: xhrLoadUserCards, userDeckGroups,
         ajaxLoadDebugForm, loadDebugForm: xhrLoadUserDebugForm, debugForm, saveDebugForm: xhrSaveUserDebugForm,
-        newCardIds, onHoldCardIds, revisionCardIds,
+        newCardIds, onHoldCardIds, revisionCardIds, ajaxAddCard,
     };
 
 }

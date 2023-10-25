@@ -98,11 +98,29 @@ class CardGroup extends Model {
 
 		$total       = $card_groups->count();
 		$offset      = ( $args['page'] - 1 );
-		$card_groups = $card_groups->offset( $offset )
-		                           ->withCount( 'cards' )
-		                           ->with( 'deck', 'topic', 'collection', 'deck.deck_group' )
-		                           ->limit( $args['per_page'] )
-		                           ->orderByDesc( 'id' )->get();
+		$card_groups = $card_groups
+			->offset( $offset )
+			->withCount( 'cards' )
+			->with( 'deck', 'topic', 'collection', 'deck.deck_group', 'cards' )
+			->limit( $args['per_page'] )
+			->orderByDesc( 'id' )->get();
+
+		foreach ( $card_groups as $card_group ) {
+			foreach ( $card_group->cards as $card ) {
+				$card_type = $card->card_group->card_type;
+				if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
+					if ( ! is_array( $card->answer ) ) {
+						$card->answer = json_decode( $card->answer );
+					}
+					if ( ! is_array( $card->question ) ) {
+						$card->question = json_decode( $card->question );
+					}
+					if ( ! is_array( $card_group->whole_question ) ) {
+						$card_group->whole_question = json_decode( $card_group->whole_question );
+					}
+				}
+			}
+		}
 
 		return array(
 			'total'       => $total,

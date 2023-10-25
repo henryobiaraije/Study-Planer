@@ -160,6 +160,8 @@ class AjaxFrontHelper {
 			Common::send_error( 'Please select cards.' );
 		}
 
+		$user_debug_form = sp_get_user_debug_form();
+
 		foreach ( $e_card_groups as $a_card_group ) {
 			$card_group_id = (int) $a_card_group['id'];
 			$card_group    = CardGroup::find( $card_group_id );
@@ -178,6 +180,11 @@ class AjaxFrontHelper {
 			$user_card->user_id       = $user_id;
 			$user_card->card_group_id = $card_group_id;
 			$user_card->save();
+
+			$user_card->update( [
+				'created_at' => $user_debug_form['current_study_date'],
+				'updated_at' => $user_debug_form['current_study_date'],
+			] );
 		}
 
 		Common::send_success( 'Cards Added successfully', [] );
@@ -236,26 +243,14 @@ class AjaxFrontHelper {
 
 	public function ajax_front_load_stats_chart_added( $post ): void {
 		Initializer::verify_post( $post, true );
-		//        Common::send_error([
-		//            'ajax_front_load_stats_chart_added',
-		//            'post' => $post,
-		//        ]);
 
-		$all  = $post[ Common::VAR_2 ];
-		$span = sanitize_text_field( $all['span'] );
-		//        $span    = 'one_month';
+		$all     = $post[ Common::VAR_2 ];
+		$span    = sanitize_text_field( $all['span'] );
 		$user_id = get_current_user_id();
 
 		$all = Study::get_user_stats_charts_added( $user_id, $span );
-		//        Common::send_error([
-		//            'ajax_front_load_stats_review_time',
-		//            'post'  => $post,
-		//            '$span' => $span,
-		//        ]);
 
 		Common::send_success( 'Charts added here', $all );
-
-
 	}
 
 	public function ajax_front_load_stats_hourly_breakdown( $post ): void {

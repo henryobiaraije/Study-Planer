@@ -35,17 +35,56 @@
           <div v-if="props.column.field === 'name'">
             <a :href="props.row.card_group_edit_url"><span>{{ props.row.name }}</span></a>
             <div class="flex gap-2">
-              <button class="bg-sp-400 text-white font-semibold px-3 py-1 cursor-pointer hover:bg-sp-700">
-                View
-              </button>
-              <ajax-action
-                  button-text="Ignore"
-                  css-classes="button !px-2 !py-1"
-                  :show-icon="false"
-                  icon="fa fa-save"
-                  @click="userCards.ignoreCard(props.row.id)"
-                  :ajax="userCards.ajaxIgnoreCard.value">
-              </ajax-action>
+              <div class="flex gap-2">
+                <v-btn
+                    color="primary"
+                    @click="viewCard(props.row.id)"
+                    variant="outlined"
+                    size="small"
+                >
+                  View
+                </v-btn>
+                <v-dialog
+                    v-model="viewDialog"
+                    width="auto"
+                >
+                  <v-card>
+                    <v-card-actions>
+                      <div class="flex flex-row justify-between items-center w-full">
+                        <span class="flex-1 text-xl !font-bold">Cards</span>
+                        <span class="flex-initial">
+                          <v-btn color="primary" block @click="viewDialog = false">Close</v-btn>
+                        </span>
+                      </div>
+                    </v-card-actions>
+                    <QuestionModal
+                        title="Cards"
+                        :cards="cardsToView"
+                        :show-only-answers="true"
+                    />
+                  </v-card>
+                </v-dialog>
+                <v-btn
+                    color="primary"
+                    @click="ignoreCards([props.row.id])"
+                    variant="outlined"
+                    size="small"
+                    :loading="userCards.ajaxIgnoreCard.value.sending && cardGroupIdsIgnore.includes(props.row.id)"
+                    :disabled="userCards.ajaxIgnoreCard.value.sending && cardGroupIdsIgnore.includes(props.row.id)"
+                >
+                  Ignore
+                </v-btn>
+                <v-btn
+                    color="primary"
+                    @click="addCards([props.row.id])"
+                    variant="elevated"
+                    size="small"
+                    :loading="userCards.ajaxAddCard.value.sending && cardGroupIdsAdd.includes(props.row.id)"
+                    :disabled="userCards.ajaxAddCard.value.sending && cardGroupIdsAdd.includes(props.row.id)"
+                >
+                  Add
+                </v-btn>
+              </div>
             </div>
           </div>
           <div v-else-if="props.column.field === 'type'">
@@ -130,10 +169,13 @@ import useNewDeckGroup from "@/composables/useNewDeckGroup";
 import useTags from "@/composables/useTags";
 import useAllCards from "@/composables/useAllCards";
 import useAllNewRemoveCards from "@/composables/useAllNewRemoveCards";
+import QuestionModal from "@/vue-component/QuestionModal.vue";
+import {_Card, _CardGroup} from "@/interfaces/inter-sp";
 
 export default defineComponent({
   name: 'UserDashboardNewCards',
   components: {
+    QuestionModal,
     TimeComp,
     AjaxActionNotForm,
     HoverNotifications,
@@ -148,6 +190,10 @@ export default defineComponent({
       pageTitle: 'All Cards',
       activeUrl: 'admin.php?page=study-planner-pro-deck-cards',
       trashUrl: 'admin.php?page=study-planner-pro-deck-cards&status=trash',
+      cardsToView: [] as _Card[],
+      viewDialog: false,
+      cardGroupIdsIgnore: [] as number[],
+      cardGroupIdsAdd: [] as number[],
     }
   },
   setup: (props, ctx) => {
@@ -191,10 +237,45 @@ export default defineComponent({
     this.allCards.loadItems();
   },
   methods: {
+    viewCard(cardGroupId: number): _CardGroup[] {
+      // const cardsToView = this.allCards.tableData.value.rows.find((item: _CardGroup) => item.id === cardGroupId).cards;
+      // console.log({cardGroupId, cardsToView});
+      this.cardsToView = this.allCards.tableData.value.rows.find((item: _CardGroup) => item.id === cardGroupId).cards;
+      this.viewDialog = true;
+    },
     createDeckGroup() {
       this.tags.create();
     },
-  }
+    ignoreCards(cardGroupIds: number[]) {
+      // push without duplicates.
+      this.cardGroupIdsIgnore.push(...cardGroupIds.filter((item) => !this.cardGroupIdsIgnore.includes(item)));
+
+      this.userCards.ignoreCard(cardGroupIds)
+          .then((done) => {
+            this.cardGroupIdsIgnore = this.cardGroupIdsIgnore.filter((item) => !cardGroupIds.includes(item));
+            this.allCards.search('');
+          })
+          .catch((err) => {
+            this.cardGroupIdsIgnore = this.cardGroupIdsIgnore.filter((item) => !cardGroupIds.includes(item));
+          });
+    },
+    addCards(cardGroups: _CardGroup[]) {
+      // push without duplicates.
+      this.cardGroupIdsAdd.push(...cardGroups.map((item) => item.id).filter((item) => !this.cardGroupIdsAdd.includes(item)));
+
+      this
+          .userCards.addCards(cardGroups)
+          .then((done) => {
+            this.cardGroupIdsAdd = this.cardGroupIdsAdd.filter((item) => !cardGroups.map((item) => item.id).includes(item));
+            this.allCards.search('');
+          })
+          .catch((err) => {
+            this.cardGroupIdsAdd = this.cardGroupIdsAdd.filter((item) => !cardGroups.map((item) => item.id).includes(item));
+          });
+    },
+  },
+
+
 });
 
 </script>

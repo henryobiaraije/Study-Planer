@@ -30,7 +30,7 @@ class UserCard extends Model {
 	use SoftDeletes;
 
 	protected $dates = array( 'deleted_at' );
-	protected $fillable = array( 'user_id', 'card_group_id' );
+	protected $fillable = array( 'user_id', 'card_group_id', 'created_at', 'updated_at' );
 
 	public function user(): BelongsTo {
 		return $this->belongsTo( User::class, 'user_id' );

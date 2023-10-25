@@ -50,7 +50,9 @@
                   <v-card-actions>
                     <div class="flex flex-row justify-between items-center w-full">
                       <span class="flex-1 text-xl !font-bold">Cards</span>
-                      <span class="flex-initial"><v-btn color="primary" block @click="viewDialog = false">Close</v-btn></span>
+                      <span class="flex-initial">
+                        <v-btn color="primary" block @click="viewDialog = false">Close</v-btn>
+                      </span>
                     </div>
                   </v-card-actions>
                   <QuestionModal
