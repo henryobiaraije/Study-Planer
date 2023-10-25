@@ -189,12 +189,9 @@ function sp_get_user_debug_form( int $user_id = null ): array {
  *
  * @param int $user_id The user ID.
  *
- * @return null|Study The study object.
+ * @return Study The study object.
  */
-function sp_get_user_study( int $user_id ): ?Study {
-	if ( empty( $user_id ) ) {
-		return null;
-	}
+function sp_get_user_study( int $user_id ): Study {
 	$study = Study::where( 'user_id', $user_id )->first();
 	if ( empty( $study ) ) {
 		$study                    = new Study();

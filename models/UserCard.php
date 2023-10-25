@@ -258,18 +258,21 @@ class UserCard extends Model {
 		                   )->get()->all();
 
 		// return card ids.
-		$card_ids = array();
-		$cards    = array();
+		$card_ids       = array();
+		$cards          = array();
+		$card_group_ids = array();
 		foreach ( $card_groups as $user_card ) {
 			foreach ( $user_card->card_group->cards as $card ) {
-				$card_ids[] = $card->id;
-				$cards[]    = $card;
+				$card_ids[]       = $card->id;
+				$cards[]          = $card;
+				$card_group_ids[] = $user_card->card_group->id;
 			}
 		}
 
 		return array(
-			'cards'    => $cards,
-			'card_ids' => $card_ids,
+			'cards'          => $cards,
+			'card_ids'       => $card_ids,
+			'card_group_ids' => $card_group_ids,
 		);
 	}
 

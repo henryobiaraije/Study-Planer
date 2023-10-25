@@ -494,7 +494,7 @@ class CardGroup extends Model {
 
 			// Then, We need only card groups that belong to the topic but are not in the user_cards table.
 			$query
-				->whereIn( 'cg.id', $new_cards['card_ids'] )
+				->whereIn( 'cg.id', $new_cards['card_group_ids'] )
 				->whereNotIn( 'cg.id', $ignored_card_group_ids );
 		}
 
@@ -505,6 +505,7 @@ class CardGroup extends Model {
 		} else {
 //			$query->with( 'tags' );
 		}
+
 
 		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
 		$only_deck       = $args['deck_group_id'] && $args['deck_id'] && ! $args['topic_id'];
