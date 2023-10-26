@@ -44,6 +44,10 @@ class UserCard extends Model {
 		$deck_group_uncategorized_id = get_uncategorized_deck_group_id();
 		$deck_uncategorized_id       = get_uncategorized_deck_id();
 
+		// Remove all card groups in any collection.
+		$card_groups_in_collection = CardGroup::get_card_groups_in_any_collections();
+
+
 		$user_study    = sp_get_user_study( $user_id );
 		$user_study_id = $user_study->id;
 
@@ -69,6 +73,15 @@ class UserCard extends Model {
 			)
 		);
 
+		// Remove all card groups in any collection.
+		$deck_groups = $deck_groups
+			->whereHas(
+				'decks.topics.card_groups',
+				function ( $query ) use ( $card_groups_in_collection ) {
+					$query->whereNotIn( 'id', $card_groups_in_collection['card_group_ids'] );
+				}
+			);
+
 		// Remove uncategorized deck group.
 		$deck_groups = $deck_groups->where( 'id', '!=', $deck_group_uncategorized_id );
 
@@ -79,6 +92,7 @@ class UserCard extends Model {
 				$query->where( 'id', '!=', $deck_uncategorized_id );
 			}
 		)->get();
+
 
 		// encode all questions in deck groups.
 		foreach ( $deck_groups as $deck_group ) {

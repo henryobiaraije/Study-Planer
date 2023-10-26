@@ -551,6 +551,10 @@ class CardGroup extends Model {
 			$query->where( 'cg.name', 'like', '%' . $args['search'] . '%' );
 		}
 
+		// Remove all card groups in any collection.
+		$card_groups_in_collection = self::get_card_groups_in_any_collections();
+		$query->whereNotIn( 'cg.id', $card_groups_in_collection['card_group_ids'] );
+
 		$offset = ( $args['page'] - 1 ) * $args['per_page'];
 
 		$totalQuery = clone $query; // Clone the query for total count
@@ -566,6 +570,7 @@ class CardGroup extends Model {
 
 		$all            = $result->get()->all();
 		$card_group_ids = array_column( $all, 'id' );
+
 
 		$card_groups = self
 			::query()
@@ -599,5 +604,41 @@ class CardGroup extends Model {
 		];
 	}
 
+	/**
+	 * Get all card groups for in any collection.
+	 *
+	 * @param bool $empty_if_admin This will allow only admins to see all card groups EVEN if they are in a collection.
+	 *
+	 * @return array
+	 */
+	public static function get_card_groups_in_any_collections( bool $empty_if_admin = true ): array {
+
+		$in_admin_page = ( ! wp_doing_ajax() && is_admin() )
+		                 || ( wp_doing_ajax() && current_user_can( 'manage_options' ) );
+
+
+		// This will allow only admins to see all card groups EVEN if they are in a collection.
+		// The floor is this is that it will not work when an admin is on the frontend.
+		if ( $empty_if_admin ) {
+			if ( $in_admin_page ) {
+				return [
+					'card_groups'    => [],
+					'card_group_ids' => [],
+				];
+			}
+		}
+
+		$card_groups = self
+			::query()
+			// collection must not be null
+			->whereNotNull( 'collection_id' )
+			->get();
+
+
+		return array(
+			'card_groups'    => $card_groups->all(),
+			'card_group_ids' => $card_groups->pluck( 'id' )->all(),
+		);
+	}
 
 }
