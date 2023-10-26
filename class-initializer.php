@@ -264,6 +264,9 @@ class Initializer {
 				$post = Common::getPost();
 				self::verify_post( $post, true );
 				$action = sanitize_title( $post[ Common::VAR_0 ] );
+//				Common::send_success( 'error', [
+//					'action' => $action,
+//				] );
 				do_action( $action, $post );
 
 				die( 'Bad Admin Ajax:  Sp. Action = ' . $action );
@@ -277,6 +280,7 @@ class Initializer {
 				$post = Common::getPost();
 				self::verify_post( $post );
 				$action = sanitize_title( $post[ Common::VAR_0 ] );
+
 				do_action( $action, $post );
 
 				die( 'Bad Public Ajax: Sp. Action = ' . $action );

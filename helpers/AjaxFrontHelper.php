@@ -281,17 +281,23 @@ class AjaxFrontHelper {
 
 	public function ajax_front_load_stats_chart_answer_buttons( $post ): void {
 		Initializer::verify_post( $post, true );
-		//        Common::send_error([
-		//            'ajax_front_load_stats_chart_answer_buttons',
-		//            'post' => $post,
-		//        ]);
+//		Common::send_error( [
+//			'ajax_front_load_stats_chart_answer_buttons',
+//			'post' => $post,
+//		] );
 
 		$all  = $post[ Common::VAR_2 ];
 		$span = sanitize_text_field( $all['span'] );
 		//        $span    = 'one_month';
 		$user_id = get_current_user_id();
 
+
 		$all = Study::get_user_stats_charts_answer_buttons( $user_id, $span );
+//		Common::send_error( [
+//			'ajax_front_load_stats_chart_answer_buttons',
+//			'post'    => $post,
+//			'user_id' => $user_id
+//		] );
 		//        Common::send_error([
 		//            'ajax_front_load_stats_review_time',
 		//            'post'  => $post,

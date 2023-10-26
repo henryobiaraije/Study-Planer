@@ -12,6 +12,7 @@ use Model\Deck;
 use Model\DeckGroup;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
+use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Libs\Settings;
 
 use function StudyPlannerPro\get_default_image_display_type;
@@ -391,14 +392,19 @@ class Initialize_Db {
 			}
 		}
 
+//		Common::in_script( array(
+//			'foreignKeys'       => $foreignKeys,
+//			'foreign_key_exist' => $foreign_key_exist,
+//		) );
+
 		if ( $foreign_key_exist ) {
-			Capsule::schema()->table(
-				SP_TABLE_STUDY,
-				function ( Blueprint $table ) {
-					$prefix = sp_get_db_prefix();
-					$table->dropForeign( [ $prefix . 'study_deck_id_foreign' ] );
-				}
-			);
+//			Capsule::schema()->table(
+//				SP_TABLE_STUDY,
+//				function ( Blueprint $table ) {
+//					$prefix = sp_get_db_prefix();
+//					$table->dropForeign( [ $prefix . 'study_deck_id_foreign' ] );
+//				}
+//			);
 		}
 	}
 

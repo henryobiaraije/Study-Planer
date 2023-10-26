@@ -492,12 +492,14 @@ class CardGroup extends Model {
 //			$new_cards_not_answered_but_added = UserCard::get_new_cards_not_answered_but_added( $args['user_id'], $user_study_id, $last_answered_card_ids['card_ids'] );
 			$ignored_card_group_ids = sp_get_user_ignored_card_group_ids( $args['user_id'] );
 
+			// Get group ids being studied.
 			$_card_groups_ids_being_studied =
 				UserCard
 					::query()
 					->where( 'user_id', $args['user_id'] )
 					->get()->pluck( 'card_group_id' )->all();
 
+			// With the group ids, get their topic ids.
 			$topic_ids_being_studied =
 				CardGroup
 					::query()
@@ -509,7 +511,9 @@ class CardGroup extends Model {
 				// Then limit the topics to card groups that belong to the topics the user is studying.
 				->whereIn( 't.id', $topic_ids_being_studied )
 				// Also exclude the card groups the user ignored.
-				->whereNotIn( 'cg.id', $ignored_card_group_ids );
+				->whereNotIn( 'cg.id', $ignored_card_group_ids )
+				// Also exclude the card groups ids already being studied.
+				->whereNotIn( 'cg.id', $_card_groups_ids_being_studied );
 		}
 
 		if ( $args['with_trashed'] ) {
@@ -519,7 +523,6 @@ class CardGroup extends Model {
 		} else {
 //			$query->with( 'tags' );
 		}
-
 
 		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
 		$only_deck       = $args['deck_group_id'] && $args['deck_id'] && ! $args['topic_id'];

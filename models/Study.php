@@ -134,12 +134,12 @@ class Study extends Model {
 				'user',
 			)
 		)
-				->where( 'user_id', '=', $args['user_id'] );
+		        ->where( 'user_id', '=', $args['user_id'] );
 		$total   = $studies->count();
 		$offset  = ( $args['page'] - 1 );
 		$studies = $studies->offset( $offset )
-						   ->limit( $args['per_page'] )
-						   ->orderByDesc( 'id' );
+		                   ->limit( $args['per_page'] )
+		                   ->orderByDesc( 'id' );
 
 		$studies = $studies->get();
 		// Common::send_error([
@@ -190,7 +190,7 @@ class Study extends Model {
 			$_date->add( new DateInterval( 'P1Y' ) );
 		} elseif ( 'all' === $span ) {
 			$newest_answer_query = Answered::orderByDesc( 'next_due_at' )
-				->limit( 1 );
+			                               ->limit( 1 );
 			if ( empty( $end_date ) ) {
 				$_date->add( new DateInterval( 'P3D' ) );
 				$end_date = $_date->format( 'Y-m-d H:i:s' );
@@ -218,20 +218,20 @@ class Study extends Model {
 				'end_date'          => $end_date,
 				'matured_card_days' => $matured_day_no,
 				'no_date_limit'     => ( $end_date === null ),
-			// 'card_ids_not_in' => $matured_cards['card_ids'],
+				// 'card_ids_not_in' => $matured_cards['card_ids'],
 			)
 		)['answers'];
-		$all_answers_card_types_young = ChartCardTypes::get_all_card_types_young(
+		$all_answers_card_types_young   = ChartCardTypes::get_all_card_types_young(
 			array(
 				'user_id'           => $user_id,
 				'start_date'        => $start_date,
 				'end_date'          => $end_date,
 				'matured_card_days' => $matured_day_no,
 				'no_date_limit'     => ( $end_date === null ),
-			// 'card_ids_not_in' => $matured_cards['card_ids'],
+				// 'card_ids_not_in' => $matured_cards['card_ids'],
 			)
 		)['answers'];
-		$forecast_new_cards_to_study = ChartForecastHelper::get_forecast_cards_new(
+		$forecast_new_cards_to_study    = ChartForecastHelper::get_forecast_cards_new(
 			array(
 				'user_id' => $user_id,
 			)
@@ -315,7 +315,7 @@ class Study extends Model {
 			$_date->add( new DateInterval( 'P1Y' ) );
 		} elseif ( 'all' === $span ) {
 			$newest_answer_query = Answered::orderByDesc( 'next_due_at' )
-				->limit( 1 );
+			                               ->limit( 1 );
 			if ( empty( $end_date ) ) {
 				$_date->add( new DateInterval( 'P3D' ) );
 				$end_date = $_date->format( 'Y-m-d H:i:s' );
@@ -352,10 +352,10 @@ class Study extends Model {
 				'start_date'    => $start_date,
 				'end_date'      => $end_date,
 				'no_date_limit' => ( $end_date === null ),
-			// 'card_ids_not_in' => $matured_cards['card_ids'],
+				// 'card_ids_not_in' => $matured_cards['card_ids'],
 			)
 		)['answers'];
-		$forecast_new_cards_to_study = ChartForecastHelper::get_forecast_cards_new(
+		$forecast_new_cards_to_study   = ChartForecastHelper::get_forecast_cards_new(
 			array(
 				'user_id' => $user_id,
 			)
@@ -454,8 +454,8 @@ class Study extends Model {
 		foreach ( $days as $key => $day ) {
 			$graphable['y'][]                    = $day['y']['count'];
 			$graphable['m'][]                    = $day['m']['count'];
-			$cumulative_count                   += ( $day['m']['count'] + $day['y']['count'] );
-			$graphable['total_reviews']         += ( $day['m']['count'] + $day['y']['count'] );
+			$cumulative_count                    += ( $day['m']['count'] + $day['y']['count'] );
+			$graphable['total_reviews']          += ( $day['m']['count'] + $day['y']['count'] );
 			$graphable['cumulative'][]           = $cumulative_count;
 			$graphable['y_debug']['answers'][]   = $day['m']['answers'];
 			$graphable['y_debug']['new_cards'][] = $day['y']['new_cards'];
@@ -539,12 +539,12 @@ class Study extends Model {
 		$total_correct              = 0;
 		foreach ( $all_answers_hourly_break_down as $answer ) {
 			// $day_diff_today   = $answer->day_diff_today;
-			$the_hour_count              = $answer->the_hour_count;
-			$grade                       = $answer->grade;
-			$the_hour                    = $answer->the_hour;
+			$the_hour_count             = $answer->the_hour_count;
+			$grade                      = $answer->grade;
+			$the_hour                   = $answer->the_hour;
 			$total_answers_in_all_hours += $the_hour_count;
-			$days[ $the_hour ]['hour']   = $the_hour;
-			$days[ $the_hour ]['count']  = $the_hour_count;
+			$days[ $the_hour ]['hour']  = $the_hour;
+			$days[ $the_hour ]['count'] = $the_hour_count;
 			if ( in_array( $grade, array( 'hard', 'good', 'easy' ) ) ) {
 				$total_correct += $the_hour_count;
 			}
@@ -583,19 +583,27 @@ class Study extends Model {
 	public static function get_user_stats_charts_answer_buttons( $user_id, $span ) {
 		$measure_start_time = microtime( true );
 		// $matured_cards = self::get_user_matured_card_ids($user_id);
-		$graphable                         = array(
+		$graphable = array(
 			'heading'  => array(),
 			'learning' => array(),
 			'y'        => array(),
 			'm'        => array(),
 		);
-		$matured_day_no                    = get_mature_card_days();
+
+		$matured_day_no = get_mature_card_days();
+
 		$end_date                          = null;
 		$user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
-		$user_timezone_mid_night_today     = get_user_timezone_date_midnight_today( $user_id );
+//		Common::send_error( [
+//			__METHOD__,
+//			__LINE__
+//		] );
+		$user_timezone_mid_night_today = get_user_timezone_date_midnight_today( $user_id );
+
 		// $start_date                   = $user_timezone_early_morning_today;
 		$end_date = $user_timezone_mid_night_today;
 		$_date    = new DateTime( $user_timezone_early_morning_today );
+
 		if ( 'one_month' === $span ) {
 			$_date->sub( new DateInterval( 'P30D' ) );
 		} elseif ( 'three_month' === $span ) {
@@ -653,7 +661,7 @@ class Study extends Model {
 				'correct_percent' => 0,
 			),
 		);
-		$__a_count = 0 - $total_no_of_days + 1;
+		$__a_count        = 0 - $total_no_of_days + 1;
 
 		$forecast_all_answers_within_a_date = ChartAnswerButtonsHelper::get_all_answers_button_clicks(
 			array(
@@ -661,11 +669,11 @@ class Study extends Model {
 				'start_date'    => $start_date,
 				'end_date'      => $end_date,
 				'no_date_limit' => ( $end_date === null ),
-			// 'card_ids_not_in' => $matured_cards['card_ids'],
+				// 'card_ids_not_in' => $matured_cards['card_ids'],
 			)
 		)['answers'];
-		$all_answers_newly_learned = ChartAnswerButtonsHelper::get_all_answers_answered_just_once( $user_id )['answers'];
-		$all_learning_answer_ids   = $all_answers_newly_learned->pluck( 'id' )->all();
+		$all_answers_newly_learned          = ChartAnswerButtonsHelper::get_all_answers_answered_just_once( $user_id )['answers'];
+		$all_learning_answer_ids            = $all_answers_newly_learned->pluck( 'id' )->all();
 
 		// Common::send_error([
 		// __METHOD__,
@@ -877,7 +885,7 @@ class Study extends Model {
 			$_date->sub( new DateInterval( 'P1Y' ) );
 		} elseif ( 'all' === $span ) {
 			$oldest_answer_query = Answered::orderBy( 'next_due_at' )
-				->limit( 1 );
+			                               ->limit( 1 );
 			$start_date          = $oldest_answer_query->get()->first()->next_due_at;
 		}
 		if ( 'all' !== $span ) {
@@ -904,7 +912,7 @@ class Study extends Model {
 				'start_date'    => $start_date,
 				'end_date'      => $end_date,
 				'no_date_limit' => ( $end_date === null ),
-			// 'card_ids_not_in' => $matured_cards['card_ids'],
+				// 'card_ids_not_in' => $matured_cards['card_ids'],
 			)
 		)['answers'];
 
@@ -917,7 +925,7 @@ class Study extends Model {
 		// ]);
 
 		foreach ( $forecast_all_answers_within_a_date as $answer ) {
-			$day_diff_today                              = ( $answer->day_diff_today - 1 );
+			$day_diff_today                             = ( $answer->day_diff_today - 1 );
 			$days[ $day_diff_today ]['new_cards_added'] += 1;
 			// Common::send_error([
 			// __METHOD__,
@@ -939,7 +947,7 @@ class Study extends Model {
 		$cumulative_new_cards = 0;
 		$days_not_learnt      = 0;
 		foreach ( $days as $key => $day ) {
-			$cumulative_new_cards               += $day['new_cards_added'];
+			$cumulative_new_cards                += $day['new_cards_added'];
 			$graphable['new_cards_added'][]      = $day['new_cards_added'];
 			$graphable['cumulative_new_cards'][] = $cumulative_new_cards;
 			if ( empty( $day['new_cards_added'] ) ) {
@@ -1016,7 +1024,7 @@ class Study extends Model {
 			$_date->sub( new DateInterval( 'P1Y' ) );
 		} elseif ( 'all' === $span ) {
 			$oldest_answer_query = Answered::orderBy( 'next_due_at' )
-				->limit( 1 );
+			                               ->limit( 1 );
 			$start_date          = $oldest_answer_query->get()->first()->next_due_at;
 			// Common::send_error([
 			// __METHOD__,
@@ -1044,7 +1052,7 @@ class Study extends Model {
 				'start_date'    => $start_date,
 				'end_date'      => $end_date,
 				'no_date_limit' => ( $end_date === null ),
-			// 'card_ids_not_in' => $matured_cards['card_ids'],
+				// 'card_ids_not_in' => $matured_cards['card_ids'],
 			)
 		)['answers'];
 
@@ -1062,10 +1070,10 @@ class Study extends Model {
 		foreach ( $forecast_all_answers_within_a_date as $answer ) {
 			// Get counts
 			$no_of_day_diffs ++;
-			$day_diff_count        = $answer->day_diff_count;
-			$day_diff              = $answer->day_diff;
+			$day_diff_count       = $answer->day_diff_count;
+			$day_diff             = $answer->day_diff;
 			$day_diff_count_total += $day_diff_count;
-			$days['day_diff'][]    = array(
+			$days['day_diff'][]   = array(
 				'day_diff'              => $day_diff,
 				'count'                 => $day_diff_count,
 				'percentage_cumulation' => 0,
@@ -1096,7 +1104,7 @@ class Study extends Model {
 
 		foreach ( $days['day_diff'] as $key => $value ) {
 			// Get percentages
-			$cumulate_day_diff_so_far                         += $value['count'];
+			$cumulate_day_diff_so_far                          += $value['count'];
 			$days['day_diff'][ $key ]['percentage_cumulation'] = ( $cumulate_day_diff_so_far / $day_diff_count_total ) * 100;
 
 			// Common::send_error([
@@ -1225,7 +1233,7 @@ class Study extends Model {
 			$_date->sub( new DateInterval( 'P1Y' ) );
 		} elseif ( 'all' === $span ) {
 			$newest_answer_query = Answered::orderBy( 'next_due_at' )
-				->limit( 1 );
+			                               ->limit( 1 );
 			$start_date          = $newest_answer_query->get()->first()->next_due_at;
 		}
 		if ( 'all' !== $span ) {
@@ -1284,7 +1292,7 @@ class Study extends Model {
 				'start_date'    => $start_date,
 				'end_date'      => $end_date,
 				'no_date_limit' => ( $end_date === null ),
-			// 'card_ids_not_in' => $matured_cards['card_ids'],
+				// 'card_ids_not_in' => $matured_cards['card_ids'],
 			)
 		)['answers'];
 
@@ -1319,7 +1327,7 @@ class Study extends Model {
 				$days[ $day_diff_today ]['m']['minutes_took'] += $minutes_took;
 				$days[ $day_diff_today ]['m']['hours_took']   += $hours_took;
 				$days[ $day_diff_today ]['m']['cumulative']   += $_cumulative_m;
-				$days[ $day_diff_today ]['m']['answers'][]     = $answer;
+				$days[ $day_diff_today ]['m']['answers'][]    = $answer;
 			}
 			if ( $is_young ) {
 				// todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
@@ -1329,7 +1337,7 @@ class Study extends Model {
 				$days[ $day_diff_today ]['y']['minutes_took'] += $minutes_took;
 				$days[ $day_diff_today ]['y']['hours_took']   += $hours_took;
 				$days[ $day_diff_today ]['y']['cumulative']   += $_cumulative_y;
-				$days[ $day_diff_today ]['y']['answers'][]     = $answer;
+				$days[ $day_diff_today ]['y']['answers'][]    = $answer;
 			}
 			if ( $is_newly_learned ) {
 				// todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
@@ -1339,7 +1347,7 @@ class Study extends Model {
 				$days[ $day_diff_today ]['newly_learned']['minutes_took'] += $minutes_took;
 				$days[ $day_diff_today ]['newly_learned']['hours_took']   += $hours_took;
 				$days[ $day_diff_today ]['newly_learned']['cumulative']   += $_cumulative_newly_learned;
-				$days[ $day_diff_today ]['newly_learned']['answers'][]     = $answer;
+				$days[ $day_diff_today ]['newly_learned']['answers'][]    = $answer;
 			}
 			if ( $is_relearned ) {
 				// todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
@@ -1349,7 +1357,7 @@ class Study extends Model {
 				$days[ $day_diff_today ]['re_learned']['minutes_took'] += $minutes_took;
 				$days[ $day_diff_today ]['re_learned']['hours_took']   += $hours_took;
 				$days[ $day_diff_today ]['re_learned']['cumulative']   += $_cumulative_re_learned;
-				$days[ $day_diff_today ]['re_learned']['answers'][]     = $answer;
+				$days[ $day_diff_today ]['re_learned']['answers'][]    = $answer;
 			}
 		}
 
@@ -1375,16 +1383,16 @@ class Study extends Model {
 			$cumulative_m_time              += $day['m']['hours_took'];
 			$cumulative_newly_learned_time  += $day['newly_learned']['hours_took'];
 			$cumulative_re_learned_time     += $day['re_learned']['hours_took'];
-			$today_time_for_today            = ( $day['y']['hours_took']
-												+ $day['m']['hours_took']
-												+ $day['newly_learned']['hours_took']
-												+ $day['re_learned']['hours_took'] );
+			$today_time_for_today           = ( $day['y']['hours_took']
+			                                    + $day['m']['hours_took']
+			                                    + $day['newly_learned']['hours_took']
+			                                    + $day['re_learned']['hours_took'] );
 			$total_time_hours               += $today_time_for_today;
 
 			if ( empty( $cumulative_y_count )
-				 && empty( $cumulative_m_count )
-				 && empty( $cumulative_newly_learned_count )
-				 && empty( $cumulative_re_learned_count ) ) {
+			     && empty( $cumulative_m_count )
+			     && empty( $cumulative_newly_learned_count )
+			     && empty( $cumulative_re_learned_count ) ) {
 				// Not learnt today
 				$days_not_learnt ++;
 			} else {
@@ -1409,7 +1417,7 @@ class Study extends Model {
 			$graphable['cumulative_m'][]             = $cumulative_m_count;
 			$graphable['cumulative_newly_learned'][] = $cumulative_newly_learned_count;
 			$graphable['cumulative_relearned'][]     = $cumulative_re_learned_count;
-			$cumulative_count                       += ( $day['m']['count'] + $day['y']['count'] );
+			$cumulative_count                        += ( $day['m']['count'] + $day['y']['count'] );
 			$graphable['cumulative'][]               = $cumulative_count;
 			// $graphable['y_debug']['answers'][]       = $day['m']['answers'];
 			// $graphable['y_debug']['new_cards'][]     = $day['y']['new_cards'];
@@ -1630,7 +1638,7 @@ class Study extends Model {
 			$_date->sub( new DateInterval( 'P1Y' ) );
 		} elseif ( 'all' === $span ) {
 			$newest_answer_query = Answered::orderBy( 'next_due_at' )
-				->limit( 1 );
+			                               ->limit( 1 );
 			$start_date          = $newest_answer_query->get()->first()->next_due_at;
 			// Common::send_error([
 			// __METHOD__,
@@ -1695,7 +1703,7 @@ class Study extends Model {
 				'start_date'    => $start_date,
 				'end_date'      => $end_date,
 				'no_date_limit' => ( $end_date === null ),
-			// 'card_ids_not_in' => $matured_cards['card_ids'],
+				// 'card_ids_not_in' => $matured_cards['card_ids'],
 			)
 		)['answers'];
 
@@ -1730,7 +1738,7 @@ class Study extends Model {
 				$days[ $day_diff_today ]['m']['minutes_took'] += $minutes_took;
 				$days[ $day_diff_today ]['m']['hours_took']   += $hours_took;
 				$days[ $day_diff_today ]['m']['cumulative']   += $_cumulative_m;
-				$days[ $day_diff_today ]['m']['answers'][]     = $answer;
+				$days[ $day_diff_today ]['m']['answers'][]    = $answer;
 			}
 			if ( $is_young ) {
 				// todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
@@ -1740,7 +1748,7 @@ class Study extends Model {
 				$days[ $day_diff_today ]['y']['minutes_took'] += $minutes_took;
 				$days[ $day_diff_today ]['y']['hours_took']   += $hours_took;
 				$days[ $day_diff_today ]['y']['cumulative']   += $_cumulative_y;
-				$days[ $day_diff_today ]['y']['answers'][]     = $answer;
+				$days[ $day_diff_today ]['y']['answers'][]    = $answer;
 			}
 			if ( $is_newly_learned ) {
 				// todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
@@ -1750,7 +1758,7 @@ class Study extends Model {
 				$days[ $day_diff_today ]['newly_learned']['minutes_took'] += $minutes_took;
 				$days[ $day_diff_today ]['newly_learned']['hours_took']   += $hours_took;
 				$days[ $day_diff_today ]['newly_learned']['cumulative']   += $_cumulative_newly_learned;
-				$days[ $day_diff_today ]['newly_learned']['answers'][]     = $answer;
+				$days[ $day_diff_today ]['newly_learned']['answers'][]    = $answer;
 			}
 			if ( $is_relearned ) {
 				// todo ignore the max no of on_hold or revise he needs to answer each day. So don't roll over remaining cards
@@ -1760,7 +1768,7 @@ class Study extends Model {
 				$days[ $day_diff_today ]['re_learned']['minutes_took'] += $minutes_took;
 				$days[ $day_diff_today ]['re_learned']['hours_took']   += $hours_took;
 				$days[ $day_diff_today ]['re_learned']['cumulative']   += $_cumulative_re_learned;
-				$days[ $day_diff_today ]['re_learned']['answers'][]     = $answer;
+				$days[ $day_diff_today ]['re_learned']['answers'][]    = $answer;
 			}
 
 			// Common::send_error([
@@ -1811,16 +1819,16 @@ class Study extends Model {
 			$cumulative_m_time              += $day['m']['hours_took'];
 			$cumulative_newly_learned_time  += $day['newly_learned']['hours_took'];
 			$cumulative_re_learned_time     += $day['re_learned']['hours_took'];
-			$today_time_for_today            = ( $day['y']['hours_took']
-												+ $day['m']['hours_took']
-												+ $day['newly_learned']['hours_took']
-												+ $day['re_learned']['hours_took'] );
+			$today_time_for_today           = ( $day['y']['hours_took']
+			                                    + $day['m']['hours_took']
+			                                    + $day['newly_learned']['hours_took']
+			                                    + $day['re_learned']['hours_took'] );
 			$total_time_hours               += $today_time_for_today;
 
 			if ( empty( $cumulative_y_count )
-				 && empty( $cumulative_m_count )
-				 && empty( $cumulative_newly_learned_count )
-				 && empty( $cumulative_re_learned_count ) ) {
+			     && empty( $cumulative_m_count )
+			     && empty( $cumulative_newly_learned_count )
+			     && empty( $cumulative_re_learned_count ) ) {
 				// Not learnt today
 				$days_not_learnt ++;
 			} else {
@@ -1845,7 +1853,7 @@ class Study extends Model {
 			$graphable['cumulative_m'][]             = $cumulative_m_count;
 			$graphable['cumulative_newly_learned'][] = $cumulative_newly_learned_count;
 			$graphable['cumulative_relearned'][]     = $cumulative_re_learned_count;
-			$cumulative_count                       += ( $day['m']['count'] + $day['y']['count'] );
+			$cumulative_count                        += ( $day['m']['count'] + $day['y']['count'] );
 			$graphable['cumulative'][]               = $cumulative_count;
 			// $graphable['y_debug']['answers'][]       = $day['m']['answers'];
 			// $graphable['y_debug']['new_cards'][]     = $day['y']['new_cards'];
@@ -2063,8 +2071,8 @@ class Study extends Model {
 		// Common::send_error(['user_id' => $args]);
 
 		$user         = User::with( 'studies' )
-							->where( 'ID', '=', $args['user_id'] )
-							->get()->first();// ->studies();//->get();
+		                    ->where( 'ID', '=', $args['user_id'] )
+		                    ->get()->first();// ->studies();//->get();
 		$user_studies = $user->studies;
 
 		$all_card_ids = array();
@@ -2074,10 +2082,10 @@ class Study extends Model {
 			$study_all_on_hold = $study->study_all_on_hold;
 			$no_on_hold        = $study->no_on_hold;
 			$query_answer      = Answered::with( 'study.deck', 'card' )
-				->where( 'study_id', '=', $study_id )
-				->where( 'grade', '=', 'hold' )
-				->groupBy( 'card_id' )
-				->orderByDesc( 'id' );
+			                             ->where( 'study_id', '=', $study_id )
+			                             ->where( 'grade', '=', 'hold' )
+			                             ->groupBy( 'card_id' )
+			                             ->orderByDesc( 'id' );
 
 			if ( $args['no_date_limit'] ) {
 				$query_answer = $query_answer->where( 'next_due_at', '>=', $args['start_date'] );
@@ -2135,8 +2143,8 @@ class Study extends Model {
 		$args    = wp_parse_args( $args, $default );
 
 		$user         = User::with( 'studies' )
-							->where( 'ID', '=', $args['user_id'] )
-							->get()->first();// ->studies();//->get();
+		                    ->where( 'ID', '=', $args['user_id'] )
+		                    ->get()->first();// ->studies();//->get();
 		$user_studies = $user->studies;
 		// Common::send_error( [
 		// '$args'         => $args,
@@ -2152,10 +2160,10 @@ class Study extends Model {
 			$revise_all   = $study->revise_all;
 			$no_to_revise = $study->no_to_revise;
 			$query_answer = Answered::with( 'study.deck', 'card' )
-				->where( 'study_id', '=', $study_id )
-				->where( 'grade', '!=', 'hold' )
-				->groupBy( 'card_id' )
-				->orderByDesc( 'id' );
+			                        ->where( 'study_id', '=', $study_id )
+			                        ->where( 'grade', '!=', 'hold' )
+			                        ->groupBy( 'card_id' )
+			                        ->orderByDesc( 'id' );
 			if ( $args['no_date_limit'] ) {
 				$query_answer = $query_answer->where( 'next_due_at', '>', $args['start_date'] );
 			} else {
@@ -2214,7 +2222,7 @@ class Study extends Model {
 		$user_query = User::with(
 			array(
 				'studies.answers' => function ( $q ) use ( $mature_card_days ) {
-					 $q
+					$q
 						->select(
 							'id',
 							'next_due_at',
@@ -2224,20 +2232,20 @@ class Study extends Model {
 							Manager::raw( 'DATEDIFF(DATE(next_due_at),DATE(created_at)) next_due_interval' ),
 							Manager::raw( 'DATE(created_at)' )
 						)
-						 ->groupBy( 'card_id' )
-						 ->having( 'next_due_interval', '>=', $mature_card_days )
-						 ->orderBy( 'id', 'desc' );
-					 // Common::send_error( [
-					 // __METHOD__,
-					 // '$q sql'               => $q->toSql(),
-					 // '$q $get'              => $q->get(),
-					 // 'Manager::getQueryLog()' => Manager::getQueryLog(),
-					 // '$aaa'                   => $aaa_get,
-					 // ] );
+						->groupBy( 'card_id' )
+						->having( 'next_due_interval', '>=', $mature_card_days )
+						->orderBy( 'id', 'desc' );
+					// Common::send_error( [
+					// __METHOD__,
+					// '$q sql'               => $q->toSql(),
+					// '$q $get'              => $q->get(),
+					// 'Manager::getQueryLog()' => Manager::getQueryLog(),
+					// '$aaa'                   => $aaa_get,
+					// ] );
 				},
 			)
 		)
-						  ->where( 'ID', '=', $user_id );
+		                  ->where( 'ID', '=', $user_id );
 
 		$user = $user_query->get()->first();
 
@@ -2320,19 +2328,19 @@ class Study extends Model {
 			}
 
 			$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
-								  ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
-								  ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
-								  ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
-								  ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
-								  ->where( 'tg.taggable_type', '=', CardGroup::class )
-								->select(
-									'c.id as card_id',
-									'd.id as deck_id',
-									'cg.card_type as card_type',
-									'cg.id as card_group_id',
-									't.name as tag_name',
-									'tg.taggable_type as taggable_type'
-								);
+			                      ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
+			                      ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
+			                      ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
+			                      ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
+			                      ->where( 'tg.taggable_type', '=', CardGroup::class )
+			                      ->select(
+				                      'c.id as card_id',
+				                      'd.id as deck_id',
+				                      'cg.card_type as card_type',
+				                      'cg.id as card_group_id',
+				                      't.name as tag_name',
+				                      'tg.taggable_type as taggable_type'
+			                      );
 
 			if ( ! $add_all_tags ) {
 				$cards_query = $cards_query->whereIn( 't.id', $tags );
@@ -2340,7 +2348,7 @@ class Study extends Model {
 			}
 
 			$cards_query = $cards_query->where( 'd.id', '=', $deck_id )
-									   ->groupBy( 'c.id' );
+			                           ->groupBy( 'c.id' );
 			// ->where( 'tb.taggable_type', '=', CardGroup::class )
 			// dd(
 			// $cards_query->toSql(),
@@ -2424,10 +2432,10 @@ class Study extends Model {
 			 */
 
 			/*** Get all cards revised today answered today (To exclude them later if "false === $study->no_to_revise") */
-			$query_revised_today = Answered::where( 'study_id', '=', $study_id )
-				->where( 'created_at', '>', $user_timezone_early_morning_today )
+			$query_revised_today                 = Answered::where( 'study_id', '=', $study_id )
+			                                               ->where( 'created_at', '>', $user_timezone_early_morning_today )
 				// ->whereNotIn( 'grade', [ 'again' ] )
-				->where( 'answered_as_revised', '=', true );
+				                                           ->where( 'answered_as_revised', '=', true );
 			$card_ids_revised_today              = $query_revised_today->pluck( 'card_id' );
 			$count_revised_today                 = $card_ids_revised_today->count();
 			$no_of_new_remaining_to_revise_today = $no_to_revise - $count_revised_today;
@@ -2442,14 +2450,14 @@ class Study extends Model {
 
 			/*** Prepare basic query */
 			$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
-								  ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
-								  ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
-								  ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
-								  ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
-								  ->where( 'tg.taggable_type', '=', CardGroup::class )
-								->select(
-									'c.id as card_id'
-								);
+			                      ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
+			                      ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
+			                      ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
+			                      ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
+			                      ->where( 'tg.taggable_type', '=', CardGroup::class )
+			                      ->select(
+				                      'c.id as card_id'
+			                      );
 
 			/*** Add just a few tags? */
 			if ( ! $add_all_tags ) {
@@ -2467,32 +2475,32 @@ class Study extends Model {
 				->whereIn(
 					'c.id',
 					function ( $q ) use (
-					$user_timezone_early_morning_today,
-					$card_ids_revised_today,
-					$study_id,
-					$user_id
+						$user_timezone_early_morning_today,
+						$card_ids_revised_today,
+						$study_id,
+						$user_id
 					) {
 						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED )
-						->whereNotIn( 'card_id', $card_ids_revised_today )
-						->whereNotIn(
-							'card_id',
-							function ( $q ) use ( $user_id ) {
-								$q
-								->select( 'card_id' )
-								->from( SP_TABLE_ANSWERED . ' as aaa' )
-								->leftJoin( SP_TABLE_STUDY . ' as sss', 'sss.id', '=', 'aaa.study_id' )
-								->leftJoin( SP_TABLE_USERS . ' as uuu', 'uuu.id', '=', 'sss.user_id' )
-								->where( 'uuu.id', '=', $user_id )
-								->where( 'grade', '!=', 'hold' )
-								->distinct(); // todo improve, limit by study_id or user_id
+						  ->whereNotIn( 'card_id', $card_ids_revised_today )
+						  ->whereNotIn(
+							  'card_id',
+							  function ( $q ) use ( $user_id ) {
+								  $q
+									  ->select( 'card_id' )
+									  ->from( SP_TABLE_ANSWERED . ' as aaa' )
+									  ->leftJoin( SP_TABLE_STUDY . ' as sss', 'sss.id', '=', 'aaa.study_id' )
+									  ->leftJoin( SP_TABLE_USERS . ' as uuu', 'uuu.id', '=', 'sss.user_id' )
+									  ->where( 'uuu.id', '=', $user_id )
+									  ->where( 'grade', '!=', 'hold' )
+									  ->distinct(); // todo improve, limit by study_id or user_id
 
-								// dd( $q->toSql(), $q->getBindings(), $q->get() );
-							}
-						)
-						->whereIn( 'grade', array( 'hold' ) )
-						->where( 'study_id', $study_id )
-						->where( 'next_due_at', '<=', $user_timezone_early_morning_today )
-						->distinct();
+								  // dd( $q->toSql(), $q->getBindings(), $q->get() );
+							  }
+						  )
+						  ->whereIn( 'grade', array( 'hold' ) )
+						  ->where( 'study_id', $study_id )
+						  ->where( 'next_due_at', '<=', $user_timezone_early_morning_today )
+						  ->distinct();
 						// dd( $q->toSql(), $q->getBindings(),$card_ids_revised_today, $q->get() );
 					}
 				);
@@ -2500,14 +2508,14 @@ class Study extends Model {
 
 			/*** Group by c.id "To prevent duplicate results being returned" */
 			$cards_query = $cards_query->where( 'd.id', '=', $deck_id )
-									   ->groupBy( 'c.id' );
+			                           ->groupBy( 'c.id' );
 			// dd( $cards_query->toSql(), $cards_query->getBindings(),$cards_query->get() );
 
 			$card_ids = $cards_query->pluck( 'card_id' );
 
 			/*** Get the cards */
 			$all_cards = Card::with( 'card_group', 'card_group.deck' )
-							 ->whereIn( 'id', $card_ids );
+			                 ->whereIn( 'id', $card_ids );
 			// Common::send_error([
 			// 'all_cards' => $all_cards,
 			// ]);
@@ -2582,10 +2590,10 @@ class Study extends Model {
 
 			/*** Get all cards revised today answered today (To exclude them later if "false === $study->no_to_revise") */
 			$query_revised_today                 = Answered::where( 'study_id', '=', $study_id )
-														   ->where( 'created_at', '>', $user_timezone_early_morning_today )
-														   ->whereNotIn( 'grade', array( 'again' ) )
-														   ->where( 'study_id', '=', $study_id )
-														   ->where( 'answered_as_revised', '=', true );
+			                                               ->where( 'created_at', '>', $user_timezone_early_morning_today )
+			                                               ->whereNotIn( 'grade', array( 'again' ) )
+			                                               ->where( 'study_id', '=', $study_id )
+			                                               ->where( 'answered_as_revised', '=', true );
 			$card_ids_revised_today              = $query_revised_today->pluck( 'card_id' );
 			$count_revised_today                 = $card_ids_revised_today->count();
 			$no_of_new_remaining_to_revise_today = $no_to_revise - $count_revised_today;
@@ -2599,14 +2607,14 @@ class Study extends Model {
 
 			/*** Prepare basic query */
 			$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
-								  ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
-								  ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
-								  ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
-								  ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
-								  ->where( 'tg.taggable_type', '=', CardGroup::class )
-								->select(
-									'c.id as card_id'
-								);
+			                      ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
+			                      ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
+			                      ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
+			                      ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
+			                      ->where( 'tg.taggable_type', '=', CardGroup::class )
+			                      ->select(
+				                      'c.id as card_id'
+			                      );
 
 			/*** Add just a few tags? */
 			if ( ! $add_all_tags ) {
@@ -2635,16 +2643,16 @@ class Study extends Model {
 				->whereIn(
 					'c.id',
 					function ( $q ) use (
-					$user_timezone_early_morning_today,
-					$card_ids_revised_today,
-					$study_id
+						$user_timezone_early_morning_today,
+						$card_ids_revised_today,
+						$study_id
 					) {
 						$q->select( 'card_id' )->from( SP_TABLE_ANSWERED )
-						->whereNotIn( 'card_id', $card_ids_revised_today )
-						->whereNotIn( 'grade', array( 'hold' ) )
-						->where( 'study_id', $study_id )
-						->where( 'next_due_at', '<=', $user_timezone_early_morning_today )
-						->distinct();
+						  ->whereNotIn( 'card_id', $card_ids_revised_today )
+						  ->whereNotIn( 'grade', array( 'hold' ) )
+						  ->where( 'study_id', $study_id )
+						  ->where( 'next_due_at', '<=', $user_timezone_early_morning_today )
+						  ->distinct();
 						// dd( $q->toSql(), $q->getBindings(),$q->get() );
 					}
 				);
@@ -2652,14 +2660,14 @@ class Study extends Model {
 
 			/*** Group by c.id "To prevent duplicate results being returned" */
 			$cards_query = $cards_query->where( 'd.id', '=', $deck_id )
-									   ->groupBy( 'c.id' );
+			                           ->groupBy( 'c.id' );
 			// dd( $cards_query->toSql(), $cards_query->getBindings(),$cards_query->get() );
 
 			$card_ids = $cards_query->pluck( 'card_id' );
 
 			/*** Get the cards */
 			$all_cards = Card::with( 'card_group', 'card_group.deck' )
-							 ->whereIn( 'id', $card_ids );
+			                 ->whereIn( 'id', $card_ids );
 			// dd(
 			// $card_ids,
 			// $all_cards->toSql(),
@@ -2735,9 +2743,9 @@ class Study extends Model {
 
 			/*** Get all new cards answered today "Only those answered once and today are truly new" */
 			$query_new_answered_today     = Answered::where( 'study_id', '=', $study_id )
-													->where( 'created_at', '>', $user_timezone_early_morning_today )
-													->where( 'grade', '!=', 'again' )
-													->where( 'answered_as_new', '=', true );
+			                                        ->where( 'created_at', '>', $user_timezone_early_morning_today )
+			                                        ->where( 'grade', '!=', 'again' )
+			                                        ->where( 'answered_as_new', '=', true );
 			$new_card_ids_answered_today  = $query_new_answered_today->pluck( 'card_id' );
 			$count_new_studied_today      = $new_card_ids_answered_today->count();
 			$no_of_new_remaining_to_study = $no_of_new - $count_new_studied_today;
@@ -2754,36 +2762,36 @@ class Study extends Model {
 
 			/*** Prepare basic query */
 			$cards_query = Manager::table( SP_TABLE_CARDS . ' as c' )
-								  ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
-								  ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
-								  ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
-								  ->leftJoin( SP_TABLE_TAGGABLES_EXCLUDED . ' as tgex', 'tgex.taggable_id', '=', 'cg.id' )
-								  ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
-								  ->where( 'tg.taggable_type', '=', CardGroup::class )
-								->where(
-									function ( $query ) use ( $user_timezone_midnight_today ) {
-										$query
-										->where(
-											function ( $q ) use ( $user_timezone_midnight_today ) {
-												$q->whereNotNull( 'cg.scheduled_at' )
-												->where( 'cg.scheduled_at', '<=', $user_timezone_midnight_today );
-											}
-										)
-										->orWhere(
-											function ( $q ) {
-												$q->whereNull( 'cg.scheduled_at' );
-											}
-										);
-									}
-								)
+			                      ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
+			                      ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
+			                      ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
+			                      ->leftJoin( SP_TABLE_TAGGABLES_EXCLUDED . ' as tgex', 'tgex.taggable_id', '=', 'cg.id' )
+			                      ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
+			                      ->where( 'tg.taggable_type', '=', CardGroup::class )
+			                      ->where(
+				                      function ( $query ) use ( $user_timezone_midnight_today ) {
+					                      $query
+						                      ->where(
+							                      function ( $q ) use ( $user_timezone_midnight_today ) {
+								                      $q->whereNotNull( 'cg.scheduled_at' )
+								                        ->where( 'cg.scheduled_at', '<=', $user_timezone_midnight_today );
+							                      }
+						                      )
+						                      ->orWhere(
+							                      function ( $q ) {
+								                      $q->whereNull( 'cg.scheduled_at' );
+							                      }
+						                      );
+				                      }
+			                      )
 				// ->whereNotIn( 'c.id', function ( $q ) use ( $study_id ) {
 				// $q->select( 'card_id' )->from( SP_TABLE_ANSWERED . ' as a' )
 				// ->where( 'study_id', '=', $study_id )
 				// ->distinct();
 				// } )
-								->select(
-									'c.id as card_id'
-								);
+				                  ->select(
+					'c.id as card_id'
+				);
 
 			/*** Add just a few tags? */
 			if ( ! $add_all_tags ) {
@@ -2805,19 +2813,19 @@ class Study extends Model {
 				->whereNotIn(
 					'c.id',
 					function ( $q ) use (
-					$user_timezone_early_morning_today,
-					$user_id
+						$user_timezone_early_morning_today,
+						$user_id
 					) {
 						// $q->select('card_id')->from(SP_TABLE_ANSWERED)
 						// ->where('grade', '!=', 'again');
 						$q
-						->select( 'card_id' )
-						->from( SP_TABLE_ANSWERED . ' as aaa' )
-						->leftJoin( SP_TABLE_STUDY . ' as sss', 'sss.id', '=', 'aaa.study_id' )
-						->leftJoin( SP_TABLE_USERS . ' as uuu', 'uuu.ID', '=', 'sss.user_id' )
-						->where( 'uuu.ID', '=', $user_id )
-						->where( 'aaa.created_at', '>', $user_timezone_early_morning_today )
-						->distinct();
+							->select( 'card_id' )
+							->from( SP_TABLE_ANSWERED . ' as aaa' )
+							->leftJoin( SP_TABLE_STUDY . ' as sss', 'sss.id', '=', 'aaa.study_id' )
+							->leftJoin( SP_TABLE_USERS . ' as uuu', 'uuu.ID', '=', 'sss.user_id' )
+							->where( 'uuu.ID', '=', $user_id )
+							->where( 'aaa.created_at', '>', $user_timezone_early_morning_today )
+							->distinct();
 					}
 				);
 
@@ -2826,12 +2834,12 @@ class Study extends Model {
 				'c.id',
 				function ( $q ) use ( $user_id ) {
 					$q
-					->select( 'card_id' )
-					->from( SP_TABLE_ANSWERED . ' as aaa' )
-					->leftJoin( SP_TABLE_STUDY . ' as sss', 'sss.id', '=', 'aaa.study_id' )
-					->leftJoin( SP_TABLE_USERS . ' as uuu', 'uuu.ID', '=', 'sss.user_id' )
-					->where( 'uuu.ID', '=', $user_id )
-					->distinct();
+						->select( 'card_id' )
+						->from( SP_TABLE_ANSWERED . ' as aaa' )
+						->leftJoin( SP_TABLE_STUDY . ' as sss', 'sss.id', '=', 'aaa.study_id' )
+						->leftJoin( SP_TABLE_USERS . ' as uuu', 'uuu.ID', '=', 'sss.user_id' )
+						->where( 'uuu.ID', '=', $user_id )
+						->distinct();
 					// Common::send_error([
 					// __METHOD__,
 					// '$q sql' => $q->toSql(),
@@ -2844,13 +2852,13 @@ class Study extends Model {
 
 			/*** Group by c.id "To prevent duplicate results being returned" */
 			$cards_query = $cards_query->where( 'd.id', '=', $deck_id )
-									   ->groupBy( 'c.id' );
+			                           ->groupBy( 'c.id' );
 
 			$card_ids = $cards_query->pluck( 'card_id' );
 
 			/*** Get the cards */
 			$all_cards = Card::with( 'card_group', 'card_group.deck' )
-							 ->whereIn( 'id', $card_ids );
+			                 ->whereIn( 'id', $card_ids );
 			// Common::send_error([
 			// '$card_ids'                          => $card_ids,
 			// '$user_timezone_early_morning_today' => $user_timezone_early_morning_today,
@@ -2950,10 +2958,10 @@ class Study extends Model {
 		$user         = User::with(
 			array(
 				'studies.deck.card_groups.cards' => function ( $query ) use ( $user_id ) {
-						$query->whereNotIn(
-							'id',
-							function ( $q ) use ( $user_id ) {
-								$q
+					$query->whereNotIn(
+						'id',
+						function ( $q ) use ( $user_id ) {
+							$q
 								->select( 'card_id' )
 								->from( SP_TABLE_ANSWERED . ' as aaa' )
 								->leftJoin( SP_TABLE_STUDY . ' as sss', 'sss.id', '=', 'aaa.study_id' )
@@ -2961,18 +2969,18 @@ class Study extends Model {
 								->where( 'uuu.id', '=', $user_id )
 								->distinct(); // todo improve, limit by study_id or user_id
 
-								// Common::send_error([
-								// __METHOD__,
-								// '$q sql' => $q->toSql(),
-								// '$q get' => $q->get(),
-								// '$q' => $q,
-								// ]);
-							}
-						);
+							// Common::send_error([
+							// __METHOD__,
+							// '$q sql' => $q->toSql(),
+							// '$q get' => $q->get(),
+							// '$q' => $q,
+							// ]);
+						}
+					);
 				},
 			)
 		)
-			->where( 'ID', '=', $user_id );
+		                    ->where( 'ID', '=', $user_id );
 		$user_studies = $user->get()->first()->studies;
 		Common::send_error(
 			array(
@@ -3024,8 +3032,8 @@ class Study extends Model {
 				},
 			)
 		)
-			->groupBy( 'card_id' )
-			->where( 'create_at', '<', strtotime( 'today midnight' ) );
+		                 ->groupBy( 'card_id' )
+		                 ->where( 'create_at', '<', strtotime( 'today midnight' ) );
 		Common::in_script(
 			array(
 				__METHOD__,
@@ -3038,35 +3046,35 @@ class Study extends Model {
 
 	private static function get_total_answer_count_for_user( $user_id, $start_date, $end_date ) {
 		$count = Manager::table( SP_TABLE_ANSWERED . ' as a' )
-						->join( SP_TABLE_STUDY . ' as s', 's.id', '=', 'a.study_id' )
-						->join( SP_TABLE_USERS . ' as u', 'u.id', '=', 's.user_id' )
-						->where( 's.user_id', '=', $user_id )
-						->whereBetween( 'a.created_at', array( $start_date, $end_date ) )
-						->count();
+		                ->join( SP_TABLE_STUDY . ' as s', 's.id', '=', 'a.study_id' )
+		                ->join( SP_TABLE_USERS . ' as u', 'u.id', '=', 's.user_id' )
+		                ->where( 's.user_id', '=', $user_id )
+		                ->whereBetween( 'a.created_at', array( $start_date, $end_date ) )
+		                ->count();
 
 		return $count;
 	}
 
 	private static function get_user_oldest_answer( $user_id ) {
 		$answer = Manager::table( SP_TABLE_ANSWERED . ' as a' )
-						 ->join( SP_TABLE_STUDY . ' as s', 's.id', '=', 'a.study_id' )
-						 ->join( SP_TABLE_USERS . ' as u', 'u.id', '=', 's.user_id' )
-						 ->where( 's.user_id', '=', $user_id )
-						 ->orderBy( 'a.created_at', 'asc' )
-						 ->limit( 1 )
-						 ->get()->first();
+		                 ->join( SP_TABLE_STUDY . ' as s', 's.id', '=', 'a.study_id' )
+		                 ->join( SP_TABLE_USERS . ' as u', 'u.id', '=', 's.user_id' )
+		                 ->where( 's.user_id', '=', $user_id )
+		                 ->orderBy( 'a.created_at', 'asc' )
+		                 ->limit( 1 )
+		                 ->get()->first();
 
 		return $answer;
 	}
 
 	private static function get_user_newest_answer( $user_id ) {
 		$answer = Manager::table( SP_TABLE_ANSWERED . ' as a' )
-						 ->join( SP_TABLE_STUDY . ' as s', 's.id', '=', 'a.study_id' )
-						 ->join( SP_TABLE_USERS . ' as u', 'u.id', '=', 's.user_id' )
-						 ->where( 's.user_id', '=', $user_id )
-						 ->orderBy( 'a.created_at', 'desc' )
-						 ->limit( 1 )
-						 ->get()->first();
+		                 ->join( SP_TABLE_STUDY . ' as s', 's.id', '=', 'a.study_id' )
+		                 ->join( SP_TABLE_USERS . ' as u', 'u.id', '=', 's.user_id' )
+		                 ->where( 's.user_id', '=', $user_id )
+		                 ->orderBy( 'a.created_at', 'desc' )
+		                 ->limit( 1 )
+		                 ->get()->first();
 
 		return $answer;
 	}

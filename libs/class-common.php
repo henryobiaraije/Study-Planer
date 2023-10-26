@@ -616,6 +616,11 @@ class Common {
 
 		$date = sp_get_user_debug_form()['current_study_date'];
 
+//		Common::send_error( array(
+//			__METHOD__,
+//			__LINE__
+//		) );
+
 //		$date = sp_da
 
 		if ( $days !== 0 ) {

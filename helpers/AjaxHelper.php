@@ -45,7 +45,10 @@ class AjaxHelper {
 
 	private function init_ajax() {
 		// <editor-fold desc="Deck Group">
-		add_action( 'admin_sp_pro_ajax_admin_create_new_deck_group', array( $this, 'ajax_admin_create_new_deck_group' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_deck_group', array(
+			$this,
+			'ajax_admin_create_new_deck_group'
+		) );
 		add_action( 'admin_sp_pro_ajax_admin_update_deck_group', array( $this, 'ajax_admin_update_deck_group' ) );
 		add_action( 'admin_sp_pro_ajax_admin_load_deck_group', array( $this, 'ajax_admin_load_deck_group' ) );
 		add_action( 'admin_sp_pro_ajax_admin_search_deck_group', array( $this, 'ajax_admin_search_deck_group' ) );
@@ -77,8 +80,14 @@ class AjaxHelper {
 		add_action( 'admin_sp_pro_ajax_admin_delete_tags', array( $this, 'ajax_admin_delete_tags' ) );
 		// </editor-fold desc="Tag">
 		// <editor-fold desc="Others">
-		add_action( 'admin_sp_pro_ajax_admin_create_new_basic_card', array( $this, 'ajax_admin_create_new_basic_card' ) );
-		add_action( 'admin_sp_pro_ajax_admin_load_image_attachment', array( $this, 'ajax_admin_load_image_attachment' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_basic_card', array(
+			$this,
+			'ajax_admin_create_new_basic_card'
+		) );
+		add_action( 'admin_sp_pro_ajax_admin_load_image_attachment', array(
+			$this,
+			'ajax_admin_load_image_attachment'
+		) );
 		add_action( 'admin_sp_pro_ajax_admin_load_basic_card', array( $this, 'ajax_admin_load_basic_card' ) );
 		add_action( 'admin_sp_pro_ajax_admin_trash_cards', array( $this, 'ajax_admin_trash_cards' ) );
 		add_action( 'admin_sp_pro_ajax_admin_restore_card_group', array( $this, 'ajax_admin_restore_card_group' ) );
@@ -89,15 +98,24 @@ class AjaxHelper {
 		add_action( 'admin_sp_pro_ajax_admin_update_gap_card', array( $this, 'ajax_admin_update_gap_card' ) );
 		add_action( 'admin_sp_pro_ajax_admin_update_table_card', array( $this, 'ajax_admin_update_table_card' ) );
 		add_action( 'admin_sp_pro_ajax_admin_update_image_card', array( $this, 'ajax_admin_update_image_card' ) );
-		add_action( 'admin_sp_pro_ajax_admin_create_new_table_card', array( $this, 'ajax_admin_create_new_table_card' ) );
-		add_action( 'admin_sp_pro_ajax_admin_create_new_image_card', array( $this, 'ajax_admin_create_new_image_card' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_table_card', array(
+			$this,
+			'ajax_admin_create_new_table_card'
+		) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_image_card', array(
+			$this,
+			'ajax_admin_create_new_image_card'
+		) );
 		add_action( 'admin_sp_pro_ajax_admin_load_settings', array( $this, 'ajax_admin_load_settings' ) );
 		add_action( 'admin_sp_pro_ajax_admin_update_settings', array( $this, 'ajax_admin_update_settings' ) );
 		// </editor-fold desc="Card">
 		// <editor-fold desc="Collections">
 		add_action( 'admin_sp_pro_ajax_admin_load_collections', array( $this, 'ajax_admin_load_collections' ) );
 		add_action( 'admin_sp_pro_ajax_admin_search_collections', array( $this, 'ajax_admin_search_collections' ) );
-		add_action( 'admin_sp_pro_ajax_admin_create_new_collection', array( $this, 'ajax_admin_create_new_collection' ) );
+		add_action( 'admin_sp_pro_ajax_admin_create_new_collection', array(
+			$this,
+			'ajax_admin_create_new_collection'
+		) );
 		add_action( 'admin_sp_pro_ajax_admin_update_collections', array( $this, 'ajax_admin_update_collections' ) );
 		add_action( 'admin_sp_pro_ajax_admin_trash_collections', array( $this, 'ajax_admin_trash_collections' ) );
 		add_action( 'admin_sp_pro_ajax_admin_delete_collections', array( $this, 'ajax_admin_delete_collections' ) );
@@ -2756,7 +2774,9 @@ class AjaxHelper {
 		$message     = 'Cards assigned to topic.';
 		$card_groups = [];
 		if ( 'selected_cards' === $what_to_do ) {
-//			$card_groups = $all['selected_cards'];
+			// Get card groups for these cards.
+			$card_group_ids = collect( $params['cards'] )->pluck( 'id' )->toArray();
+			$card_groups    = CardGroup::whereIn( 'id', $card_group_ids )->get();
 		} elseif ( 'selected_group' === $what_to_do ) {
 			if ( ! is_array( $e_group ) ) {
 				Common::send_error( 'Please select a group.' );
@@ -2772,19 +2792,46 @@ class AjaxHelper {
 					}
 				)
 				->get();
-			if ( $card_groups ) {
-				// Assign the card groups to $topic to assign.
-				foreach ( $card_groups as $card_group ) {
-					$card_group->topic_id = $topic_id_to_assign;
-					$card_group->save();
-				}
-			}
-			$message = $card_groups->count() . ' card groups assigned to topic.';
 		} elseif ( 'selected_deck' === $what_to_do ) {
+			if ( ! is_array( $e_deck ) ) {
+				Common::send_error( 'Please select a deck.' );
+			}
+			$deck_id = (int) sanitize_text_field( $e_deck['id'] );
 
+			// Get card groups under this deck.
+			$card_groups = CardGroup
+				::whereHas(
+					'deck',
+					function ( $query ) use ( $deck_id ) {
+						$query->where( 'id', '=', $deck_id );
+					}
+				)
+				->get();
 		} elseif ( 'selected_topic' === $what_to_do ) {
+			if ( ! is_array( $e_topic ) ) {
+				Common::send_error( 'Please select a topic.' );
+			}
+			$topic_id = (int) sanitize_text_field( $e_topic['id'] );
 
+			// Get card groups under this topic.
+			$card_groups = CardGroup
+				::whereHas(
+					'topic',
+					function ( $query ) use ( $topic_id ) {
+						$query->where( 'id', '=', $topic_id );
+					}
+				)
+				->get();
 		}
+
+		if ( $card_groups ) {
+			// Assign the card groups to $topic to assign.
+			foreach ( $card_groups as $card_group ) {
+				$card_group->topic_id = $topic_id_to_assign;
+				$card_group->save();
+			}
+		}
+		$message = $card_groups->count() . ' card groups assigned to topic.';
 
 
 		Common::send_success( $message );

@@ -37,8 +37,10 @@
     "ext-json": "*"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest"
-    ,
+    "roave/security-advisories": "dev-latest",
     "symfony/var-dumper": "^5.3"
+  },
+  "scripts": {
+    "build": "composer install --no-dev --optimize-autoloader"
   }
 }

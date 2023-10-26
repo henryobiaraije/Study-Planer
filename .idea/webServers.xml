@@ -23,6 +23,9 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="67003acf-039a-4769-a959-47577e734f90" name="test2" url="http://localhost">
+        <fileTransfer mountedRoot="C:\laragon\www\awesome" accessType="MOUNT" port="0" />
+      </webServer>
     </option>
   </component>
 </project>

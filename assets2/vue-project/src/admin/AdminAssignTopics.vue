@@ -111,7 +111,6 @@ export default defineComponent({
     this.topics.search('');
   },
   methods: {},
-  // watch
   watch: {},
 });
 

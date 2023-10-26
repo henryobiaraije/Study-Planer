@@ -50,11 +50,6 @@ class UserCard extends Model {
 		$all_user_cards         = self::get_all_user_cards( $user_id );
 		$last_answered_card_ids = self::get_all_last_answered_user_cards( $user_id, $user_study_id );
 		$new_cards              = self::get_new_cards_not_answered_but_added( $user_id, $user_study_id, $last_answered_card_ids['card_ids'] );
-		// $cards_on_hold          = self::get_cards_on_hold_for_today(
-		// $user_id,
-		// $user_study_id,
-		// $last_answered_card_ids['on_hold_and_due']
-		// );
 
 		// Get cards organized by deck groups, decks, topics and card_groups.
 		$deck_groups = DeckGroup::with(
@@ -109,12 +104,12 @@ class UserCard extends Model {
 			}
 		}
 
-
 		return array(
-			'deck_groups'       => $deck_groups->all(),
-			'new_card_ids'      => $new_cards['card_ids'],
-			'on_hold_card_ids'  => $last_answered_card_ids['on_hold_and_due_ids'],
-			'revision_card_ids' => $last_answered_card_ids['revision_and_due_ids'],
+			'deck_groups'                       => $deck_groups->all(),
+			'new_card_ids'                      => $new_cards['card_ids'],
+			'on_hold_card_ids'                  => $last_answered_card_ids['on_hold_and_due_ids'],
+			'revision_card_ids'                 => $last_answered_card_ids['revision_and_due_ids'],
+			'user_card_group_ids_being_studied' => $all_user_cards['card_group_ids']
 		);
 	}
 
@@ -131,19 +126,22 @@ class UserCard extends Model {
 		                  ->where( 'user_id', '=', $user_id )
 		                  ->get()->all();
 
-		$cards    = array();
-		$card_ids = array();
+		$cards          = array();
+		$card_ids       = array();
+		$card_group_ids = array();
 		foreach ( $user_cards as $user_card ) {
 			$card_group               = $user_card->card_group;
 			$cards[ $card_group->id ] = $card_group->cards;
 			foreach ( $card_group->cards as $card ) {
 				$card_ids[] = $card->id;
 			}
+			$card_group_ids[] = $card_group->id;
 		}
 
 		return array(
-			'cards'    => $cards,
-			'card_ids' => $card_ids,
+			'cards'          => $cards,
+			'card_ids'       => $card_ids,
+			'card_group_ids' => $card_group_ids,
 		);
 	}
 

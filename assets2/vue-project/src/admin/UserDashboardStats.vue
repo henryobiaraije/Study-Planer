@@ -477,15 +477,15 @@ export default defineComponent({
   data() {
     return {
       show: {
-        progressChart: false,
-        chartForecast: false,
-        chartReviewCount: false,
-        chartReviewTime: false,
+        progressChart: true,
+        chartForecast: true,
+        chartReviewCount: true,
+        chartReviewTime: true,
         chartAdded: true,
-        chartInterval: false,
-        chartAnswerButtons: false,
-        chartHourlyBreakdown: false,
-        chartCardTypes: false,
+        chartInterval: true,
+        chartAnswerButtons: true,
+        chartHourlyBreakdown: true,
+        chartCardTypes: true,
       }
     }
   },

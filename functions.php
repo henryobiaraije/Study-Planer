@@ -67,8 +67,13 @@ function get_user_timezone_minutes_to_add( $user_id ) {
 
 function get_user_timezone_date_early_morning_today( $user_id ) {
 	$user_timezone_minutes_from_now = get_user_timezone_minutes_to_add( $user_id );
-	$_date_today                    = Common::getDateTime();
-	$_datetime                      = new DateTime( $_date_today );
+
+	$_date_today = Common::getDateTime();
+//	Common::send_error( array(
+//		__METHOD__,
+//		__LINE__
+//	) );
+	$_datetime = new DateTime( $_date_today );
 	$_datetime->modify( "$user_timezone_minutes_from_now minutes" );
 	$_datetime->setTime( 0, 0, 0 );
 	$the_date = $_datetime->format( 'Y-m-d H:i:s' );
@@ -172,7 +177,7 @@ function sp_get_user_debug_form( int $user_id = null ): array {
 
 	$current_study_date = get_user_meta( $user_id, Settings::UM_CURRENT_STUDY_DATE, true );
 	if ( empty( $current_study_date ) ) {
-		$current_study_date = Common::getDateTime();
+		$current_study_date = date('Y-m-d H:i:s');
 	}
 
 	// format to: 2020-12-31 23:59:59.

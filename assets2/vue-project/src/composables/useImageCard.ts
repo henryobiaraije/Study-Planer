@@ -544,6 +544,9 @@ export default function (cardGroupId = 0) {
         });
     };
     const xhrLoad = () => {
+        if (Store.jQuery()) {
+            return;
+        }
         return new Promise((resolve, reject) => {
             const handleAjax: HandleAjax = new HandleAjax(ajaxCreate.value);
             new Server().send_online({

@@ -7,6 +7,7 @@ import {type InterFuncSuccess, Server} from "@/static/server";
 import Cookies from "js-cookie";
 import {spClientData} from "@/functions";
 import {toast} from "vue3-toastify";
+import {Store} from "@/static/store";
 
 declare var bootstrap;
 
@@ -229,6 +230,10 @@ export default function (status = 'publish') {
         });
     };
     const xhrAssignTopics = () => {
+        if (Store.jQuery()) {
+            return;
+        }
+
         const handleAjax: HandleAjax = new HandleAjax(ajaxAssignTopics.value);
         return new Server().send_online({
             data: [
@@ -251,15 +256,18 @@ export default function (status = 'publish') {
             },
             funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
-                toast.success(done.message);
+                // toast.success(done.message);
             },
             funcFailue(done) {
                 handleAjax.error(done);
-                toast.error(done.message);
+                // toast.error(done.message);
             },
         });
     };
     const xhrAddCards = (cardGroups: _CardGroup[] = []) => {
+        if (Store.jQuery()) {
+            return;
+        }
         const handleAjax: HandleAjax = new HandleAjax(ajaxAddCards.value);
         return new Promise((resolve, reject) => {
             new Server().send_online({
@@ -357,8 +365,13 @@ export default function (status = 'publish') {
         })
     };
     const xhrLoadUserCards = () => {
+        if (Store.jQuery()) {
+            return;
+        }
+
         const handleAjax: HandleAjax = new HandleAjax(ajaxLoadUserCard.value);
         return new Promise((resolve, reject) => {
+
             new Server().send_online({
                 data: [
                     spClientData().nonce,
@@ -375,9 +388,11 @@ export default function (status = 'publish') {
                     new_card_ids: number[],
                     on_hold_card_ids: number[],
                     revision_card_ids: number[],
+                    user_card_group_ids_being_studied: number[],
                 }>) {
                     handleAjax.stop();
-                    userDeckGroups.value = sortCardByCardCountOnGroups(done.data.deck_groups);
+                    let deckGroups = sortCardByCardCountOnGroups(done.data.deck_groups);
+                    userDeckGroups.value = filterOutItemsWithoutCardsTheUserIsStudying(deckGroups, done.data.user_card_group_ids_being_studied);
                     newCardIds.value = done.data.new_card_ids;
                     onHoldCardIds.value = done.data.on_hold_card_ids;
                     revisionCardIds.value = done.data.revision_card_ids;
@@ -514,6 +529,23 @@ export default function (status = 'publish') {
                 return acc + cardGroup.cards.length;
             }, 0);
         });
+    }
+
+    function filterOutItemsWithoutCardsTheUserIsStudying(deckGroups: _DeckGroup[], cardGroupIds: number[]): _DeckGroup[] {
+
+        return deckGroups.filter((deckGroup) => {
+            deckGroup.decks = deckGroup.decks.filter((deck) => {
+                deck.topics = deck.topics.filter((topic) => {
+                    topic.card_groups = topic.card_groups.filter((cardGroup) => {
+                        return cardGroupIds.includes(cardGroup.id);
+                    });
+                    return topic.card_groups.length > 0;
+                });
+                return deck.topics.length > 0;
+            });
+            return deckGroup.decks.length > 0;
+        });
+
     }
 
     return {
