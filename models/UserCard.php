@@ -51,9 +51,18 @@ class UserCard extends Model {
 		$user_study    = sp_get_user_study( $user_id );
 		$user_study_id = $user_study->id;
 
+
 		$all_user_cards         = self::get_all_user_cards( $user_id );
 		$last_answered_card_ids = self::get_all_last_answered_user_cards( $user_id, $user_study_id );
 		$new_cards              = self::get_new_cards_not_answered_but_added( $user_id, $user_study_id, $last_answered_card_ids['card_ids'] );
+
+//		Common::send_error( '', array(
+//			__METHOD__,
+//			__LINE__,
+//			'user_study_id'          => $user_study_id,
+//			'user_id'                => $user_id,
+//			'last_answered_card_ids' => $last_answered_card_ids,
+//		) );
 
 		// Get cards organized by deck groups, decks, topics and card_groups.
 		$deck_groups = DeckGroup::with(

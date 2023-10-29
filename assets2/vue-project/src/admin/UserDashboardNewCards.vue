@@ -4,10 +4,10 @@
       <h2 class="text-xl font-semibold mb-0 text-sp-500 p-0">
         New Cards
       </h2>
-      <p class="text-base text-gray-500">Here you browse new cards that has been added to the topics in your in your
-        study deck</p>
-      <p class="text-base text-gray-500"><b>Note: </b>When you ignore a card, they'll no longer be available here but
-        you can still access them in the "Add Card" tab.</p>
+      <p class="text-base text-gray-500">Here you can browse new cards that have been added to the selection of topics
+        you have added to your study deck.</p>
+      <p class="text-base text-gray-500"><b>Note: </b>When you ignore a card, it will no longer be available here.
+        However, you can still access it in the 'Add Cards' tab.</p>
     </div>
     <br/>
     <div class="form-area flex-1 md:flex-none  md:w-30 ">

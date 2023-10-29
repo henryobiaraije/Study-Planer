@@ -312,7 +312,7 @@ export default function (status = 'publish') {
                 spClientData().nonce,
                 {
                     params: {
-                        per_page: 10,
+                        per_page: 50,
                         page: page.value,
                         search_keyword: query,
                         status: 'publish',

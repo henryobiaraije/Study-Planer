@@ -12,15 +12,15 @@
           </span>
           <vue-mulitiselect
               v-model="userCards.form.value.group"
-              :options="deckGroup.searchResults.value"
+              :options="deckGroupMulti.searchResults.value"
               :multiple="false"
-              :loading="deckGroup.ajaxSearch.value.sending || deckGroup.ajax.value.sending"
+              :loading="deckGroupMulti.ajaxSearch.value.sending || deckGroupMulti.ajax.value.sending"
               :searchable="true"
               :allowEmpty="false"
               :close-on-select="true"
               :taggable="false"
               :createTag="false"
-              @search-change="deckGroup.search"
+              @search-change="deckGroupMulti.search"
               placeholder="Deck Groups"
               label="name"
               track-by="id"
@@ -35,15 +35,15 @@
           </span>
           <vue-mulitiselect
               v-model="userCards.form.value.deck"
-              :options="decks.searchResults.value"
+              :options="decksMulti.searchResults.value"
               :multiple="false"
-              :loading="decks.ajaxSearch.value.sending"
+              :loading="decksMulti.ajaxSearch.value.sending"
               :searchable="true"
               :allowEmpty="false"
               :close-on-select="true"
               :taggable="false"
               :createTag="false"
-              @search-change="(query) => decks.search(query,form.group as any)"
+              @search-change="(query) => decksMulti.search(query,form.group as any)"
               placeholder="Decks"
               label="name"
               track-by="id"
@@ -59,15 +59,15 @@
           </span>
           <vue-mulitiselect
               v-model="userCards.form.value.topic"
-              :options="topics.searchResults.value"
+              :options="topicsMulti.searchResults.value"
               :multiple="false"
-              :loading="topics.ajaxSearch.value.sending"
+              :loading="topicsMulti.ajaxSearch.value.sending"
               :searchable="true"
               :allowEmpty="false"
               :close-on-select="true"
               :taggable="false"
               :createTag="false"
-              @search-change="(query) => topics.search(query,form.deck as any)"
+              @search-change="(query) => topicsMulti.search(query,form.deck as any)"
               placeholder="Select Topic"
               label="name"
               track-by="id"
@@ -220,11 +220,14 @@ export default defineComponent({
   setup: (props, ctx) => {
     return {
       decks: useDecks(),
+      decksMulti: useDecks(),
       deckGroup: useDeckGroupLists(),
+      deckGroupMulti: useDeckGroupLists(),
       searchTags: useTagSearch(),
       basicCard: useBasicCard(),
       gapCard: useGapCard(),
       topics: useTopics(),
+      topicsMulti: useTopics(),
       collections: useCollections(),
       // allCards: useAllCards(),
       // userCards: useUserCards()
@@ -256,6 +259,7 @@ export default defineComponent({
     this.topics.load();
     this.deckGroup.load();
     this.decks.search('');
+    this.deckGroupMulti.search('');
   },
   methods: {
     UseUserCards,
