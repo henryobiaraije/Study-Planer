@@ -2,7 +2,7 @@
   <!--  <form @submit.prevent="">-->
   <!--  Tabs Found, Selected -->
   <div
-      class="tabs flex items-center gap-2 relative border-r-0 border-l-0 border-t-0 border-b border-solid border-sp-400">
+      class="tabs group flex items-center gap-2 relative border-r-0 border-l-0 border-t-0 border-b border-solid border-sp-400">
     <label :class="[tabClassFound]" class="cursor-pointer">
       <input type="radio" name="tab" value="found" @change="$emit('tab-changed','found')"
              style="display: none">
@@ -20,6 +20,11 @@
         <span v-if="loading" class="w-[20px] h-[20px] text-sp-500">
           <i class="fa fa-spin fa-spinner"></i></span>
         <span v-if="!loading">({{ selectedCount }})</span>
+      </span>
+    </label>
+    <label @click="clearSelected" :class="['hidden group-hover:block bg-gray-100 py-1 px-2']" class="cursor-pointer">
+      <span class="font-semibold text-sp-900">
+        Clear Selected
       </span>
     </label>
   </div>
@@ -65,7 +70,7 @@
               <span class="bg-gray-300 px-2 py-1 rounded-md">{{ cardGroup.card_type }}</span>
             </span>
           </span>
-<!--          <span class="bg-gray-300 px-2 py-1 rounded-md lg:hidden group-hover:inline-block">{{ cardGroup.cards.length }} Cards</span>-->
+          <!--          <span class="bg-gray-300 px-2 py-1 rounded-md lg:hidden group-hover:inline-block">{{ cardGroup.cards.length }} Cards</span>-->
           <v-chip
               class="ma-2"
               color="primary"
@@ -139,7 +144,7 @@ import useMyStore from "@/composables/useMyStore";
 export default defineComponent({
   name: 'SelectedCardsAssign',
   components: {QuestionModal},
-  emits: ['card-clicked', 'tab-changed'],
+  emits: ['card-clicked', 'tab-changed', "clear-selected"],
   props: {
     cardItems: {
       type: Array as () => _CardGroup[],
@@ -185,6 +190,9 @@ export default defineComponent({
     }
   },
   methods: {
+    clearSelected() {
+      this.$emit('clear-selected');
+    },
     viewCard(cardGroupId: number): _CardGroup[] {
 
       if (this.myStore.store.inAddCards) {

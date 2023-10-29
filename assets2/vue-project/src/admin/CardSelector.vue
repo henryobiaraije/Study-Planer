@@ -139,6 +139,7 @@
       <br/>
       <SelectedCardsAssign
           @tab-changed="this.userCards.form.value.activeTab = $event"
+          @clear-selected="this.userCards.clearSelectedCards"
           :active-tab="activeTab"
           @card-clicked="cardSelected($event)"
           :card-items="allCards.searchResults.value"

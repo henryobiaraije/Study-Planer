@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import {spClientData} from "@/functions";
 import {toast} from "vue3-toastify";
 import {Store} from "@/static/store";
+import selectedCardsAssign from "@/components/SelectedCardsAssign.vue";
 
 declare var bootstrap;
 
@@ -202,6 +203,11 @@ export default function (status = 'publish') {
         }
     });
 
+    const clearSelectedCards = () => {
+        oneSpecificCard.value = null;
+        form.value.selectedCards = [];
+    }
+
     const xhrSave = () => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxSave.value);
         return new Server().send_online({
@@ -295,6 +301,7 @@ export default function (status = 'publish') {
                         deck: null,
                         topic: null,
                     };
+                    clearSelectedCards();
                     toast.success(done.message);
                     resolve(done);
                 },
@@ -557,6 +564,7 @@ export default function (status = 'publish') {
         ajaxLoadUserCard, loadUserCards: xhrLoadUserCards, userDeckGroups,
         ajaxLoadDebugForm, loadDebugForm: xhrLoadUserDebugForm, debugForm, saveDebugForm: xhrSaveUserDebugForm,
         newCardIds, onHoldCardIds, revisionCardIds, ajaxAddCard,
+        clearSelectedCards,
     };
 
 }
