@@ -41,6 +41,19 @@ class UserCard extends Model {
 	}
 
 	public static function get_user_cards_to_study( int $user_id ) {
+		// Get all user cards.
+		$all_user_cards = self::get_all_user_cards( $user_id );
+		if ( empty( $all_user_cards['card_group_ids'] ) ) {
+			return array(
+				'deck_groups'                       => array(),
+				'new_card_ids'                      => array(),
+				'on_hold_card_ids'                  => array(),
+				'revision_card_ids'                 => array(),
+				'user_card_group_ids_being_studied' => array()
+			);
+		}
+
+
 		$deck_group_uncategorized_id = get_uncategorized_deck_group_id();
 		$deck_uncategorized_id       = get_uncategorized_deck_id();
 
@@ -52,7 +65,6 @@ class UserCard extends Model {
 		$user_study_id = $user_study->id;
 
 
-		$all_user_cards         = self::get_all_user_cards( $user_id );
 		$last_answered_card_ids = self::get_all_last_answered_user_cards( $user_id, $user_study_id );
 		$new_cards              = self::get_new_cards_not_answered_but_added( $user_id, $user_study_id, $last_answered_card_ids['card_ids'] );
 
