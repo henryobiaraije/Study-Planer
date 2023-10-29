@@ -260,6 +260,8 @@ export default defineComponent({
     this.deckGroup.load();
     this.decks.search('');
     this.deckGroupMulti.search('');
+    this.decksMulti.search('');
+    this.topicsMulti.search('');
   },
   methods: {
     UseUserCards,
@@ -305,16 +307,16 @@ export default defineComponent({
       const form = this.userCards.form.value;
       form.deck = null;
       form.topic = null;
-      this.decks.searchResults.value = [];
-      this.topics.searchResults.value = [];
-      this.decks.search('', form.group);
+      this.decksMulti.searchResults.value = [];
+      this.topicsMulti.searchResults.value = [];
+      this.decksMulti.search('', form.group);
       this.searchCards();
     },
     'userCards.form.value.deck': function (newVal, oldVal) {
       const form = this.userCards.form.value;
       form.topic = null;
-      this.topics.searchResults.value = [];
-      this.topics.search('', form.deck);
+      this.topicsMulti.searchResults.value = [];
+      this.topicsMulti.search('', form.deck);
       this.searchCards();
     },
     'userCards.form.value.topic': function (newVal, oldVal) {
