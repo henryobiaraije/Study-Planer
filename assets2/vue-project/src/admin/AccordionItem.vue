@@ -8,19 +8,29 @@
               class="header-title-icon flex flex-1 justify-start items-center gap-2 cursor-pointer"
               :class="[cssLeftRight.left]"
           >
-            <div v-if="'card_group' !== theItem.childrenType" class="sp-icon flex-initial px-2 text-gray-400">
-              <v-icon v-if="!showChildren " left>
-                mdi-chevron-down
-              </v-icon>
-              <v-icon v-if="showChildren" left>
-                mdi-chevron-up
-              </v-icon>
+            <div class="left">
+              <div v-if="'card_group' !== theItem.childrenType" class="sp-icon flex-initial px-2 text-gray-400">
+                <v-icon v-if="!showChildren " left>
+                  mdi-chevron-down
+                </v-icon>
+                <v-icon v-if="showChildren" left>
+                  mdi-chevron-up
+                </v-icon>
+              </div>
+              <div class="sp-name flex-1 font-medium text-black px-2 py-2 text-base">
+                {{ theItem.name }}
+              </div>
             </div>
-            <div class="sp-name flex-1 font-medium text-black px-2 py-2 text-base">
-              {{ theItem.name }}
-            </div>
-            <div class="header-counts flex-initial px-2 text-sm">
-              {{ theItem.childrenLength }} {{ theItem.childrenTypeName }}{{ theItem.plural }}
+            <div class="right">
+              <div class="settings-and-switch">
+                <v-switch v-model="switchMe">
+                <v-icon v-if="!showChildren " left>
+                  mdi-cog-outline
+                </v-icon>
+              </div>
+              <div class="header-counts flex-initial px-2 text-sm">
+                {{ theItem.childrenLength }} {{ theItem.childrenTypeName }}{{ theItem.plural }}
+              </div>
             </div>
           </div>
           <div class="sp-deck-count lg:flex flex-1 items-center justify-space-around py-1"

@@ -277,7 +277,12 @@ export default defineComponent({
       );
     },
     cardSelected(card: _CardGroup) {
-      this.userCards.oneSpecificCard.value = card; // This will trigger the watch in useUserCards to add the card to the selected cards.
+      let index = this.userCards.form.value.selectedCards.findIndex((c) => c.id === card.id);
+      if (index > -1) {
+        this.userCards.removeSelectedCard(card);
+      } else {
+        this.userCards.oneSpecificCard.value = card; // This will trigger the watch in useUserCards to add the card to the selected cards.
+      }
     },
     callback: function (page) {
       this.page = page;

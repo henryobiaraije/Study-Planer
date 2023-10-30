@@ -575,7 +575,7 @@ class CardGroup extends Model {
 		$card_groups = self
 			::query()
 			->whereIn( 'id', $card_group_ids )
-			->with( 'cards', 'deck.deck_group', 'topic', 'collection' )
+			->with( 'cards', 'tags', 'deck.deck_group', 'topic', 'collection' )
 			->get();
 
 		// Convert table and image card questions and anwers to array.

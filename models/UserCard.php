@@ -53,7 +53,6 @@ class UserCard extends Model {
 			);
 		}
 
-
 		$deck_group_uncategorized_id = get_uncategorized_deck_group_id();
 		$deck_uncategorized_id       = get_uncategorized_deck_id();
 

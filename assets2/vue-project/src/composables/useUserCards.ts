@@ -207,7 +207,14 @@ export default function (status = 'publish') {
         oneSpecificCard.value = null;
         form.value.selectedCards = [];
     }
-
+    const removeSelectedCard = (cardGroup: _CardGroup) => {
+        const index = form.value.selectedCards.findIndex((c) => {
+            return c.id === cardGroup.id
+        });
+        if (index !== -1) {
+            form.value.selectedCards.splice(index, 1);
+        }
+    }
     const xhrSave = () => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxSave.value);
         return new Server().send_online({
@@ -564,7 +571,7 @@ export default function (status = 'publish') {
         ajaxLoadUserCard, loadUserCards: xhrLoadUserCards, userDeckGroups,
         ajaxLoadDebugForm, loadDebugForm: xhrLoadUserDebugForm, debugForm, saveDebugForm: xhrSaveUserDebugForm,
         newCardIds, onHoldCardIds, revisionCardIds, ajaxAddCard,
-        clearSelectedCards,
+        clearSelectedCards, removeSelectedCard,
     };
 
 }

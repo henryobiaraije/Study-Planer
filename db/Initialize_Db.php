@@ -8,6 +8,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Model\Deck;
 use Model\DeckGroup;
 use PDOException;
@@ -198,6 +199,8 @@ class Initialize_Db {
 				}
 			);
 		}
+
+
 	}
 
 	public function create_table_user_cards(): void {
@@ -356,9 +359,7 @@ class Initialize_Db {
 				function ( Blueprint $table ) {
 					global $wpdb;
 					$table->id();
-					// $table->foreignId('deck_id')->references('id')->on(SP_TABLE_DECKS);
 					$table->foreignId( 'deck_id' )->constrained( SP_TABLE_DECKS )->cascadeOnUpdate()->cascadeOnDelete();
-					// $table->foreignId('user_id')->references('ID')->on($wpdb->prefix.'users');
 					$table->foreignId( 'user_id' )->references( 'ID' )->on( ( $wpdb->prefix . 'users' ) )->cascadeOnUpdate()->cascadeOnDelete();
 					$table->boolean( 'all_tags' );
 					$table->integer( 'no_to_revise' );
@@ -373,39 +374,97 @@ class Initialize_Db {
 			);
 		}
 
-		// Remove deck_id constraint.
-		$schema_builder = $this->schema_builder;
+		// Add topic_id to study table.
+		if ( ! $this->schema_builder->hasColumn( SP_TABLE_STUDY, 'topic_id' ) ) {
+			Capsule::schema()->table(
+				SP_TABLE_STUDY,
+				function ( Blueprint $table ) {
+					$table
+						->foreignId( 'topic_id' )
+						->constrained( SP_TABLE_TOPICS )
+						->nullOnDelete();
+				}
+			);
+		}
+		// Add active column.
+		if ( ! $this->schema_builder->hasColumn( SP_TABLE_STUDY, 'active' ) ) {
+			Capsule::schema()->table(
+				SP_TABLE_STUDY,
+				function ( Blueprint $table ) {
+					$table
+						->boolean( 'active' )
+						->default( 1 )
+						->after( 'no_on_hold' )
+						->comment( 'Whether the study is active or not.' );
+				}
+			);
+		}
+		// Alter deck_id to study table
+		if ( $this->schema_builder->hasColumn( SP_TABLE_STUDY, 'deck_id' ) ) {
+			Capsule
+				::schema()
+				->table(
+					SP_TABLE_STUDY,
+					function ( Blueprint $table ) {
+						$prefix = sp_get_db_prefix();
+						if ( $this->foreign_key_exists( SP_TABLE_STUDY, 'deck_id' ) ) {
+							$table->dropForeign( $prefix . 'study_deck_id_foreign' );
+						}
+						if ( $this->has_index( SP_TABLE_STUDY, 'deck_id' ) ) {
+							$table->dropIndex( $prefix . 'study_deck_id_foreign' );
+						}
+					}
+				);
+		}
 
-		$foreignKeys       = Capsule
+	}
+
+	private function foreign_key_exists( string $table_name, string $foreign_key ) {
+		$foreignKeys = Capsule
 			::schema()
 			->getConnection()
 			->getDoctrineSchemaManager()
-			->listTableForeignKeys( SP_TABLE_STUDY );
-		$foreign_key_exist = false;
-		// Check if the constraint exists before dropping it.
+			->listTableForeignKeys( $table_name );
 
+		if ( ! $foreignKeys ) {
+			return [];
+		}
+
+		$foreign_key_exist = false;
+		// Find the foreign key.
 		foreach ( $foreignKeys as $foreignKey ) {
 			$local = $foreignKey->getLocalColumns();
-			if ( 'deck_id' === $local[0] ) {
+			if ( $foreign_key === $local[0] ) {
 				$foreign_key_exist = true;
 				break;
 			}
 		}
 
-//		Common::in_script( array(
-//			'foreignKeys'       => $foreignKeys,
-//			'foreign_key_exist' => $foreign_key_exist,
-//		) );
+		return $foreign_key_exist;
+	}
 
-		if ( $foreign_key_exist ) {
-//			Capsule::schema()->table(
-//				SP_TABLE_STUDY,
-//				function ( Blueprint $table ) {
-//					$prefix = sp_get_db_prefix();
-//					$table->dropForeign( [ $prefix . 'study_deck_id_foreign' ] );
-//				}
-//			);
+	private function has_index( string $table_name, string $index_name ) {
+		$indexes = Capsule
+			::schema()
+			->getConnection()
+			->getDoctrineSchemaManager()
+			->listTableIndexes( $table_name );
+
+		if ( ! $indexes ) {
+			return [];
 		}
+
+		$index_exist = false;
+		// Find the foreign key.
+		foreach ( $indexes as $index ) {
+			$local = $index->getColumns();
+			if ( $index_name === $local[0] ) {
+				$index_exist = true;
+				break;
+			}
+		}
+
+		return $index_exist;
 	}
 
 	public function create_table_answered() {
