@@ -3,14 +3,15 @@
     <div class="accordion-header" :class="[top && !showChildren ? 'pb-2':'']">
       <!-- Header -->
       <div class="sp-deck-group-header border-b border-gray-100">
-        <div @click="toggle()" class="sp-header-title lg:flex">
+        <div class="sp-header-title lg:flex">
           <div
-              class="header-title-icon flex flex-1 justify-start items-center gap-2 cursor-pointer"
+              class="header-title-icon flex flex-1 justify-between items-center gap-2 cursor-pointer"
               :class="[cssLeftRight.left]"
           >
-            <div class="left">
-              <div v-if="'card_group' !== theItem.childrenType" class="sp-icon flex-initial px-2 text-gray-400">
-                <v-icon v-if="!showChildren " left>
+            <div @click="toggle()" class="left flex-1 flex gap-2">
+              <div v-if="'card_group' !== theItem.childrenType"
+                   class="sp-icon flex-initial flex items-center px-2 text-gray-400">
+                <v-icon v-if="!showChildren" left>
                   mdi-chevron-down
                 </v-icon>
                 <v-icon v-if="showChildren" left>
@@ -21,12 +22,16 @@
                 {{ theItem.name }}
               </div>
             </div>
-            <div class="right">
-              <div class="settings-and-switch">
-                <v-switch v-model="switchMe">
-                <v-icon v-if="!showChildren " left>
-                  mdi-cog-outline
-                </v-icon>
+            <div class="right flex gap-2 items-center">
+              <div v-if="showSettings" class="settings-and-switch flex gap-2">
+                <div class="flex items-center">
+                  <v-switch v-model="switchMe"/>
+                </div>
+                <div class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
+                  <v-icon left>
+                    mdi-cog-outline
+                  </v-icon>
+                </div>
               </div>
               <div class="header-counts flex-initial px-2 text-sm">
                 {{ theItem.childrenLength }} {{ theItem.childrenTypeName }}{{ theItem.plural }}
@@ -40,13 +45,13 @@
                  :class="[cssLeftRight.right]"
             >
               <template v-for="(stat,statKey) in stats">
-              <span class="on-hold bg-white font-semibold flex gap-2 justify-center ">
-                <span class="text-sm px-2 py-1">{{ stat.title }}:</span>
-                <span
-                    class="text-sm px-2 rounded-full flex items-center font-semibold"
-                    :class="[cssLeftRight.left]"
-                >{{ stat.count }}</span>
-              </span>
+                <span class="on-hold bg-white font-semibold flex gap-2 justify-center ">
+                  <span class="text-sm px-2 py-1">{{ stat.title }}:</span>
+                  <span
+                      class="text-sm px-2 rounded-full flex items-center font-semibold"
+                      :class="[cssLeftRight.left]"
+                  >{{ stat.count }}</span>
+                </span>
               </template>
             </div>
             <div v-if="inMobile" class="mobile-stats flex justify-between px-2">
@@ -125,6 +130,7 @@ export default defineComponent({
   },
   data() {
     return {
+      switchMe: false,
       showChildren: false,
       viewDialog: false,
       cardsToView: [] as _Card[],
@@ -138,6 +144,14 @@ export default defineComponent({
     }
   },
   computed: {
+    /**
+     * Whether in deck or topic.
+     * @return {boolean}
+     */
+    showSettings(): boolean {
+      // In deck or topics.
+      return ['deck', 'topic'].includes(this.theItem.itemType);
+    },
     inMobile(): boolean {
       // in mobile reactive.
       return this.windowWidth < 768;

@@ -726,3 +726,7 @@ svg.vch__wrapper.dark-mode text.vch__month__label, svg.vch__wrapper.dark-mode te
 .v-overlay.v-overlay--active {
   z-index: 999999 !important;
 }
+
+.v-input__details {
+  display: none !important;
+}

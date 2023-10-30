@@ -44,7 +44,8 @@ export default defineComponent({
   computed: {
     userDeckGroups(): _DeckGroup[] {
       return this.userCards.userDeckGroups.value ?? [];
-    }
+    },
+
   },
   created() {
     this.userCards.loadUserCards();
