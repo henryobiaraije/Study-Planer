@@ -11,8 +11,11 @@ class Settings {
 	// Options
 	public const OP_UNCATEGORIZED_DECK_GROUP_ID = 'sp_uncat_dkgrp_id';
 	public const OP_UNCATEGORIZED_DECK_ID = 'sp_uncat_dk_id';
+	public const OP_UNCATEGORIZED_TOPIC_ID = 'sp_uncat_tp_id';
 	public const OP_DEFAULT_CARD_BG_IMAGE = 'sp_df_cd_bg_img';
 	public const OPTION_MATURED_CARD_DAYS = 'ob_mat_card_days';
+
+	public const OPTION_CARD_GROUPS_WITHOUT_TOPICS_IS_ASSIGNED_UNCATEGORIZED_TOPICS = 'ob_card_grps_wout_tp_is_assigned_uncat_tp';
 
 	// Cookies
 

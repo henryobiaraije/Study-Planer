@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Model\CardGroup;
 use Model\Deck;
 use Model\DeckGroup;
+use Model\Topic;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
 use StudyPlannerPro\Libs\Common;
@@ -45,6 +47,7 @@ class Initialize_Db {
 		// Initialize_Db::get_instance()->create_default_rows();
 		$this->create_tables();
 		$this->create_default_rows();
+		$this->assign_all_card_groups_to_uncategorized_topic();
 	}
 
 	public function initialize() {
@@ -73,6 +76,7 @@ class Initialize_Db {
 
 	public function create_default_rows() {
 		$this->crete_default_deck_group();
+
 	}
 
 	private function crete_default_deck_group(): void {
@@ -98,12 +102,15 @@ class Initialize_Db {
 		$this->create_default_deck( $deck_group );
 	}
 
+
 	private function create_default_deck( $deck_group ): void {
 		$deck = Deck::query()
 		            ->where( 'name', '=', 'Uncategorized' )
 		            ->where( 'deck_group_id', '=', $deck_group->id )
 		            ->first();
 		if ( ! empty( $deck ) ) {
+			$this->create_default_topic( $deck );
+
 			return;
 		}
 
@@ -119,6 +126,30 @@ class Initialize_Db {
 			)
 		);
 		update_option( Settings::OP_UNCATEGORIZED_DECK_ID, $deck->id );
+		$this->create_default_topic( $deck );
+	}
+
+	private function create_default_topic( Deck $deck ): void {
+		$topic = Topic::query()
+		              ->where( 'name', '=', 'Uncategorized' )
+		              ->where( 'deck_id', '=', $deck->id )
+		              ->first();
+		if ( ! empty( $topic ) ) {
+			return;
+		}
+
+		$topic = Topic::where( 'name', 'Uncategorized' );
+		if ( ! empty( $topic ) ) {
+			$topic->delete();
+		}
+
+		$topic = Topic::create(
+			array(
+				'name'    => 'Uncategorized',
+				'deck_id' => $deck->id,
+			)
+		);
+		update_option( Settings::OP_UNCATEGORIZED_TOPIC_ID, $topic->id );
 	}
 
 	public function create_tables() {
@@ -559,6 +590,30 @@ class Initialize_Db {
 				}
 			);
 		}
+	}
+
+	/**
+	 * Migration - Assign all card groups that does not have any topic to Uncategorized topic.
+	 *
+	 * @return void
+	 */
+	public function assign_all_card_groups_to_uncategorized_topic(): void {
+		$already_assigned = get_option( Settings::OPTION_CARD_GROUPS_WITHOUT_TOPICS_IS_ASSIGNED_UNCATEGORIZED_TOPICS, false );
+		if ( $already_assigned ) {
+			return;
+		}
+
+		$uncategorized_topic_id = get_option( Settings::OP_UNCATEGORIZED_TOPIC_ID );
+		if ( ! $uncategorized_topic_id ) {
+			return;
+		}
+		$card_groups = CardGroup::query()->where( 'topic_id', '=', 0 )->get();
+		foreach ( $card_groups as $card_group ) {
+			$card_group->topic_id = $uncategorized_topic_id;
+			$card_group->save();
+		}
+
+		update_option( Settings::OPTION_CARD_GROUPS_WITHOUT_TOPICS_IS_ASSIGNED_UNCATEGORIZED_TOPICS, true );
 	}
 
 }

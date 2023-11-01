@@ -27,7 +27,7 @@
                 <div class="flex items-center">
                   <v-switch v-model="switchMe"/>
                 </div>
-                <div class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
+                <div @click="showStudySettings" class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
                   <v-icon left>
                     mdi-cog-outline
                   </v-icon>
@@ -78,7 +78,7 @@
       <!--      <slot name="body"></slot>-->
     </div>
 
-    <!-- Body -->
+    <!-- Question Modal -->
     <v-dialog
         v-model="viewDialog"
         width="auto"
@@ -98,6 +98,22 @@
         />
       </v-card>
     </v-dialog>
+
+    <!-- Study Modal -->
+    <v-dialog
+        v-model="viewDialogEditStudy"
+        width="auto"
+    >
+      <v-card>
+        <v-card-actions>
+          <div class="flex flex-row justify-between items-center w-full">
+            <span class="flex-1 text-xl !font-bold">Study Cards</span>
+            <span class="flex-initial"><v-btn color="primary" block @click="viewDialog = false">Close</v-btn></span>
+          </div>
+        </v-card-actions>
+        <StudySettingsModal :study="studyToEdit"/>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script lang="ts">
@@ -107,13 +123,14 @@ import CardSelector from "@/admin/CardSelector.vue";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useUserCards from "@/composables/useUserCards";
 import useAllCards from "@/composables/useAllCards";
-import type {_CardGroup, _Deck, _DeckGroup, _Topic} from "@/interfaces/inter-sp";
+import type {_CardGroup, _Deck, _DeckGroup, _Study, _Topic} from "@/interfaces/inter-sp";
 import QuestionModal from "@/vue-component/QuestionModal.vue";
 import {_Card} from "@/interfaces/inter-sp";
+import StudySettingsModal from "@/admin/StudySettingsModal.vue";
 
 export default defineComponent({
   name: 'AccordionItem',
-  components: {QuestionModal, AjaxAction, CardSelector},
+  components: {StudySettingsModal, QuestionModal, AjaxAction, CardSelector},
   props: {
     item: {
       type: Object as () => _DeckGroup | _Deck | _Topic | _CardGroup,
@@ -135,6 +152,8 @@ export default defineComponent({
       viewDialog: false,
       cardsToView: [] as _Card[],
       windowWidth: window.innerWidth,
+      viewDialogEditStudy: false,
+      studyToEdit: null as null | _Study,
     }
   },
   setup: (props, ctx) => {
@@ -358,6 +377,11 @@ export default defineComponent({
     window.addEventListener('resize', this.updateWindowWidth);
   },
   methods: {
+    showStudySettings() {
+      const theItem = (this.item as _Deck | _Topic);
+      this.studyToEdit = theItem.studies && theItem.studies.length > 0 ? theItem.studies[0] : null;
+      this.viewDialogEditStudy = true;
+    },
     updateWindowWidth() {
       this.windowWidth = window.innerWidth;
     },

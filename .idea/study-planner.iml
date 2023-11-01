@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/app/controllers" isTestSource="false" packagePrefix="App\Controllers\" />
       <sourceFolder url="file://$MODULE_DIR$/app/models" isTestSource="false" packagePrefix="App\Models\" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/models" isTestSource="false" packagePrefix="Model" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
@@ -47,7 +48,9 @@
       <excludeFolder url="file://$MODULE_DIR$/assets" />
     </content>
     <content url="file://$MODULE_DIR$/adocs/working/working-28-feb-2022" />
-    <content url="file://$MODULE_DIR$/../../../wp-includes" />
+    <content url="file://$MODULE_DIR$/../../../wp-includes">
+      <sourceFolder url="file://$MODULE_DIR$/../../../wp-includes" isTestSource="false" packagePrefix="PHPMailer" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
