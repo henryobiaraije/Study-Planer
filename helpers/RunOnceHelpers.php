@@ -64,6 +64,7 @@ class RunOnceHelpers {
     }
 
     public function run_once_update_answers_last_updated_card_ids() {
+		return;
         $option = get_option('spROUpdAnsLasUpdCId', false);
         if ($option) {
             return;

@@ -20,6 +20,7 @@ use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Models\Tag;
 use function StudyPlannerPro\get_uncategorized_deck_group_id;
 use function StudyPlannerPro\get_uncategorized_deck_id;
+use function StudyPlannerPro\get_uncategorized_topic_id;
 use function StudyPlannerPro\get_user_timezone_date_early_morning_today;
 use function StudyPlannerPro\get_user_timezone_date_midnight_today;
 use function StudyPlannerPro\sp_get_user_study;
@@ -40,7 +41,124 @@ class UserCard extends Model {
 		return $this->belongsTo( CardGroup::class, 'card_group_id' );
 	}
 
+	/**
+	 * Used for when both topics and decks can be studied.
+	 *
+	 * @param int $user_id
+	 *
+	 * @return array|array[]
+	 */
 	public static function get_user_cards_to_study( int $user_id ) {
+		// Get all user cards.
+		$all_user_cards = self::get_all_user_cards( $user_id );
+		if ( empty( $all_user_cards['card_group_ids'] ) ) {
+			return array(
+				'deck_groups'                       => array(),
+				'new_card_ids'                      => array(),
+				'on_hold_card_ids'                  => array(),
+				'revision_card_ids'                 => array(),
+				'user_card_group_ids_being_studied' => array()
+			);
+		}
+
+		$deck_group_uncategorized_id = get_uncategorized_deck_group_id();
+		$deck_uncategorized_id       = get_uncategorized_deck_id();
+		$topic_uncategorized_id      = get_uncategorized_topic_id();
+
+		// Remove all card groups in any collection.
+		$card_groups_in_collection = CardGroup::get_card_groups_in_any_collections();
+
+		$user_study    = sp_get_user_study( $user_id );
+		$user_study_id = $user_study->id;
+
+		$last_answered_card_ids = self::get_all_last_answered_user_cards( $user_id, $user_study_id );
+		$new_cards              = self::get_new_cards_not_answered_but_added( $user_id, $user_study_id, $last_answered_card_ids['card_ids'] );
+
+		// Get cards organized by deck groups, decks, topics and card_groups.
+		$deck_groups = DeckGroup::with(
+			array(
+				'decks.topics.card_groups.cards',
+				'decks.studies'        => function ( $q ) use ( $user_id ) {
+					$q->where( 'user_id', '=', $user_id );
+				},
+				'decks.topics.studies' => function ( $q ) use ( $user_id ) {
+					$q->where( 'user_id', '=', $user_id );
+				},
+				'decks.studies.deck',
+				'decks.topics.studies.topic'
+			)
+		);
+
+		// Remove all card groups in any collection.
+		$deck_groups = $deck_groups
+			->whereHas(
+				'decks.topics.card_groups',
+				function ( $query ) use ( $card_groups_in_collection ) {
+					$query->whereNotIn( 'id', $card_groups_in_collection['card_group_ids'] );
+				}
+			);
+
+		// Remove uncategorized deck group.
+		$deck_groups = $deck_groups->where( 'id', '!=', $deck_group_uncategorized_id );
+
+		// Remove uncategorized deck.
+		$deck_groups = $deck_groups->whereHas(
+			'decks',
+			function ( $query ) use ( $deck_uncategorized_id ) {
+				$query->where( 'id', '!=', $deck_uncategorized_id );
+			}
+		);
+
+		// Remove uncategorized topic.
+		$deck_groups = $deck_groups->whereHas(
+			'decks.topics',
+			function ( $query ) use ( $topic_uncategorized_id ) {
+				$query->where( 'id', '!=', $topic_uncategorized_id );
+			}
+		)->get();
+
+		// encode all questions in deck groups.
+		foreach ( $deck_groups as $deck_group ) {
+			foreach ( $deck_group->decks as $deck ) {
+				foreach ( $deck->topics as $topic ) {
+					foreach ( $topic->card_groups as $card_group ) {
+						foreach ( $card_group->cards as $card ) {
+							$card_type = $card->card_group->card_type;
+							if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
+								if ( ! is_array( $card->answer ) ) {
+									$card->answer = json_decode( $card->answer );
+								}
+								if ( ! is_array( $card->question ) ) {
+									$card->question = json_decode( $card->question );
+								}
+								if ( ! is_array( $card_group->whole_question ) ) {
+									$card_group->whole_question = json_decode( $card_group->whole_question );
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return array(
+			'deck_groups'                       => $deck_groups->all(),
+			'new_card_ids'                      => $new_cards['card_ids'],
+			'on_hold_card_ids'                  => $last_answered_card_ids['on_hold_and_due_ids'],
+			'revision_card_ids'                 => $last_answered_card_ids['revision_and_due_ids'],
+			'user_card_group_ids_being_studied' => $all_user_cards['card_group_ids']
+		);
+	}
+
+	/**
+	 * Get user cards.
+	 * Used only for when only topics can be studied.
+	 *
+	 * @param int $user_id
+	 *
+	 * @return array
+	 */
+	public static function get_user_cards_to_study___( int $user_id ) {
 		// Get all user cards.
 		$all_user_cards = self::get_all_user_cards( $user_id );
 		if ( empty( $all_user_cards['card_group_ids'] ) ) {

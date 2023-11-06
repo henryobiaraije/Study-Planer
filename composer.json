@@ -11,7 +11,7 @@
   ],
   "config": {
     "platform": {
-      "php": "7.3"
+      "php": "8.0.30"
     }
   },
   "autoload": {
@@ -30,11 +30,13 @@
     ]
   },
   "require": {
-    "illuminate/database": "^8.69",
-    "illuminate/events": "^8.70",
+    "illuminate/database": "^9.52",
     "ext-pdo": "*",
-    "staudenmeir/eloquent-has-many-deep": "^1.7",
-    "ext-json": "*"
+    "ext-json": "*",
+    "robmorgan/phinx": "^0.14.0",
+    "staudenmeir/eloquent-has-many-deep": "^1.17",
+    "doctrine/dbal": "^2.0",
+    "illuminate/events": "^9.52"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest",

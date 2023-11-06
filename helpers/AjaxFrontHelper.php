@@ -20,6 +20,7 @@ use Model\Deck;
 use Model\DeckGroup;
 use Model\Study;
 use Model\StudyLog;
+use Model\Topic;
 use Model\User;
 use PDOException;
 use PHPMailer\PHPMailer\Exception;
@@ -740,18 +741,28 @@ class AjaxFrontHelper {
 		$study_all_on_hold = (bool) sanitize_text_field( $all['study_all_on_hold'] );
 		$all_tags          = (bool) sanitize_text_field( $all['all_tags'] );
 		$tags_excluded     = $all['tags_excluded'];
+		$topic_id          = (int) sanitize_text_field( $all['topic_id'] );
 
-		$deck = Deck::find( $deck_id );
-		if ( empty( $deck ) ) {
-			Common::send_error( 'Invalid deck', [
-				'post' => $post,
-			] );
+		if ( empty( $deck_id ) && empty( $topic_id ) ) {
+			Common::send_error( 'Either deck or topic must be selected.' );
 		}
-		$study = Study
-			::where( 'deck_id', '=', $deck_id )
-			->where( 'user_id', '=', $user_id )
-			->get()->first();
 
+		if ( ! empty( $deck_id ) ) {
+			$deck = Deck::find( $deck_id );
+			if ( empty( $deck ) ) {
+				Common::send_error( 'Invalid deck' );
+			}
+		}
+		if ( ! empty( $topic_id ) ) {
+			$topic = Topic::find( $topic_id );
+			if ( empty( $topic ) ) {
+				Common::send_error( 'Invalid topic' );
+			}
+		}
+
+		$study = Study
+			::where( 'id', '=', $study_id )
+			->get()->first();
 
 		Manager::beginTransaction();
 
@@ -770,6 +781,7 @@ class AjaxFrontHelper {
 		$study->user_id           = $user_id;
 		$study->deck_id           = $deck_id;
 		$study->all_tags          = $all_tags;
+		$study->topic_id          = $topic_id;
 
 		// Save or update.
 		if ( $creating_new ) {
@@ -781,10 +793,10 @@ class AjaxFrontHelper {
 		// Remove old tags from study.
 		$study->tags()->detach();
 		// Add the selected tags to the study.
-		foreach ( $tags as $one ) {
-			$tag = Tag::find( $one['id'] );
+		foreach ( $tags as $one_tag ) {
+			$tag = Tag::find( $one_tag['id'] );
 			$study->tags()->save( $tag );
-			$excluded_key = array_search( $one['id'], array_column( $tags_excluded, 'id' ) );
+			$excluded_key = array_search( $one_tag['id'], array_column( $tags_excluded, 'id' ), true );
 			// Make sure none of the excluded cards is added as included cards.
 			if ( $excluded_key !== false ) {
 				unset( $tags_excluded[ $excluded_key ] );

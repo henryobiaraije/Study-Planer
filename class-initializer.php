@@ -25,6 +25,7 @@ use StudyPlannerPro\Pages\Admin_Tags;
 use StudyPlannerPro\Pages\AdminDeck;
 use StudyPlannerPro\Pages\AdminDeckGroups;
 use StudyPlannerPro\Pages\AdminTopics;
+use StudyPlannerPro\Services\Log_Service;
 use StudyPlannerPro\Shortcodes\Short_User_Dashboard;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -61,11 +62,18 @@ class Initializer {
 	public static $general_localize = array();
 
 	/**
+	 * An instance of the Log Service.
+	 *
+	 * @var null|Log_Service $log_service An instance of the Log Service.
+	 */
+	public ?Log_Service $log_service = null;
+
+	/**
 	 * Stores the instance
 	 *
 	 * @var self $instance The instance of this class
 	 */
-	public static $instance;
+	public static ?Initializer $instance = null;
 
 	/**
 	 * @return self
@@ -110,6 +118,8 @@ class Initializer {
 		Admin_Collections::get_instance();
 		Admin_Assign_Topic::get_instance();
 
+		$this->initialize_services();
+
 		// Localize all added general object
 		add_action( 'wp_footer', array( $this, 'output_localized' ), 10 );
 		add_action( 'admin_footer', array( $this, 'output_localized' ), 10 );
@@ -136,6 +146,15 @@ class Initializer {
 		// 'active query' => $active->toSql(),
 		// '$active' => $active,
 		// ]);
+	}
+
+	/**
+	 * Initialize services.
+	 *
+	 * @return void
+	 */
+	public function initialize_services(): void {
+		$this->log_service = new Log_Service( self::$plugin_dir . '/logs.log' );
 	}
 
 	public function output_localized() {
@@ -177,37 +196,6 @@ class Initializer {
 		// '$value' => $value,
 		// ]);
 		return self::$general_localize[ $key ];
-	}
-
-	public function add_customize_view_to_footer() {
-		add_action(
-			'wp_footer',
-			function () {
-				global $post;
-				if ( ! is_single() ) {
-					return;
-				}
-				if ( ! $post ) {
-					return;
-				}
-				$post_id = $post->ID;
-				if ( ! ( 'product' === $post->post_type ) ) {
-					return;
-				}
-
-				$book_bundle_id = (int) get_post_meta( $post_id, Settings::PM_PRODUCT_LINKED_BOOK_BUNDLE_ID, true );
-
-				if ( $book_bundle_id ) {
-					// Common::in_script( [
-					// 'wp_footer',
-					// 'post'           => $post,
-					// '$book_bundle_id' => $book_bundle_id,
-					// '$post_id'       => $post_id,
-					// ] );
-					echo do_shortcode( '[book_bundle id="' . $book_bundle_id . '"]' );
-				}
-			}
-		);
 	}
 
 	public function init(): void {

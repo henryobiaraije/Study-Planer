@@ -37,6 +37,10 @@ class DeckGroup extends Model {
 		return $this->hasMany( Deck::class, 'deck_group_id' );
 	}
 
+	public function studies() {
+
+	}
+
 	public function decks_with_study( $user_id ) {
 		return $this->hasMany( Deck::class, 'deck_group_id' );
 	}

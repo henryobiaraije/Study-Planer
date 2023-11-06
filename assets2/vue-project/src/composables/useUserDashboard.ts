@@ -532,7 +532,8 @@ export default function (status = 'publish') {
         currentQuestion, answeredCount,
         showCurrentAnswer, showGrade, _hold, _acceptChanges,
         _showAnswer, _markAnswer, lastAnsweredDebugData,
-        xhrRecordStudyLog, xhrMarkAnswer, xhrMarkAnswerOnHold
+        xhrRecordStudyLog, xhrMarkAnswer, xhrMarkAnswerOnHold,
+        xhrCreateOrUpdateStudy
     };
 
 }

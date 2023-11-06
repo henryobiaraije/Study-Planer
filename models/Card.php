@@ -16,7 +16,7 @@ use StudyPlannerPro\Models\Tag;
 
 class Card extends Model {
 	protected $table = SP_TABLE_CARDS;
-	use HasRelationships;
+//	use HasRelationships;
 	use SoftDeletes;
 
 	protected $fillable = [

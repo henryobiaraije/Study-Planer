@@ -5,21 +5,13 @@ namespace StudyPlannerPro\Db;
 
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Model\CardGroup;
 use Model\Deck;
 use Model\DeckGroup;
 use Model\Topic;
-use PDOException;
-use PHPMailer\PHPMailer\Exception;
-use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Libs\Settings;
 
-use function StudyPlannerPro\get_default_image_display_type;
-use function StudyPlannerPro\print_log;
 use function StudyPlannerPro\sp_get_db_prefix;
 
 class Initialize_Db {
@@ -76,7 +68,6 @@ class Initialize_Db {
 
 	public function create_default_rows() {
 		$this->crete_default_deck_group();
-
 	}
 
 	private function crete_default_deck_group(): void {
@@ -129,12 +120,15 @@ class Initialize_Db {
 		$this->create_default_topic( $deck );
 	}
 
-	private function create_default_topic( Deck $deck ): void {
+	private function create_default_topic( $deck ): void {
 		$topic = Topic::query()
 		              ->where( 'name', '=', 'Uncategorized' )
 		              ->where( 'deck_id', '=', $deck->id )
 		              ->first();
+
 		if ( ! empty( $topic ) ) {
+			update_option( Settings::OP_UNCATEGORIZED_TOPIC_ID, $topic->id );
+
 			return;
 		}
 
@@ -598,16 +592,27 @@ class Initialize_Db {
 	 * @return void
 	 */
 	public function assign_all_card_groups_to_uncategorized_topic(): void {
+		if ( ! wp_doing_ajax() ) {
+			return; // Run only on ajax incase there are huge number of card groups, so that it does not affect the performance.
+		}
 		$already_assigned = get_option( Settings::OPTION_CARD_GROUPS_WITHOUT_TOPICS_IS_ASSIGNED_UNCATEGORIZED_TOPICS, false );
 		if ( $already_assigned ) {
-			return;
+//			return;
 		}
 
+
 		$uncategorized_topic_id = get_option( Settings::OP_UNCATEGORIZED_TOPIC_ID );
+//		Common::send_error( array(
+//			'card_groups'            => '',
+//			'uncategorized_topic_id' => $uncategorized_topic_id
+//		) );
 		if ( ! $uncategorized_topic_id ) {
 			return;
 		}
 		$card_groups = CardGroup::query()->where( 'topic_id', '=', 0 )->get();
+//		Common::send_error( array(
+//			'card_groups' => $card_groups
+//		) );
 		foreach ( $card_groups as $card_group ) {
 			$card_group->topic_id = $uncategorized_topic_id;
 			$card_group->save();

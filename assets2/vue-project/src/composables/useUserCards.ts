@@ -405,8 +405,10 @@ export default function (status = 'publish') {
                     user_card_group_ids_being_studied: number[],
                 }>) {
                     handleAjax.stop();
-                    let deckGroups = sortCardByCardCountOnGroups(done.data.deck_groups);
-                    userDeckGroups.value = filterOutItemsWithoutCardsTheUserIsStudying(deckGroups, done.data.user_card_group_ids_being_studied);
+                    let deckGroups = done.data.deck_groups;
+                    // deckGroups = sortCardByCardCountOnGroups(deckGroups);
+                    // deckGroups = filterOutItemsWithoutCardsTheUserIsStudying(deckGroups, done.data.user_card_group_ids_being_studied);
+                    userDeckGroups.value = deckGroups;
                     newCardIds.value = done.data.new_card_ids;
                     onHoldCardIds.value = done.data.on_hold_card_ids;
                     revisionCardIds.value = done.data.revision_card_ids;

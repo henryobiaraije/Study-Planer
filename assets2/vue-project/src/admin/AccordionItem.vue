@@ -25,9 +25,10 @@
             <div class="right flex gap-2 items-center">
               <div v-if="showSettings" class="settings-and-switch flex gap-2">
                 <div class="flex items-center">
-                  <v-switch v-model="switchMe"/>
+                  <v-switch color="primary" v-model="switchMe"/>
                 </div>
-                <div @click="showStudySettings" class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
+                <div v-if="studyActive" @click="showStudySettings"
+                     class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
                   <v-icon left>
                     mdi-cog-outline
                   </v-icon>
@@ -71,7 +72,7 @@
     <div v-if="showChildren" class="accordion-body" :class="[top && showChildren ? 'pb-2' : '']">
       <template v-if="'topic' !== theItem.itemType">
         <template v-for="(child,childIndex) in theItem.children">
-          <AccordionItem :user-cards="userCards" :item="child">
+          <AccordionItem :user-cards="userCards" :current-item="child">
           </AccordionItem>
         </template>
       </template>
@@ -95,7 +96,7 @@
             :cards="cardsToView"
             :show-only-answers="false"
             purpose="study"
-        />
+            :user-cards="userCards"/>
       </v-card>
     </v-dialog>
 
@@ -125,14 +126,14 @@ import useUserCards from "@/composables/useUserCards";
 import useAllCards from "@/composables/useAllCards";
 import type {_CardGroup, _Deck, _DeckGroup, _Study, _Topic} from "@/interfaces/inter-sp";
 import QuestionModal from "@/vue-component/QuestionModal.vue";
-import {_Card} from "@/interfaces/inter-sp";
+import {_Card, _Tag} from "@/interfaces/inter-sp";
 import StudySettingsModal from "@/admin/StudySettingsModal.vue";
 
 export default defineComponent({
   name: 'AccordionItem',
   components: {StudySettingsModal, QuestionModal, AjaxAction, CardSelector},
   props: {
-    item: {
+    currentItem: {
       type: Object as () => _DeckGroup | _Deck | _Topic | _CardGroup,
       required: true,
     },
@@ -147,6 +148,7 @@ export default defineComponent({
   },
   data() {
     return {
+      item: this.currentItem as _DeckGroup | _Deck | _Topic | _CardGroup,
       switchMe: false,
       showChildren: false,
       viewDialog: false,
@@ -158,7 +160,7 @@ export default defineComponent({
   },
   setup: (props, ctx) => {
     return {
-      // userCards: useUserCards(),
+      userCards: useUserCards(),
       allCards: useAllCards(),
     }
   },
@@ -338,6 +340,7 @@ export default defineComponent({
         plural: (item[childrenType + 's'].length > 1) ? 's' : '',
         childrenTypeName,
         childrenLength,
+        item
       };
     },
     stats() {
@@ -372,9 +375,42 @@ export default defineComponent({
         right,
       }
     },
+    studyActive(): boolean {
+      const study = this.currentItemStudy;
+      if (null !== study) {
+        return study.active;
+      }
+      return false;
+    },
+    currentItemStudy(): null | _Study {
+      if (Object.keys(this.item).includes('studies') && (this.item?.['studies'].length > 0)) {
+        return this.item?.['studies'][0];
+      }
+      return null;
+    }
   },
   created() {
+    this.item = this.currentItem;
     window.addEventListener('resize', this.updateWindowWidth);
+    // Make sure item has study.
+    // Since a deck or topic can have multiple studies, we will add studies as an array.
+    // Expecting just 1 study for now and for the current user.
+    if (!Object.keys(this.item).includes('studies') || Object.keys(this.item).includes('studies') && this.item['studies'].length < 1) {
+      this.item['studies'] = [];
+    }
+    this.item['studies'].push({
+      deck: null,
+      topic: null,
+      tags: Array<_Tag>,
+      tags_excluded: Array<_Tag>,
+      all_tags: true,
+      no_to_revise: 0,
+      no_of_new: 0,
+      no_on_hold: 0,
+      revise_all: true,
+      study_all_new: true,
+      study_all_on_hold: true,
+    } as _Study);
   },
   methods: {
     showStudySettings() {

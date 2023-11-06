@@ -1,0 +1,78 @@
+[ERROR] 2023-11-06 12:19:49 - Array
+(
+    [0] => Phinx migrations encountered an error.
+    [Command: ] => C:\laragon\www\Test-Site-Wordpress\wp-content\plugins\study-planner-pro/vendor/bin/phinx migrate -c phinx.php
+    [Output: ] => Array
+        (
+            [0] => Phinx by CakePHP - https://phinx.org.
+            [1] => 
+        )
+
+    [Return Var: ] => 1
+)
+
+[ERROR] 2023-11-06 12:19:54 - Array
+(
+    [0] => Phinx migrations encountered an error.
+    [Command: ] => C:\laragon\www\Test-Site-Wordpress\wp-content\plugins\study-planner-pro/vendor/bin/phinx migrate -c phinx.php
+    [Output: ] => Array
+        (
+            [0] => Phinx by CakePHP - https://phinx.org.
+            [1] => 
+        )
+
+    [Return Var: ] => 1
+)
+
+[ERROR] 2023-11-06 12:19:56 - Array
+(
+    [0] => Phinx migrations encountered an error.
+    [Command: ] => C:\laragon\www\Test-Site-Wordpress\wp-content\plugins\study-planner-pro/vendor/bin/phinx migrate -c phinx.php
+    [Output: ] => Array
+        (
+            [0] => Phinx by CakePHP - https://phinx.org.
+            [1] => 
+        )
+
+    [Return Var: ] => 1
+)
+
+[ERROR] 2023-11-06 12:19:58 - Array
+(
+    [0] => Phinx migrations encountered an error.
+    [Command: ] => C:\laragon\www\Test-Site-Wordpress\wp-content\plugins\study-planner-pro/vendor/bin/phinx migrate -c phinx.php
+    [Output: ] => Array
+        (
+            [0] => Phinx by CakePHP - https://phinx.org.
+            [1] => 
+        )
+
+    [Return Var: ] => 1
+)
+
+[ERROR] 2023-11-06 12:21:12 - Array
+(
+    [0] => Phinx migrations encountered an error.
+    [Command: ] => C:\laragon\www\Test-Site-Wordpress\wp-content\plugins\study-planner-pro/vendor/bin/phinx migrate -c phinx.php
+    [Output: ] => Array
+        (
+            [0] => Phinx by CakePHP - https://phinx.org.
+            [1] => 
+        )
+
+    [Return Var: ] => 1
+)
+
+[ERROR] 2023-11-06 12:22:55 - Array
+(
+    [0] => Phinx migrations encountered an error.
+    [Command: ] => C:\laragon\www\Test-Site-Wordpress\wp-content\plugins\study-planner-pro/vendor/bin/phinx migrate -c phinx.php
+    [Output: ] => Array
+        (
+            [0] => Phinx by CakePHP - https://phinx.org.
+            [1] => 
+        )
+
+    [Return Var: ] => 1
+)
+

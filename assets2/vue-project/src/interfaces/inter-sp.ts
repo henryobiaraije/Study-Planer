@@ -9,6 +9,7 @@ export interface _DeckGroup {
     created_at: string;
     updated_at: boolean,
     decks: Array<_Deck>;
+    studies: _Study[];
 }
 
 export interface _Deck {
@@ -20,7 +21,7 @@ export interface _Deck {
     created_at: string;
     updated_at: boolean,
     topics: Array<_Topic>;
-    studies?: Array<_Study>;
+    studies: Array<_Study>;
 }
 
 export interface _Topic {
@@ -32,7 +33,7 @@ export interface _Topic {
     updated_at: boolean,
     tags: Array<_Tag>;
     card_groups: Array<_CardGroup>;
-    studies?: Array<_Study>;
+    studies: Array<_Study>;
 }
 
 export type _TopicNew = Partial<_Topic & Pick<_Topic, 'name' | 'deck' | 'tags'>>;
@@ -54,7 +55,7 @@ interface _TimeStamps {
 export interface _Study {
     id?: number,
     deck: _Deck,
-    topic?:_Topic,
+    topic?: _Topic,
     user?: any,
     tags: Array<_Tag>,
     tags_excluded: Array<_Tag>,
@@ -65,6 +66,7 @@ export interface _Study {
     revise_all: boolean,
     study_all_new: boolean,
     study_all_on_hold: boolean,
+    active: boolean,
 }
 
 export type _QuestionType = string | _TableItem | _ImageItem;

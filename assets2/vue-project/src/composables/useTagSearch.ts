@@ -1,8 +1,8 @@
 import {ref} from "vue";
 import type {_Ajax} from "@/classes/HandleAjax";
+import {HandleAjax} from "@/classes/HandleAjax";
 import type {_Tag} from "@/interfaces/inter-sp";
 import {type InterFuncSuccess, Server} from "@/static/server";
-import {HandleAjax} from "@/classes/HandleAjax";
 import {spClientData} from "@/functions";
 
 export default function (canCreate = true) {
@@ -24,7 +24,7 @@ export default function (canCreate = true) {
     const newName = ref('');
     let results = ref<Array<_Tag>>([]);
     // let results    = ref<Array<any>>([]);
-    let sendOnline = null as Server;
+    let sendOnline = null as Server<any>;
 
     const search = (query: string) => {
         xhrSearchTags(query)
@@ -41,7 +41,7 @@ export default function (canCreate = true) {
                 spClientData().nonce,
                 {
                     params: {
-                        per_page: 5,
+                        per_page: 50,
                         page: 1,
                         search_keyword: query,
                         status: 'publish',
@@ -52,9 +52,8 @@ export default function (canCreate = true) {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
-                const items = done.data.details.items;
-                results.value = items;
+            funcSuccess(done: InterFuncSuccess<any>) {
+                results.value = done.data.details.items;
                 handleAjax.stop();
             },
             funcFailue(done) {
@@ -81,7 +80,7 @@ export default function (canCreate = true) {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 newName.value = '';
                 results.value.push(done.data);

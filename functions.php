@@ -4,9 +4,12 @@ namespace StudyPlannerPro;
 
 use DateTime;
 use Model\Study;
+use Phinx\Console\PhinxApplication;
+use Phinx\Wrapper\TextWrapper;
 use StudyPlannerPro\Db\Initialize_Db;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Libs\Settings;
+use StudyPlannerPro\Services\Log_Service;
 
 function load_template( $template ) {
 	require __DIR__ . '/templates/' . $template . '.php';
@@ -111,15 +114,6 @@ function get_mature_card_days() {
 	return $option;
 }
 
-function print_log( $log ) {
-	if ( true === WP_DEBUG ) {
-		if ( is_array( $log ) || is_object( $log ) ) {
-			error_log( print_r( $log, true ) );
-		} else {
-			error_log( $log );
-		}
-	}
-}
 
 function get_uncategorized_deck_group_id() {
 	$id = get_option( Settings::OP_UNCATEGORIZED_DECK_GROUP_ID, 0 );
@@ -142,6 +136,26 @@ function get_uncategorized_deck_id() {
 
 	return $id;
 }
+
+function get_uncategorized_topic_id() {
+	$id = get_option( Settings::OP_UNCATEGORIZED_TOPIC_ID, 0 );
+	if ( ! empty( $id ) ) {
+		return $id;
+	}
+	Initialize_Db::get_instance()->create_default_rows();
+
+	return (int) get_option( Settings::OP_UNCATEGORIZED_TOPIC_ID, 0 );
+}
+
+/**
+ * Get Log Service instance.
+ *
+ * @return Log_Service
+ */
+function mp_log(): ?Log_Service {
+	return Initializer::get_instance()->log_service;
+}
+
 
 function get_card_group_background_image( $cg_image_id ) {
 	$image_url = wp_get_attachment_image_url( $cg_image_id );
@@ -177,7 +191,7 @@ function sp_get_user_debug_form( int $user_id = null ): array {
 
 	$current_study_date = get_user_meta( $user_id, Settings::UM_CURRENT_STUDY_DATE, true );
 	if ( empty( $current_study_date ) ) {
-		$current_study_date = date('Y-m-d H:i:s');
+		$current_study_date = date( 'Y-m-d H:i:s' );
 	}
 
 	// format to: 2020-12-31 23:59:59.
@@ -315,3 +329,19 @@ define( 'SP_TABLE_STUDY_LOG', SP_DB_PREFIX . 'study_log' );
 define( 'SP_TABLE_TOPICS', SP_DB_PREFIX . 'topics' );
 define( 'SP_TABLE_COLLECTIONS', SP_DB_PREFIX . 'collections' );
 define( 'SP_TABLE_USER_CARDS', SP_DB_PREFIX . 'user_cards' );
+
+/**
+ * Create a new migration.
+ */
+function phinx_migrate(): void {
+	$phinx = new PhinxApplication();
+	$phinx->setAutoExit( false );
+
+	$wrap = new TextWrapper( $phinx );
+	$wrap->setOption( 'configuration', __DIR__ . '/phinx.php' );
+	$wrap->getMigrate( 'development' );
+	if ( $wrap->getExitCode() ) {
+		mp_log()?->log( 'Phinx migrations encountered an error.', array() );
+	}
+}
+
