@@ -171,6 +171,9 @@ export default function (status = 'publish') {
                 study_all_new: true,
                 study_all_on_hold: true,
                 user: null,
+                topic: null,
+                active: false,
+                id: null,
             };
         }
         console.log({study});

@@ -1,64 +1,66 @@
 <template>
-  <div class="sp sp-sc-ud min-h-[60vh]">
-    <!-- Mobile Tabs -->
-    <div v-if="inMobile" class="">
-      <div class="flex justify-space-around gap-3">
-        <div class="few-items flex-initial">
-          <div class="sp-tab flex gap-2 justify-center items-center my-4 all-loaded">
-            <template v-for="(item,menuIndex) in mobileMenus">
-              <div class="sp-one-tab ">
-                <a :href="getUrl(item.tag)" class="px-2 block whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-lg hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
+  <v-app>
+    <div class="sp sp-sc-ud min-h-[60vh]">
+      <!-- Mobile Tabs -->
+      <div v-if="inMobile" class="">
+        <div class="flex justify-space-around gap-3">
+          <div class="few-items flex-initial">
+            <div class="sp-tab flex gap-2 justify-center items-center my-4 all-loaded">
+              <template v-for="(item,menuIndex) in mobileMenus">
+                <div class="sp-one-tab ">
+                  <a :href="getUrl(item.tag)" class="px-2 block whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-lg hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
 			                text-decoration-none bg-sp-200"
-                   @click.prevent="gotoMenu(item.tag)"
-                   :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
-                >{{ item.title }}</a>
-              </div>
-            </template>
-            <div class="other-items flex items-end flex-initial">
-              <v-btn id="menu-activator"
-                     color="primary" icon="mdi-menu" size="small"></v-btn>
+                     @click.prevent="gotoMenu(item.tag)"
+                     :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
+                  >{{ item.title }}</a>
+                </div>
+              </template>
+              <div class="other-items flex items-end flex-initial">
+                <v-btn id="menu-activator"
+                       color="primary" icon="mdi-menu" size="small"></v-btn>
 
-              <v-menu activator="#menu-activator">
-                <v-list>
-                  <v-list-item
-                      v-for="(item, index) in otherMobileMenu"
-                      :key="index"
-                      :value="index"
-                      active-color="primary"
-                  >
-                    <v-list-item-title
-                        @click.prevent="gotoMenu(item.tag)"
-                    >{{ item.title }}
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
+                <v-menu activator="#menu-activator">
+                  <v-list>
+                    <v-list-item
+                        v-for="(item, index) in otherMobileMenu"
+                        :key="index"
+                        :value="index"
+                        active-color="primary"
+                    >
+                      <v-list-item-title
+                          @click.prevent="gotoMenu(item.tag)"
+                      >{{ item.title }}
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Desktop Tabs -->
-    <div v-if="!inMobile" class="sp-tab flex gap-2 justify-center my-4 all-loaded">
-      <div v-for="(item,menuIndex) in menus" class="sp-one-tab ">
-        <a :href="getUrl(item.tag)" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-lg hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
+      <!-- Desktop Tabs -->
+      <div v-if="!inMobile" class="sp-tab flex gap-2 justify-center my-4 all-loaded">
+        <div v-for="(item,menuIndex) in menus" class="sp-one-tab ">
+          <a :href="getUrl(item.tag)" class="px-2 whitespace-nowrap md:px-4 py-2 fs-5 rounded-t-lg hover:bg-sp-400  hover:text-white focus:text-white  cursor-pointer
 			      text-decoration-none bg-sp-200"
-           @click.prevent="gotoMenu(item.tag)"
-           :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
-        >{{ item.title }}</a>
+             @click.prevent="gotoMenu(item.tag)"
+             :class="[menu === item.tag ? 'font-bold bg-sp-500 text-white' : 'font-semibold text-sp-800']"
+          >{{ item.title }}</a>
+        </div>
       </div>
-    </div>
 
-    <div v-for="(item,itemIndex) in menus" class="section-profile">
-      <template v-if="item.tag === menu">
-        <component :is="item.comp" v-bind="item.props"/>
-      </template>
-    </div>
+      <div v-for="(item,itemIndex) in menus" class="section-profile">
+        <template v-if="item.tag === menu">
+          <component :is="item.comp" v-bind="item.props"/>
+        </template>
+      </div>
 
-  </div>
-  <!--  <ModalsContainer/>-->
-  <hover-notifications></hover-notifications>
+    </div>
+    <!--  <ModalsContainer/>-->
+    <hover-notifications></hover-notifications>
+  </v-app>
 </template>
 <script lang="ts">
 

@@ -12,7 +12,7 @@
     <template v-if="!userCards.ajaxLoadUserCard.value.sending && userDeckGroups.length > 0">
       <template v-for="(group,groupIndex) in userDeckGroups">
         <div class="mp-slide-in">
-          <AccordionItem :user-cards="userCards" :item="group" :top="true"/>
+          <AccordionItem :user-cards="userCards" :top="true" :current-item="group"/>
         </div>
       </template>
     </template>
@@ -45,7 +45,6 @@ export default defineComponent({
     userDeckGroups(): _DeckGroup[] {
       return this.userCards.userDeckGroups.value ?? [];
     },
-
   },
   created() {
     this.userCards.loadUserCards();

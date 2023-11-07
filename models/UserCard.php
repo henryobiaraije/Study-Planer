@@ -81,11 +81,20 @@ class UserCard extends Model {
 				'decks.studies'        => function ( $q ) use ( $user_id ) {
 					$q->where( 'user_id', '=', $user_id );
 				},
+				'decks.studies.tags',
+				'decks.studies.tags_excluded',
 				'decks.topics.studies' => function ( $q ) use ( $user_id ) {
 					$q->where( 'user_id', '=', $user_id );
 				},
 				'decks.studies.deck',
-				'decks.topics.studies.topic'
+				'decks.topics.studies.topic',
+				'decks.topics.studies.tags',
+				'decks.topics.studies.tags_excluded',
+				'studies'              => function ( $q ) use ( $user_id ) {
+					$q->where( 'user_id', '=', $user_id );
+				},
+				'studies.tags',
+				'studies.tags_excluded',
 			)
 		);
 

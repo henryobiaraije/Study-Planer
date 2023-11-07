@@ -49,6 +49,7 @@ class Study extends Model {
 		'revise_all',
 		'study_all_new',
 		'study_all_on_hold',
+		'active'
 	);
 
 	protected $casts = array(
@@ -56,6 +57,7 @@ class Study extends Model {
 		'study_all_new'     => 'boolean',
 		'study_all_on_hold' => 'boolean',
 		'all_tags'          => 'boolean',
+		'active'            => 'boolean',
 	);
 
 	private static $sp_debug = array();

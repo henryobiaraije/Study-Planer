@@ -37,8 +37,8 @@ class DeckGroup extends Model {
 		return $this->hasMany( Deck::class, 'deck_group_id' );
 	}
 
-	public function studies() {
-
+	public function studies(): \Illuminate\Database\Eloquent\Relations\HasMany {
+		return $this->hasMany( Study::class, 'deck_group_id', 'deck_id' );
 	}
 
 	public function decks_with_study( $user_id ) {

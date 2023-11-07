@@ -742,6 +742,7 @@ class AjaxFrontHelper {
 		$all_tags          = (bool) sanitize_text_field( $all['all_tags'] );
 		$tags_excluded     = $all['tags_excluded'];
 		$topic_id          = (int) sanitize_text_field( $all['topic_id'] );
+		$active            = (bool) sanitize_text_field( $all['active'] );
 
 		if ( empty( $deck_id ) && empty( $topic_id ) ) {
 			Common::send_error( 'Either deck or topic must be selected.' );
@@ -782,6 +783,7 @@ class AjaxFrontHelper {
 		$study->deck_id           = $deck_id;
 		$study->all_tags          = $all_tags;
 		$study->topic_id          = $topic_id;
+		$study->active            = $active;
 
 		// Save or update.
 		if ( $creating_new ) {

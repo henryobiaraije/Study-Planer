@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="userDash.xhrCreateOrUpdateStudy(studyToEdit)" class="p-4">
+  <form @submit.prevent="saveStudy" class="p-4">
     <div class=" p-4">
       <div class="sp-study-input shadow p-2 rounded fs-5 mb-4 ">
         <div class="my-1">Include Tags |
@@ -102,21 +102,19 @@
 import {defineComponent} from "vue";
 import CardSelector from "@/admin/CardSelector.vue";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
-import useUserCards from "@/composables/useUserCards";
-import useAllCards from "@/composables/useAllCards";
 import type {_CardGroup, _Deck, _DeckGroup, _Study, _Tag, _Topic} from "@/interfaces/inter-sp";
 import QuestionModal from "@/vue-component/QuestionModal.vue";
-import {_Card} from "@/interfaces/inter-sp";
 import useUserDashboard from "@/composables/useUserDashboard";
-import VueMulitiselect from "@/admin/AdminTopics.vue";
 import useTagSearch from "@/composables/useTagSearch";
+import VueMulitiselect from "vue-multiselect";
+import {toast} from "vue3-toastify";
 
 export default defineComponent({
   name: 'StudySettingsModal',
   components: {VueMulitiselect, QuestionModal, AjaxAction, CardSelector},
   props: {
     study: {
-      type: Object as () => null | _Study,
+      type: Object as () => _Study,
       required: true,
     },
   },
@@ -135,7 +133,14 @@ export default defineComponent({
   created() {
     this.searchTags.search('');
   },
-  methods: {},
+  methods: {
+    saveStudy() {
+      this.userDash.xhrCreateOrUpdateStudy(this.studyToEdit)
+          .then(() => {
+            toast.success('Study settings Saved.')
+          });
+    }
+  },
   watch: {},
   beforeUnmount() {
   }

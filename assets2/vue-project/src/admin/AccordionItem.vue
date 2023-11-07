@@ -24,12 +24,15 @@
             </div>
             <div class="right flex gap-2 items-center">
               <div v-if="showSettings" class="settings-and-switch flex gap-2">
-                <div class="flex items-center">
-                  <v-switch color="primary" v-model="switchMe"/>
+                <div v-if="null !== currentItemStudy" class="flex items-center">
+                  <!--                  <v-switch color="primary" :input-value="studyIsActive" @change="studyChanged"></v-switch>-->
+                  <SwitchComp is-round v-model="currentItemStudy.active" @change="studyChanged"/>
+                  <!--                  <SwitchComp is-round v-model="studyIsActive" @change="studyChanged"></SwitchComp>-->
+                  <!--                  <v-switch color="primary" :v-model="studyIsActive" ></v-switch>-->
                 </div>
                 <div v-if="studyActive" @click="showStudySettings"
                      class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
-                  <v-icon left>
+                  <v-icon left class="cursor-pointer">
                     mdi-cog-outline
                   </v-icon>
                 </div>
@@ -108,11 +111,14 @@
       <v-card>
         <v-card-actions>
           <div class="flex flex-row justify-between items-center w-full">
-            <span class="flex-1 text-xl !font-bold">Study Cards</span>
-            <span class="flex-initial"><v-btn color="primary" block @click="viewDialog = false">Close</v-btn></span>
+            <span class="flex-1 text-xl !font-bold">Study Settings</span>
+            <span class="flex-initial"><v-btn color="primary"
+                                              @click="viewDialogEditStudy = false">Close</v-btn></span>
           </div>
         </v-card-actions>
-        <StudySettingsModal :study="studyToEdit"/>
+        <template v-if="studyToEdit">
+          <StudySettingsModal :study="studyToEdit"/>
+        </template>
       </v-card>
     </v-dialog>
   </div>
@@ -128,10 +134,12 @@ import type {_CardGroup, _Deck, _DeckGroup, _Study, _Topic} from "@/interfaces/i
 import QuestionModal from "@/vue-component/QuestionModal.vue";
 import {_Card, _Tag} from "@/interfaces/inter-sp";
 import StudySettingsModal from "@/admin/StudySettingsModal.vue";
+import useUserDashboard from "@/composables/useUserDashboard";
+import SwitchComp from "@/components/SwitchComp.vue";
 
 export default defineComponent({
   name: 'AccordionItem',
-  components: {StudySettingsModal, QuestionModal, AjaxAction, CardSelector},
+  components: {SwitchComp, StudySettingsModal, QuestionModal, AjaxAction, CardSelector},
   props: {
     currentItem: {
       type: Object as () => _DeckGroup | _Deck | _Topic | _CardGroup,
@@ -156,12 +164,14 @@ export default defineComponent({
       windowWidth: window.innerWidth,
       viewDialogEditStudy: false,
       studyToEdit: null as null | _Study,
+      studyIsActive: true
     }
   },
   setup: (props, ctx) => {
     return {
       userCards: useUserCards(),
       allCards: useAllCards(),
+      userDash: useUserDashboard()
     }
   },
   computed: {
@@ -398,21 +408,55 @@ export default defineComponent({
     if (!Object.keys(this.item).includes('studies') || Object.keys(this.item).includes('studies') && this.item['studies'].length < 1) {
       this.item['studies'] = [];
     }
-    this.item['studies'].push({
-      deck: null,
-      topic: null,
-      tags: Array<_Tag>,
-      tags_excluded: Array<_Tag>,
-      all_tags: true,
-      no_to_revise: 0,
-      no_of_new: 0,
-      no_on_hold: 0,
-      revise_all: true,
-      study_all_new: true,
-      study_all_on_hold: true,
-    } as _Study);
+    if (!this.item['studies'].length) {
+      this.item['studies'].push({
+        deck: this.theItem.itemType === 'deck' ? this.theItem.item : null,
+        topic: this.theItem.itemType === 'topic' ? this.theItem.item : null,
+        tags: Array<_Tag>,
+        tags_excluded: Array<_Tag>,
+        all_tags: true,
+        no_to_revise: 0,
+        no_of_new: 0,
+        no_on_hold: 0,
+        revise_all: true,
+        study_all_new: true,
+        study_all_on_hold: true,
+        active: false,
+      } as _Study);
+    }
   },
   methods: {
+    customStringify(obj) {
+      const seen = new WeakSet();
+
+      return JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+          if (seen.has(value)) {
+            // Handle circular reference here (e.g., return a placeholder)
+            return '[Circular Reference]';
+          }
+          seen.add(value);
+        }
+        return value;
+      });
+    },
+    studyChanged() {
+      if (Object.keys(this.item).includes('studies') && (this.item?.['studies'].length > 0)) {
+        let study = this.item?.['studies'][0];
+        let theStudy: _Study = JSON.parse(this.customStringify(study)) as _Study;
+        console.log({theStudy});
+        setTimeout(() => {
+          this.userDash.xhrCreateOrUpdateStudy(theStudy);
+        }, 1000);
+        // this.userDash.xhrCreateOrUpdateStudy(study);
+      }
+      // if (this.currentItemStudy) {
+      //   this.currentItemStudy.active = !this.currentItemStudy.active;
+      //   // clone the study.
+      //   const study = {...this.currentItemStudy};
+      //   this.userDash.xhrCreateOrUpdateStudy(study);
+      // }
+    },
     showStudySettings() {
       const theItem = (this.item as _Deck | _Topic);
       this.studyToEdit = theItem.studies && theItem.studies.length > 0 ? theItem.studies[0] : null;
