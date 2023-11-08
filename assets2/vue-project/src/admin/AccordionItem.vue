@@ -1,6 +1,6 @@
 <template>
   <div class="one-accordion-item">
-    <div class="accordion-header" :class="[top && !showChildren ? 'pb-2':'']">
+    <div class="accordion-header" :class="[top && !isToggled ? 'pb-2':'']">
       <!-- Header -->
       <div class="sp-deck-group-header border-b border-gray-100">
         <div class="sp-header-title lg:flex">
@@ -11,10 +11,10 @@
             <div @click="toggle()" class="left flex-1 flex gap-2">
               <div v-if="'card_group' !== theItem.childrenType"
                    class="sp-icon flex-initial flex items-center px-2 text-gray-400">
-                <v-icon v-if="!showChildren" left>
-                  mdi-chevron-down
+                <v-icon v-if="!isToggled" left>
+                  mdi-chevron-right
                 </v-icon>
-                <v-icon v-if="showChildren" left>
+                <v-icon v-if="isToggled" left>
                   mdi-chevron-up
                 </v-icon>
               </div>
@@ -72,7 +72,7 @@
       </div>
     </div>
     <!-- Body -->
-    <div v-if="showChildren" class="accordion-body" :class="[top && showChildren ? 'pb-2' : '']">
+    <div v-if="isToggled" class="accordion-body" :class="[top && isToggled ? 'pb-2' : '']">
       <template v-if="'topic' !== theItem.itemType">
         <template v-for="(child,childIndex) in theItem.children">
           <AccordionItem :user-cards="userCards" :current-item="child">
@@ -136,6 +136,7 @@ import {_Card, _Tag} from "@/interfaces/inter-sp";
 import StudySettingsModal from "@/admin/StudySettingsModal.vue";
 import useUserDashboard from "@/composables/useUserDashboard";
 import SwitchComp from "@/components/SwitchComp.vue";
+import useToggle from "@/composables/useToggle";
 
 export default defineComponent({
   name: 'AccordionItem',
@@ -158,7 +159,6 @@ export default defineComponent({
     return {
       item: this.currentItem as _DeckGroup | _Deck | _Topic | _CardGroup,
       switchMe: false,
-      showChildren: false,
       viewDialog: false,
       cardsToView: [] as _Card[],
       windowWidth: window.innerWidth,
@@ -170,10 +170,14 @@ export default defineComponent({
   setup: (props, ctx) => {
     return {
       allCards: useAllCards(),
-      userDash: useUserDashboard()
+      userDash: useUserDashboard(),
+      uToggle: useToggle(),
     }
   },
   computed: {
+    isToggled() {
+      return this.uToggle.isToggled(this.theItem.itemType + '-' + this.theItem.id);
+    },
     /**
      * Whether in deck or topic.
      * @return {boolean}
@@ -489,7 +493,7 @@ export default defineComponent({
         setTimeout(() => {
           this.userDash.xhrCreateOrUpdateStudy(theStudy)
               .then((response) => {
-                this.userCards.loadUserCards();
+                // this.userCards.loadUserCards();
               });
 
         }, 1000);
@@ -504,13 +508,10 @@ export default defineComponent({
       this.windowWidth = window.innerWidth;
     },
     toggle() {
-      this.showChildren = !this.showChildren;
-      // this.viewCard();
-      // const el = document.querySelector(selector);
-      // if (el) {
-      //   el.style.display = (el.style.display === 'none') ? 'block' : 'none';
-      // }
+      this.uToggle.toggle(this.theItem.itemType + '-' + this.theItem.id);
+      // this.showChildren = !this.showChildren;
     },
+
     viewCard() {
       console.log('view card');
       if ('topic' !== this.theItem.itemType && 'deck' !== this.theItem.itemType) {

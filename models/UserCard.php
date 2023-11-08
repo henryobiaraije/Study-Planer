@@ -130,9 +130,9 @@ class UserCard extends Model {
 					continue; // todo remove;
 				}
 				$study = $deck->studies->first();
-				if ( $study ) {
+				if ( $study instanceof Study ) {
 					$cards       = self::get_cards_to_study_in_study(
-						$study->id,
+						$study,
 						$interested_card_group_ids,
 						$user_cards_not_studied['card_ids'],
 						$user_cards_answered['revision_and_due_ids'],
@@ -144,9 +144,9 @@ class UserCard extends Model {
 				}
 				foreach ( $deck->topics as $topic ) {
 					$study = $topic->studies->first();
-					if ( $study ) {
+					if ( $study instanceof Study ) {
 						$cards        = self::get_cards_to_study_in_study(
-							$study->d,
+							$study,
 							$interested_card_group_ids,
 							$user_cards_not_studied['card_ids'],
 							$user_cards_answered['revision_and_due_ids'],
@@ -172,13 +172,13 @@ class UserCard extends Model {
 	/**
 	 * Get cards to study in study.
 	 *
-	 * @param int $study_id The study.
+	 * @param Study $study The study.
 	 * @param array $interested_card_group_ids_for_topic_or_deck The interested card group ids for topic or deck.
 	 *
 	 * @return Card[]
 	 */
-	public static function get_cards_to_study_in_study( int $study_id, array $interested_card_group_ids_for_topic_or_deck, array $user_cards_not_studied_ids, array $user_cards_in_revision_and_due_ids, array $user_cards_on_hold_and_due_ids ): array {
-		$study             = Study::find( $study_id );
+	public static function get_cards_to_study_in_study( Study $study, array $interested_card_group_ids_for_topic_or_deck, array $user_cards_not_studied_ids, array $user_cards_in_revision_and_due_ids, array $user_cards_on_hold_and_due_ids ): array {
+//		$study             = Study::find( $study_id );
 		$deck_id           = $study->deck_id;
 		$topic_id          = $study->topic_id;
 		$tags              = array();

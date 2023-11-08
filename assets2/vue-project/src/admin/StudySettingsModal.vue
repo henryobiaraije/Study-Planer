@@ -89,7 +89,7 @@
     </div>
     <div class="">
       <ajax-action
-          button-text="Study"
+          button-text="Save Study Settings"
           css-classes="sp-action-button"
           icon="fa fa-save"
           :ajax="userDash.ajaxSaveStudy.value">
