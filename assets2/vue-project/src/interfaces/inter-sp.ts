@@ -22,6 +22,7 @@ export interface _Deck {
     updated_at: boolean,
     topics: Array<_Topic>;
     studies: Array<_Study>;
+    cards?: Array<_Card>;
 }
 
 export interface _Topic {
@@ -34,6 +35,7 @@ export interface _Topic {
     tags: Array<_Tag>;
     card_groups: Array<_CardGroup>;
     studies: Array<_Study>;
+    cards?: Array<_Card>;
 }
 
 export type _TopicNew = Partial<_Topic & Pick<_Topic, 'name' | 'deck' | 'tags'>>;

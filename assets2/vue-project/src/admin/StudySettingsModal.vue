@@ -139,8 +139,23 @@ export default defineComponent({
     this.searchTags.search('');
   },
   methods: {
+    customStringify(obj) {
+      const seen = new WeakSet();
+
+      return JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+          if (seen.has(value)) {
+            // Handle circular reference here (e.g., return a placeholder)
+            return '[Circular Reference]';
+          }
+          seen.add(value);
+        }
+        return value;
+      });
+    },
     saveStudy() {
-      this.userDash.xhrCreateOrUpdateStudy(this.studyToEdit)
+      let theStudy: _Study = JSON.parse(this.customStringify(this.studyToEdit)) as _Study;
+      this.userDash.xhrCreateOrUpdateStudy(theStudy)
           .then(() => {
             toast.success('Study settings Saved.')
             this.userCards.loadUserCards();

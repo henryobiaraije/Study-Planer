@@ -18,7 +18,7 @@
                   mdi-chevron-up
                 </v-icon>
               </div>
-              <div class="sp-name flex-1 font-medium text-black px-2 py-2 text-base">
+              <div @click.prevent="viewCard" class="sp-name flex-1 font-medium text-black px-2 py-2 text-base">
                 {{ theItem.name }}
               </div>
             </div>
@@ -452,7 +452,6 @@ export default defineComponent({
               });
 
         }, 1000);
-        // this.userDash.xhrCreateOrUpdateStudy(study);
       }
       // if (this.currentItemStudy) {
       //   this.currentItemStudy.active = !this.currentItemStudy.active;
@@ -471,21 +470,40 @@ export default defineComponent({
     },
     toggle() {
       this.showChildren = !this.showChildren;
-      this.viewCard();
+      // this.viewCard();
       // const el = document.querySelector(selector);
       // if (el) {
       //   el.style.display = (el.style.display === 'none') ? 'block' : 'none';
       // }
     },
-    viewCard(): _CardGroup[] {
-      if ('topic' !== this.theItem.itemType) {
+    viewCard() {
+      console.log('view card');
+      if ('topic' !== this.theItem.itemType && 'deck' !== this.theItem.itemType) {
         return;
       }
-      // this.cardsToView = topic.card_groups.
+
+      // The item must be studyable.
+      if (!this.currentItemStudy) {
+        return;
+      }
+
+      // The item's study must be active.
+      if (!this.currentItemStudy.active) {
+        return;
+      }
+
+      const cardsToStudy = (this.item as _Topic | _Deck).cards ?? [];
+      if (cardsToStudy.length < 1) {
+        return;
+      }
+
+      this.cardsToView = cardsToStudy;
       this.viewDialog = true;
-      this.cardsToView = (this.item as _Topic).card_groups.reduce((acc, cardGroup) => {
-        return acc.concat(cardGroup.cards);
-      }, [] as _Card[]);
+
+      // this.cardsToView = (this.item as _Topic | _Deck).cards?.reduce((acc, card: _Card) => {
+      //   return acc.concat(card);
+      // }, [] as _Card[]);
+
       // setTimeout(() => this.openQuestionModal(), 1000);
     },
   },
