@@ -169,7 +169,6 @@ export default defineComponent({
   },
   setup: (props, ctx) => {
     return {
-      userCards: useUserCards(),
       allCards: useAllCards(),
       userDash: useUserDashboard()
     }
@@ -228,71 +227,91 @@ export default defineComponent({
       const holdCardIds: number[] = userCards.onHoldCardIds.value;
 
       if ('deck_group' === theItem.itemType) {
-        counts.newCards = (item as _DeckGroup).decks.reduce((acc, deck) => {
-          return acc + deck.topics.reduce((acc, topic) => {
-            return acc + topic.card_groups.reduce((acc, cardGroup) => {
-              return acc + cardGroup.cards.reduce((acc, card) => {
-                return acc + (newCardIds.includes(card.id as number) ? 1 : 0);
-              }, 0);
-            }, 0);
+        counts.newCards = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countNewCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countNewCards(topic.cards ?? []);
           }, 0);
         }, 0);
-        counts.revision = (item as _DeckGroup).decks.reduce((acc, deck) => {
-          return acc + deck.topics.reduce((acc, topic) => {
-            return acc + topic.card_groups.reduce((acc, cardGroup) => {
-              return acc + cardGroup.cards.reduce((acc, card) => {
-                return acc + (revisionCardIds.includes(card.id as number) ? 1 : 0);
-              }, 0);
-            }, 0);
+        counts.revision = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countRevisionCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countRevisionCards(topic.cards ?? []);
           }, 0);
         }, 0);
-        counts.onHold = (item as _DeckGroup).decks.reduce((acc, deck) => {
-          return acc + deck.topics.reduce((acc, topic) => {
-            return acc + topic.card_groups.reduce((acc, cardGroup) => {
-              return acc + cardGroup.cards.reduce((acc, card) => {
-                return acc + (holdCardIds.includes(card.id as number) ? 1 : 0);
-              }, 0);
-            }, 0);
+        counts.onHold = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countOnHoldCards(topic.cards ?? []);
           }, 0);
         }, 0);
       } else if ('deck' === theItem.itemType) {
-        counts.newCards = (item as _Deck).topics.reduce((acc, topic) => {
-          return acc + topic.card_groups.reduce((acc, cardGroup) => {
-            return acc + cardGroup.cards.reduce((acc, card) => {
-              return acc + (newCardIds.includes(card.id as number) ? 1 : 0);
-            }, 0);
+        counts.newCards = [(item as _Deck)].reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countNewCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countNewCards(topic.cards ?? []);
           }, 0);
         }, 0);
-        counts.revision = (item as _Deck).topics.reduce((acc, topic) => {
-          return acc + topic.card_groups.reduce((acc, cardGroup) => {
-            return acc + cardGroup.cards.reduce((acc, card) => {
-
-              return acc + (revisionCardIds.includes(card.id as number) ? 1 : 0);
-            }, 0);
+        counts.revision = [(item as _Deck)].reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countRevisionCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countRevisionCards(topic.cards ?? []);
           }, 0);
         }, 0);
-        counts.onHold = (item as _Deck).topics.reduce((acc, topic) => {
-          return acc + topic.card_groups.reduce((acc, cardGroup) => {
-            return acc + cardGroup.cards.reduce((acc, card) => {
-              return acc + (holdCardIds.includes(card.id as number) ? 1 : 0);
-            }, 0);
+        counts.onHold = [(item as _Deck)].reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countOnHoldCards(topic.cards ?? []);
           }, 0);
         }, 0);
       } else if ('topic' === theItem.itemType) {
-        counts.newCards = (item as _Topic).card_groups.reduce((acc, cardGroup) => {
-          return acc + cardGroup.cards.reduce((acc, card) => {
-            return acc + (newCardIds.includes(card.id as number) ? 1 : 0);
-          }, 0);
+        counts.newCards = [(item as _Topic)].reduce((acc, topic: _Topic) => {
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicCardsCount: number = 0;
+          if (topicHasActiveStudy) { //
+            topicCardsCount = this.countNewCards(topic.cards ?? []);
+          }
+          return topicCardsCount + acc;
         }, 0);
-        counts.revision = (item as _Topic).card_groups.reduce((acc, cardGroup) => {
-          return acc + cardGroup.cards.reduce((acc, card) => {
-            return acc + (revisionCardIds.includes(card.id as number) ? 1 : 0);
-          }, 0);
+        counts.revision = [(item as _Topic)].reduce((acc, topic: _Topic) => {
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicCardsCount: number = 0;
+          if (topicHasActiveStudy) { //
+            topicCardsCount = this.countRevisionCards(topic.cards ?? []);
+          }
+          return topicCardsCount + acc;
         }, 0);
-        counts.onHold = (item as _Topic).card_groups.reduce((acc, cardGroup) => {
-          return acc + cardGroup.cards.reduce((acc, card) => {
-            return acc + (holdCardIds.includes(card.id as number) ? 1 : 0);
-          }, 0);
+        counts.onHold = [(item as _Topic)].reduce((acc, topic: _Topic) => {
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicCardsCount: number = 0;
+          if (topicHasActiveStudy) { //
+            topicCardsCount = this.countOnHoldCards(topic.cards ?? []);
+          }
+          return topicCardsCount + acc;
         }, 0);
       }
 
@@ -426,6 +445,28 @@ export default defineComponent({
     }
   },
   methods: {
+    countNewCards(cards: _Card[]): number {
+      const newCardIds: number[] = this.userCards.newCardIds.value;
+      let count = cards.reduce((acc, card) => {
+        return acc + (newCardIds.includes(card.id as number) ? 1 : 0);
+      }, 0);
+      console.log({count, cards, newCardIds, userCards: this.userCards});
+      return count;
+    },
+    countRevisionCards(cards: _Card[]): number {
+      const userCards = this.userCards;
+      const revisionCardIds: number[] = userCards.revisionCardIds.value;
+      return cards.reduce((acc, card) => {
+        return acc + (revisionCardIds.includes(card.id as number) ? 1 : 0);
+      }, 0);
+    },
+    countOnHoldCards(cards: _Card[]): number {
+      const userCards = this.userCards;
+      const onHoldCardIds: number[] = userCards.onHoldCardIds.value;
+      return cards.reduce((acc, card) => {
+        return acc + (onHoldCardIds.includes(card.id as number) ? 1 : 0);
+      }, 0);
+    },
     customStringify(obj) {
       const seen = new WeakSet();
 
@@ -453,12 +494,6 @@ export default defineComponent({
 
         }, 1000);
       }
-      // if (this.currentItemStudy) {
-      //   this.currentItemStudy.active = !this.currentItemStudy.active;
-      //   // clone the study.
-      //   const study = {...this.currentItemStudy};
-      //   this.userDash.xhrCreateOrUpdateStudy(study);
-      // }
     },
     showStudySettings() {
       const theItem = (this.item as _Deck | _Topic);
