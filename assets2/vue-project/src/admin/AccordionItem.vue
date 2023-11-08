@@ -117,7 +117,7 @@
           </div>
         </v-card-actions>
         <template v-if="studyToEdit">
-          <StudySettingsModal :study="studyToEdit"/>
+          <StudySettingsModal :user-cards="userCards" :study="studyToEdit"/>
         </template>
       </v-card>
     </v-dialog>
@@ -444,9 +444,13 @@ export default defineComponent({
       if (Object.keys(this.item).includes('studies') && (this.item?.['studies'].length > 0)) {
         let study = this.item?.['studies'][0];
         let theStudy: _Study = JSON.parse(this.customStringify(study)) as _Study;
-        console.log({theStudy});
+        console.log('saving now', {theStudy});
         setTimeout(() => {
-          this.userDash.xhrCreateOrUpdateStudy(theStudy);
+          this.userDash.xhrCreateOrUpdateStudy(theStudy)
+              .then((response) => {
+                this.userCards.loadUserCards();
+              });
+
         }, 1000);
         // this.userDash.xhrCreateOrUpdateStudy(study);
       }

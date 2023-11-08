@@ -108,6 +108,7 @@ import useUserDashboard from "@/composables/useUserDashboard";
 import useTagSearch from "@/composables/useTagSearch";
 import VueMulitiselect from "vue-multiselect";
 import {toast} from "vue3-toastify";
+import useUserCards from "@/composables/useUserCards";
 
 export default defineComponent({
   name: 'StudySettingsModal',
@@ -115,6 +116,10 @@ export default defineComponent({
   props: {
     study: {
       type: Object as () => _Study,
+      required: true,
+    },
+    userCards: {
+      type: Object as () => ReturnType<typeof useUserCards>,
       required: true,
     },
   },
@@ -138,7 +143,8 @@ export default defineComponent({
       this.userDash.xhrCreateOrUpdateStudy(this.studyToEdit)
           .then(() => {
             toast.success('Study settings Saved.')
-          });
+            this.userCards.loadUserCards();
+          })
     }
   },
   watch: {},

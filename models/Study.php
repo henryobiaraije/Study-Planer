@@ -93,6 +93,10 @@ class Study extends Model {
 		// ] )->where( 'user_id', '=', $user_id );
 	}
 
+	public function topic() {
+		return $this->belongsTo( Topic::class );
+	}
+
 	public function answers() {
 		return $this->hasMany( Answered::class );
 	}

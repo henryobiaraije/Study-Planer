@@ -339,7 +339,8 @@ export default function (status = 'publish') {
                 funcSuccess(done: InterFuncSuccess<any>) {
                     handleAjax.stop();
                     studyToEdit.value = done.data;
-                    resolve(0);
+                    console.log('Resolving qqq');
+                    resolve(done);
                 },
                 funcFailue(done) {
                     handleAjax.error(done);

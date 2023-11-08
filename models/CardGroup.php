@@ -80,6 +80,7 @@ class CardGroup extends Model {
 		return $this->morphToMany( Tag::class, 'taggable', SP_TABLE_TAGGABLES );
 	}
 
+
 	public static function get_card_groups( $args ): array {
 		$default = array(
 			'search'       => '',
@@ -488,7 +489,7 @@ class CardGroup extends Model {
 
 			$user_study             = sp_get_user_study( $args['user_id'] );
 			$user_study_id          = $user_study->id;
-			$last_answered_card_ids = UserCard::get_all_last_answered_user_cards( $args['user_id'], $user_study_id );
+//			$last_answered_card_ids = UserCard::get_all_last_answered_user_cards( $args['user_id'], $user_study_id );
 //			$new_cards_not_answered_but_added = UserCard::get_new_cards_not_answered_but_added( $args['user_id'], $user_study_id, $last_answered_card_ids['card_ids'] );
 			$ignored_card_group_ids = sp_get_user_ignored_card_group_ids( $args['user_id'] );
 

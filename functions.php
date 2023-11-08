@@ -228,7 +228,28 @@ function sp_get_user_study( int $user_id ): Study {
 	}
 
 	return $study;
+}
 
+/**
+ * Get user studies.
+ *
+ * @param int $user_id The user ID.
+ *
+ * @return array
+ */
+function sp_get_user_studies( int $user_id ): array {
+	$studies = Study::where( 'user_id', $user_id )->get();
+	if ( empty( $studies ) ) {
+		return array(
+			'studies'   => array(),
+			'study_ids' => array(),
+		);
+	}
+
+	return array(
+		'studies'   => $studies,
+		'study_ids' => $studies->pluck( 'id' )->toArray(),
+	);
 }
 
 function sp_get_db_prefix() {
