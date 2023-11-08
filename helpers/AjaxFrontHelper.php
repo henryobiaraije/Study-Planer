@@ -762,7 +762,18 @@ class AjaxFrontHelper {
 		}
 
 		$study = Study
-			::where( 'id', '=', $study_id )
+			::query();
+
+		if ( ! empty( $study_id ) ) {
+			$study = $study->where( 'id', '=', $study_id );
+		}
+		if ( ! empty( $deck_id ) ) {
+			$study = $study->where( 'deck_id', '=', $deck_id );
+		}
+		if ( ! empty( $topic_id ) ) {
+			$study = $study->where( 'topic_id', '=', $topic_id );
+		}
+		$study = $study
 			->get()->first();
 
 		Manager::beginTransaction();
