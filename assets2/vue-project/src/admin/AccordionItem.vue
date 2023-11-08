@@ -18,8 +18,8 @@
                   mdi-chevron-up
                 </v-icon>
               </div>
-              <div @click.prevent="viewCard" class="sp-name flex-1 font-medium text-black px-2 py-2 text-base">
-                {{ theItem.name }}
+              <div class="sp-name flex-1 font-medium text-black px-2 py-2 text-base">
+                <span @click.prevent="viewCard">{{ theItem.name }}</span>
               </div>
             </div>
             <div class="right flex gap-2 items-center">
