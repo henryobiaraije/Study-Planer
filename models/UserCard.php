@@ -126,6 +126,9 @@ class UserCard extends Model {
 		// encode all questions in deck groups.
 		foreach ( $deck_groups as $deck_group ) {
 			foreach ( $deck_group->decks as $deck ) {
+				if ( 37 !== $deck->id ) {
+					continue; // todo remove;
+				}
 				$study = $deck->studies->first();
 				if ( $study ) {
 					$cards       = self::get_cards_to_study_in_study(
@@ -250,39 +253,82 @@ class UserCard extends Model {
 	 * @return Card[]
 	 */
 	public static function get_cards_to_study_in_card_groups( array $card_group_ids, int $max_no_of_new_cards, int $max_no_on_hold, int $max_no_in_revision, array $all_new_card_ids, array $all_revision_card_ids, $all_on_hold_card_ids ): array {
-		$card_groups = CardGroup
+		$card_groups_new      = CardGroup
 			::query()
 			->whereIn( 'id', $card_group_ids )
 			->with(
 				array(
-//					'cards.card_group',
-					'cards' => function ( $query ) use ( $all_new_card_ids, $all_revision_card_ids, $all_on_hold_card_ids ) {
+					'cards' => function ( $query ) use ( $all_new_card_ids, $max_no_of_new_cards ) {
 						$query
 							->whereIn( 'id', $all_new_card_ids )
-							->orWhereIn( 'id', $all_revision_card_ids )
-							->orWhereIn( 'id', $all_on_hold_card_ids );
+							->limit( $max_no_of_new_cards );
+					},
+				)
+			)->get();
+		$card_groups_revision = CardGroup
+			::query()
+			->whereIn( 'id', $card_group_ids )
+			->with(
+				array(
+					'cards' => function ( $query ) use ( $all_revision_card_ids, $max_no_in_revision ) {
+						$query
+							->whereIn( 'id', $all_revision_card_ids )
+							->limit( $max_no_in_revision );
+					},
+				)
+			)->get();
+		$card_groups_hold     = CardGroup
+			::query()
+			->whereIn( 'id', $card_group_ids )
+			->with(
+				array(
+					'cards' => function ( $query ) use ( $all_on_hold_card_ids, $max_no_on_hold ) {
+						$query
+							->whereIn( 'id', $all_on_hold_card_ids )
+							->limit( $max_no_on_hold );
 					},
 				)
 			)->get();
 
-		$cards = array();
-		foreach ( $card_groups as $card_group ) {
-			foreach ( $card_group->cards as $card ) {
-				$card_type = $card->card_group->card_type;
-				if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
-					if ( ! is_array( $card->answer ) ) {
-						$card->answer = json_decode( $card->answer );
-					}
-					if ( ! is_array( $card->question ) ) {
-						$card->question = json_decode( $card->question );
-					}
+		// Merge all eloquent collections card groups.
+		$card_groups = $card_groups_new
+			->merge( $card_groups_revision )
+			->merge( $card_groups_hold );
 
-				}
+		$cards = array();
+		foreach ( $card_groups_new as $card_group ) {
+			foreach ( $card_group->cards as $card ) {
+				$cards[] = $card;
+			}
+		}
+		foreach ( $card_groups_revision as $card_group ) {
+			foreach ( $card_group->cards as $card ) {
+				$cards[] = $card;
+			}
+		}
+		foreach ( $card_groups_hold as $card_group ) {
+			foreach ( $card_group->cards as $card ) {
 				$cards[] = $card;
 			}
 		}
 
-		return $cards;
+
+		$all_cards = array();
+		foreach ( $cards as $card ) {
+			$card_type = $card->card_group->card_type;
+			if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
+				if ( ! is_array( $card->answer ) ) {
+					$card->answer = json_decode( $card->answer );
+				}
+				if ( ! is_array( $card->question ) ) {
+					$card->question = json_decode( $card->question );
+				}
+
+			}
+			$all_cards[] = $card;
+		}
+
+		return $all_cards;
 	}
 
 
@@ -563,7 +609,7 @@ class UserCard extends Model {
 		return array(
 			'cards'          => $cards,
 			'card_ids'       => $card_ids,
-			'card_group_ids' => $card_group_ids,
+			'card_group_ids' => array_unique( $card_group_ids ),
 			'topic_ids'      => $topic_ids,
 		);
 	}

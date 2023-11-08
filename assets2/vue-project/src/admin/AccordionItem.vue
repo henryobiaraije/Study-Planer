@@ -377,8 +377,8 @@ export default defineComponent({
         left = 'bg-blue-200 hover:bg-blue-300 ';
         right = 'bg-blue-100 ';
       } else if (theItem.itemType === 'topic') {
-        left = 'bg-amber-accent-1 hover:bg-gray-300 ';
-        right = 'bg-amber ';
+        left = 'bg-amber hover:bg-gray-300 ';
+        right = 'bg-amber-300';
       }
       return {
         left,
