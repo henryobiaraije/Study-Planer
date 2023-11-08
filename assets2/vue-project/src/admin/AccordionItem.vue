@@ -74,7 +74,7 @@
     <!-- Body -->
     <div v-if="isToggled" class="accordion-body" :class="[top && isToggled ? 'pb-2' : '']">
       <template v-if="'topic' !== theItem.itemType">
-        <template v-for="(child,childIndex) in theItem.children">
+        <template v-for="(child,childIndex) in theItem.children" :key="'topic-'+child.id">
           <AccordionItem :user-cards="userCards" :current-item="child">
           </AccordionItem>
         </template>

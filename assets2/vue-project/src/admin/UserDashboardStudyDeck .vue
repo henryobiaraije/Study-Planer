@@ -9,14 +9,16 @@
         </v-alert>
       </div>
     </template>
-    <!--    <template v-if="!userCards.ajaxLoadUserCard.value.sending && userDeckGroups.length > 0">-->
-    <template v-if="userDeckGroups.length > 0">
+    <template v-if="!userCards.ajaxLoadUserCard.value.sending && userDeckGroups.length > 0">
+      <!--    <template v-if="userDeckGroups.length > 0">-->
       <template v-for="(group,groupIndex) in userDeckGroups">
         <div class="mp-slide-in">
           <AccordionItem :user-cards="userCards" :top="true" :current-item="group"/>
         </div>
       </template>
     </template>
+    <v-progress-linear v-if="userCards.ajaxLoadUserCard.value.sending && userDeckGroups.length > 0" color="primary"
+                       indeterminate></v-progress-linear>
   </div>
 </template>
 <script lang="ts">
