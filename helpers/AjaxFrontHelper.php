@@ -730,7 +730,7 @@ class AjaxFrontHelper {
 		$user_id = get_current_user_id();
 
 		$all               = $post[ Common::VAR_2 ]['study'];
-		$deck_id           = (int) sanitize_text_field( $all['deck']['id'] );
+		$deck_id           = (int) sanitize_text_field( null !== $all['deck'] ? $all['deck']['id'] : 0 );
 		$study_id          = (int) sanitize_text_field( $all['id'] );
 		$tags              = $all['tags'];
 		$no_of_new         = (int) sanitize_text_field( $all['no_of_new'] );
@@ -741,7 +741,7 @@ class AjaxFrontHelper {
 		$study_all_on_hold = (bool) sanitize_text_field( $all['study_all_on_hold'] );
 		$all_tags          = (bool) sanitize_text_field( $all['all_tags'] );
 		$tags_excluded     = $all['tags_excluded'];
-		$topic_id          = (int) sanitize_text_field( $all['topic_id'] );
+		$topic_id          = (int) sanitize_text_field( null !== $all['topic'] ? $all['topic']['id'] : 0 );
 		$active            = (bool) sanitize_text_field( $all['active'] );
 
 		if ( empty( $deck_id ) && empty( $topic_id ) ) {
