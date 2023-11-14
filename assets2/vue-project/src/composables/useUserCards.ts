@@ -405,16 +405,19 @@ export default function (status = 'publish') {
                     user_card_group_ids_being_studied: number[],
                 }>) {
                     handleAjax.stop();
-                    let deckGroups = done.data.deck_groups;
-                    // deckGroups = sortCardByCardCountOnGroups(deckGroups);
-                    // deckGroups = filterOutItemsWithoutCardsTheUserIsStudying(deckGroups, done.data.user_card_group_ids_being_studied);
-                    userDeckGroups.value = deckGroups;
-                    newCardIds.value = done.data.new_card_ids;
-                    onHoldCardIds.value = done.data.on_hold_card_ids;
-                    revisionCardIds.value = done.data.revision_card_ids;
-                    // newCardIds.value = [42, 43];
-                    // onHoldCardIds.value = [44, 45];
-                    // revisionCardIds.value = [46];
+                    userDeckGroups.value = [];
+                    setTimeout(() => {
+                        let deckGroups = done.data.deck_groups;
+                        // deckGroups = sortCardByCardCountOnGroups(deckGroups);
+                        // deckGroups = filterOutItemsWithoutCardsTheUserIsStudying(deckGroups, done.data.user_card_group_ids_being_studied);
+                        userDeckGroups.value = deckGroups;
+                        newCardIds.value = done.data.new_card_ids;
+                        onHoldCardIds.value = done.data.on_hold_card_ids;
+                        revisionCardIds.value = done.data.revision_card_ids;
+                        // newCardIds.value = [42, 43];
+                        // onHoldCardIds.value = [44, 45];
+                        // revisionCardIds.value = [46];
+                    }, 50);
 
                     resolve(done);
                 },

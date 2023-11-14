@@ -30,6 +30,7 @@ use StudyPlannerPro\Libs\Settings;
 use StudyPlannerPro\Models\Tag;
 use StudyPlannerPro\Models\UserCard;
 use StudyPlannerPro\Services\Card_Due_Date_Service;
+
 use function StudyPlannerPro\get_all_card_grades;
 use function StudyPlannerPro\get_card_group_background_image;
 use function StudyPlannerPro\sp_get_user_debug_form;
@@ -147,8 +148,6 @@ class AjaxFrontHelper {
 
 
 		Common::send_success( 'Profile loaded', $profile );
-
-
 	}
 
 	public function ajax_front_add_user_cards( $post ): void {
@@ -212,8 +211,6 @@ class AjaxFrontHelper {
 		$all = Study::get_user_stats_card_types( $user_id, $span );
 
 		Common::send_success( 'Stats Card types here', $all );
-
-
 	}
 
 	public function ajax_front_load_stats_progress_chart( $post ): void {
@@ -226,8 +223,6 @@ class AjaxFrontHelper {
 		$all = Study::get_user_stats_progress_chart( $user_id, $year );
 
 		Common::send_success( 'Progress chart here', $all );
-
-
 	}
 
 	public function ajax_front_load_stats_forecast( $post ): void {
@@ -241,7 +236,6 @@ class AjaxFrontHelper {
 		$forecast = Study::get_user_card_forecast( $user_id, $span );
 
 		Common::send_success( 'Forecast here', $forecast );
-
 	}
 
 	public function ajax_front_load_stats_chart_added( $post ): void {
@@ -276,8 +270,6 @@ class AjaxFrontHelper {
 		//        ]);
 
 		Common::send_success( 'Charts hourly breackdown here', $all );
-
-
 	}
 
 	public function ajax_front_load_stats_chart_answer_buttons( $post ): void {
@@ -306,8 +298,6 @@ class AjaxFrontHelper {
 		//        ]);
 
 		Common::send_success( 'Charts answer buttons here', $all );
-
-
 	}
 
 	public function ajax_front_load_stats_chart_interval( $post ): void {
@@ -330,8 +320,6 @@ class AjaxFrontHelper {
 		//        ]);
 
 		Common::send_success( 'Charts intervals here', $all );
-
-
 	}
 
 	public function ajax_front_load_stats_review_time( $post ): void {
@@ -354,8 +342,6 @@ class AjaxFrontHelper {
 		//        ]);
 
 		Common::send_success( 'Review here', $review );
-
-
 	}
 	// </editor-fold desc="Stats">
 
@@ -603,7 +589,6 @@ class AjaxFrontHelper {
 	 * @param $post
 	 */
 	public function ajax_front_get_today_questions_in_study( $post ): void {
-
 		$all      = $post[ Common::VAR_2 ]['study'];
 		$study_id = (int) sanitize_text_field( $all['id'] );
 
@@ -713,7 +698,6 @@ class AjaxFrontHelper {
 				'cards' => $all_cards,
 			],
 		] );
-
 	}
 
 	/**
@@ -728,6 +712,9 @@ class AjaxFrontHelper {
 		//			] );
 		Initializer::verify_post( $post, true );
 		$user_id = get_current_user_id();
+
+		// Delete all studies without deck or topic.
+		Study::delete_all_studies_without_deck_or_topic();
 
 		$all               = $post[ Common::VAR_2 ]['study'];
 		$deck_id           = (int) sanitize_text_field( null !== $all['deck'] ? $all['deck']['id'] : 0 );
@@ -827,14 +814,15 @@ class AjaxFrontHelper {
 		// Commit changes.
 		Manager::commit();
 
+		// Delete all studies without deck or topic.
+		Study::delete_all_studies_without_deck_or_topic();
+
 		// Study to return.
 		$new_study = Study::get_user_study_by_id( $study->id );
 		Common::send_success( 'Saved.', $new_study );
-
 	}
 
 	public function ajax_front_get_single_deck_group( $post ): void {
-
 		//			Common::send_error( [
 		//				'ajax_front_get_single_deck_group',
 		//				'post' => $post,
@@ -862,7 +850,6 @@ class AjaxFrontHelper {
 		//			] );
 
 		Common::send_success( 'Deck group loaded.', $deck_group );
-
 	}
 
 	public function ajax_front_get_deck_groups( $post ): void {
@@ -909,7 +896,6 @@ class AjaxFrontHelper {
 			'details' => $deck_groups,
 			'studies' => $studies,
 		] );
-
 	}
 
 	// </editor-fold desc="Gap Cards">
@@ -932,7 +918,6 @@ class AjaxFrontHelper {
 		//				'$time_zone' => $time_zone,
 		//			] );
 		Common::send_success( 'Timezone saved.' );
-
 	}
 
 	public function ajax_admin_get_timezones( $post ): void {
@@ -943,7 +928,6 @@ class AjaxFrontHelper {
 			'timezones'     => Common::get_time_zones(),
 			'user_timezone' => $user_timezone,
 		] );
-
 	}
 	// </editor-fold desc="Others">
 
@@ -966,6 +950,9 @@ class AjaxFrontHelper {
 		// 'selected_cards' | 'selected_group' | 'selected_deck' | 'selected_topic'
 		$params = $post[ Common::VAR_2 ]['params'];
 		Initializer::verify_post( $post, true );
+
+		// Delete all studies without deck or topic.
+		Study::delete_all_studies_without_deck_or_topic();
 
 		$user_id           = get_current_user_id();
 		$user_card_details = UserCard

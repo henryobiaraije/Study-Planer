@@ -267,6 +267,7 @@ export default defineComponent({
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countNewCards(deck.cards ?? []);
+            return deckCardsCount + acc;
           }
           return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
             return acc + this.countNewCards(topic.cards ?? []);
@@ -277,6 +278,7 @@ export default defineComponent({
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countRevisionCards(deck.cards ?? []);
+            return deckCardsCount + acc;
           }
           return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
             return acc + this.countRevisionCards(topic.cards ?? []);
@@ -287,6 +289,7 @@ export default defineComponent({
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
+            return deckCardsCount + acc;
           }
           return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
             return acc + this.countOnHoldCards(topic.cards ?? []);
@@ -298,6 +301,7 @@ export default defineComponent({
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countNewCards(topic.cards ?? []);
+            return topicCardsCount + acc;
           }
           return topicCardsCount + acc;
         }, 0);
@@ -306,6 +310,7 @@ export default defineComponent({
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countRevisionCards(topic.cards ?? []);
+            return topicCardsCount + acc;
           }
           return topicCardsCount + acc;
         }, 0);
@@ -314,6 +319,7 @@ export default defineComponent({
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countOnHoldCards(topic.cards ?? []);
+            return topicCardsCount + acc;
           }
           return topicCardsCount + acc;
         }, 0);

@@ -29,6 +29,7 @@ use StudyPlannerPro\Helpers\ChartReviewHelper;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Libs\Settings;
 use StudyPlannerPro\Models\Tag;
+
 use function StudyPlannerPro\get_mature_card_days;
 use function StudyPlannerPro\get_user_timezone_date_early_morning_today;
 use function StudyPlannerPro\get_user_timezone_date_midnight_today;
@@ -286,7 +287,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	public static function get_user_card_forecast( $user_id, $span ) {
@@ -476,7 +476,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	public static function get_user_stats_charts_hourly_breakdown( $user_id, $date ) {
@@ -583,7 +582,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	public static function get_user_stats_charts_answer_buttons( $user_id, $span ) {
@@ -785,7 +783,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	public static function get_user_stats_progress_chart( $user_id, $year ) {
@@ -863,7 +860,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	public static function get_user_stats_charts_added( $user_id, $span ) {
@@ -1001,7 +997,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	public static function get_user_stats_charts_intervals( $user_id, $span ) {
@@ -1164,7 +1159,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	public static function get_user_card_review_count_and_time( $user_id, $span ) {
@@ -1547,18 +1541,27 @@ class Study extends Model {
 		$graphable['total_seconds']                             = number_format( $total_time_seconds, 2 );
 		$graphable['formed_total_time']                         = $formed_total_time;
 		$graphable['total_reviews_time']                        = $total_answers_count;
-		$graphable['average_time_for_days_studied_hours']       = number_format( $average_time_for_days_studied_hours, 2 );
-		$graphable['average_time_for_days_studied_minutes']     = number_format( $average_time_for_days_studied_minutes, 2 );
-		$graphable['average_time_for_days_studied_seconds']     = number_format( $average_time_for_days_studied_seconds, 2 );
-		$graphable['average_time_if_studied_every_day_hours']   = number_format( $average_time_if_studied_every_day_hours, 2 );
-		$graphable['average_time_if_studied_every_day_minutes'] = number_format( ( $average_time_if_studied_every_day_hours * 60 ), 2 );
-		$graphable['average_time_if_studied_every_day_seconds'] = number_format( ( $average_time_if_studied_every_day_hours * 3600 ), 2 );
+		$graphable['average_time_for_days_studied_hours']       = number_format( $average_time_for_days_studied_hours,
+			2 );
+		$graphable['average_time_for_days_studied_minutes']     = number_format( $average_time_for_days_studied_minutes,
+			2 );
+		$graphable['average_time_for_days_studied_seconds']     = number_format( $average_time_for_days_studied_seconds,
+			2 );
+		$graphable['average_time_if_studied_every_day_hours']   = number_format( $average_time_if_studied_every_day_hours,
+			2 );
+		$graphable['average_time_if_studied_every_day_minutes'] = number_format( ( $average_time_if_studied_every_day_hours * 60 ),
+			2 );
+		$graphable['average_time_if_studied_every_day_seconds'] = number_format( ( $average_time_if_studied_every_day_hours * 3600 ),
+			2 );
 		// $graphable['average_answer_time_hours']                 = number_format($average_answer_time_hours, 2);
 		// $graphable['average_answer_time_minutes']               = number_format($average_answer_time_minutes, 2);
 		// $graphable['average_answer_time_seconds']               = number_format($average_answer_time_seconds, 2);
-		$graphable['average_answer_cards_per_hour']           = number_format( ( $average_answered_cards_per_hour ), 2 );
-		$graphable['average_answer_cards_per_minute']         = number_format( ( $average_answered_cards_per_minute ), 2 );
-		$graphable['average_answered_cards_per_seconds_time'] = number_format( ( $average_answered_cards_per_seconds_time ), 2 );
+		$graphable['average_answer_cards_per_hour']           = number_format( ( $average_answered_cards_per_hour ),
+			2 );
+		$graphable['average_answer_cards_per_minute']         = number_format( ( $average_answered_cards_per_minute ),
+			2 );
+		$graphable['average_answered_cards_per_seconds_time'] = number_format( ( $average_answered_cards_per_seconds_time ),
+			2 );
 
 		$measure_end_time                       = microtime( true );
 		$measure_execution_time                 = ( $measure_end_time - $measure_start_time );
@@ -1568,7 +1571,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	public static function get_user_card_review_count_and_time2( $user_id, $span ) {
@@ -2000,7 +2002,8 @@ class Study extends Model {
 
 		$formed_total_time       = $total_time_hours < 1.0 ?
 			( $total_time_minutes < 1.0 ? number_format( $total_time_seconds, 2 ) . ' seconds'
-				: number_format( $total_time_minutes, 2 ) . ' minutes' ) : number_format( $total_time_hours, 2 ) . ' hours';
+				: number_format( $total_time_minutes, 2 ) . ' minutes' ) : number_format( $total_time_hours,
+				2 ) . ' hours';
 		$debug_formed_total_time = '<b>Average for days studied: </b>';
 
 		$graphable['total_days']                                = $total_no_of_days;
@@ -2015,18 +2018,27 @@ class Study extends Model {
 		$graphable['total_seconds']                             = number_format( $total_time_seconds, 2 );
 		$graphable['formed_total_time']                         = $formed_total_time;
 		$graphable['total_reviews_time']                        = $total_answers_count;
-		$graphable['average_time_for_days_studied_hours']       = number_format( $average_time_for_days_studied_hours, 2 );
-		$graphable['average_time_for_days_studied_minutes']     = number_format( $average_time_for_days_studied_minutes, 2 );
-		$graphable['average_time_for_days_studied_seconds']     = number_format( $average_time_for_days_studied_seconds, 2 );
-		$graphable['average_time_if_studied_every_day_hours']   = number_format( $average_time_if_studied_every_day_hours, 2 );
-		$graphable['average_time_if_studied_every_day_minutes'] = number_format( ( $average_time_if_studied_every_day_hours * 60 ), 2 );
-		$graphable['average_time_if_studied_every_day_seconds'] = number_format( ( $average_time_if_studied_every_day_hours * 3600 ), 2 );
+		$graphable['average_time_for_days_studied_hours']       = number_format( $average_time_for_days_studied_hours,
+			2 );
+		$graphable['average_time_for_days_studied_minutes']     = number_format( $average_time_for_days_studied_minutes,
+			2 );
+		$graphable['average_time_for_days_studied_seconds']     = number_format( $average_time_for_days_studied_seconds,
+			2 );
+		$graphable['average_time_if_studied_every_day_hours']   = number_format( $average_time_if_studied_every_day_hours,
+			2 );
+		$graphable['average_time_if_studied_every_day_minutes'] = number_format( ( $average_time_if_studied_every_day_hours * 60 ),
+			2 );
+		$graphable['average_time_if_studied_every_day_seconds'] = number_format( ( $average_time_if_studied_every_day_hours * 3600 ),
+			2 );
 		// $graphable['average_answer_time_hours']                 = number_format($average_answer_time_hours, 2);
 		// $graphable['average_answer_time_minutes']               = number_format($average_answer_time_minutes, 2);
 		// $graphable['average_answer_time_seconds']               = number_format($average_answer_time_seconds, 2);
-		$graphable['average_answer_cards_per_hour']           = number_format( ( $average_answered_cards_per_hour ), 2 );
-		$graphable['average_answer_cards_per_minute']         = number_format( ( $average_answered_cards_per_minute ), 2 );
-		$graphable['average_answered_cards_per_seconds_time'] = number_format( ( $average_answered_cards_per_seconds_time ), 2 );
+		$graphable['average_answer_cards_per_hour']           = number_format( ( $average_answered_cards_per_hour ),
+			2 );
+		$graphable['average_answer_cards_per_minute']         = number_format( ( $average_answered_cards_per_minute ),
+			2 );
+		$graphable['average_answered_cards_per_seconds_time'] = number_format( ( $average_answered_cards_per_seconds_time ),
+			2 );
 
 		$measure_end_time                       = microtime( true );
 		$measure_execution_time                 = ( $measure_end_time - $measure_start_time );
@@ -2053,7 +2065,6 @@ class Study extends Model {
 		return array(
 			'graphable' => $graphable,
 		);
-
 	}
 
 	/**
@@ -2303,7 +2314,6 @@ class Study extends Model {
 	}
 
 	public static function get_user_cards_____( $study_id, $user_id ) {
-
 		try {
 			$user_timezone_minutes_from_now = get_user_timezone_minutes_to_add( $user_id );
 			$_date_today                    = Common::getDateTime();
@@ -2407,11 +2417,9 @@ class Study extends Model {
 				'cards' => array(),
 			);
 		}
-
 	}
 
 	public static function get_user_cards_on_hold( $study_id, $user_id, $particular_date = null ) {
-
 		try {
 			$user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
 
@@ -2439,7 +2447,9 @@ class Study extends Model {
 
 			/*** Get all cards revised today answered today (To exclude them later if "false === $study->no_to_revise") */
 			$query_revised_today                 = Answered::where( 'study_id', '=', $study_id )
-			                                               ->where( 'created_at', '>', $user_timezone_early_morning_today )
+			                                               ->where( 'created_at',
+				                                               '>',
+				                                               $user_timezone_early_morning_today )
 				// ->whereNotIn( 'grade', [ 'again' ] )
 				                                           ->where( 'answered_as_revised', '=', true );
 			$card_ids_revised_today              = $query_revised_today->pluck( 'card_id' );
@@ -2553,7 +2563,6 @@ class Study extends Model {
 			return array(
 				'cards' => $all_cards->get(),
 			);
-
 		} catch ( ItemNotFoundException $e ) {
 			// todo handle later
 			return array(
@@ -2565,11 +2574,9 @@ class Study extends Model {
 				'cards' => array(),
 			);
 		}
-
 	}
 
 	public static function get_user_cards_to_revise( $study_id, $user_id ) {
-
 		try {
 			$user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
 
@@ -2596,7 +2603,9 @@ class Study extends Model {
 
 			/*** Get all cards revised today answered today (To exclude them later if "false === $study->no_to_revise") */
 			$query_revised_today                 = Answered::where( 'study_id', '=', $study_id )
-			                                               ->where( 'created_at', '>', $user_timezone_early_morning_today )
+			                                               ->where( 'created_at',
+				                                               '>',
+				                                               $user_timezone_early_morning_today )
 			                                               ->whereNotIn( 'grade', array( 'again' ) )
 			                                               ->where( 'study_id', '=', $study_id )
 			                                               ->where( 'answered_as_revised', '=', true );
@@ -2702,7 +2711,6 @@ class Study extends Model {
 			return array(
 				'cards' => $all_cards->get(),
 			);
-
 		} catch ( ItemNotFoundException $e ) {
 			// todo handle later
 			return array(
@@ -2714,7 +2722,6 @@ class Study extends Model {
 				'cards' => array(),
 			);
 		}
-
 	}
 
 	/**
@@ -2726,7 +2733,6 @@ class Study extends Model {
 	 * @return array|array[]
 	 */
 	public static function get_user_cards_new( $study_id, $user_id ): array {
-
 		try {
 			$user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
 			$user_timezone_midnight_today      = get_user_timezone_date_midnight_today( $user_id );
@@ -2771,7 +2777,10 @@ class Study extends Model {
 			                      ->leftJoin( SP_TABLE_CARD_GROUPS . ' as cg', 'cg.id', '=', 'c.card_group_id' )
 			                      ->leftJoin( SP_TABLE_DECKS . ' as d', 'd.id', '=', 'cg.deck_id' )
 			                      ->leftJoin( SP_TABLE_TAGGABLES . ' as tg', 'tg.taggable_id', '=', 'cg.id' )
-			                      ->leftJoin( SP_TABLE_TAGGABLES_EXCLUDED . ' as tgex', 'tgex.taggable_id', '=', 'cg.id' )
+			                      ->leftJoin( SP_TABLE_TAGGABLES_EXCLUDED . ' as tgex',
+				                      'tgex.taggable_id',
+				                      '=',
+				                      'cg.id' )
 			                      ->leftJoin( SP_TABLE_TAGS . ' as t', 't.id', '=', 'tg.tag_id' )
 			                      ->where( 'tg.taggable_type', '=', CardGroup::class )
 			                      ->where(
@@ -2780,7 +2789,9 @@ class Study extends Model {
 						                      ->where(
 							                      function ( $q ) use ( $user_timezone_midnight_today ) {
 								                      $q->whereNotNull( 'cg.scheduled_at' )
-								                        ->where( 'cg.scheduled_at', '<=', $user_timezone_midnight_today );
+								                        ->where( 'cg.scheduled_at',
+									                        '<=',
+									                        $user_timezone_midnight_today );
 							                      }
 						                      )
 						                      ->orWhere(
@@ -2905,7 +2916,6 @@ class Study extends Model {
 			return array(
 				'cards' => $all_cards->get(),
 			);
-
 		} catch ( ItemNotFoundException $e ) {
 			// todo handle later
 			return array(
@@ -2917,7 +2927,6 @@ class Study extends Model {
 				'cards' => array(),
 			);
 		}
-
 	}
 
 	public static function get_user_cards_to_study( $study_id, $user_id ) {
@@ -3083,6 +3092,22 @@ class Study extends Model {
 		                 ->get()->first();
 
 		return $answer;
+	}
+
+	/**
+	 * Delete all studies without deck or topic
+	 *
+	 * @return void
+	 */
+	public static function delete_all_studies_without_deck_or_topic(): void {
+		$studies = self
+			::query()
+			->where( 'deck_id', '=', 0 )
+			->where( 'topic_id', '=', 0 )
+			->get();
+		foreach ( $studies as $study ) {
+			$study->forceDelete();
+		}
 	}
 
 }
