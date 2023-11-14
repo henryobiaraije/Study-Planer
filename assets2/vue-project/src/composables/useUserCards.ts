@@ -408,7 +408,7 @@ export default function (status = 'publish') {
                     userDeckGroups.value = [];
                     setTimeout(() => {
                         let deckGroups = done.data.deck_groups;
-                        // deckGroups = sortCardByCardCountOnGroups(deckGroups);
+                        deckGroups = sortCardByCardCountOnGroups(deckGroups);
                         // deckGroups = filterOutItemsWithoutCardsTheUserIsStudying(deckGroups, done.data.user_card_group_ids_being_studied);
                         userDeckGroups.value = deckGroups;
                         newCardIds.value = done.data.new_card_ids;
@@ -501,18 +501,14 @@ export default function (status = 'publish') {
         // Sort on group level, on decks level and on the topics level.
         return groups.sort((a, b) => {
             return b.decks.reduce((acc, deck) => {
-                return acc + deck.topics.reduce((acc, topic) => {
-                    topic = sortCardByCardCountOnTopics([topic])[0];
-                    return acc + topic.card_groups.reduce((acc, cardGroup) => {
-                        return acc + cardGroup.cards.length;
-                    }, 0);
+                const cardCount = deck.cards?.length;
+                return acc + cardCount + deck.topics.reduce((acc, topic) => {
+                    return acc + topic.cards?.length;
                 }, 0);
             }, 0) - a.decks.reduce((acc, deck) => {
-                return acc + deck.topics.reduce((acc, topic) => {
-                    topic = sortCardByCardCountOnTopics([topic])[0];
-                    return acc + topic.card_groups.reduce((acc, cardGroup) => {
-                        return acc + cardGroup.cards.length;
-                    }, 0);
+                const cardCount = deck.cards?.length;
+                return acc + cardCount + deck.topics.reduce((acc, topic) => {
+                    return acc + topic.cards?.length;
                 }, 0);
             }, 0);
         });
@@ -542,11 +538,7 @@ export default function (status = 'publish') {
     function sortCardByCardCountOnTopics(topics: _Topic[]): _Topic[] {
         // Sort on group level, on decks level and on the topics level.
         return topics.sort((a, b) => {
-            return b.card_groups.reduce((acc, cardGroup) => {
-                return acc + cardGroup.cards.length;
-            }, 0) - a.card_groups.reduce((acc, cardGroup) => {
-                return acc + cardGroup.cards.length;
-            }, 0);
+            return b.cards?.length - a.cards?.length;
         });
     }
 
