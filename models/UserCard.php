@@ -20,6 +20,7 @@ use Model\Topic;
 use Model\User;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Models\Tag;
+
 use function StudyPlannerPro\get_uncategorized_deck_group_id;
 use function StudyPlannerPro\get_uncategorized_deck_id;
 use function StudyPlannerPro\get_uncategorized_topic_id;
@@ -52,6 +53,8 @@ class UserCard extends Model {
 	 * @return array|array[]
 	 */
 	public static function get_user_cards_to_study( int $user_id ): array {
+		$today_datetime = Common::getDateTime();
+		$today_date     = Common::get_date();
 		// Get all user cards.
 		$all_user_cards = self::get_all_user_cards( $user_id );
 		if ( empty( $all_user_cards['card_group_ids'] ) ) {
@@ -126,9 +129,9 @@ class UserCard extends Model {
 		// encode all questions in deck groups.
 		foreach ( $deck_groups as $deck_group ) {
 			foreach ( $deck_group->decks as $deck ) {
-				if ( 37 !== $deck->id ) {
-					continue; // todo remove;
-				}
+//				if ( 37 !== $deck->id ) {
+//					continue; // todo remove;
+//				}
 				$study = $deck->studies->first();
 				if ( $study instanceof Study ) {
 					$cards       = self::get_cards_to_study_in_study(
@@ -143,7 +146,8 @@ class UserCard extends Model {
 					$deck->cards = array();
 				}
 				foreach ( $deck->topics as $topic ) {
-					$study = $topic->studies->first();
+					$study                     = $topic->studies->first();
+
 					if ( $study instanceof Study ) {
 						$cards        = self::get_cards_to_study_in_study(
 							$study,
@@ -177,23 +181,39 @@ class UserCard extends Model {
 	 *
 	 * @return Card[]
 	 */
-	public static function get_cards_to_study_in_study( Study $study, array $interested_card_group_ids_for_topic_or_deck, array $user_cards_not_studied_ids, array $user_cards_in_revision_and_due_ids, array $user_cards_on_hold_and_due_ids ): array {
+	public static function get_cards_to_study_in_study(
+		Study $study,
+		array $interested_card_group_ids_for_topic_or_deck,
+		array $user_cards_not_studied_ids,
+		array $user_cards_in_revision_and_due_ids,
+		array $user_cards_on_hold_and_due_ids
+	): array {
 //		$study             = Study::find( $study_id );
-		$deck_id           = $study->deck_id;
-		$topic_id          = $study->topic_id;
-		$tags              = array();
-		$tags_excluded     = array();
-		$add_all_tags      = $study->all_tags;
-		$study_all_new     = $study->study_all_new;
-		$revise_all        = $study->revise_all;
-		$study_all_on_hold = $study->study_all_on_hold;
-		$no_of_new         = $study_all_new ? 10000 : $study->no_of_new;
-		$no_on_hold        = $study_all_on_hold ? 10000 : $study->no_on_hold;
-		$no_of_revision    = $revise_all ? 10000 : $study->no_to_revise;
+		$today_date          = Common::get_date();
+		$study_studied_today = self::get_all_last_answered_user_cards(
+			array( $study->id ),
+			$today_date
+		);
+		$deck_id             = $study->deck_id;
+		$topic_id            = $study->topic_id;
+		$tags                = array();
+		$tags_excluded       = array();
+		$add_all_tags        = $study->all_tags;
+		$study_all_new       = $study->study_all_new;
+		$revise_all          = $study->revise_all;
+		$study_all_on_hold   = $study->study_all_on_hold;
+		$no_of_new           = $study_all_new ? 10000 : $study->no_of_new;
+		$no_on_hold          = $study_all_on_hold ? 10000 : $study->no_on_hold;
+		$no_of_revision      = $revise_all ? 10000 : $study->no_to_revise;
 		if ( ! $add_all_tags ) {
 			$tags          = $study->tags->pluck( 'id' );
 			$tags_excluded = $study->tagsExcluded->pluck( 'id' );
 		}
+		// Minus those answered today.
+		$no_of_new      -= count( $study_studied_today['answered_as_new_ids'] );
+		$no_on_hold     -= count( $study_studied_today['on_hold'] );
+		$no_of_revision -= count( $study_studied_today['revision'] );
+
 
 		// Get card groups in this deck and in the tags and NOT in exclude tags.
 		$card_groups = CardGroup
@@ -252,7 +272,15 @@ class UserCard extends Model {
 	 *
 	 * @return Card[]
 	 */
-	public static function get_cards_to_study_in_card_groups( array $card_group_ids, int $max_no_of_new_cards, int $max_no_on_hold, int $max_no_in_revision, array $all_new_card_ids, array $all_revision_card_ids, $all_on_hold_card_ids ): array {
+	public static function get_cards_to_study_in_card_groups(
+		array $card_group_ids,
+		int $max_no_of_new_cards,
+		int $max_no_on_hold,
+		int $max_no_in_revision,
+		array $all_new_card_ids,
+		array $all_revision_card_ids,
+		$all_on_hold_card_ids
+	): array {
 		$card_groups_new      = CardGroup
 			::query()
 			->whereIn( 'id', $card_group_ids )
@@ -323,7 +351,6 @@ class UserCard extends Model {
 				if ( ! is_array( $card->question ) ) {
 					$card->question = json_decode( $card->question );
 				}
-
 			}
 			$all_cards[] = $card;
 		}
@@ -365,7 +392,9 @@ class UserCard extends Model {
 
 
 		$last_answered_card_ids = self::get_all_last_answered_user_cards( $user_id, $user_study_id );
-		$new_cards              = self::get_new_cards_not_answered_but_added( $user_id, $user_study_id, $last_answered_card_ids['card_ids'] );
+		$new_cards              = self::get_new_cards_not_answered_but_added( $user_id,
+			$user_study_id,
+			$last_answered_card_ids['card_ids'] );
 
 //		Common::send_error( '', array(
 //			__METHOD__,
@@ -486,10 +515,11 @@ class UserCard extends Model {
 	 * Get all answered last answered cards.
 	 *
 	 * @param array $user_study_ids The user's study ids.
+	 * @param string|null $date The date. If you want to filter by date answered.
 	 *
 	 * @return array
 	 */
-	public static function get_all_last_answered_user_cards( array $user_study_ids ): array {
+	public static function get_all_last_answered_user_cards( array $user_study_ids, string $date = null ): array {
 		$card_answered = Answered
 			::query()
 			->with(
@@ -499,7 +529,11 @@ class UserCard extends Model {
 						$q->whereIn( 'id', $user_study_ids );
 					},
 				)
-			)
+			);
+		if ( $date ) {
+			$card_answered = $card_answered->whereDate( 'created_at', '=', $date );
+		}
+		$card_answered = $card_answered
 			->groupBy( 'card_id' )
 			->orderBy( 'created_at', 'desc' )
 			->get()->all();
@@ -515,6 +549,9 @@ class UserCard extends Model {
 		$cards_on_hold_and_due     = array();
 		$cards_in_revision         = array();
 		$cards_in_revision_and_due = array();
+		$cards_answered_as_new     = array(); // Those that are answered only once.
+		$cards_answered_as_new_ids = array(); // Those that are answered only once.
+
 		foreach ( $card_answered as $answered ) {
 			$card = $answered->card;
 			if ( ! $card ) {
@@ -539,6 +576,12 @@ class UserCard extends Model {
 					$cards_in_revision_and_due[] = $card;
 				}
 			}
+
+			// Check if answered as new.
+			if ( $answered->answered_as_new ) {
+				$cards_answered_as_new[]     = $card;
+				$cards_answered_as_new_ids[] = $card->id;
+			}
 		}
 
 		return array(
@@ -560,6 +603,8 @@ class UserCard extends Model {
 				},
 				$cards_in_revision_and_due
 			),
+			'answered_as_new'      => $cards_answered_as_new,
+			'answered_as_new_ids'  => $cards_answered_as_new_ids,
 		);
 	}
 
@@ -572,8 +617,10 @@ class UserCard extends Model {
 	 *
 	 * @return int[]
 	 */
-	public static function get_new_cards_not_answered_but_added( int $user_id, array $last_answered_card_ids = array() ): array {
-
+	public static function get_new_cards_not_answered_but_added(
+		int $user_id,
+		array $last_answered_card_ids = array()
+	): array {
 //		$user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
 //		$user_timezone_midnight_today      = get_user_timezone_date_midnight_today( $user_id );
 		$all_users_cards = self::get_all_user_cards( $user_id );
@@ -614,6 +661,37 @@ class UserCard extends Model {
 		);
 	}
 
+//	/**
+//	 * Get how many new, revision and on hold cards the user has studied today in a study.
+//	 *
+//	 * @param Study $study The study object.
+//	 *
+//	 * @return array
+//	 */
+//	public static function get_study_studied_today_stats( Study $study ): array {
+//		$study_studied_today_stats = array(
+//			'no_of_new_cards_studied_today' => 0,
+//			'no_of_revision_studied_today'  => 0,
+//			'no_of_on_hold_studied_today'   => 0
+//		);
+//		$datetime                  = Common::getDateTime();
+//		$date                      = date( 'Y-m-d', strtotime( $datetime ) );
+//
+//
+//		$study_id = $study->id;
+//
+//		$answered = Answered
+//			::query()
+//			->where( 'study_id', '=', $study_id )
+//			->where( 'created_at', '>=', $date )
+//
+//
+//		$answers_today
+//
+//
+//		return $study_studied_today_stats;
+//	}
+
 	/**
 	 * Get all cards on hold for today.
 	 *
@@ -623,7 +701,11 @@ class UserCard extends Model {
 	 *
 	 * @return int[]
 	 */
-	public static function get_cards_on_hold_for_today( int $user_id, int $user_study_id, array $last_answered_card_ids_on_hold_and_due = array() ): array {
+	public static function get_cards_on_hold_for_today(
+		int $user_id,
+		int $user_study_id,
+		array $last_answered_card_ids_on_hold_and_due = array()
+	): array {
 		// $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
 		// $user_timezone_midnight_today      = get_user_timezone_date_midnight_today( $user_id );
 		$all_users_card = self::get_all_user_cards( $user_id );
@@ -632,7 +714,10 @@ class UserCard extends Model {
 		                   ->where( 'user_id', '=', $user_id )
 		                   ->with(
 			                   array(
-				                   'card_group.cards' => function ( $query ) use ( $all_users_card, $last_answered_card_ids_on_hold_and_due ) {
+				                   'card_group.cards' => function ( $query ) use (
+					                   $all_users_card,
+					                   $last_answered_card_ids_on_hold_and_due
+				                   ) {
 					                   // Exclude all cards that has been Answered before.
 					                   $query
 						                   ->whereIn( 'id', $last_answered_card_ids_on_hold_and_due );
@@ -667,7 +752,11 @@ class UserCard extends Model {
 	 *
 	 * @return int[]
 	 */
-	public static function get_cards_in_revision_for_today( int $user_id, int $user_study_id, array $last_answered_card_ids_in_revision_and_due = array() ): array {
+	public static function get_cards_in_revision_for_today(
+		int $user_id,
+		int $user_study_id,
+		array $last_answered_card_ids_in_revision_and_due = array()
+	): array {
 		// $user_timezone_early_morning_today = get_user_timezone_date_early_morning_today( $user_id );
 		// $user_timezone_midnight_today      = get_user_timezone_date_midnight_today( $user_id );
 		$all_users_card = self::get_all_user_cards( $user_id );
@@ -676,7 +765,10 @@ class UserCard extends Model {
 		                   ->where( 'user_id', '=', $user_id )
 		                   ->with(
 			                   array(
-				                   'card_group.cards' => function ( $query ) use ( $all_users_card, $last_answered_card_ids_in_revision_and_due ) {
+				                   'card_group.cards' => function ( $query ) use (
+					                   $all_users_card,
+					                   $last_answered_card_ids_in_revision_and_due
+				                   ) {
 					                   // Exclude all cards that has been Answered before.
 					                   $query
 						                   ->whereIn( 'id', $last_answered_card_ids_in_revision_and_due );

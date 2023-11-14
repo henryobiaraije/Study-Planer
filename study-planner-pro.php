@@ -54,6 +54,10 @@ register_uninstall_hook( __FILE__, [ Initializer::class, 'on_uninstall' ] );
 
 phinx_migrate();
 
+// Do next.
+// - sort loaded study deck groups by cards count down the chain.
+// - Test onhold, reverse counts
+
 
 
 

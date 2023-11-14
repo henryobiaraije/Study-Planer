@@ -50,7 +50,6 @@ class Common {
 	private static $instance = null;
 
 	function __construct( $dates_according_to_ip = false ) {
-
 		if ( $_SERVER["SERVER_NAME"] === "localhost" ) {
 			//      self::$SCRIPT_VERSION = time();
 		} else {
@@ -58,14 +57,12 @@ class Common {
 		}
 		if ( isset( $_SERVER['SERVER_NAME'] ) ) {
 			if ( $_SERVER["SERVER_NAME"] === "localhost" ) {
-
 			} else {
 				self::$online_start_count = 0;
 			}
 		}
 
 		if ( self::$online_now ) {
-
 		}
 
 		//		Common::in_script( [
@@ -131,7 +128,12 @@ class Common {
 	}
 
 
-	public static function verify_post( $post, $must_be_logged_in = false, $must_be_admin = false, $forget_nonce = false ) {
+	public static function verify_post(
+		$post,
+		$must_be_logged_in = false,
+		$must_be_admin = false,
+		$forget_nonce = false
+	) {
 		if ( $must_be_admin ) {
 			if ( ! current_user_can( 'administrator' ) ) {
 				Common::send_error( 'Sorry, only admins can do this.', [
@@ -159,8 +161,6 @@ class Common {
 				Common::send_error( 'Session Expired. Please reload page.' );
 			}
 		}
-
-
 	}
 
 	private function init_constants() {
@@ -250,7 +250,6 @@ class Common {
 		$ff .= " var " . $var_name . " = " . wp_json_encode( $data_to_assign ) . "; ";
 		$ff .= "</script>";
 		echo $ff;
-
 	}
 
 	// Function to get the client IP address
@@ -393,8 +392,10 @@ class Common {
 	}
 
 	public static function getPost() {
-		$data = json_decode( trim( preg_replace( '/\\\"/', "\"",
-			$_POST["form_data"] ) ), true );
+		$data = json_decode( trim( preg_replace( '/\\\"/',
+			"\"",
+			$_POST["form_data"] ) ),
+			true );
 		if ( $data == null ) {
 			$data = json_decode( stripslashes( $_POST["form_data"] ), true );
 		}
@@ -433,7 +434,6 @@ class Common {
 	}
 
 	public static function get_page_url_by_id( $page_id ) {
-
 		$url = get_permalink( $page_id );
 		if ( empty( $url ) ) {
 			$page = get_post( $page_id );
@@ -611,7 +611,6 @@ class Common {
 	 * @return false|string
 	 */
 	public static function getDateTime( $days = 0, $hours = 0 ) {
-
 //		$date = date( 'Y-m-d H:i:s' );
 
 		$date = sp_get_user_debug_form()['current_study_date'];
@@ -633,37 +632,26 @@ class Common {
 		}
 
 		return $date;
-
 	}
 
 	public static function format_datetime( $date ) {
 		return date( 'Y-m-d H:i:s', strtotime( $date ) );
-
 	}
 
 	/**
-	 * @param int $days
-	 * @param string $format
+	 * Get date.
 	 *
-	 * @return false|string
+	 * @param int $days
+	 * @param int $hours
+	 *
+	 * @return string
 	 */
-	public
-	static function getDate(
-		$days = 0,
-		$format = 'Y-m-d'
-	) {
-		$date = date( $format );
-		if ( $days !== 0 ) {
-			$days = "$days days";
-			$date = date( $format, strtotime( $days ) );
-		}
-
-		return $date;
+	public static function get_date( int $days = 0, int $hours = 0 ): string {
+		return date( 'Y-m-d', strtotime( self::getDateTime( $days, $hours ) ) );
 	}
 
 	public
 	static function getTime() {
-
 		return date( 'H:i:s' );
 	}
 

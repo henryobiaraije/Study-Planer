@@ -412,7 +412,7 @@ $current_year = date( 'Y' );
                             <input @change="useStats._loadChartHourlyBreakDown"
                                    v-model="useStats.chartHourlyBreakdownDate.value"
                                    class="border-1  px-2 border-gray-500"
-                                   max="<?php echo \StudyPlannerPro\Libs\Common::getDate(); ?>"
+                                   max="<?php echo \StudyPlannerPro\Libs\Common::get_date(); ?>"
                                    name="forecast_span" value="one_month" type="date"></label>
                     </form>
                     <div v-show="useStats.chartHourlyBreakdownDate.value.length > 3" class="chart-review-time"
