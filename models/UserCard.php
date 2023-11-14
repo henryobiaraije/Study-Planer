@@ -78,8 +78,10 @@ class UserCard extends Model {
 		$user_studies = sp_get_user_studies( $user_id );
 
 		// User un-studied topics.
-		$user_cards_not_studied = self::get_new_cards_not_answered_but_added( $user_id );
 		$user_cards_answered    = self::get_all_last_answered_user_cards( $user_studies['study_ids'] );
+		$user_cards_not_studied = self::get_new_cards_not_answered_but_added( $user_id,
+			$user_cards_answered['card_ids'] );
+
 
 		$card_groups = CardGroup
 			::query()
@@ -129,9 +131,9 @@ class UserCard extends Model {
 		// encode all questions in deck groups.
 		foreach ( $deck_groups as $deck_group ) {
 			foreach ( $deck_group->decks as $deck ) {
-//				if ( 37 !== $deck->id ) {
-//					continue; // todo remove;
-//				}
+				if ( 37 !== $deck->id ) {
+					continue; // todo remove;
+				}
 				$study = $deck->studies->first();
 				if ( $study instanceof Study ) {
 					$cards       = self::get_cards_to_study_in_study(
@@ -146,7 +148,7 @@ class UserCard extends Model {
 					$deck->cards = array();
 				}
 				foreach ( $deck->topics as $topic ) {
-					$study                     = $topic->studies->first();
+					$study = $topic->studies->first();
 
 					if ( $study instanceof Study ) {
 						$cards        = self::get_cards_to_study_in_study(
@@ -214,6 +216,11 @@ class UserCard extends Model {
 		$no_on_hold     -= count( $study_studied_today['on_hold'] );
 		$no_of_revision -= count( $study_studied_today['revision'] );
 
+		// No negative numbers, make it 0.
+		$no_of_new      = max( $no_of_new, 0 );
+		$no_on_hold     = max( $no_on_hold, 0 );
+		$no_of_revision = max( $no_of_revision, 0 );
+
 
 		// Get card groups in this deck and in the tags and NOT in exclude tags.
 		$card_groups = CardGroup
@@ -239,7 +246,6 @@ class UserCard extends Model {
 						->whereNotIn( SP_TABLE_TAGS . '.id', $tags_excluded );
 				} );
 		}
-//		$card_groups_ids_in_deck = $card_groups->get()->pluck( 'id' )->toArray();
 		$card_groups_ids_in_deck = $card_groups->get()->toArray();
 		$card_groups_ids_in_deck = array_map(
 			static function ( $card_group ) {
@@ -279,7 +285,7 @@ class UserCard extends Model {
 		int $max_no_in_revision,
 		array $all_new_card_ids,
 		array $all_revision_card_ids,
-		$all_on_hold_card_ids
+		array $all_on_hold_card_ids
 	): array {
 		$card_groups_new      = CardGroup
 			::query()
@@ -319,27 +325,56 @@ class UserCard extends Model {
 			)->get();
 
 		// Merge all eloquent collections card groups.
-		$card_groups = $card_groups_new
-			->merge( $card_groups_revision )
-			->merge( $card_groups_hold );
+//		$card_groups = $card_groups_new
+//			->merge( $card_groups_revision )
+//			->merge( $card_groups_hold );
 
 		$cards = array();
 		foreach ( $card_groups_new as $card_group ) {
 			foreach ( $card_group->cards as $card ) {
+				// Make sure that the card is not already in the array.
+				$existing_card_ids = array_map(
+					static function ( $card ) {
+						return $card->id;
+					},
+					$cards
+				);
+				if ( in_array( $card->id, $existing_card_ids, true ) ) {
+					continue;
+				}
 				$cards[] = $card;
 			}
 		}
 		foreach ( $card_groups_revision as $card_group ) {
 			foreach ( $card_group->cards as $card ) {
+				// Make sure that the card is not already in the array.
+				$existing_card_ids = array_map(
+					static function ( $card ) {
+						return $card->id;
+					},
+					$cards
+				);
+				if ( in_array( $card->id, $existing_card_ids, true ) ) {
+					continue;
+				}
 				$cards[] = $card;
 			}
 		}
 		foreach ( $card_groups_hold as $card_group ) {
 			foreach ( $card_group->cards as $card ) {
+				// Make sure that the card is not already in the array.
+				$existing_card_ids = array_map(
+					static function ( $card ) {
+						return $card->id;
+					},
+					$cards
+				);
+				if ( in_array( $card->id, $existing_card_ids, true ) ) {
+					continue;
+				}
 				$cards[] = $card;
 			}
 		}
-
 
 		$all_cards = array();
 		foreach ( $cards as $card ) {
@@ -356,127 +391,6 @@ class UserCard extends Model {
 		}
 
 		return $all_cards;
-	}
-
-
-	/**
-	 * Get user cards.
-	 * Used only for when only topics can be studied.
-	 *
-	 * @param int $user_id
-	 *
-	 * @return array
-	 */
-	public static function get_user_cards_to_study___( int $user_id ) {
-		// Get all user cards.
-		$all_user_cards = self::get_all_user_cards( $user_id );
-		if ( empty( $all_user_cards['card_group_ids'] ) ) {
-			return array(
-				'deck_groups'                       => array(),
-				'new_card_ids'                      => array(),
-				'on_hold_card_ids'                  => array(),
-				'revision_card_ids'                 => array(),
-				'user_card_group_ids_being_studied' => array()
-			);
-		}
-
-		$deck_group_uncategorized_id = get_uncategorized_deck_group_id();
-		$deck_uncategorized_id       = get_uncategorized_deck_id();
-
-		// Remove all card groups in any collection.
-		$card_groups_in_collection = CardGroup::get_card_groups_in_any_collections();
-
-
-		$user_study    = sp_get_user_study( $user_id );
-		$user_study_id = $user_study->id;
-
-
-		$last_answered_card_ids = self::get_all_last_answered_user_cards( $user_id, $user_study_id );
-		$new_cards              = self::get_new_cards_not_answered_but_added( $user_id,
-			$user_study_id,
-			$last_answered_card_ids['card_ids'] );
-
-//		Common::send_error( '', array(
-//			__METHOD__,
-//			__LINE__,
-//			'user_study_id'          => $user_study_id,
-//			'user_id'                => $user_id,
-//			'last_answered_card_ids' => $last_answered_card_ids,
-//		) );
-
-		// Get cards organized by deck groups, decks, topics and card_groups.
-		$deck_groups = DeckGroup::with(
-			array(
-				'decks.topics.card_groups.cards' => function ( $q ) use ( $new_cards, $last_answered_card_ids ) {
-					$q->whereIn(
-						'id',
-						array_values(
-							array_merge(
-								$new_cards['card_ids'],
-								$last_answered_card_ids['on_hold_and_due_ids'],
-								$last_answered_card_ids['revision_and_due_ids']
-							)
-						)
-					);
-				},
-				'decks.studies'                  => function ( $q ) use ( $user_id ) {
-					$q->where( 'user_id', '=', $user_id );
-				},
-			)
-		);
-
-		// Remove all card groups in any collection.
-		$deck_groups = $deck_groups
-			->whereHas(
-				'decks.topics.card_groups',
-				function ( $query ) use ( $card_groups_in_collection ) {
-					$query->whereNotIn( 'id', $card_groups_in_collection['card_group_ids'] );
-				}
-			);
-
-		// Remove uncategorized deck group.
-		$deck_groups = $deck_groups->where( 'id', '!=', $deck_group_uncategorized_id );
-
-		// Remove uncategorized deck.
-		$deck_groups = $deck_groups->whereHas(
-			'decks',
-			function ( $query ) use ( $deck_uncategorized_id ) {
-				$query->where( 'id', '!=', $deck_uncategorized_id );
-			}
-		)->get();
-
-
-		// encode all questions in deck groups.
-		foreach ( $deck_groups as $deck_group ) {
-			foreach ( $deck_group->decks as $deck ) {
-				foreach ( $deck->topics as $topic ) {
-					foreach ( $topic->card_groups as $card_group ) {
-						foreach ( $card_group->cards as $card ) {
-							$card_type = $card->card_group->card_type;
-							if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
-								if ( ! is_array( $card->answer ) ) {
-									$card->answer = json_decode( $card->answer );
-								}
-								if ( ! is_array( $card->question ) ) {
-									$card->question = json_decode( $card->question );
-								}
-								if ( ! is_array( $card_group->whole_question ) ) {
-									$card_group->whole_question = json_decode( $card_group->whole_question );
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return array(
-			'deck_groups'                       => $deck_groups->all(),
-			'new_card_ids'                      => $new_cards['card_ids'],
-			'on_hold_card_ids'                  => $last_answered_card_ids['on_hold_and_due_ids'],
-			'revision_card_ids'                 => $last_answered_card_ids['revision_and_due_ids'],
-			'user_card_group_ids_being_studied' => $all_user_cards['card_group_ids']
-		);
 	}
 
 	/**
@@ -529,6 +443,12 @@ class UserCard extends Model {
 						$q->whereIn( 'id', $user_study_ids );
 					},
 				)
+			)
+			->whereHas(
+				'study',
+				function ( $query ) use ( $user_study_ids ) {
+					$query->whereIn( 'id', $user_study_ids );
+				}
 			);
 		if ( $date ) {
 			$card_answered = $card_answered->whereDate( 'created_at', '=', $date );
@@ -578,6 +498,12 @@ class UserCard extends Model {
 			}
 
 			// Check if answered as new.
+//			$answered = Answered
+//				::query()
+//				->where( 'card_id', '=', $card->id )
+//				->limit( 2 )
+//				->get()->all();
+//			if ( count( $answered ) === 1 ) {
 			if ( $answered->answered_as_new ) {
 				$cards_answered_as_new[]     = $card;
 				$cards_answered_as_new_ids[] = $card->id;
@@ -660,37 +586,6 @@ class UserCard extends Model {
 			'topic_ids'      => $topic_ids,
 		);
 	}
-
-//	/**
-//	 * Get how many new, revision and on hold cards the user has studied today in a study.
-//	 *
-//	 * @param Study $study The study object.
-//	 *
-//	 * @return array
-//	 */
-//	public static function get_study_studied_today_stats( Study $study ): array {
-//		$study_studied_today_stats = array(
-//			'no_of_new_cards_studied_today' => 0,
-//			'no_of_revision_studied_today'  => 0,
-//			'no_of_on_hold_studied_today'   => 0
-//		);
-//		$datetime                  = Common::getDateTime();
-//		$date                      = date( 'Y-m-d', strtotime( $datetime ) );
-//
-//
-//		$study_id = $study->id;
-//
-//		$answered = Answered
-//			::query()
-//			->where( 'study_id', '=', $study_id )
-//			->where( 'created_at', '>=', $date )
-//
-//
-//		$answers_today
-//
-//
-//		return $study_studied_today_stats;
-//	}
 
 	/**
 	 * Get all cards on hold for today.

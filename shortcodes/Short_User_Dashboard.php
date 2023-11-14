@@ -93,14 +93,7 @@ class Short_User_Dashboard {
 	}
 
 	public function localize_data(): void {
-		$study = sp_get_user_study( get_current_user_id() );
-		if ( $study instanceof Study ) {
-			Initializer::add_to_localize( 'user_study_deck_id', $study->id );
-			Initializer::add_to_localize( 'user_study', $study );
-		} else {
-			Initializer::add_to_localize( 'user_study_deck_id', 0 );
-			Initializer::add_to_localize( 'user_study', null );
-		}
+
 	}
 
 	final public function register_scripts(): void {

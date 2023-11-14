@@ -94,12 +94,23 @@
             <span class="flex-initial"><v-btn color="primary" block @click="viewDialog = false">Close</v-btn></span>
           </div>
         </v-card-actions>
-        <QuestionModal
-            title="Study Cards"
-            :cards="cardsToView"
-            :show-only-answers="false"
-            purpose="study"
-            :user-cards="userCards"/>
+        <template v-if="null !== studyToEdit">
+          <QuestionModal
+              title="Study Cards"
+              :cards="cardsToView"
+              :show-only-answers="false"
+              purpose="study"
+              :study="studyToEdit"
+              :user-cards="userCards"/>
+        </template>
+        <template v-else>
+          <QuestionModal
+              title="Study Cards"
+              :cards="cardsToView"
+              :show-only-answers="false"
+              purpose="study"
+              :user-cards="userCards"/>
+        </template>
       </v-card>
     </v-dialog>
 
@@ -539,7 +550,9 @@ export default defineComponent({
         return;
       }
 
+      const theItem = (this.item as _Deck | _Topic);
       this.cardsToView = cardsToStudy;
+      this.studyToEdit = theItem.studies && theItem.studies.length > 0 ? theItem.studies[0] : null;
       this.viewDialog = true;
 
       // this.cardsToView = (this.item as _Topic | _Deck).cards?.reduce((acc, card: _Card) => {

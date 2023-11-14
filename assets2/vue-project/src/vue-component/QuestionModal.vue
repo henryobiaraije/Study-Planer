@@ -281,7 +281,7 @@
 import {defineComponent} from "vue";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useUserDashboard from "@/composables/useUserDashboard";
-import type {_Card, _CardGroup} from "@/interfaces/inter-sp";
+import type {_Card, _CardGroup, _Study} from "@/interfaces/inter-sp";
 import useImageCard from "@/composables/useImageCard";
 import {spClientData} from "@/functions";
 import useUserCards from "@/composables/useUserCards";
@@ -332,11 +332,15 @@ export default defineComponent({
     },
     recordStudyLogStart() {
       if ('study' === this.purpose) {
-        this.userDash.xhrRecordStudyLog(spClientData().user_study, this.cards[this.index], 'start');
+        if (this.study) {
+          this.userDash.xhrRecordStudyLog(this.study, this.cards[this.index], 'start');
+        }
       }
     },
     recordStudyLogStop() {
-      this.userDash.xhrRecordStudyLog(spClientData().user_study, this.cards[this.index], 'stop');
+      if (this.study) {
+        this.userDash.xhrRecordStudyLog(this.study, this.cards[this.index], 'stop');
+      }
     },
     injectImageCardCss(card: _Card) {
       if ('image' === card.card_group.card_type) {
@@ -356,14 +360,18 @@ export default defineComponent({
     answer(grade: string) {
       // console.log(grade)
       const card = this.cards[this.index];
-      this.userDash
-          .xhrMarkAnswer(
-              spClientData().user_study,
-              card,
-              grade,
-              card.answer,
-              card.question
-          );
+      if (this.study) {
+        this.userDash
+            .xhrMarkAnswer(
+                this.study,
+                card,
+                grade,
+                card.answer,
+                card.question
+            );
+      } else {
+        console.log('Study is not set', {study: this.study, card: card});
+      }
 
       if ('again' === grade) {
         this.again();
@@ -418,12 +426,14 @@ export default defineComponent({
     hold() {
       // HOld, push the card to the end.
       const currentCard = this.cards[this.index];
-      this
-          .userDash
-          .xhrMarkAnswerOnHold(
-              spClientData().user_study,
-              currentCard
-          );
+      if (this.study) {
+        this
+            .userDash
+            .xhrMarkAnswerOnHold(
+                this.study,
+                currentCard
+            );
+      }
       this.next();
     },
   },
@@ -497,6 +507,10 @@ export default defineComponent({
       required: false,
       default: 0,
     },
+    study: {
+      type: Object as () => _Study,
+      required: false,
+    }
   },
   mounted() {
     document.addEventListener('keydown', this.handleKeyup);
