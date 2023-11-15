@@ -32,51 +32,81 @@
   <div class="cards">
     <ul class="card-wrapper !list-none !p-0 !m-0 max-h-300px overflow-y-auto shadow">
       <li v-for="(cardGroup,cardIndex) in cardsToDisplay"
-          class="flex !p-0 !m-0 justify-between items-center hover:bg-sp-50 border-b border-solid border-sp-300 cursor-pointer"
+          class="!p-0 !m-0 justify-between items-center hover:bg-sp-50 border-b border-solid border-sp-300 cursor-pointer"
           key="cardGroup.id"
       >
         <label
-
-            class="single-card cursor-pointer group px-2 flex-1 flex gap-2 justify-between items-center ">
-          <span class="single-card px-2 flex-1 flex gap-2 justify-start items-center ">
-            <span class="block flex-initial icon p-2 hover:bg-sp-300 rounded-full "
-                  @click="$emit('card-clicked', cardGroup)"
-            >
-              <!-- Plus icon -->
-              <svg v-if="!selectedCardIds.includes(cardGroup.id)" class="w-[20px] h-[20px]" fill="none"
-                   stroke="currentColor"
-                   stroke-width="3.5"
-                   viewBox="0 0 24 24"
-                   xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"></path>
-              </svg>
-              <!-- Checked icon -->
-              <svg v-else class="w-[20px] h-[20px] text-sp-500" fill="none" stroke="currentColor" stroke-width="3.5"
-                   viewBox="0 0 24 24"
-                   xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"></path>
-              </svg>
-            </span>
-            <span
-                @click="viewCard(cardGroup.id)"
-                class="px-2 py-2 flex-1 flex gap-2 justify-start items-center ">
-              <span class="card-name block ">{{ cardGroup.name }}</span>
-              <span class="bg-gray-300 px-2 py-1 rounded-md">{{ cardGroup.card_type }}</span>
-            </span>
-          </span>
-          <!--          <span class="bg-gray-300 px-2 py-1 rounded-md lg:hidden group-hover:inline-block">{{ cardGroup.cards.length }} Cards</span>-->
-          <v-chip
-              class="ma-2"
-              color="primary"
+            class="flex single-card cursor-pointer group px-2 flex-1 gap-2 justify-between items-center ">
+          <div class="flex-initial icon block icon p-2 hover:bg-sp-300 rounded-full "
+               @click="$emit('card-clicked', cardGroup)"
           >
-            {{ cardGroup.cards.length }} Cards
-          </v-chip>
+            <!-- Plus icon -->
+            <svg v-if="!selectedCardIds.includes(cardGroup.id)" class="w-[20px] h-[20px]" fill="none"
+                 stroke="currentColor"
+                 stroke-width="3.5"
+                 viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 4.5v15m7.5-7.5h-15"></path>
+            </svg>
+            <!-- Checked icon -->
+            <svg v-else class="w-[20px] h-[20px] text-sp-500" fill="none" stroke="currentColor" stroke-width="3.5"
+                 viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4.5 12.75l6 6 9-13.5"></path>
+            </svg>
+          </div>
+          <div class="body-details flex-auto lg:flex">
+            <div @click="viewCard(cardGroup.id)" class="card-name text-base font-medium block ">{{
+                cardGroup.name
+              }}
+            </div>
+            <div class="in-mobile flex lg:hidden gap-2 card-stats bg-gray-50">
+              <div class="mobile-stats flex justify-between gap-4 border-t-sm border-solid border-gray-400 ">
+                <div class="flex flex-row gap-1 items-center">
+                  <span class="text-sm text-gray-400">Card Type: </span>
+                  <v-chip
+                      class="ma-2"
+                      size="x-small"
+                      color="primary"
+                  >
+                    {{ cardGroup.card_type }}
+                  </v-chip>
+                </div>
+                <div class="flex flex-row gap-1 items-center">
+                  <span class="text-sm text-gray-400">Cards: </span>
+                  <v-chip
+                      class="ma-2"
+                      size="x-small"
+                      color="primary"
+                  >
+                    {{ cardGroup.cards.length }}
+                  </v-chip>
+                </div>
+              </div>
+            </div>
+            <div class="in-desktop hidden lg:flex">
+              <v-chip
+                  class="ma-2 text-xs my-0"
+                  color="primary"
+                  size="x-small"
+              >
+                {{ cardGroup.card_type }}
+              </v-chip>
+              <v-chip
+                  class="ma-2 text-xs my-0"
+                  color="primary"
+                  size="x-small"
+              >
+                {{ cardGroup.cards.length }} Cards
+              </v-chip>
+            </div>
+          </div>
         </label>
         <v-dialog
             v-model="viewDialog"
@@ -140,6 +170,7 @@ import QuestionModal from "@/vue-component/QuestionModal.vue";
 import {_Card} from "@/interfaces/inter-sp";
 import useUserCards from "@/composables/useUserCards";
 import useMyStore from "@/composables/useMyStore";
+import useWidth from "@/composables/useWidth";
 
 export default defineComponent({
   name: 'SelectedCardsAssign',
@@ -187,6 +218,7 @@ export default defineComponent({
   setup: (props, ctx) => {
     return {
       myStore: useMyStore(),
+      uWidth: useWidth(),
     }
   },
   methods: {

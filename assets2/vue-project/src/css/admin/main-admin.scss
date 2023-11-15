@@ -730,3 +730,13 @@ svg.vch__wrapper.dark-mode text.vch__month__label, svg.vch__wrapper.dark-mode te
 .v-input__details {
   display: none !important;
 }
+
+.v-dialog > .v-overlay__content {
+  max-width: calc(100% - 5px) !important;
+}
+
+.card-pagination {
+  ul {
+    list-style: none !important;
+  }
+}

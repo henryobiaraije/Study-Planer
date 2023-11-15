@@ -1,7 +1,7 @@
 <template>
   <!--  <div class="sp sp-modal">-->
   <div class="admin-image-card">
-    <form @submit.prevent="" class="modal-content min-w-[90vw]" style="height: 100%;">
+    <form @submit.prevent="" class="modal-content min-w-[85vw]" style="height: 100%;">
       <div class="mb-4">
         <!--              <?php \StudyPlannerPro\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>-->
       </div>
@@ -26,10 +26,6 @@
                   style="background: transparent !important;"
               >
                 <div class="d-flex fill-height justify-center align-center">
-                  <!--                <div class="text-h2">-->
-                  <!--                  {{ slide }} Slide-->
-                  <!--                </div>-->
-
                   <!-- <editor-fold desc="Basic Card"> -->
                   <div v-if="'basic' === currentQuestion?.card_group.card_type"
                        class="sp-basic-question w-full text-center"
@@ -168,7 +164,7 @@
                 Prev
               </v-btn>
               </span>
-              <div class="flex flex-1 gap-4 justify-center items-center">
+              <div class="flex-1 hidden lg:flex gap-4 justify-center items-center">
                 <span class="text-xl font-semibold">{{ index + 1 }}/{{ cards.length }}</span>
                 <span v-if="inAddQuestions" class="flex-initial">
                   <v-switch
@@ -192,6 +188,18 @@
                 </v-icon>
               </v-btn>
               </span>
+            </div>
+            <div class="flex-1 flex lg:hidden gap-4 justify-center items-center">
+              <span class="text-xl font-semibold">{{ index + 1 }}/{{ cards.length }}</span>
+              <span v-if="inAddQuestions" class="flex-initial">
+                  <v-switch
+                      v-model="userCards.form.value.selectedCards"
+                      color="primary"
+                      hide-details
+                      :value="cards[index].card_group"
+                      label="Selected"
+                  ></v-switch>
+                </span>
             </div>
             <p class="flex-1 w-full py-4 text-center text-base text-gray-500">You can use left and right arrow keys to
               move through the cards</p>
@@ -224,7 +232,7 @@
 
             <!-- <editor-fold desc="Buttons (Again | Hard | Good | Easy)"> -->
             <div v-if="showCurrentAnswer" class="">
-              <div class="flex flex-wrap gap-4 justify-center align-center py-4">
+              <div class="flex flex-wrap gap-4 justify-center align-center py-4 px-2">
                 <v-btn
                     color="primary"
                     @keyup.1="answer('again')"

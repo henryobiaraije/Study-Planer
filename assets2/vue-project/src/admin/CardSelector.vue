@@ -80,8 +80,8 @@
           <span class="flex-initial text-base block mb-2 font-medium">Card Types<span
               class="text-gray-400"> (optional)</span></span>
           <div
-              class="card-types flex-1 list-none p-2 m-0 flex gap-4 items-center border border-solid !border-sp-500 bg-white rounded">
-            <label class="flex gap-2 items-center justify-start !m-0 cursor-pointer hover:text-sp-500"
+              class="card-types flex-1 list-none p-2 m-0 flex flex-wrap gap-4 items-center border border-solid !border-sp-500 bg-white rounded">
+            <label class="flex flex-auto gap-2 items-center justify-start !m-0 cursor-pointer hover:text-sp-500"
                    :class="[userCards.form.value.cardTypes.includes('basic') ? 'text-sp-500' : '']"
             >
               <span class="block items-center">
@@ -89,7 +89,7 @@
               </span>
               <span class="'block no-break">Basic Cards</span>
             </label>
-            <label class="flex gap-2 items-center justify-start !m-0 cursor-pointer hover:text-sp-500"
+            <label class="flex flex-auto gap-2 items-center justify-start !m-0 cursor-pointer hover:text-sp-500"
                    :class="[userCards.form.value.cardTypes.includes('gap') ? 'text-sp-500' : '']"
             >
               <span class="block ">
@@ -97,7 +97,7 @@
               </span>
               <span class="block no-break">Gap Cards</span>
             </label>
-            <label class="flex gap-2 items-center justify-start !m-0 cursor-pointer hover:text-sp-500"
+            <label class="flex flex-auto gap-2 items-center justify-start !m-0 cursor-pointer hover:text-sp-500"
                    :class="[userCards.form.value.cardTypes.includes('table') ? 'text-sp-500' : '']"
             >
               <span class="block ">
@@ -105,7 +105,7 @@
               </span>
               <span class="block">Table Cards</span>
             </label>
-            <label class="flex gap-2 items-center justify-start !m-0 cursor-pointer hover:text-sp-500"
+            <label class="flex flex-auto gap-2 items-center justify-start !m-0 cursor-pointer hover:text-sp-500"
                    :class="[userCards.form.value.cardTypes.includes('image') ? 'text-sp-500' : '']"
             >
               <span class="block ">
@@ -248,7 +248,7 @@ export default defineComponent({
       return this.userCards.form.value;
     },
     perPage() {
-      return Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 2;
+      return Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 50;
     },
   },
   created() {
