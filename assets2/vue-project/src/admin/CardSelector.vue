@@ -188,8 +188,6 @@ import Pagination from 'v-pagination-3';
 import useUserCards from "@/composables/useUserCards";
 import UseUserCards from "@/composables/useUserCards";
 import Cookies from "js-cookie";
-
-
 export default defineComponent({
   name: 'CardSelector',
   components: {
@@ -248,7 +246,7 @@ export default defineComponent({
       return this.userCards.form.value;
     },
     perPage() {
-      return Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 50;
+      return 50;
     },
   },
   created() {

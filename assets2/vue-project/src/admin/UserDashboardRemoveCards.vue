@@ -237,8 +237,14 @@ export default defineComponent({
     jQuery('.all-loading').hide();
     this.allCards.fromFrontend.value = true;
     this.allCards.forRemoveFromStudyDeck.value = true;
-    // this.allCards.load();
-    this.allCards.search('')
+    this.allCards.search(
+        '',
+        null,
+        null,
+        null,
+        [],
+        1000000 // Load all cards.
+    );
   },
   methods: {
     createDeckGroup() {
@@ -263,7 +269,7 @@ export default defineComponent({
       this.userCards.removeCard(cardGroupIds)
           .then((done) => {
             this.cardGroupIdsRemoving = this.cardGroupIdsRemoving.filter((item) => !cardGroupIds.includes(item));
-            this.allCards.search('');
+            this.allCards.removeCardsFromResults(cardGroupIds);
           })
           .catch((err) => {
             this.cardGroupIdsRemoving = this.cardGroupIdsRemoving.filter((item) => !cardGroupIds.includes(item));

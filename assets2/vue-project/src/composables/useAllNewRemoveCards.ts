@@ -41,7 +41,7 @@ const tableData = ref({
             field: 'tags',
         },
     ],
-    rows: [],
+    rows: [] as Array<_CardGroup>,
     isLoading: true,
     totalRecords: 0,
     totalTrashed: 0,
@@ -57,7 +57,7 @@ const tableData = ref({
     paginationOptions: {
         enabled: true,
         mode: 'page',
-        perPage: Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 2,
+        perPage: Cookies.get('spPerPage_newRemoveCards') ? Number(Cookies.get('spPerPage_newRemoveCards')) : 2,
         position: 'bottom',
         perPageDropdown: [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
         dropdownAllowAll: true,
@@ -87,6 +87,7 @@ const totals = ref({
     active: 0,
     trashed: 0
 });
+const loadedRows = ref<_CardGroup[]>([]);
 
 export default function (status = 'publish') {
     const ajax = ref<_Ajax>({
@@ -178,6 +179,29 @@ export default function (status = 'publish') {
     const load = () => {
         xhrLoad();
     }
+    const calculateRows = () => {
+        let page = tt().paginationOptions.setCurrentPage;
+        let perPage = tt().paginationOptions.perPage;
+        let start = (page - 1) * perPage;
+        let end = start + perPage;
+        let rows = loadedRows.value.slice(start, end);
+        // console.log({start, end, rows});
+        tt().rows = rows;
+        tableData.value.rows = rows;
+        searchResults.value = rows;
+        return rows;
+    }
+    const removeCardsFromResults = (cardGroupIds: number[]) => {
+        loadedRows.value = loadedRows.value.filter((item) => {
+            return !cardGroupIds.includes(item.id);
+        });
+        calculateRows();
+        totals.value = {
+            active: loadedRows.value.length,
+            trashed: 0,
+        }
+        tt().totalRecords = loadedRows.value.length;
+    }
 
     // const search = (query: string) => {
     //     return xhrSearch(query);
@@ -205,10 +229,17 @@ export default function (status = 'publish') {
         tt().searchKeyword = params.searchTerm;
         xhrLoad();
     };
-    const onPageChange = (params: { currentPage: number, currentPerPage: number, prevPage: number, total: number }) => {
+    const onPageChange = (params: {
+        currentPage: number,
+        currentPerPage: number,
+        prevPage: number,
+        total: number
+    }) => {
+        console.log('onPageChange');
         tt().paginationOptions.setCurrentPage = params.currentPage;
         tt().paginationOptions.perPage = params.currentPerPage;
-        xhrLoad();
+        // xhrLoad();
+        calculateRows();
     };
     const onSortChange = (params) => {
 
@@ -218,10 +249,12 @@ export default function (status = 'publish') {
         console.log('sort change');
     };
     const onPerPageChange = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
+        console.log('onPerPageChange');
         tt().paginationOptions.setCurrentPage = params.currentPage;
         tt().paginationOptions.perPage = params.currentPerPage;
-        Cookies.set('spPerPage', params.currentPerPage.toString());
-        xhrLoad();
+        Cookies.set('spPerPage_newRemoveCards', params.currentPerPage.toString());
+        // xhrLoad();
+        calculateRows();
     };
     const loadItems = () => {
         xhrLoad();
@@ -268,14 +301,26 @@ export default function (status = 'publish') {
             },
             funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
-                const items = done.data.details.card_groups;
+                const items: _CardGroup[] = done.data.details.card_groups;
                 const total = done.data.details.total;
                 const theTotals = done.data.totals;
                 // console.log({done, items, total, totals});
                 tt().isLoading = false;
-                tableData.value.rows = items;
+                // tableData.value.rows = items;
+
+                // Save the loaded rows.
+                loadedRows.value = items;
+
+                // Set the totals.
                 totals.value = theTotals;
                 tt().totalRecords = total;
+
+                // Start from first page again.
+                tt().paginationOptions.setCurrentPage = 0;
+                tt().paginationOptions.perPage = 0;
+
+                // Calculate those to show.
+                calculateRows();
             },
             funcFailue(done) {
                 handleAjax.error(done);
@@ -289,6 +334,7 @@ export default function (status = 'publish') {
         deck: null | _Deck = null,
         topic: null | _Topic = null,
         cardTypes: [] | CardType[] = [],
+        perPage: number = 0,
     ) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
         sendOnline = new Server().send_online({
@@ -296,8 +342,8 @@ export default function (status = 'publish') {
                 spClientData().nonce,
                 {
                     params: {
-                        per_page: 10,
                         page: page.value,
+                        per_page: perPage > 0 ? perPage : page.value,
                         search_keyword: query,
                         status: 'publish',
                         deck_group: deckGroup,
@@ -321,15 +367,25 @@ export default function (status = 'publish') {
                 total: number,
                 items: Array<_CardGroup>,
             }>) {
+                tt().isLoading = false;
                 handleAjax.stop();
-                searchResults.value = done.data.items;
+                const items: _CardGroup[] = done.data.items;
+
                 tt().totalRecords = done.data.total;
-                tableData.value.rows = done.data.items;
+                // tableData.value.rows = done.data.items;
+                loadedRows.value = items;
+
                 totals.value = {
                     active: done.data.total,
                     trashed: 0,
                 };
-                tt().isLoading = false;
+
+                // Start from first page again.
+                tt().paginationOptions.setCurrentPage = 0;
+                tt().paginationOptions.perPage = 0;
+
+                // Calculate those to show.
+                calculateRows();
             },
             funcFailue(done) {
                 handleAjax.error(done);
@@ -478,6 +534,7 @@ export default function (status = 'publish') {
         batchUpdate, batchDelete, batchTrash, batchRestore,
         totals, closeEditModal, openEditModal, search, searchResults,
         fromFrontend, forAddToStudyDeck, forRemoveFromStudyDeck, forNewCards,
+        removeCardsFromResults,
     };
 
 }

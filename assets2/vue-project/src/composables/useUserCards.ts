@@ -279,7 +279,7 @@ export default function (status = 'publish') {
     };
     const xhrAddCards = (cardGroups: _CardGroup[] = []) => {
         if (Store.jQuery()) {
-            return;
+            return Promise.resolve();
         }
         const handleAjax: HandleAjax = new HandleAjax(ajaxAddCards.value);
         return new Promise((resolve, reject) => {

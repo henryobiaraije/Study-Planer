@@ -55,7 +55,16 @@ export default function (cardGroupId = 0) {
         name: '',
         group_type: '',
         whole_question: '',
-        scheduled_at: '',
+        bg_image_url: "",
+        card_group_edit_url: "",
+        card_type: "",
+        cards_count: 0,
+        created_at: "",
+        deleted_at: "",
+        image_type: undefined,
+        updated_at: "",
+        scheduled_at: ''
+
     });
     let setBgAsDefault = ref(false);
 
@@ -95,7 +104,7 @@ export default function (cardGroupId = 0) {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 window.location = done.data;
             },
@@ -119,7 +128,7 @@ export default function (cardGroupId = 0) {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 // window.location = done.data;
             },
@@ -142,7 +151,7 @@ export default function (cardGroupId = 0) {
                 funcBefore() {
                     handleAjax.start();
                 },
-                funcSuccess(done: InterFuncSuccess) {
+                funcSuccess(done: InterFuncSuccess<any>) {
                     handleAjax.stop();
                     const hold: _CardGroup = done.data.card_group;
                     if (hold.cards.length > 0) {

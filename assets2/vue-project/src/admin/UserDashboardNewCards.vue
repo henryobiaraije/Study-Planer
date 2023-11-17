@@ -27,9 +27,9 @@
           @page-change="allCards.onPageChange"
           @sort-change="allCards.onSortChange"
           @column-filter="allCards.onColumnFilter"
-          @per-page-change="allCards.onPerPageChange"
           @selected-rows-change="allCards.onSelect"
           @search="allCards.onSearch"
+          @per-page-change="allCards.onPerPageChange"
       >
         <template slot="table-row" #table-row="props">
           <div v-if="props.column.field === 'name'">
@@ -148,7 +148,6 @@
       </vue-good-table>
     </div>
   </div>
-
 </template>
 <script lang="ts">
 
@@ -237,7 +236,14 @@ export default defineComponent({
   created() {
     jQuery('.all-loading').hide();
     this.allCards.forNewCards.value = true;
-    this.allCards.search('');
+    this.allCards.search(
+        '',
+        null,
+        null,
+        null,
+        [],
+        1000000 // Load all cards.
+    );
   },
   methods: {
     viewCard(cardGroupId: number): _CardGroup[] {
@@ -256,7 +262,8 @@ export default defineComponent({
       this.userCards.ignoreCard(cardGroupIds)
           .then((done) => {
             this.cardGroupIdsIgnore = this.cardGroupIdsIgnore.filter((item) => !cardGroupIds.includes(item));
-            this.allCards.search('');
+            // this.allCards.search('');
+            this.allCards.removeCardsFromResults(cardGroupIds);
           })
           .catch((err) => {
             this.cardGroupIdsIgnore = this.cardGroupIdsIgnore.filter((item) => !cardGroupIds.includes(item));
@@ -270,7 +277,7 @@ export default defineComponent({
           .userCards.addCards(cardGroups)
           .then((done) => {
             this.cardGroupIdsAdd = this.cardGroupIdsAdd.filter((item) => !cardGroups.map((item) => item.id).includes(item));
-            this.allCards.search('');
+            this.allCards.removeCardsFromResults(cardGroups.map((item) => item.id));
           })
           .catch((err) => {
             this.cardGroupIdsAdd = this.cardGroupIdsAdd.filter((item) => !cardGroups.map((item) => item.id).includes(item));

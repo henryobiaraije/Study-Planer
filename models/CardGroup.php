@@ -20,6 +20,7 @@ use StudyPlannerPro\Libs\Settings;
 use StudyPlannerPro\Models\Collections;
 use StudyPlannerPro\Models\Tag;
 use StudyPlannerPro\Models\UserCard;
+
 use function StudyPlannerPro\sp_get_user_ignored_card_group_ids;
 use function StudyPlannerPro\sp_get_user_study;
 
@@ -449,7 +450,13 @@ class CardGroup extends Model {
 		// Join tables and apply aliases
 		$query = Manager
 			::table( SP_TABLE_CARD_GROUPS . ' as cg' )
-			->select( 'cg.*', 'd.name as deck_name', 'dg.name as deck_group_name', 't.name as topic_name', 'cl.name as collection_name', 'c.id as card_id', 'uc.id as user_card_id' )
+			->select( 'cg.*',
+				'd.name as deck_name',
+				'dg.name as deck_group_name',
+				't.name as topic_name',
+				'cl.name as collection_name',
+				'c.id as card_id',
+				'uc.id as user_card_id' )
 			->leftJoin( SP_TABLE_DECKS . ' AS d', 'd.id', '=', 'cg.deck_id' )
 			->leftJoin( SP_TABLE_DECK_GROUPS . ' AS dg', 'dg.id', '=', 'd.deck_group_id' )
 			->leftJoin( SP_TABLE_TOPICS . ' AS t', 't.id', '=', 'cg.topic_id' )
@@ -487,8 +494,8 @@ class CardGroup extends Model {
 		} elseif ( $args['for_new_cards'] ) {
 			// Get the topics of the cards the user is studying.
 
-			$user_study             = sp_get_user_study( $args['user_id'] );
-			$user_study_id          = $user_study->id;
+//			$user_study             = sp_get_user_study( $args['user_id'] );
+//			$user_study_id          = $user_study->id;
 //			$last_answered_card_ids = UserCard::get_all_last_answered_user_cards( $args['user_id'], $user_study_id );
 //			$new_cards_not_answered_but_added = UserCard::get_new_cards_not_answered_but_added( $args['user_id'], $user_study_id, $last_answered_card_ids['card_ids'] );
 			$ignored_card_group_ids = sp_get_user_ignored_card_group_ids( $args['user_id'] );
@@ -564,20 +571,26 @@ class CardGroup extends Model {
 		$result = $query
 			->offset( $offset )
 			->limit( $args['per_page'] )
-			->orderBy( 'deck_group_name' )
-			->groupBy( 'deck_group_name', 'deck_name', 'topic_name', 'cg.id' );
+//			->groupBy( 'deck_group_name', 'deck_name', 'topic_name', 'cg.id' )
+			->orderBy( 'deck_group_name', 'asc' )
+			->orderBy( 'deck_name', 'asc' );
 
 		$sql = $result->toSql();
 
 		$all            = $result->get()->all();
 		$card_group_ids = array_column( $all, 'id' );
 
-
 		$card_groups = self
 			::query()
 			->whereIn( 'id', $card_group_ids )
 			->with( 'cards', 'tags', 'deck.deck_group', 'topic', 'collection' )
+			->orderBy( 'id' )
 			->get();
+
+		// For new cards, or remove cards,  we are reading all at once. So the total is the total of the card groups.
+		if ( $args['for_new_cards'] || $args['for_remove_from_study_deck'] ) {
+			$total = $card_groups->count();
+		}
 
 		// Convert table and image card questions and anwers to array.
 		foreach ( $card_groups as $card_group ) {
@@ -613,7 +626,6 @@ class CardGroup extends Model {
 	 * @return array
 	 */
 	public static function get_card_groups_in_any_collections( bool $empty_if_admin = true ): array {
-
 		$in_admin_page = ( ! wp_doing_ajax() && is_admin() )
 		                 || ( wp_doing_ajax() && current_user_can( 'manage_options' ) );
 

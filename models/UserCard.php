@@ -131,9 +131,9 @@ class UserCard extends Model {
 		// encode all questions in deck groups.
 		foreach ( $deck_groups as $deck_group ) {
 			foreach ( $deck_group->decks as $deck ) {
-				if ( 37 !== $deck->id ) {
-					continue; // todo remove;
-				}
+//				if ( 37 !== $deck->id ) {
+//					continue; // todo its for test, remove;
+//				}
 				$study = $deck->studies->first();
 				if ( $study instanceof Study ) {
 					$cards       = self::get_cards_to_study_in_study(

@@ -32,7 +32,7 @@ export default function () {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 useDeckGroupLists().load();
                 groupName.value = '';

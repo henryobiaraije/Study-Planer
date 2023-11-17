@@ -60,7 +60,7 @@ const tableData = ref({
     paginationOptions: {
         enabled: true,
         mode: 'page',
-        perPage: Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 2,
+        perPage: Cookies.get('spPerPage_topics') ? Number(Cookies.get('spPerPage_topics')) : 2,
         position: 'bottom',
         perPageDropdown: [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
         dropdownAllowAll: true,
@@ -208,7 +208,7 @@ export default function (status = 'publish') {
     const onPerPageChange = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
         tt().paginationOptions.setCurrentPage = params.currentPage;
         tt().paginationOptions.perPage = params.currentPerPage;
-        Cookies.set('spPerPage', params.currentPerPage.toString());
+        Cookies.set('spPerPage_topics', params.currentPerPage.toString());
         xhrLoad();
     };
     const loadItems = () => {

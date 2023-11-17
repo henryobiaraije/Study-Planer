@@ -46,7 +46,7 @@ const tableData = ref({
     paginationOptions: {
         enabled: true,
         mode: 'page',
-        perPage: Cookies.get('spPerPage') ? Number(Cookies.get('spPerPage')) : 2,
+        perPage: Cookies.get('spPerPage_Tags') ? Number(Cookies.get('spPerPage_Tags')) : 2,
         position: 'bottom',
         perPageDropdown: [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
         dropdownAllowAll: true,
@@ -175,7 +175,7 @@ export default function (status = 'publish') {
     const onPerPageChange = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
         tt().paginationOptions.setCurrentPage = params.currentPage;
         tt().paginationOptions.perPage = params.currentPerPage;
-        Cookies.set('spPerPage', params.currentPerPage.toString());
+        Cookies.set('spPerPage_Tags', params.currentPerPage.toString());
         xhrLoad();
     };
     const loadItems = () => {
@@ -203,7 +203,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 tt().isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
                 const items = done.data.details.items;
                 const total = done.data.details.total;
@@ -233,7 +233,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 newName.value = '';
                 xhrLoad();
@@ -257,7 +257,7 @@ export default function (status = 'publish') {
                 handleAjax.start();
                 // vdata.tableData.isLoading = true;
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
             },
             funcFailue(done) {
@@ -282,7 +282,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
@@ -307,7 +307,7 @@ export default function (status = 'publish') {
             funcBefore() {
                 handleAjax.start();
             },
-            funcSuccess(done: InterFuncSuccess) {
+            funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.success(done);
                 xhrLoad();
             },
