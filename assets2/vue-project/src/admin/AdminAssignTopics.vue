@@ -66,6 +66,8 @@ import useUserCards from "@/composables/useUserCards";
 import useTopics from "@/composables/useTopics";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useAllCards from "@/composables/useAllCards";
+import {TriggerHelper} from "@/classes/TriggerHelper";
+import type {_CardGroup} from "@/interfaces/inter-sp";
 
 export default defineComponent({
   name: 'AdminAssignTopics',
@@ -110,8 +112,11 @@ export default defineComponent({
   created() {
     this.topics.search('');
   },
-  methods: {},
+  methods: {
+
+  },
   watch: {},
+
 });
 
 </script>

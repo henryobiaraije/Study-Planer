@@ -182,3 +182,13 @@ export interface _AssignTopic {
 }
 
 export type CardType = 'basic' | 'gap' | 'table' | 'image';
+
+export interface TriggerType {
+    /**
+     * The Value is cardGroupIds.
+     */
+    'sp:assign-topics:success': number[];
+}
+
+
+

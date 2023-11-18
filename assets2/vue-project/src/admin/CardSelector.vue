@@ -188,6 +188,7 @@ import Pagination from 'v-pagination-3';
 import useUserCards from "@/composables/useUserCards";
 import UseUserCards from "@/composables/useUserCards";
 import Cookies from "js-cookie";
+import {TriggerHelper} from "@/classes/TriggerHelper";
 export default defineComponent({
   name: 'CardSelector',
   components: {
@@ -210,10 +211,6 @@ export default defineComponent({
     return {
       pageTitle: 'Assign Topics',
       showMain: false,
-      // selectedCards: [] as _CardGroup[],
-      // page: 1,
-      // activeTab: 'found',
-      // whatToDo: 'selected_cards'
     }
   },
   setup: (props, ctx) => {
@@ -254,6 +251,10 @@ export default defineComponent({
     jQuery('.all-loading').hide();
     jQuery('.all-loaded').show();
     this.showMain = true;
+
+    this.deckGroupMulti.tableData.value.paginationOptions.perPage = 51;
+    this.topics.tableData.value.paginationOptions.perPage = 50;
+    // console.log('created now');
 
     this.topics.load();
     this.deckGroup.load();
@@ -305,7 +306,6 @@ export default defineComponent({
       this.searchCards();
     },
   },
-  // watch
   watch: {
     'userCards.form.value.group': function (newVal, oldVal) {
       const form = this.userCards.form.value;

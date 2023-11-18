@@ -30,7 +30,7 @@
   </div>
   <!--  Cards List  -->
   <div class="cards">
-    <ul class="card-wrapper !list-none !p-0 !m-0 max-h-300px overflow-y-auto shadow">
+    <ul class="card-wrapper !list-none !p-0 !m-0 max-h-[400px] overflow-y-auto shadow">
       <li v-for="(cardGroup,cardIndex) in cardsToDisplay"
           class="!p-0 !m-0 justify-between items-center hover:bg-sp-50 border-b border-solid border-sp-300 cursor-pointer"
           key="cardGroup.id"
@@ -171,6 +171,7 @@ import {_Card} from "@/interfaces/inter-sp";
 import useUserCards from "@/composables/useUserCards";
 import useMyStore from "@/composables/useMyStore";
 import useWidth from "@/composables/useWidth";
+import {TriggerHelper} from "@/classes/TriggerHelper";
 
 export default defineComponent({
   name: 'SelectedCardsAssign',
@@ -286,12 +287,12 @@ export default defineComponent({
     },
     selectedCardIds(): number[] {
       return this.selectedCards.map((card: _CardGroup) => card.id);
-    }
+    },
+
   },
   created() {
 
   },
-
 });
 
 </script>

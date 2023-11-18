@@ -53,8 +53,8 @@ class UserCard extends Model {
 	 * @return array|array[]
 	 */
 	public static function get_user_cards_to_study( int $user_id ): array {
-		$today_datetime = Common::getDateTime();
-		$today_date     = Common::get_date();
+//		$today_datetime = Common::getDateTime();
+//		$today_date     = Common::get_date();
 		// Get all user cards.
 		$all_user_cards = self::get_all_user_cards( $user_id );
 		if ( empty( $all_user_cards['card_group_ids'] ) ) {

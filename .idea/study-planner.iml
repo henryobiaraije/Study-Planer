@@ -11,8 +11,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/container" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/container" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/collections" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/macroable" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/database" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/contracts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/string" />
@@ -21,7 +19,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/translation-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-mbstring" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/deprecation-contracts" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/voku/portable-ascii" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/nesbot/carbon" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/inflector" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/support" />
@@ -33,8 +30,6 @@
       <excludeFolder url="file://$MODULE_DIR$/adocs" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/var-dumper" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/events" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/pipeline" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/bus" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/staudenmeir/eloquent-has-many-deep" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/cache" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/dbal" />
@@ -43,18 +38,16 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/log" />
       <excludeFolder url="file://$MODULE_DIR$/adocs/working/working-28-feb-2022" />
       <excludeFolder url="file://$MODULE_DIR$/assets" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/cakephp/core" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/cakephp/database" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/cakephp/datasource" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/cakephp/utility" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/illuminate/conditionable" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/psr/clock" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/robmorgan/phinx" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/staudenmeir/eloquent-has-many-deep-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/config" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php81" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php73" />
     </content>
     <content url="file://$MODULE_DIR$/adocs/working/working-28-feb-2022" />
     <content url="file://$MODULE_DIR$/../woocommerce" />

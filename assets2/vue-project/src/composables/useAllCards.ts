@@ -475,19 +475,16 @@ export default function (status = 'publish') {
     const search = xhrSearch;
 
     const removeAlreadyAdded = (cardGroupIds: number[]) => {
-        console.log('event now', {cardGroupIds});
         searchResults.value = searchResults.value.filter((item) => {
             return cardGroupIds.indexOf(item.id) === -1;
         });
     }
     onMounted(() => {
         TriggerHelper.on('sp:assign-topics:success', removeAlreadyAdded);
-        console.log('onMounted')
     });
 
     onBeforeUnmount(() => {
         TriggerHelper.off('sp:assign-topics:success', removeAlreadyAdded);
-        console.log('onBeforeUnmount');
     });
 
     // onMounted(() => {

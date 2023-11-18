@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Plugin Name:       Study Planner Pro
  * Plugin URI:        https://www.pereere.com/wordpress-plugins/study-planner-pro
  * Description:       Comes with admin dashboard to create deck groups, decks, cards. It also comes with an user dashboard where users can plan and study the cards with built in statistics. User Dashboard shortcode <code>[sp_pro_user_dashboard]</code>.
- * Version:           3.0.1
+ * Version:           3.0.5
  * Author:            Pereere Codes (mpereere@gmail.com)
  * Author URI:        https://www.pereere.com/
  * License:           GPL-2.0+
@@ -30,17 +30,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Domain Path:       /languages
  */
 
+//phpinfo();
 //return;
-//    require_once 'languages.php';
 require_once __DIR__ . '/vendor/autoload.php';
-//	require_once __DIR__.'/bootstrap.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/class-initializer.php';
 
-use Phinx\Console\PhinxApplication;
 use StudyPlannerPro\Db\Initialize_Db;
 use StudyPlannerPro\Initializer;
-use Symfony\Component\Console\Exception\ExceptionInterface;
 use function StudyPlannerPro\phinx_migrate;
 
 Initialize_Db::get_instance();
@@ -59,7 +56,17 @@ phinx_migrate();
 // - Test onhold, reverse counts
 
 
+//'illuminate/database': '^9.52',
+//    'ext-pdo': '*',
+//    'ext-json': '*',
+//    'staudenmeir/eloquent-has-many-deep': '^1.17',
+//    'doctrine/dbal': '^2.0',
+//    'illuminate/events': '^9.52',
+//    'robmorgan/phinx': '^0.11.7'
 
+
+//'roave/security-advisories': 'dev-latest',
+//    'symfony/var-dumper': '^5.3'
 
 
 

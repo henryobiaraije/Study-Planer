@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="test2" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+  <component name="PublishConfigData" serverName="awesome" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
     <option name="confirmBeforeUploading" value="false" />
     <serverData>
+      <paths name="awesome">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../../wp-admin" web="/" />
+            <mapping deploy="wp-content\plugins\study-planner-pro" local="$PROJECT_DIR$" web="/" />
+            <mapping local="$PROJECT_DIR$/adocs/working/working-28-feb-2022" web="/" />
+            <mapping local="$PROJECT_DIR$/../../../wp-includes" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="greatbigcode.com">
         <serverdata>
           <mappings>
@@ -36,16 +46,6 @@
           <mappings>
             <mapping local="$PROJECT_DIR$/../../../wp-admin" web="/" />
             <mapping deploy="/wp-content/plugins/study-planner-pro" local="$PROJECT_DIR$" web="/" />
-            <mapping local="$PROJECT_DIR$/adocs/working/working-28-feb-2022" web="/" />
-            <mapping local="$PROJECT_DIR$/../../../wp-includes" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="test2">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$/../../../wp-admin" web="/" />
-            <mapping deploy="wp-content\plugins\study-planner-pro" local="$PROJECT_DIR$" web="/" />
             <mapping local="$PROJECT_DIR$/adocs/working/working-28-feb-2022" web="/" />
             <mapping local="$PROJECT_DIR$/../../../wp-includes" web="/" />
           </mappings>

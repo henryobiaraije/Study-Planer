@@ -26,7 +26,6 @@ function get_all_card_grades() {
 }
 
 function get_user_timezone_minutes_to_add( $user_id ) {
-
 	$timezones     = Common::get_time_zones();
 	$user_timezone = get_user_meta( $user_id, Settings::UM_USER_TIMEZONE, true );
 	if ( empty( $user_timezone ) ) {
@@ -279,7 +278,6 @@ function sp_save_user_ignored_card_groups( int $user_id, array $ignored_card_gro
 	}
 
 	update_user_meta( $user_id, Settings::UM_IGNORED_CARD_GROUP_IDS, $user_ignored_card_group_ids );
-
 }
 
 /**
@@ -316,8 +314,6 @@ function sp_remove_user_ignored_card_groups( int $user_id, array $ignored_card_g
 function sp_get_user_ignored_card_group_ids( int $user_id ): array {
 	$user_ignored_card_group_ids = get_user_meta( $user_id, Settings::UM_IGNORED_CARD_GROUP_IDS, true );
 	if ( empty( $user_ignored_card_group_ids ) || ! is_array( $user_ignored_card_group_ids ) ) {
-
-
 		$user_ignored_card_group_ids = [];
 	}
 
@@ -357,12 +353,15 @@ define( 'SP_TABLE_USER_CARDS', SP_DB_PREFIX . 'user_cards' );
 function phinx_migrate(): void {
 	$phinx = new PhinxApplication();
 	$phinx->setAutoExit( false );
+	$log = mp_log();
 
 	$wrap = new TextWrapper( $phinx );
 	$wrap->setOption( 'configuration', __DIR__ . '/phinx.php' );
 	$wrap->getMigrate( 'development' );
 	if ( $wrap->getExitCode() ) {
-		mp_log()?->log( 'Phinx migrations encountered an error.', array() );
+		if ( $log instanceof Log_Service ) {
+			$log->log( 'Phinx migrations encountered an error.', array() );
+		}
 	}
 }
 

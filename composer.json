@@ -11,7 +11,10 @@
   ],
   "config": {
     "platform": {
-      "php": "8.0.30"
+      "php": "7.4.0"
+    },
+    "allow-plugins": {
+      "kylekatarnls/update-helper": true
     }
   },
   "autoload": {
@@ -30,19 +33,17 @@
     ]
   },
   "require": {
-    "illuminate/database": "^9.52",
     "ext-pdo": "*",
     "ext-json": "*",
-    "robmorgan/phinx": "^0.14.0",
-    "staudenmeir/eloquent-has-many-deep": "^1.17",
-    "doctrine/dbal": "^2.0",
-    "illuminate/events": "^9.52"
-  },
-  "require-dev": {
-    "roave/security-advisories": "dev-latest",
-    "symfony/var-dumper": "^5.3"
+    "staudenmeir/eloquent-has-many-deep": "^1.7",
+    "doctrine/dbal": "^2.5",
+    "illuminate/events": "^5.5",
+    "robmorgan/phinx": "^0.14.0"
   },
   "scripts": {
     "build": "composer install --no-dev --optimize-autoloader"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^5.4"
   }
 }

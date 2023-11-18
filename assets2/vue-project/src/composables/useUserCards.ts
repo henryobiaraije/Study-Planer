@@ -9,6 +9,7 @@ import {spClientData} from "@/functions";
 import {toast} from "vue3-toastify";
 import {Store} from "@/static/store";
 import selectedCardsAssign from "@/components/SelectedCardsAssign.vue";
+import {TriggerHelper} from "@/classes/TriggerHelper";
 
 declare var bootstrap;
 
@@ -266,14 +267,22 @@ export default function (status = 'publish') {
             funcBefore() {
                 console.log('before');
                 handleAjax.start();
+
             },
             funcSuccess(done: InterFuncSuccess<any>) {
                 handleAjax.stop();
-                // toast.success(done.message);
+                const cardGroupIds = form.value.selectedCards.map(cd => {
+                    return cd.id;
+                });
+                TriggerHelper.trigger(
+                    'sp:assign-topics:success',
+                    cardGroupIds
+                );
+                // clear selected cards.
+                clearSelectedCards();
             },
             funcFailue(done) {
                 handleAjax.error(done);
-                // toast.error(done.message);
             },
         });
     };
