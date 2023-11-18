@@ -1,4 +1,4 @@
-import {ref} from "vue";
+import {onBeforeUnmount, onMounted, ref} from "vue";
 import type {_CardGroup, _Deck, _DeckGroup, _Tag, _Topic, CardType} from "@/interfaces/inter-sp";
 import type {_Ajax} from "@/classes/HandleAjax";
 import {HandleAjax} from "@/classes/HandleAjax";
@@ -6,6 +6,7 @@ import {type InterFuncSuccess, Server} from "@/static/server";
 import useDeckGroupLists from "@/composables/useDeckGroupLists";
 import Cookies from "js-cookie";
 import {spClientData} from "@/functions";
+import {TriggerHelper} from "@/classes/TriggerHelper";
 
 declare var bootstrap;
 
@@ -472,6 +473,22 @@ export default function (status = 'publish') {
     };
 
     const search = xhrSearch;
+
+    const removeAlreadyAdded = (cardGroupIds: number[]) => {
+        console.log('event now', {cardGroupIds});
+        searchResults.value = searchResults.value.filter((item) => {
+            return cardGroupIds.indexOf(item.id) === -1;
+        });
+    }
+    onMounted(() => {
+        TriggerHelper.on('sp:assign-topics:success', removeAlreadyAdded);
+        console.log('onMounted')
+    });
+
+    onBeforeUnmount(() => {
+        TriggerHelper.off('sp:assign-topics:success', removeAlreadyAdded);
+        console.log('onBeforeUnmount');
+    });
 
     // onMounted(() => {
     //   tableData.value.post_status = status;
