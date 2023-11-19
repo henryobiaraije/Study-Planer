@@ -2777,6 +2777,8 @@ class AjaxHelper {
 		}
 		$message = $card_groups->count() . ' card groups assigned to topic.';
 
+		// Make sure these assigned card groups have a real deck.
+		Topic::make_sure_card_groups_with_real_topic_also_have_a_real_deck();
 
 		Common::send_success( $message );
 	}

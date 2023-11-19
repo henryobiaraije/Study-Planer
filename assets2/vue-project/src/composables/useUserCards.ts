@@ -280,6 +280,7 @@ export default function (status = 'publish') {
                 );
                 // clear selected cards.
                 clearSelectedCards();
+                toast.success(done.message);
             },
             funcFailue(done) {
                 handleAjax.error(done);
