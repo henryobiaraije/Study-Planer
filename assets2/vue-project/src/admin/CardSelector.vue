@@ -179,7 +179,7 @@ import InputEditor from "@/vue-component/InputEditor.vue";
 import InputEditorB from "@/vue-component/InputEditorB.vue";
 import useTopics from "@/composables/useTopics";
 import useCollections from "@/composables/useCollections";
-import type {_AssignTopic, _CardGroup, _Deck, _DeckGroup} from "@/interfaces/inter-sp";
+import type {_AssignTopic, _CardGroup, _Deck, _DeckGroup, _Topic} from "@/interfaces/inter-sp";
 import useDeckGroupLists from "@/composables/useDeckGroupLists";
 import useAllCards from "@/composables/useAllCards";
 import SelectedCardsAssign from "@/components/SelectedCardsAssign.vue";
@@ -189,6 +189,7 @@ import useUserCards from "@/composables/useUserCards";
 import UseUserCards from "@/composables/useUserCards";
 import Cookies from "js-cookie";
 import {TriggerHelper} from "@/classes/TriggerHelper";
+
 export default defineComponent({
   name: 'CardSelector',
   components: {
@@ -205,7 +206,11 @@ export default defineComponent({
       type: Object as () => ReturnType<typeof useAllCards>,
       required: true
     },
-
+    topicToAssign: {
+      type: Object as () => _Topic | null,
+      required: false,
+      default: null
+    },
   },
   data() {
     return {
@@ -272,7 +277,8 @@ export default defineComponent({
           this.userCards.form.value.group,
           this.userCards.form.value.deck,
           this.userCards.form.value.topic,
-          this.userCards.form.value.cardTypes
+          this.userCards.form.value.cardTypes,
+          null !== this.topicToAssign ? [this.topicToAssign] : []
       );
     },
     cardSelected(card: _CardGroup) {

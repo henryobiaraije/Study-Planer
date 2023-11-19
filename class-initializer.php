@@ -157,6 +157,13 @@ class Initializer {
 		$this->log_service = new Log_Service( self::$plugin_dir . '/logs.log' );
 	}
 
+	public function get_plugin_version(): string {
+		// return wp current plugin version.
+		$plugin_data = get_plugin_data( __FILE__ );
+
+		return $plugin_data['Version'];
+	}
+
 	public function output_localized() {
 		self::$general_localize['ajax_url']    = Common::get_ajax_url();
 		self::$general_localize['ajax_action'] = self::$ajax_action;
@@ -297,7 +304,6 @@ class Initializer {
 		if ( self::$debug_mode ) {
 			self::$script_version = time();
 		}
-
 	}
 
 	public static function register_default_admin_scripts(): void {
@@ -324,9 +330,16 @@ class Initializer {
 			wp_register_style( $base . 'bootstrap', $css_bootstrap, array(), 1.0 );
 			wp_register_style( $base . 'animated', $css_animated, array(), 1.0 );
 		} else {
-			wp_register_script( $base . 'fontawesome', 'https://use.fontawesome.com/0ea7668aa9.js', array(), 1.0, false );
+			wp_register_script( $base . 'fontawesome',
+				'https://use.fontawesome.com/0ea7668aa9.js',
+				array(),
+				1.0,
+				false );
 			// wp_register_script($base.'vue', 'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js', [], 1.0, true);
-			wp_register_script( $base . 'bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js', array(), 1.0 );
+			wp_register_script( $base . 'bootstrap',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js',
+				array(),
+				1.0 );
 			wp_register_script(
 				$base . 'fontawesome',
 				'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/fontawesome.min.css',
@@ -334,8 +347,14 @@ class Initializer {
 				1.0,
 				false
 			);
-			wp_register_style( $base . 'animated', 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.compat.min.css', array(), 1.0 );
-			wp_register_style( $base . 'bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css', array(), 1.0 );
+			wp_register_style( $base . 'animated',
+				'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.compat.min.css',
+				array(),
+				1.0 );
+			wp_register_style( $base . 'bootstrap',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css',
+				array(),
+				1.0 );
 		}
 
 		$css_general = self::$css_url . '/general.css';
@@ -353,10 +372,8 @@ class Initializer {
 				wp_enqueue_script( $base . 'fontawesome' );
 				wp_enqueue_style( $base . 'animated' );
 				wp_enqueue_style( $base . 'bootstrap' );
-
 			}
 		);
-
 	}
 
 	public static function register_default_frontend_scripts(): void {
@@ -383,9 +400,16 @@ class Initializer {
 			wp_register_style( $base . 'bootstrap', $css_bootstrap, array(), 1.0 );
 			wp_register_style( $base . 'animated', $css_animated, array(), 1.0 );
 		} else {
-			wp_register_script( $base . 'fontawesome', 'https://use.fontawesome.com/0ea7668aa9.js', array(), 1.0, false );
+			wp_register_script( $base . 'fontawesome',
+				'https://use.fontawesome.com/0ea7668aa9.js',
+				array(),
+				1.0,
+				false );
 			// wp_register_script($base.'vue', 'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js', [], 1.0, true);
-			wp_register_script( $base . 'bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js', array(), 1.0 );
+			wp_register_script( $base . 'bootstrap',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js',
+				array(),
+				1.0 );
 			wp_register_script(
 				$base . 'fontawesome',
 				'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/fontawesome.min.css',
@@ -393,8 +417,14 @@ class Initializer {
 				1.0,
 				false
 			);
-			wp_register_style( $base . 'animated', 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.compat.min.css', array(), 1.0 );
-			wp_register_style( $base . 'bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css', array(), 1.0 );
+			wp_register_style( $base . 'animated',
+				'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.compat.min.css',
+				array(),
+				1.0 );
+			wp_register_style( $base . 'bootstrap',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css',
+				array(),
+				1.0 );
 		}
 
 		add_action(
@@ -408,10 +438,14 @@ class Initializer {
 				// wp_enqueue_style( $base . 'bootstrap' );
 			}
 		);
-
 	}
 
-	public static function verify_post( $post, $must_be_logged_in = false, $must_be_admin = false, $forget_nonce = false ): void {
+	public static function verify_post(
+		$post,
+		$must_be_logged_in = false,
+		$must_be_admin = false,
+		$forget_nonce = false
+	): void {
 		if ( true === $must_be_logged_in ) {
 			if ( ! is_user_logged_in() ) {
 				Common::send_error(

@@ -26,7 +26,7 @@
 
     <p>Filter cards below and add them to the above topic.</p>
 
-    <CardSelector :user-cards="userCards" :all-cards="allCards"/>
+    <CardSelector :user-cards="userCards" :all-cards="allCards" :topic-to-assign="form.topicToAssign"></CardSelector>
 
     <!--  What to do -->
     <div v-if="form.topicToAssign"
@@ -112,9 +112,7 @@ export default defineComponent({
   created() {
     this.topics.search('');
   },
-  methods: {
-
-  },
+  methods: {},
   watch: {},
 
 });

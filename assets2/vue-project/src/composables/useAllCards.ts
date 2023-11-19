@@ -306,6 +306,7 @@ export default function (status = 'publish') {
         deck: null | _Deck = null,
         topic: null | _Topic = null,
         cardTypes: [] | CardType[] = [],
+        topicsToExclude: _Topic[] = []
     ) => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
         sendOnline = new Server().send_online({
@@ -325,6 +326,7 @@ export default function (status = 'publish') {
                         for_add_to_study_deck: forAddToStudyDeck.value,
                         for_remove_from_study_deck: forRemoveFromStudyDeck.value,
                         for_new_cards: forNewCards.value,
+                        topic_ids_to_exclude: topicsToExclude.map((item) => item.id),
                     },
                 }
             ],
@@ -478,6 +480,7 @@ export default function (status = 'publish') {
         searchResults.value = searchResults.value.filter((item) => {
             return cardGroupIds.indexOf(item.id) === -1;
         });
+        tt().totalRecords = tt().totalRecords - cardGroupIds.length;
     }
     onMounted(() => {
         TriggerHelper.on('sp:assign-topics:success', removeAlreadyAdded);

@@ -17,6 +17,7 @@ use StudyPlannerPro\Libs\Settings;
 use StudyPlannerPro\Models\Collections;
 use StudyPlannerPro\Models\Tag;
 use StudyPlannerPro\Models\UserCard;
+
 use function StudyPlannerPro\get_default_image_display_type;
 use function StudyPlannerPro\get_mature_card_days;
 use function StudyPlannerPro\get_uncategorized_deck_group_id;
@@ -128,7 +129,6 @@ class AjaxHelper {
 
 		add_action( 'admin_sp_pro_ajax_admin_save_user_cards', array( $this, 'ajax_admin_save_user_cards' ) );
 		add_action( 'admin_sp_pro_ajax_admin_assign_topics', array( $this, 'ajax_admin_assign_topics' ) );
-
 		// </editor-fold desc="User Cards">
 	}
 
@@ -155,12 +155,9 @@ class AjaxHelper {
 				->get()->all();
 
 			if ( $deck_group() ) {
-
 			}
 		} elseif ( null !== $deck_id ) {
-
 		} elseif ( null !== $topic_id ) {
-
 		}
 
 		Common::send_success( 'User Cards', $items );
@@ -183,11 +180,13 @@ class AjaxHelper {
 		$e_for_add_to_study_deck      = $params['for_add_to_study_deck'] === true;
 		$e_for_remove_from_study_deck = $params['for_remove_from_study_deck'] === true;
 		$e_for_new_cards              = $params['for_new_cards'] === true;
+		$e_topic_ids_to_exclude       = $params['topic_ids_to_exclude'] === true;
 
-		$deck_group_id = is_array( $e_deck_group ) ? $e_deck_group['id'] : null;
-		$deck_id       = is_array( $e_deck ) ? $e_deck['id'] : null;
-		$topic_id      = is_array( $e_topic ) ? $e_topic['id'] : null;
-		$card_types    = is_array( $e_card_types ) ? $e_card_types : array();
+		$deck_group_id       = is_array( $e_deck_group ) ? $e_deck_group['id'] : null;
+		$deck_id             = is_array( $e_deck ) ? $e_deck['id'] : null;
+		$topic_id            = is_array( $e_topic ) ? $e_topic['id'] : null;
+		$card_types          = is_array( $e_card_types ) ? $e_card_types : array();
+		$e_topics_to_exclude = is_array( $e_topic_ids_to_exclude ) ? $e_topic_ids_to_exclude : array();
 
 		$user_id = get_current_user_id();
 
@@ -209,6 +208,7 @@ class AjaxHelper {
 				'order_by_deck_group_name'   => true,
 				'order_by_deck_name'         => true,
 				'order_by_topic'             => true,
+				'topic_ids_to_exclude'       => $e_topics_to_exclude,
 			)
 		);
 
@@ -220,14 +220,12 @@ class AjaxHelper {
 	// <editor-fold desc="Image Cards">
 
 	public function ajax_admin_update_settings( $post ): void {
-
 		$all              = $post[ Common::VAR_2 ];
 		$settings         = $all['settings'];
 		$mature_card_days = (int) sanitize_text_field( $settings['mature_card_days'] );
 		update_option( Settings::OPTION_MATURED_CARD_DAYS, $mature_card_days );
 
 		Common::send_success( 'Saved successfully.' );
-
 	}
 
 	public function ajax_admin_load_settings( $post ): void {
@@ -245,11 +243,9 @@ class AjaxHelper {
 		);
 
 		Common::send_success( 'Settings loaded.', $settings );
-
 	}
 
 	public function ajax_admin_create_new_image_card( $post ): void {
-
 		$all                 = $post[ Common::VAR_2 ];
 		$e_cards             = $all['cards'];
 		$e_card_group        = $all['cardGroup'];
@@ -412,7 +408,6 @@ class AjaxHelper {
 		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
-
 	}
 
 	public function ajax_admin_update_image_card( $post ): void {
@@ -549,7 +544,8 @@ class AjaxHelper {
 
 		// Delete cards without not updated
 		$cards_to_delete = $all_cards = CardGroup::find( $cg_id )->cards()
-		                                         ->whereNotIn( 'c_number', $c_numbers_updated )->get()->pluck( 'id' )->all();
+		                                         ->whereNotIn( 'c_number',
+			                                         $c_numbers_updated )->get()->pluck( 'id' )->all();
 
 		Answered::whereIn( 'card_id', $cards_to_delete )->forceDelete();
 		Card::whereIn( 'id', $cards_to_delete )->forceDelete();
@@ -586,7 +582,6 @@ class AjaxHelper {
 		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
-
 	}
 
 	// </editor-fold desc="/Image Cards">
@@ -740,7 +735,6 @@ class AjaxHelper {
 		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
-
 	}
 
 	public function ajax_admin_update_table_card( $post ): void {
@@ -902,14 +896,12 @@ class AjaxHelper {
 		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
-
 	}
 
 	// </editor-fold desc="Table Cards">
 
 	// <editor-fold desc="Gap Cards">
 	public function ajax_admin_update_gap_card( $post ): void {
-
 		$all                 = $post[ Common::VAR_2 ];
 		$e_cards             = $all['cards'];
 		$e_card_group        = $all['cardGroup'];
@@ -1050,11 +1042,9 @@ class AjaxHelper {
 		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
-
 	}
 
 	public function ajax_admin_create_new_gap_card( $post ): void {
-
 		$all                 = $post[ Common::VAR_2 ];
 		$e_cards             = $all['cards'];
 		$e_card_group        = $all['cardGroup'];
@@ -1195,7 +1185,6 @@ class AjaxHelper {
 		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
-
 	}
 
 	public function ajax_admin_load_cards_groups( $post ): void {
@@ -1223,7 +1212,6 @@ class AjaxHelper {
 			array(// 'post' => $post,
 			)
 		);
-
 	}
 
 	// </editor-fold desc="Gap Cards">
@@ -1264,7 +1252,6 @@ class AjaxHelper {
 		Manager::commit();
 
 		Common::send_success( 'Deleted successfully.' );
-
 	}
 
 	public function ajax_admin_restore_card_group( $post ): void {
@@ -1321,7 +1308,6 @@ class AjaxHelper {
 		Manager::commit();
 
 		Common::send_success( 'Restored successfully.' );
-
 	}
 
 	public function ajax_admin_trash_cards( $post ): void {
@@ -1377,7 +1363,6 @@ class AjaxHelper {
 		Manager::commit();
 
 		Common::send_success( 'Trashed successfully.' );
-
 	}
 
 	public function admin_update_basic_card( $post ): void {
@@ -1506,7 +1491,6 @@ class AjaxHelper {
 		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Updated successfully.', $edit_page );
-
 	}
 
 	public function ajax_admin_create_new_basic_card( $post ): void {
@@ -1623,7 +1607,6 @@ class AjaxHelper {
 		             . '&card-group=' . $card_group->id;
 
 		Common::send_success( 'Created successfully.', $edit_page );
-
 	}
 
 	public function ajax_admin_load_basic_card( $post ): void {
@@ -1655,7 +1638,6 @@ class AjaxHelper {
 				'card_group' => $card_group,
 			)
 		);
-
 	}
 	// </editor-fold desc="Basic Cards">
 
@@ -1678,7 +1660,6 @@ class AjaxHelper {
 		// ] );
 
 		Common::send_success( 'Created successfully.', $create );
-
 	}
 
 	public function ajax_admin_update_tags( $post ): void {
@@ -1710,7 +1691,6 @@ class AjaxHelper {
 		// ] );
 
 		Common::send_success( 'Updated successfully.' );
-
 	}
 
 	public function ajax_admin_search_tags( $post ): void {
@@ -1764,7 +1744,6 @@ class AjaxHelper {
 			array(// 'post' => $post,
 			)
 		);
-
 	}
 
 	public function ajax_admin_load_tags( $post ): void {
@@ -1818,7 +1797,6 @@ class AjaxHelper {
 			array(// 'post' => $post,
 			)
 		);
-
 	}
 
 	public function ajax_admin_trash_tags( $post ): void {
@@ -1848,7 +1826,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Trashed successfully.' );
-
 	}
 
 	public function ajax_admin_delete_tags( $post ): void {
@@ -1878,7 +1855,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Deleted.' );
-
 	}
 
 	// </editor-fold desc="Tags">
@@ -1912,7 +1888,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Trashed successfully.' );
-
 	}
 
 	public function ajax_admin_delete_decks( $post ): void {
@@ -1955,7 +1930,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Deleted successfully.' );
-
 	}
 
 	public function ajax_admin_load_decks( $post ): void {
@@ -1999,11 +1973,9 @@ class AjaxHelper {
 				'post' => $post,
 			)
 		);
-
 	}
 
 	public function ajax_admin_search_decks( $post ): void {
-
 		$params          = $post[ Common::VAR_2 ]['params'];
 		$per_page        = (int) sanitize_text_field( $params['per_page'] );
 		$page            = (int) sanitize_text_field( $params['page'] );
@@ -2025,7 +1997,6 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_create_new_deck( $post ): void {
-
 		$all        = $post[ Common::VAR_2 ];
 		$name       = sanitize_text_field( $all['name'] );
 		$deck_group = $all['deck_group'];
@@ -2071,11 +2042,9 @@ class AjaxHelper {
 		// ] );
 
 		Common::send_success( 'Deck created.' );
-
 	}
 
 	public function ajax_admin_update_decks( $post ): void {
-
 		$all = $post[ Common::VAR_2 ];
 
 		$decks = $all['decks'];
@@ -2123,14 +2092,12 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Saved.' );
-
 	}
 
 	// </editor-fold desc="Deck">
 
 	// <editor-fold desc="Topic">
 	public function ajax_admin_create_new_topic( $post ): void {
-
 		$all  = $post[ Common::VAR_2 ];
 		$name = sanitize_text_field( $all['name'] );
 		$deck = $all['deck'];
@@ -2163,7 +2130,6 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_trash_topics( $post ): void {
-
 		$all  = $post[ Common::VAR_2 ];
 		$args = wp_parse_args(
 			$all,
@@ -2177,11 +2143,9 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Trashed successfully.' );
-
 	}
 
 	public function ajax_admin_delete_topics( $post ): void {
-
 		$all  = $post[ Common::VAR_2 ];
 		$args = wp_parse_args(
 			$all,
@@ -2201,7 +2165,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Deleted successfully.' );
-
 	}
 
 	public function ajax_admin_load_topics( $post ): void {
@@ -2255,7 +2218,6 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_update_topics( $post ): void {
-
 		$all = $post[ Common::VAR_2 ];
 
 		$topics = $all['topics'];
@@ -2286,7 +2248,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Saved.' );
-
 	}
 
 	// </editor-fold desc="Topic">
@@ -2335,7 +2296,6 @@ class AjaxHelper {
 		// ] );
 
 		Common::send_success( 'Deck group found.', $deck_groups );
-
 	}
 
 	public function ajax_admin_load_deck_group( $post ): void {
@@ -2390,7 +2350,6 @@ class AjaxHelper {
 				'post' => $post,
 			)
 		);
-
 	}
 
 	public function ajax_admin_trash_deck_group( $post ): void {
@@ -2419,7 +2378,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Trashed successfully.' );
-
 	}
 
 	public function ajax_admin_delete_deck_group( $post ): void {
@@ -2467,7 +2425,6 @@ class AjaxHelper {
 		Manager::commit();
 
 		Common::send_success( 'Deleted.' );
-
 	}
 
 	public function ajax_admin_update_deck_group( $post ): void {
@@ -2513,7 +2470,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Saved.' );
-
 	}
 
 	public function ajax_admin_create_new_deck_group( $post ): void {
@@ -2554,14 +2510,12 @@ class AjaxHelper {
 		// ] );
 
 		Common::send_success( 'Deck group created.' );
-
 	}
 
 	// </editor-fold  desc="Deck Groups" >
 
 	// <editor-fold desc="Others">
 	public function ajax_admin_load_image_attachment( $post ): void {
-
 		// Common::send_error( [
 		// 'ajax_admin_load_image_attachment',
 		// 'post' => $post,
@@ -2588,7 +2542,6 @@ class AjaxHelper {
 		// ] );
 
 		Common::send_success( 'Image found', $attachment_url );
-
 	}
 	// </editor-fold desc="Others">
 
@@ -2608,7 +2561,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Trashed successfully.' );
-
 	}
 
 	/**
@@ -2619,7 +2571,6 @@ class AjaxHelper {
 	 * @return void
 	 */
 	public function ajax_admin_delete_collections( $post ): void {
-
 		$all         = $post[ Common::VAR_2 ];
 		$collections = $all['collections'];
 
@@ -2636,7 +2587,6 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_load_collections( $post ): void {
-
 		$params         = $post[ Common::VAR_2 ]['params'];
 		$per_page       = (int) sanitize_text_field( $params['per_page'] );
 		$page           = (int) sanitize_text_field( $params['page'] );
@@ -2663,7 +2613,6 @@ class AjaxHelper {
 				'post' => $post,
 			)
 		);
-
 	}
 
 	public function ajax_admin_search_collections( $post ): void {
@@ -2682,11 +2631,9 @@ class AjaxHelper {
 		);
 
 		Common::send_success( 'Collections found.', $items );
-
 	}
 
 	public function ajax_admin_create_new_collection( $post ): void {
-
 		$all  = $post[ Common::VAR_2 ];
 		$name = sanitize_text_field( $all['name'] );
 
@@ -2702,11 +2649,9 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Collection created.' );
-
 	}
 
 	public function ajax_admin_update_collections( $post ): void {
-
 		$all = $post[ Common::VAR_2 ];
 
 		$collections = $all['collections'];
@@ -2727,7 +2672,6 @@ class AjaxHelper {
 		}
 
 		Common::send_success( 'Saved.' );
-
 	}
 
 

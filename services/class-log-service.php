@@ -7,6 +7,8 @@
 
 namespace StudyPlannerPro\Services;
 
+use StudyPlannerPro\Initializer;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit(); // Exit if accessed directly.
 }
@@ -68,11 +70,13 @@ class Log_Service {
 	 */
 	public function log( string $message, array $data = array() ): void {
 		$caller        = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 2 )[1];
-		$class_name    = $caller['class'];
-		$function_name = $caller['function'];
-		$line          = $caller['line'];
+		$class_name    = array_key_exists( 'class', $caller ) ? $caller['class'] : '-';
+		$function_name = array_key_exists( 'function', $caller ) ? $caller['function'] : '-';
+		$line          = array_key_exists( 'line', $caller ) ? $caller['line'] : '-';
+		$file          = array_key_exists( 'file', $caller ) ? $caller['file'] : '-';
 
 		$this->log_info = array(
+			'file'       => $file,
 			'class_name' => $class_name,
 			'function'   => $function_name,
 			'line'       => $line,
@@ -294,7 +298,7 @@ class Log_Service {
 	 */
 	private function convert_to_text( string $formatted_data, string $log_level = 'LOG' ): string {
 		$timestamp      = date( 'Y-m-d H:i:s' );
-		$plugin_version = Initializer::PLUGIN_VERSION;
+		$plugin_version = Initializer::get_instance()->get_plugin_version();
 
 		$log_Info = $this->log_info;
 
@@ -303,7 +307,6 @@ class Log_Service {
 		$line          = $log_Info['line'];
 
 		return "[$log_level][$plugin_version][$class_name][$function_name][$line][$timestamp] - $formatted_data";
-
 		//		return "[$log_level] - $plugin_version - $timestamp - $formatted_data";
 	}
 
