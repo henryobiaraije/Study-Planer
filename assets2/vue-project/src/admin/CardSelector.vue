@@ -27,7 +27,8 @@
           ></vue-mulitiselect>
         </div>
         <!--  Deck -->
-        <div v-if="userCards.form.value.group" class="group flex-1 mp-slide-in">
+        <!--        <div v-if="userCards.form.value.group" class="group flex-1 mp-slide-in">-->
+        <div class="group flex-1 mp-slide-in">
           <span class="text-base flex items-center gap-2 w-full mb-2 font-medium">
             <span>Subject <span class="text-gray-400">(optional)</span></span>
             <span @click="clearDeck"
@@ -51,7 +52,8 @@
           ></vue-mulitiselect>
         </div>
         <!--  Topic -->
-        <div v-if="userCards.form.value.deck" class="group lg:w-1/3 mp-slide-in">
+        <!--        <div v-if="userCards.form.value.deck" class="group lg:w-1/3 mp-slide-in">-->
+        <div class="group lg:w-1/3 mp-slide-in">
           <span class="text-base flex items-center gap-2 w-full mb-2 font-medium">
             <span>Topic <span class="text-gray-400">(optional)</span></span>
             <span @click="clearTopic"
@@ -208,8 +210,7 @@ export default defineComponent({
     },
     topicToAssign: {
       type: Object as () => _Topic | null,
-      required: false,
-      default: null
+      required: true,
     },
   },
   data() {
@@ -313,6 +314,18 @@ export default defineComponent({
     },
   },
   watch: {
+    'userCards.form.value.topicToAssign': function (newVal, oldVal) {
+      // const form = this.userCards.form.value;
+      // form.deck = null;
+      // form.topic = null;
+      // this.decksMulti.searchResults.value = [];
+      // this.topicsMulti.searchResults.value = [];
+      // this.decksMulti.search('', form.group);
+      setTimeout(() => {
+        console.log('topic to assign change', {topicToAssign: this.topicToAssign})
+        this.searchCards();
+      }, 100);
+    },
     'userCards.form.value.group': function (newVal, oldVal) {
       const form = this.userCards.form.value;
       form.deck = null;

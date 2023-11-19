@@ -240,6 +240,7 @@ export default defineComponent({
       jQuery('.all-loading').hide();
       jQuery('.all-error').show();
     });
+    this.triggerLoadMultiSelects();
   },
   methods: {
     spClientData,
@@ -247,6 +248,12 @@ export default defineComponent({
       if ('string' === typeof value) {
         this.basicCardGroup.whole_question = value;
       }
+    },
+    triggerLoadMultiSelects() {
+      this.decks.search('');
+      this.collections.search('');
+      this.topics.search('');
+      this.searchTags.search('');
     }
   }
 });

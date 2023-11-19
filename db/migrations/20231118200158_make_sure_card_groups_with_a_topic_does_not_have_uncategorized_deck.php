@@ -22,6 +22,6 @@ final class MakeSureCardGroupsWithATopicDoesNotHaveUncategorizedDeck extends Abs
 	 * with the Table class.
 	 */
 	public function change(): void {
-		Topic::make_sure_card_groups_with_real_topic_also_have_a_real_deck();
+		Topic::make_sure_card_groups_with_real_topic_also_have_the_right_parent_deck();
 	}
 }

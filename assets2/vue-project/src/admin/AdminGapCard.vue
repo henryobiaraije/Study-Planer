@@ -246,8 +246,17 @@ export default defineComponent({
       jQuery('.all-loading').hide();
       jQuery('.all-error').show();
     });
+    this.triggerLoadMultiSelects();
   },
-  methods: {spClientData}
+  methods: {
+    spClientData,
+    triggerLoadMultiSelects() {
+      this.decks.search('');
+      this.collections.search('');
+      this.topics.search('');
+      this.searchTags.search('');
+    }
+  }
 });
 
 </script>

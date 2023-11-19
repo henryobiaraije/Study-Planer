@@ -1,4 +1,4 @@
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import type {_Deck, _DeckGroup, _Tag} from "@/interfaces/inter-sp";
 import type {_Ajax} from "@/classes/HandleAjax";
 import {HandleAjax} from "@/classes/HandleAjax";
@@ -167,6 +167,8 @@ export default function (status = 'publish') {
     const load = () => {
         xhrLoad();
     }
+
+
 
     //
     const onSelect = (items: { selectedRows: Array<_Deck> }) => {
@@ -408,6 +410,7 @@ export default function (status = 'publish') {
     //   tableData.value.post_status = status;
     //   console.log('function mounted');
     // });
+
 
     return {
         ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch,

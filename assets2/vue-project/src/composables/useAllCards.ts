@@ -308,6 +308,7 @@ export default function (status = 'publish') {
         cardTypes: [] | CardType[] = [],
         topicsToExclude: _Topic[] = []
     ) => {
+        console.log('search', {topicsToExclude})
         const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
         sendOnline = new Server().send_online({
             data: [
@@ -347,6 +348,7 @@ export default function (status = 'publish') {
             funcFailue(done) {
                 handleAjax.error(done);
                 tt().isLoading = false;
+
             },
         });
     };

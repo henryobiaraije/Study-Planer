@@ -857,11 +857,16 @@ class CardGroup extends Model {
 			];
 		}
 
-		$card_groups = self
-			::get_card_groups_simple_with_ordering_query( $args )
-			->get();
-		$total       = self
-			::get_card_groups_simple_with_ordering_query( $args )
+		$card_groups     = self
+			::get_card_groups_simple_with_ordering_query( $args );
+		$cards_group_sql = $card_groups->toSql();
+		$card_groups     = $card_groups->get();
+
+		$total     = self
+			::get_card_groups_simple_with_ordering_query( $args, true );
+		$total_sql = $total->toSql();
+		$total     = $total
+			->get()
 			->count();
 
 		// For new cards, or remove cards,  we are reading all at once. So the total is the total of the card groups.
@@ -896,7 +901,14 @@ class CardGroup extends Model {
 		];
 	}
 
-	public static function get_card_groups_simple_with_ordering_query( $args ): \Illuminate\Database\Eloquent\Builder {
+	/**
+	 *
+	 * @param array $args
+	 * @param array $for_total Set to true to return query that is usable to get query.
+	 *
+	 * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+	 */
+	public static function get_card_groups_simple_with_ordering_query( $args, bool $for_total = false ) {
 		// Join tables and apply aliases
 		$query = Manager
 			::table( SP_TABLE_CARD_GROUPS . ' as cg' )
@@ -984,18 +996,55 @@ class CardGroup extends Model {
 		}
 
 		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
-		$only_deck       = $args['deck_group_id'] && $args['deck_id'] && ! $args['topic_id'];
-		$only_topic      = $args['deck_group_id'] && $args['deck_id'] && $args['topic_id'];
+		$only_deck       = $args['deck_id'] && ! $args['topic_id'];
+		$only_topic      = $args['topic_id'];
+
+//		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
+//		$only_deck       = ! $args['deck_group_id'] && $args['deck_id'] && ! $args['topic_id'];
+//		$only_topic      = ! $args['deck_group_id'] && ! $args['deck_id'] && $args['topic_id'];
+
+//		$with_both_deck_group__deck__topic = $args['deck_group_id'] && $args['deck_id'] && $args['topic_id'];
+//		$with_both_deck__topic             = ! $args['deck_group_id'] && $args['deck_id'] && $args['topic_id'];
 
 		if ( $only_deck_group ) {
 			// Add conditions for 'only_deck_group'
-			$query->whereIn( 'cg.deck_id', function ( Builder $query ) use ( $args ) {
-				$query->select( 'id' )
-				      ->from( SP_TABLE_DECKS )
-				      ->where( 'deck_group_id', $args['deck_group_id'] );
-			} );
+			// Get all cg that has a deck that is under the deck group.
+			$query
+				->whereIn( 'cg.deck_id', function ( Builder $query ) use ( $args ) {
+					$query->select( 'id' )
+					      ->from( SP_TABLE_DECKS )
+					      ->where( 'deck_group_id', $args['deck_group_id'] );
+				} )
+				// sub group.
+				->orWhere( function ( Builder $query ) use ( $args ) {
+					// where cg.deck_id is null
+					$query
+						->where( 'cg.deck_id', '=', 0 )
+						// and cg.topic_id is in the topics that are under decks that are under the deck group
+						->whereIn( 'cg.topic_id', function ( Builder $query ) use ( $args ) {
+							$query->select( 'id' )
+							      ->from( SP_TABLE_TOPICS )
+							      ->whereIn( 'deck_id', function ( Builder $query ) use ( $args ) {
+								      $query->select( 'id' )
+								            ->from( SP_TABLE_DECKS )
+								            ->where( 'deck_group_id', $args['deck_group_id'] );
+							      } );
+						} );
+				} );
 		} elseif ( $only_deck ) {
-			$query->where( 'cg.deck_id', $args['deck_id'] );
+			//(cg has no deck and cg has a topic that is under a deck that is under the deck group)
+			$query
+				->where( function ( Builder $query ) use ( $args ) {
+					$query
+						// cgs that have this deck.
+						->where( 'cg.deck_id', '=', $args['deck_id'] )
+						// and cg's topic belongs to this deck.
+						->orWhereIn( 'cg.topic_id', function ( Builder $query ) use ( $args ) {
+							$query->select( 'id' )
+							      ->from( SP_TABLE_TOPICS )
+							      ->where( 'deck_id', $args['deck_id'] );
+						} );
+				} );
 		} elseif ( $only_topic ) {
 			$query->where( 'cg.topic_id', $args['topic_id'] );
 		}
@@ -1021,18 +1070,21 @@ class CardGroup extends Model {
 			$query->whereNotIn( 'cg.topic_id', $args['topic_ids_to_exclude'] );
 		}
 
-		$result = $query
-			->offset( $offset )
-			->limit( $args['per_page'] )
-//			->groupBy( 'deck_group_name', 'deck_name', 'topic_name', 'cg.id' )
-//			->orderBy( 'deck_group_name', 'asc' )
-//			->orderBy( 'dg.name', 'asc' )
-//			->orderBy( 'd.name', 'asc' )
+		// Group by cd.id
+		$query = $query
 			->groupBy( [ 'cg.id' ] );
 
-//		$sql = $result->toSql();
+		if ( $for_total ) {
+			return $query
+				->offset( 0 )
+				->limit( 99999999 );
+		} else {
+			$query = $query
+				->offset( $offset )
+				->limit( $args['per_page'] );
+		}
 
-		$all            = $result->get()->all();
+		$all            = $query->get()->all();
 		$card_group_ids = array_column( $all, 'id' );
 
 		return self
