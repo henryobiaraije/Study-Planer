@@ -251,10 +251,8 @@ export default defineComponent({
     const url = new URL(window.location.href);
     const searchParams = new URLSearchParams(url.search);
     const status = searchParams.get('status');
-    const action = searchParams.get('action');
     const cardGroupId = Number(searchParams.get('card-group'));
 
-    // console.log('in setup', {url, searchParams, status, cardGroupId});
     return {
       decks: useDecks(status),
       searchTags: useTagSearch(),

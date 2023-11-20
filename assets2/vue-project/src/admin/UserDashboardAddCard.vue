@@ -7,7 +7,7 @@
       <p class="text-base text-gray-500">Here you can add cards to your study deck.</p>
     </div>
     <br/>
-    <CardSelector :user-cards="userCards" :all-cards="allCards"/>
+    <CardSelector :user-cards="userCards" :all-cards="allCards" :topic-to-assign="null"/>
     <br/>
     <p>Add the selected cards to your study deck.</p>
     <ajax-action

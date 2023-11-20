@@ -173,7 +173,7 @@ import QuestionModal from "@/vue-component/QuestionModal.vue";
 import useImageCard from "@/composables/useImageCard";
 
 export default defineComponent({
-  name: 'UserDashboardNewCards',
+  name: 'UserDashboardRemoveCards',
   components: {
     QuestionModal,
     TimeComp,

@@ -221,6 +221,18 @@ class UserCard extends Model {
 		$no_on_hold     = max( $no_on_hold, 0 );
 		$no_of_revision = max( $no_of_revision, 0 );
 
+//		if ( 27 === $study->id ) {
+//
+//			Common::send_error( array(
+//				__METHOD__,
+//				'study'                      => $study,
+//				'no_of_new'                  => $no_of_new,
+//				'no_on_hold'                 => $no_on_hold,
+//				'no_of_revision'             => $no_of_revision,
+//				'user_cards_not_studied_ids' => $user_cards_not_studied_ids,
+//			) );
+//		}
+
 
 		// Get card groups in this deck and in the tags and NOT in exclude tags.
 		$card_groups = CardGroup

@@ -1,4 +1,4 @@
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import type {_CardGroup, _Deck, _DeckGroup, _Tag, _Topic, CardType} from "@/interfaces/inter-sp";
 import type {_Ajax} from "@/classes/HandleAjax";
 import {HandleAjax} from "@/classes/HandleAjax";
@@ -57,7 +57,7 @@ const tableData = ref({
     paginationOptions: {
         enabled: true,
         mode: 'page',
-        perPage: Cookies.get('spPerPage_newRemoveCards') ? Number(Cookies.get('spPerPage_newRemoveCards')) : 2,
+        perPage: Cookies.get('spPerPage_newRemoveCards') ? Number(Cookies.get('spPerPage_newRemoveCards')) : 10,
         position: 'bottom',
         perPageDropdown: [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700],
         dropdownAllowAll: true,
@@ -182,7 +182,7 @@ export default function (status = 'publish') {
     const calculateRows = () => {
         let page = tt().paginationOptions.setCurrentPage;
         let perPage = tt().paginationOptions.perPage;
-        let start = (page - 1) * perPage;
+        let start = Math.max(0, (page - 1) * perPage);
         let end = start + perPage;
         let rows = loadedRows.value.slice(start, end);
         // console.log({start, end, rows});
@@ -235,9 +235,9 @@ export default function (status = 'publish') {
         prevPage: number,
         total: number
     }) => {
-        console.log('onPageChange');
-        tt().paginationOptions.setCurrentPage = params.currentPage;
-        tt().paginationOptions.perPage = params.currentPerPage;
+        console.log('onPageChange', {params});
+        tt().paginationOptions.setCurrentPage =  params.currentPage;
+        // tt().paginationOptions.perPage = Math.max(params.currentPerPage, 10);
         // xhrLoad();
         calculateRows();
     };
@@ -249,11 +249,9 @@ export default function (status = 'publish') {
         console.log('sort change');
     };
     const onPerPageChange = (params: { currentPage: number; currentPerPage: number; total: number; }) => {
-        console.log('onPerPageChange');
-        tt().paginationOptions.setCurrentPage = params.currentPage;
+        console.log('onPerPageChange', {params});
         tt().paginationOptions.perPage = params.currentPerPage;
         Cookies.set('spPerPage_newRemoveCards', params.currentPerPage.toString());
-        // xhrLoad();
         calculateRows();
     };
     const loadItems = () => {
@@ -316,8 +314,8 @@ export default function (status = 'publish') {
                 tt().totalRecords = total;
 
                 // Start from first page again.
-                tt().paginationOptions.setCurrentPage = 0;
-                tt().paginationOptions.perPage = 0;
+                tt().paginationOptions.setCurrentPage = 1;
+                // tt().paginationOptions.perPage = 10;
 
                 // Calculate those to show.
                 calculateRows();
@@ -381,8 +379,7 @@ export default function (status = 'publish') {
                 };
 
                 // Start from first page again.
-                tt().paginationOptions.setCurrentPage = 0;
-                tt().paginationOptions.perPage = 0;
+                tt().paginationOptions.setCurrentPage = 1;
 
                 // Calculate those to show.
                 calculateRows();
@@ -520,10 +517,11 @@ export default function (status = 'publish') {
 
     const search = xhrSearch;
 
-    // onMounted(() => {
-    //   tableData.value.post_status = status;
-    //   console.log('function mounted');
-    // });
+    onMounted(() => {
+        console.log('mounded now');
+        // tt().paginationOptions.perPage = Cookies.get('spPerPage_newRemoveCards') ? Number(Cookies.get('spPerPage_newRemoveCards')) : 10;
+        calculateRows();
+    });
 
     return {
         ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch, ajaxRestore,
@@ -534,7 +532,7 @@ export default function (status = 'publish') {
         batchUpdate, batchDelete, batchTrash, batchRestore,
         totals, closeEditModal, openEditModal, search, searchResults,
         fromFrontend, forAddToStudyDeck, forRemoveFromStudyDeck, forNewCards,
-        removeCardsFromResults,
+        removeCardsFromResults, loadedRows,
     };
 
 }
