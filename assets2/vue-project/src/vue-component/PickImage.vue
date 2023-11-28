@@ -2,7 +2,7 @@
   <div class="bg-image">
     <img :src="imageUrl" alt=""
          class="bg-gray-300"
-         @click="selectImage"
+         @click="triggerFileClick"
          style="width: 150px; height: 150px;">
     <span v-if="bgImage.ajaxLoad.value.sending" class="loading">
       <i class="fa fa-spin fa-spinner">
@@ -10,6 +10,7 @@
       </i>
     </span>
   </div>
+  <input type="file" accept="image/*" style="display: none;" ref="fileInput" @change="uploadImage">
 </template>
 
 <script lang="ts">
@@ -43,6 +44,23 @@ export default defineComponent({
     }
   },
   methods: {
+    triggerFileClick() {
+      //@ts-ignore
+      this.$refs.fileInput.click();
+    },
+    uploadImage(event: Event) {
+      //@ts-ignore
+      const file = (event.target as HTMLInputElement).files[0];
+      console.log({file});
+      if (file) {
+        this.bgImage.xhrUploadImage(file)
+            .then((res) => {
+              console.log('res', res);
+              this.$emit('update:modelValue', res.id);
+              this.initImage(res.id);
+            });
+      }
+    },
     initImage(imageId: number) {
       //@ts-ignore
       this.bgImage.xhrLoadImage(imageId);
@@ -50,9 +68,9 @@ export default defineComponent({
     selectImage() {
       //@ts-ignore
       this.bgImage.pickImage().then((res) => {
+        console.log('resol', res);
         this.$emit('update:modelValue', res.id);
         this.initImage(res.id);
-        // console.log('resol', res);
       });
     }
   },

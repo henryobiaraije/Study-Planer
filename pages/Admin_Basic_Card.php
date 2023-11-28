@@ -34,6 +34,7 @@ class Admin_Basic_Card {
 
 	public function initialize(): void {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
 		add_action( 'init', array( $this, 'init' ) );
 
 	}
@@ -101,7 +102,7 @@ class Admin_Basic_Card {
 		// enqueue the scripts
 		add_action(
 			'sp_enqueue_default_admin_basic_card',
-			function () use ( $dis ) {
+			static function () use ( $dis ) {
 				do_action( 'sp_enqueue_default_admin_scripts' );
 				wp_enqueue_style( 'sp-admin-basic-card' );
 				wp_enqueue_script( 'sp-admin-basic-card' );

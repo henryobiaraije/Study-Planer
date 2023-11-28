@@ -20,6 +20,7 @@ import 'vuetify/styles'
 import {createVuetify} from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives';
+import CKEditor from '@ckeditor/ckeditor5-vue';
 
 const myCustomLightTheme = {
     dark: false,
@@ -115,12 +116,14 @@ function renderVue() {
         let elem = jQuery(item.elem);
         if (elem.length) {
             // @ts-ignore
+            // const app = createApp(item.component);
             const app = createApp(item.component);
             app.use(Vue3Toastify, {
                 autoClose: 4000,
                 position: 'bottom-right'
             } as ToastContainerOptions);
             app.use(vuetify);
+            app.use(CKEditor);
             app.mount(item.elem);
         }
     });
@@ -135,7 +138,11 @@ function renderVue() {
     // // const app = createApp(AdminTopics);
     // const app = createApp(AdminTopics);
     // app.mount('.admin-topics')
-    spInitDevTools();
+    try {
+        spInitDevTools();
+    } catch (e) {
+        console.error('dev tools error', e);
+    }
 }
 
 jQuery(document).ready(function () {

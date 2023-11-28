@@ -1,7 +1,8 @@
 <template>
   <div style="background-color: #fff;padding: 2px;min-width: 20px;">
-    <div :id="divId" style="min-height: 30px" v-html="value"></div>
+<!--    <div :id="divId" style="min-height: 30px" v-html="value"></div>-->
     <!--    <div :id="divId" style="min-height: 30px" v-html="value">{{ value }}</div>-->
+    <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" :data="value"></ckeditor>
   </div>
 </template>
 
@@ -11,6 +12,8 @@ import useDecks from "@/composables/useDecks";
 import useTagSearch from "@/composables/useTagSearch";
 import useBasicCard from "@/composables/useBasicCard";
 import {spClientData} from "@/functions";
+// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 
 declare var tinymce;
 declare var wp;
@@ -42,27 +45,42 @@ export default defineComponent({
       showMain: false,
       divId: '',
       newContent: '',
+      editor: InlineEditor,
+      editorData: '',
+      editorConfig: {
+        // The configuration of the editor.
+      }
     }
   },
   setup: (props, ctx) => {
     return {}
   },
   computed: {},
-  created() {
-    setTimeout(() => {
-      const original = this.value;
-      // console.log('value = ' + this.value, {original})
-      let content: string = this.value;
-      content = content.replace('/(?:\\r\\n|\\r|\\n)/g', '');
-      content = content.replace(/>n</g, '><');
-      // console.log({content, original});
-      this.newContent = content;
-      this.$emit('input', this.newContent);
-      this.divId = 'wp-editor-' + Math.random().toString(36).substr(3, 10);
-      setTimeout(() => {
-        this.initEditor();
-      }, 1000);
-    }, 1000);
+  // created() {
+  //   // Random wait from 1 to 4 seconds.
+  //   const random1 = Math.floor(Math.random() * 4) + 1;
+  //   const random2 = Math.floor(Math.random() * 4) + 1;
+  //   console.log('created ', {random1, random2})
+  //   setTimeout(() => {
+  //     const original = this.value;
+  //     // console.log('value = ' + this.value, {original})
+  //     let content: string = this.value;
+  //     content = content.replace('/(?:\\r\\n|\\r|\\n)/g', '');
+  //     content = content.replace(/>n</g, '><');
+  //     // console.log({content, original});
+  //     this.newContent = content;
+  //     // this.$emit('input', this.newContent);
+  //     this.$emit('update:modelValue', this.newContent);
+  //
+  //     this.divId = 'wp-editor-' + Math.random().toString(36).substr(3, 10);
+  //     console.log('value = ' + this.value, {original, content, divId: this.divId})
+  //     setTimeout(() => {
+  //       this.initEditor();
+  //     },  4000);
+  //   },  1000);
+  // },
+  created(){
+    this.editorData = this.value;
   },
   methods: {
     initEditor() {
@@ -134,7 +152,14 @@ export default defineComponent({
   beforeUnmount() {
     // wp.editor.remove(this.divId);
     // console.log('beforeUnmount');
-  }
+  },
+  watch: {
+    editorData: function (val) {
+      console.log('editorData', val);
+      // this.$emit('input', val);
+      this.$emit('update:modelValue', val);
+    },
+  },
 });
 </script>
 

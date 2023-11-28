@@ -29,7 +29,8 @@
       "helpers\\",
       "db\\",
       "shortcodes\\",
-      "services\\"
+      "services\\",
+      "rest\\"
     ]
   },
   "require": {

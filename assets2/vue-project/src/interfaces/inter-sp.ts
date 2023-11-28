@@ -143,6 +143,7 @@ export interface _Localize {
     localize: {
         default_bg_image: number,
         nonce: string;
+        rest_nonce: string;
         page_all_cards: string;
         page_basic_card: string;
         page_deck_groups: string;

@@ -19,6 +19,7 @@ export function spClientData(): _Localize {
         serverUrl: localize.ajax_url,
         actionString: localize.ajax_action,
         nonce: localize.nonce,
+
     });
 
     return {

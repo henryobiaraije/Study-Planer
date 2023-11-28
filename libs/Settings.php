@@ -5,7 +5,11 @@ namespace StudyPlannerPro\Libs;
 
 class Settings {
 
+	// Rest
+	public const REST_NAMESPACE = 'study-planner-pro/v1';
+
 	// Consts
+
 	// public const MATURE_CARD_DAYS = 5; // todo, change to 21 in production
 
 	// Options

@@ -25,6 +25,7 @@ use StudyPlannerPro\Pages\Admin_Tags;
 use StudyPlannerPro\Pages\AdminDeck;
 use StudyPlannerPro\Pages\AdminDeckGroups;
 use StudyPlannerPro\Pages\AdminTopics;
+use StudyPlannerPro\Rest\Rest_File_Upload_Controller;
 use StudyPlannerPro\Services\Log_Service;
 use StudyPlannerPro\Shortcodes\Short_User_Dashboard;
 
@@ -49,6 +50,7 @@ class Initializer {
 	public static $extra_js_dir;
 	public static $extra_js_url;
 	public static $css_dir;
+	public static $plugin_name;
 	public static $css_url;
 	public static $extra_dir;
 	public static $extra_url;
@@ -118,6 +120,8 @@ class Initializer {
 		Admin_Collections::get_instance();
 		Admin_Assign_Topic::get_instance();
 
+		( new Rest_File_Upload_Controller() )->init();
+
 		$this->initialize_services();
 
 		// Localize all added general object
@@ -169,6 +173,7 @@ class Initializer {
 		self::$general_localize['ajax_action'] = self::$ajax_action;
 		self::$general_localize['site_url']    = site_url();
 		self::$general_localize['nonce']       = wp_create_nonce( self::$nonce_key );
+		self::$general_localize['rest_nonce']  = wp_create_nonce( 'wp_rest' );
 
 		$default_bg_image = (int) get_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, 0 );
 
@@ -284,11 +289,12 @@ class Initializer {
 	}
 
 	private function init_variables(): void {
-		$plugin_name      = basename( __DIR__ );
-		$plugin_dir       = __DIR__;
-		$plugin_url       = get_site_url() . "/wp-content/plugins/$plugin_name";
-		self::$plugin_dir = $plugin_dir;
-		self::$plugin_url = $plugin_url;
+		$plugin_name       = basename( __DIR__ );
+		$plugin_dir        = __DIR__;
+		$plugin_url        = get_site_url() . "/wp-content/plugins/$plugin_name";
+		self::$plugin_dir  = $plugin_dir;
+		self::$plugin_url  = $plugin_url;
+		self::$plugin_name = $plugin_name;
 		// self::$js_dir       = $plugin_dir . '/assets/js';
 		self::$js_dir = $plugin_dir . '/assets2/vue-project/dist/assets';
 		// self::$js_url       = $plugin_url . '/assets/js';
