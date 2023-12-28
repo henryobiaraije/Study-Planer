@@ -146,6 +146,14 @@ class UserCard extends Model {
 						$user_cards_answered['on_hold_and_due_ids']
 					);
 					$deck->cards = $cards;
+					Initializer::add_debug_with_key(
+						'getting_cards_for_deck__' . $deck->name,
+						array(
+//							'cards' => $cards,
+							'user_cards_not_studied' => $user_cards_not_studied,
+							'user_cards_answered'    => $user_cards_answered,
+						)
+					);
 				} else {
 					$deck->cards = array();
 				}
@@ -469,10 +477,22 @@ class UserCard extends Model {
 		if ( $date ) {
 			$card_answered = $card_answered->whereDate( 'created_at', '=', $date );
 		}
+
 		$card_answered = $card_answered
-			->groupBy( 'card_id' )
-			->orderBy( 'created_at', 'desc' )
+			->orderBy( 'created_at', 'desc' );
+
+		$sql = $card_answered->toSql();
+
+		$card_answered = $card_answered
 			->get()->all();
+
+		$card_answered_unique = array();
+		foreach ( $card_answered as $answered ) {
+			$card_id = $answered->card_id;
+			if ( ! isset( $card_answered_unique[ $card_id ] ) ) {
+				$card_answered_unique[ $card_id ] = $answered;
+			}
+		}
 
 		/**
 		 * @var string $today
@@ -488,7 +508,7 @@ class UserCard extends Model {
 		$cards_answered_as_new     = array(); // Those that are answered only once.
 		$cards_answered_as_new_ids = array(); // Those that are answered only once.
 
-		foreach ( $card_answered as $answered ) {
+		foreach ( $card_answered_unique as $answered ) {
 			$card = $answered->card;
 			if ( ! $card ) {
 				continue;
@@ -505,13 +525,166 @@ class UserCard extends Model {
 			// Check if card is due today.
 			$card_due_date = $answered->next_due_at;
 			// e.i. if due date is today or before today.
-			if ( strtotime( $card_due_date ) <= strtotime( date( 'Y-m-d', strtotime( $today ) ) ) ) {
+			$is_due = strtotime( $card_due_date ) <= strtotime( date( 'Y-m-d', strtotime( $today ) ) );
+			if ( $is_due ) {
 				if ( $answered->grade === 'hold' ) {
 					$cards_on_hold_and_due[] = $card;
 				} else {
 					$cards_in_revision_and_due[] = $card;
 				}
 			}
+
+			Initializer::add_debug_with_key(
+				'is_due_' . $answered->card_id,
+				array(
+					'answer_id'            => $answered->id,
+					'card'                 => $card,
+					'answered'             => $answered,
+					'is_due'               => $is_due,
+					'today'                => $today,
+					'card_due_date'        => $card_due_date,
+					'sql'                  => $sql,
+					'card_answered'        => $card_answered,
+					'card_answered_unique' => $card_answered_unique,
+				)
+			);
+
+			// Check if answered as new.
+			if ( $answered->answered_as_new ) {
+				$cards_answered_as_new[]     = $card;
+				$cards_answered_as_new_ids[] = $card->id;
+			}
+		}
+
+		return array(
+			'cards'                => $cards,
+			'card_ids'             => $card_ids,
+			'on_hold'              => $cards_on_hold,
+			'on_hold_and_due'      => $cards_on_hold_and_due,
+			'on_hold_and_due_ids'  => array_map(
+				static function ( $card ) {
+					return $card->id;
+				},
+				$cards_on_hold_and_due
+			),
+			'revision'             => $cards_in_revision,
+			'revision_and_due'     => $cards_in_revision_and_due,
+			'revision_and_due_ids' => array_map(
+				static function ( $card ) {
+					return $card->id;
+				},
+				$cards_in_revision_and_due
+			),
+			'answered_as_new'      => $cards_answered_as_new,
+			'answered_as_new_ids'  => $cards_answered_as_new_ids,
+		);
+	}
+
+	public static function get_all_last_answered_user_cards__( array $user_study_ids, string $date = null ): array {
+		// Get distinct card ids.
+		$distinct          = Answered
+			::query()
+			->select( 'card_id' )
+			->whereIn( 'study_id', $user_study_ids )
+			->groupBy( [ 'card_id' ] )
+			->get();
+		$card_ids_distinct = $distinct->pluck( 'card_id' )->toArray();
+
+
+		$card_answered = Answered
+			::query()
+			->with(
+				array(
+					'card',
+					'study' => function ( $q ) use ( $user_study_ids ) {
+						$q->whereIn( 'id', $user_study_ids );
+					},
+				)
+			)
+			->whereHas(
+				'study',
+				function ( $query ) use ( $user_study_ids ) {
+					$query->whereIn( 'id', $user_study_ids );
+				}
+			);
+		if ( $date ) {
+			$card_answered = $card_answered->whereDate( 'created_at', '=', $date );
+		}
+//		$card_answered = $card_answered
+//			->groupBy( [ 'card_id' ] )
+//			->orderBy( 'created_at', 'desc' );
+
+		$card_answered = $card_answered
+			->whereIn( 'card_id', $card_ids_distinct )
+			->orderBy( 'created_at', 'desc' );
+
+		$sql = $card_answered->toSql();
+
+		$card_answered = $card_answered
+			->get()->all();
+
+		$card_answered_unique = array();
+		foreach ( $card_answered as $answered ) {
+			$card_id = $answered->card_id;
+			if ( ! isset( $card_answered_unique[ $card_id ] ) ) {
+				$card_answered_unique[ $card_id ] = $answered;
+			}
+		}
+
+		/**
+		 * @var string $today
+		 */
+		$today = Common::getDateTime();
+
+		$cards                     = array();
+		$card_ids                  = array();
+		$cards_on_hold             = array();
+		$cards_on_hold_and_due     = array();
+		$cards_in_revision         = array();
+		$cards_in_revision_and_due = array();
+		$cards_answered_as_new     = array(); // Those that are answered only once.
+		$cards_answered_as_new_ids = array(); // Those that are answered only once.
+
+		foreach ( $card_answered_unique as $answered ) {
+			$card = $answered->card;
+			if ( ! $card ) {
+				continue;
+			}
+			$cards[]    = $card;
+			$card_ids[] = $card->id;
+			$grade      = $answered->grade;
+			if ( $grade === 'hold' ) {
+				$cards_on_hold[] = $card;
+			} else {
+				$cards_in_revision[] = $card;
+			}
+
+			// Check if card is due today.
+			$card_due_date = $answered->next_due_at;
+			// e.i. if due date is today or before today.
+			$is_due = strtotime( $card_due_date ) <= strtotime( date( 'Y-m-d', strtotime( $today ) ) );
+			if ( $is_due ) {
+				if ( $answered->grade === 'hold' ) {
+					$cards_on_hold_and_due[] = $card;
+				} else {
+					$cards_in_revision_and_due[] = $card;
+				}
+			}
+
+			Initializer::add_debug_with_key(
+				'is_due_' . $answered->card_id,
+				array(
+					'answer_id'         => $answered->id,
+					'card'              => $card,
+					'answered'          => $answered,
+					'is_due'            => $is_due,
+					'today'             => $today,
+					'card_due_date'     => $card_due_date,
+					'sql'               => $sql,
+					'card_ids_distinct' => $card_ids_distinct,
+
+				)
+			);
 
 			// Check if answered as new.
 //			$answered = Answered

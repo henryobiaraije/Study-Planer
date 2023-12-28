@@ -971,7 +971,10 @@ class AjaxFrontHelper {
 		$user_card_details = UserCard
 			::get_user_cards_to_study( $user_id );
 
-		Common::send_success( 'User cards loaded successfully', $user_card_details );
+		Common::send_success(
+			'User cards loaded successfully',
+			$user_card_details,
+		);
 	}
 
 	public function ajax_front_save_user_debug_form( $post ): void {

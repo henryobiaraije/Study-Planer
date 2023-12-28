@@ -471,7 +471,7 @@ export default defineComponent({
       let count = cards.reduce((acc, card) => {
         return acc + (newCardIds.includes(card.id as number) ? 1 : 0);
       }, 0);
-      console.log({count, cards, newCardIds, userCards: this.userCards});
+      // console.log({count, cards, newCardIds, userCards: this.userCards});
       return count;
     },
     countRevisionCards(cards: _Card[]): number {
@@ -506,7 +506,7 @@ export default defineComponent({
       if (Object.keys(this.item).includes('studies') && (this.item?.['studies'].length > 0)) {
         let study = this.item?.['studies'][0];
         let theStudy: _Study = JSON.parse(this.customStringify(study)) as _Study;
-        console.log('saving now', {theStudy});
+        // console.log('saving now', {theStudy});
         setTimeout(() => {
           this.userDash.xhrCreateOrUpdateStudy(theStudy)
               .then((response) => {
@@ -530,7 +530,7 @@ export default defineComponent({
     },
 
     viewCard() {
-      console.log('view card');
+      // console.log('view card');
       if ('topic' !== this.theItem.itemType && 'deck' !== this.theItem.itemType) {
         return;
       }

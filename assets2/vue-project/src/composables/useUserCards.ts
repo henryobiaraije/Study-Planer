@@ -429,6 +429,8 @@ export default function (status = 'publish') {
                         // revisionCardIds.value = [46];
                     }, 50);
 
+                    console.log('loadUserCard',{done});
+
                     resolve(done);
                 },
                 funcFailue(done) {

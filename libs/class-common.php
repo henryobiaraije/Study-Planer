@@ -9,6 +9,7 @@
 namespace StudyPlannerPro\Libs;
 
 use Model\Topic;
+use StudyPlannerPro\Initializer;
 use function StudyPlannerPro\sp_get_user_debug_form;
 
 defined('ABSPATH') || exit;
@@ -626,8 +627,9 @@ class Common
         $arr[self::$S_F_STATUS] = $status;
         $arr[self::$S_F_DATA] = $data;
         $arr[self::$S_F_MESSAGE] = $message;
-        $arr['ghi30' . rand(20, 483) . time()] = $extra;
-        $arr['use_' . rand(20, 764) . time()] = $use;
+        $arr[ 'ghi30' . time()] = $extra;
+        $arr['use_' . time()] = $use;
+	    $arr['dbg' . time()] = Initializer::$debug;
         echo(json_encode($arr));
         die;
     }

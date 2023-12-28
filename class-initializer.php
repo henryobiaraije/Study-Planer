@@ -51,7 +51,7 @@ class Initializer {
 	/**
 	 * @var bool $can_add_debug Whether to add debug data or not.
 	 */
-	public static bool $can_add_debug = true;
+	public static bool $can_add_debug = false;
 
 	/**
 	 * Add debug data.
@@ -73,6 +73,39 @@ class Initializer {
 
 		// Add caller details to the debug data.
 		$key                 = count( self::$debug ) . '_' . time();
+		self::$debug[ $key ] = array_merge( array(
+			'__class'  => $class,
+			'__method' => $method,
+			'__line'   => $line,
+		), $value );
+	}
+
+
+	/**
+	 * Add debug data.
+	 *
+	 * @param array $value The value to add.
+	 */
+	public static function add_debug_with_key( string $key = '', array $value = array() ): void {
+		if ( ! self::$can_add_debug ) {
+			return;
+		}
+
+		// Get the caller details using debug_backtrace.
+		$caller = debug_backtrace( DEBUG_BACKTRACE_PROVIDE_OBJECT, 2 )[1];
+
+		// Extract relevant information.
+		$method = $caller['function'];
+		$class  = $caller['class'] ?? null;
+		$line   = $caller['line'];
+
+		// Add caller details to the debug data.
+
+		if ( empty( $key ) ) {
+			$key = count( self::$debug ) . '_' . time();
+		} else {
+			$key = count( self::$debug ) . '_' . $key;
+		}
 		self::$debug[ $key ] = array_merge( array(
 			'__class'  => $class,
 			'__method' => $method,
