@@ -41,6 +41,45 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package StudyPlannerPro
  */
 class Initializer {
+
+	/**
+	 * Debugging data.
+	 * @var array $debug Debugging data.
+	 */
+	public static array $debug = array();
+
+	/**
+	 * @var bool $can_add_debug Whether to add debug data or not.
+	 */
+	public static bool $can_add_debug = true;
+
+	/**
+	 * Add debug data.
+	 *
+	 * @param array $value The value to add.
+	 */
+	public static function add_debug( array $value ): void {
+		if ( ! self::$can_add_debug ) {
+			return;
+		}
+
+		// Get the caller details using debug_backtrace.
+		$caller = debug_backtrace( DEBUG_BACKTRACE_PROVIDE_OBJECT, 2 )[1];
+
+		// Extract relevant information.
+		$method = $caller['function'];
+		$class  = $caller['class'] ?? null;
+		$line   = $caller['line'];
+
+		// Add caller details to the debug data.
+		$key                 = count( self::$debug ) . '_' . time();
+		self::$debug[ $key ] = array_merge( array(
+			'__class'  => $class,
+			'__method' => $method,
+			'__line'   => $line,
+		), $value );
+	}
+
 	public static $plugin_dir;
 	public static $plugin_url;
 	public static $js_dir;
@@ -56,7 +95,7 @@ class Initializer {
 	public static $extra_url;
 	// todo change to false later during production
 	public static $debug_mode = true;
-	public static $script_version = '3.0.5';
+	public static $script_version = '3.1.5';
 	public static $nonce_key = 'e5824f448200111383345g424';
 	public static $ajax_action = 'sp_pro_ajax_action_4fef425g424r5q5g6q';
 	public static $localize_id = 'pereere_dot_com_sp_pro_general_localize_4736';

@@ -66,7 +66,7 @@
                 cardGroup.name
               }}
             </div>
-            <div class="in-mobile flex lg:hidden gap-2 card-stats bg-gray-50">
+            <div class="in-mobile flex lg:hidden gap-2 card-stats ">
               <div class="mobile-stats flex justify-between gap-4 border-t-sm border-solid border-gray-400 ">
                 <div class="flex flex-row gap-1 items-center">
                   <span class="text-sm text-gray-400">Card Type: </span>
@@ -108,33 +108,37 @@
             </div>
           </div>
         </label>
-        <v-dialog
-            v-model="viewDialog"
-            width="auto"
-        >
-          <v-card>
-            <v-card-actions>
-              <div class="flex flex-row justify-between items-center w-full">
-                <span class="flex-1 text-xl !font-bold">Cards</span>
-                <span class="flex-initial">
-                          <v-btn color="primary" block @click="viewDialog = false">Close</v-btn>
-                        </span>
-              </div>
-            </v-card-actions>
-            <QuestionModal
-                title="Cards"
-                :cards="cardsToView"
-                :index-to-start="carouselCardIndexToStart"
-                :show-only-answers="true"
-                :user-cards="userCards"
-                @card-selected="(cardGroupId:number) => $emit('card-clicked', cardItems.find((item) => item.id === cardGroupId))"
-                :for-add-cards="true"
-            />
-          </v-card>
-        </v-dialog>
+
       </li>
     </ul>
   </div>
+
+  <!--  Question Modal -->
+  <v-dialog
+      v-model="viewDialog"
+      width="auto"
+  >
+    <v-card>
+      <v-card-actions>
+        <div class="flex flex-row justify-between items-center w-full">
+          <span class="flex-1 text-xl !font-bold">Cards</span>
+          <span class="flex-initial">
+                          <v-btn color="primary" block @click="viewDialog = false">Close</v-btn>
+                        </span>
+        </div>
+      </v-card-actions>
+      <QuestionModal
+          title="Cards"
+          :cards="cardsToView"
+          :index-to-start="carouselCardIndexToStart"
+          :show-only-answers="true"
+          :user-cards="userCards"
+          @card-selected="(cardGroupId:number) => $emit('card-clicked', cardItems.find((item) => item.id === cardGroupId))"
+          :for-add-cards="true"
+      />
+    </v-card>
+  </v-dialog>
+
   <!--  Tabs Found, Selected -->
   <div
       v-if="cardsToDisplay.length"
@@ -227,7 +231,6 @@ export default defineComponent({
       this.$emit('clear-selected');
     },
     viewCard(cardGroupId: number): _CardGroup[] {
-
       if (this.myStore.store.inAddCards) {
         // Display all cards in all groups if in AddCards page.
         let cartsCountTillToStart = 0;
@@ -235,20 +238,19 @@ export default defineComponent({
         const cards: _Card[] = [];
 
         this.cardItems.forEach(group => {
-
           if (cardGroupId === group.id) {
             stopCounting = true;
           }
 
           if (stopCounting) {
             // Continue to increase the index to start until we reach the current group.
-            cartsCountTillToStart += group.cards.length;
+            if (cartsCountTillToStart === 0) {
+              cartsCountTillToStart = cards.length;
+            }
           }
-
           group.cards.forEach(card => cards.push(card));
         });
-
-        this.carouselCardIndexToStart = cartsCountTillToStart - 1;
+        this.carouselCardIndexToStart = cartsCountTillToStart;
         this.cardsToView = cards;
       } else {
         this.cardsToView = this.cardItems.find((item: _CardGroup) => item.id === cardGroupId).cards;

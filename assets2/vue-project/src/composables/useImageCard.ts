@@ -87,6 +87,7 @@ export default function (cardGroupId = 0) {
 
     const _AddImage = () => {
         useBgImage().pickImage('Pick', 'Select Medical Image').then((res) => {
+            console.log({res})
             imageItem.value.boxes.push({
                 top: 0,
                 left: 0,

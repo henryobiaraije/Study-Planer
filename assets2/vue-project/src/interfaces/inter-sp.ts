@@ -100,7 +100,7 @@ export interface _CardGroup extends _TimeStamps {
     bg_image_id: number;
     deck: _Deck,
     topic: _Topic,
-    collection: _Collection,
+    collection?: _Collection,
     group_type: string;
     card_type: string;
     tags: Array<_Tag>;

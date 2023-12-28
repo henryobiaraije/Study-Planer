@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <div class="sp sp-sc-ud min-h-[60vh]">
+    <div class="sp sp-sc-ud min-h-[60vh] lg:p-4">
       <!-- Mobile Tabs -->
       <div v-if="inMobile" class="">
         <div class="flex justify-space-around gap-3">

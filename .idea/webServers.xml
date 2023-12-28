@@ -26,6 +26,13 @@
       <webServer id="67003acf-039a-4769-a959-47577e734f90" name="awesome" url="http://localhost">
         <fileTransfer mountedRoot="C:\laragon\www\awesome" accessType="MOUNT" port="0" />
       </webServer>
+      <webServer id="8f9ac90f-3d44-4f7f-8e70-4ab64b28998e" name="medabc.eu/Pyra" url="http://ftp.medabc.eu">
+        <fileTransfer host="ftp.medabc.eu" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

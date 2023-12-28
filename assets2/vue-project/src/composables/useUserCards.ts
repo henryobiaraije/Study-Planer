@@ -439,7 +439,6 @@ export default function (status = 'publish') {
             });
         })
     };
-
     const xhrLoadUserDebugForm = () => {
         const handleAjax: HandleAjax = new HandleAjax(ajaxLoadUserCard.value);
         return new Promise((resolve, reject) => {

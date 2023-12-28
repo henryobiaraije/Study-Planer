@@ -41,6 +41,17 @@
           </excludedPaths>
         </serverdata>
       </paths>
+      <paths name="medabc.eu/Pyra">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$/../../../wp-admin" web="/" />
+            <mapping deploy="/wp-content/plugins/study-planner-pro" local="$PROJECT_DIR$" web="/" />
+            <mapping local="$PROJECT_DIR$/adocs/working/working-28-feb-2022" web="/" />
+            <mapping local="$PROJECT_DIR$/../woocommerce" web="/" />
+            <mapping local="$PROJECT_DIR$/../../../wp-includes" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="staging.medabc.eu">
         <serverdata>
           <mappings>

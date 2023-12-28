@@ -761,6 +761,7 @@ class AjaxFrontHelper {
 			$study = $study->where( 'topic_id', '=', $topic_id );
 		}
 		$study = $study
+			->where( 'user_id', '=', $user_id )
 			->get()->first();
 
 		Manager::beginTransaction();
@@ -782,6 +783,15 @@ class AjaxFrontHelper {
 		$study->all_tags          = $all_tags;
 		$study->topic_id          = $topic_id;
 		$study->active            = $active;
+
+//		Common::send_error( [
+//			'ajax_front_create_study',
+//			'post'          => $post,
+//			'$study'        => $study,
+//			'$creating_new' => $creating_new,
+//			'$study_id'     => $study_id,
+//		] );
+
 
 		// Save or update.
 		if ( $creating_new ) {
@@ -942,6 +952,9 @@ class AjaxFrontHelper {
 		        ->whereIn( 'card_group_id', $card_group_ids )
 		        ->forceDelete();
 
+		$user_id = get_current_user_id();
+		// Also delete all the previous answers to all cards in this card group by the user.
+		Answered::delete_all_cards_a_user_has_studied( $user_id, $card_group_ids );
 
 		Common::send_success( 'Removed successfully' );
 	}

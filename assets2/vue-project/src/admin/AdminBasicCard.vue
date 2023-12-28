@@ -48,10 +48,20 @@
         </div>
       </div>
     </div>
-    <label class="sp-wp-checkbox border-1 bg-white my-2 p-2 rounded shadow flex gap-2 items-center">
+    <div class="sp-wp-checkbox border-1 bg-white my-2 p-2 rounded shadow flex gap-4 items-center">
       <span>Reverse</span>
-      <input v-model="basicCardGroup.reverse" type="checkbox" class="">
-    </label>
+      <!--      <input @change="changeReverse" v-model="basicCardGroup.reverse" :value="1" checked type="checkbox" class="">-->
+      <div class="flex gap-4 items-center">
+        <label>
+          <input v-model="basicCardGroup.reverse" :value="1" type="radio" name="reverse" class="">
+          <span>Yes</span>
+        </label>
+        <label>
+          <input v-model="basicCardGroup.reverse" :value="0" type="radio" name="reverse" class="">
+          <span>No</span>
+        </label>
+      </div>
+    </div>
     <div class="bg-white my-2 p-2 rounded shadow">
       <span>Deck </span>
       <vue-mulitiselect
@@ -89,7 +99,10 @@
       ></vue-mulitiselect>
     </div>
     <div class="bg-white my-2 p-2 rounded shadow">
-      <span> Collection </span>
+      <span>
+        Collection
+        <button v-if="undefined !== basicCardGroup.collection" @click="removeCollection">remove</button>
+      </span>
       <vue-mulitiselect
           v-model="basicCardGroup.collection"
           :options="collections.searchResults.value"
@@ -244,6 +257,9 @@ export default defineComponent({
   },
   methods: {
     spClientData,
+    removeCollection() {
+      this.basicCardGroup.collection = undefined;
+    },
     setQuestion(value) {
       if ('string' === typeof value) {
         this.basicCardGroup.whole_question = value;

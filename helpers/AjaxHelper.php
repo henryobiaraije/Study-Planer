@@ -1442,6 +1442,7 @@ class AjaxHelper {
 		$card_group->bg_image_id    = $bg_image_id;
 		$card_group->name           = $cg_name;
 		$card_group->deck_id        = $e_deck_id;
+		$card_group->reverse        = $reverse;
 		if ( $collection_id ) {
 			$card_group->collection_id = $collection_id;
 		}
@@ -1607,11 +1608,12 @@ class AjaxHelper {
 		$card->c_number      = 'c1';
 		$card->card_group_id = $card_group->id;
 		$card->save();
+		$new_hash = bin2hex( random_bytes( 30 ) );
 		if ( $reverse ) {
 			$card                = new Card();
 			$card->question      = $answer;
 			$card->answer        = $question;
-			$card->hash          = bin2hex( random_bytes( 30 ) );
+			$card->hash          = $new_hash;
 			$card->c_number      = 'c2';
 			$card->card_group_id = $card_group->id;
 			$card->save();

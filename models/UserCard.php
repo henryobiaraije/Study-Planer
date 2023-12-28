@@ -18,6 +18,7 @@ use Model\DeckGroup;
 use Model\Study;
 use Model\Topic;
 use Model\User;
+use StudyPlannerPro\Initializer;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Models\Tag;
 
@@ -66,6 +67,7 @@ class UserCard extends Model {
 				'user_card_group_ids_being_studied' => array()
 			);
 		}
+		Initializer::add_debug( $all_user_cards );
 
 //		$deck_group_uncategorized_id = get_uncategorized_deck_group_id();
 //		$deck_uncategorized_id  = get_uncategorized_deck_id();
@@ -171,7 +173,9 @@ class UserCard extends Model {
 			'new_card_ids'                      => $user_cards_not_studied['card_ids'],
 			'on_hold_card_ids'                  => $user_cards_answered['on_hold_and_due_ids'],
 			'revision_card_ids'                 => $user_cards_answered['revision_and_due_ids'],
-			'user_card_group_ids_being_studied' => $all_user_cards['card_group_ids']
+			'user_card_group_ids_being_studied' => $all_user_cards['card_group_ids'],
+			'debug'                             => Initializer::$debug,
+			'study_ids'                         => $user_studies['study_ids'],
 		);
 	}
 

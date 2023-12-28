@@ -79,4 +79,10 @@ class Answered extends Model {
 		}
 	}
 
+    public static function delete_all_cards_a_user_has_studied(int $user_id, array $card_group_ids){
+        $cards = Card::whereIn('card_group_id', $card_group_ids)->get();
+        $card_ids = $cards->pluck('id')->toArray();
+
+	    return Answered::whereIn('card_id', $card_ids)->forceDelete();
+    }
 }

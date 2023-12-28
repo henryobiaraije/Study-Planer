@@ -1,0 +1,4 @@
+ChangeLog
+
+Version 3.1.5 (2023-12-21)
+- Feature: Added feature to generate 2 cards for basic cards when the reverse option is turned on.
