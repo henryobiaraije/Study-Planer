@@ -77,6 +77,7 @@ export class Store {
     }
 
     public static jQuery() {
+        return false;
         //console.log("jQuery", {a});
         return this._nn;
     }

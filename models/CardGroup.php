@@ -484,8 +484,8 @@ class CardGroup extends Model {
 				)
 			';
 		} elseif ( $args['for_new_cards'] ) {
-			$user_study             = sp_get_user_study( $args['user_id'] );
-			$user_study_id          = $user_study->id;
+			$user_study    = sp_get_user_study( $args['user_id'] );
+			$user_study_id = $user_study->id;
 //			$last_answered_card_ids = UserCard::get_all_last_answered_user_cards(
 //				$args['user_id'],
 //				$user_study_id );
@@ -841,6 +841,10 @@ class CardGroup extends Model {
 
 		$args = wp_parse_args( $args, $default );
 
+//		Common::send_error( 'test', array(
+//			'args' => $args
+//		) );
+
 		// if from front end, then either deck_group_id or deck_id or topic_id must be provided.
 		if (
 			true === $args['from_front_end']
@@ -1071,6 +1075,7 @@ class CardGroup extends Model {
 			$query->whereNotIn( 'cg.topic_id', $args['topic_ids_to_exclude'] );
 		}
 
+
 		// Group by cd.id
 		$query = $query
 			->groupBy( [ 'cg.id' ] );
@@ -1087,6 +1092,13 @@ class CardGroup extends Model {
 
 		$all            = $query->get()->all();
 		$card_group_ids = array_column( $all, 'id' );
+
+//		Common::send_error( 'test', array(
+//			'args'                => $args,
+//			'offset'              => $offset,
+//			'card_group_ids'      => $card_group_ids,
+//			'cards_in_collection' => $card_groups_in_collection,
+//		) );
 
 		return self
 			::query()
@@ -1123,6 +1135,7 @@ class CardGroup extends Model {
 			::query()
 			// collection must not be null
 			->whereNotNull( 'collection_id' )
+			->where( 'collection_id', '!=', 0 )
 			->get();
 
 

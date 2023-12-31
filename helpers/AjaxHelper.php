@@ -212,7 +212,7 @@ class AjaxHelper {
 			)
 		);
 
-		Common::send_success( 'Cards  found.', $items );
+		Common::send_success( 'Cards  found 2.', $items );
 	}
 
 	//    </editor-fold desc="All Cards">
