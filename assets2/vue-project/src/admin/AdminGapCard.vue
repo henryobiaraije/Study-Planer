@@ -17,9 +17,10 @@
             <!--							<input-editor-->
             <!--									:value="gapCardGroup.whole_question"-->
             <!--									v-model="gapCardGroup.whole_question" ></input-editor >-->
-            <input-editor-b
-                :value="gapCardGroup.whole_question"
-                v-model="gapCardGroup.whole_question"></input-editor-b>
+<!--            <input-editor-b-->
+<!--                :value="gapCardGroup.whole_question"-->
+<!--                v-model="gapCardGroup.whole_question"></input-editor-b>-->
+            <input-editor v-model="gapCardGroup.whole_question" :value="gapCardGroup.whole_question"></input-editor>
           </div>
         </div>
       </div>

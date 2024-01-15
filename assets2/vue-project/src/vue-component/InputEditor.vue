@@ -1,8 +1,12 @@
 <template>
   <div style="background-color: #fff;padding: 2px;min-width: 20px;">
-<!--    <div :id="divId" style="min-height: 30px" v-html="value"></div>-->
+    <!--    <div :id="divId" style="min-height: 30px" v-html="value"></div>-->
     <!--    <div :id="divId" style="min-height: 30px" v-html="value">{{ value }}</div>-->
-    <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" :data="value"></ckeditor>
+    <!--    <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" :data="value"></ckeditor>-->
+    <!--    <QuillEditor theme="snow" :toolbar="quilToolbar" ref="myQuillEditor"-->
+    <!--                 @editorChange="updateContent"-->
+    <!--    ></QuillEditor>-->
+    <div ref="myQuillEditor"/>
   </div>
 </template>
 
@@ -14,13 +18,19 @@ import useBasicCard from "@/composables/useBasicCard";
 import {spClientData} from "@/functions";
 // import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import InlineEditor from '@ckeditor/ckeditor5-build-inline';
+import {Delta, Quill, QuillEditor} from "@vueup/vue-quill";
+
+// import { Essentials } from '@ckeditor/ckeditor5-essentials';
+// import { Bold, Italic } from '@ckeditor/ckeditor5-basic-styles';
+// import { Link } from '@ckeditor/ckeditor5-link';
+// import { Paragraph } from '@ckeditor/ckeditor5-paragraph';
 
 declare var tinymce;
 declare var wp;
 export default defineComponent({
   name: 'InputEditor',
   emits: ['update:modelValue'],
-  components: {},
+  components: {QuillEditor},
   props: {
     media: {
       type: Boolean,
@@ -42,14 +52,41 @@ export default defineComponent({
       // pageTitle: 'All Cards',
       // activeUrl: 'admin.php?page=study-planner-pro-deck-cards',
       // trashUrl: 'admin.php?page=study-planner-pro-deck-cards&status=trash',
+      showToolbar:false,
       showMain: false,
       divId: '',
       newContent: '',
       editor: InlineEditor,
       editorData: '',
-      editorConfig: {
-        // The configuration of the editor.
-      }
+      editorConfig: {},
+      quilToolbar: [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block'],
+
+        [{'header': 1}, {'header': 2}],               // custom button values
+        [{'list': 'ordered'}, {'list': 'bullet'}],
+        [{'script': 'sub'}, {'script': 'super'}],      // superscript/subscript
+        [{'indent': '-1'}, {'indent': '+1'}],          // outdent/indent
+        [{'direction': 'rtl'}],                         // text direction
+
+        [{'size': ['small', false, 'large', 'huge']}],  // custom dropdown
+        [{'header': [1, 2, 3, 4, 5, 6, false]}],
+
+        [{'color': []}, {'background': [
+            '#000000', '#e60000', '#ff9900', '#ffff00', '#008a00', '#0066cc', '#9933ff', '#ffffff',
+            '#facccc', '#ffebcc', '#ffffcc', '#cce8cc', '#cce0f5', '#ebd6ff', '#bbbbbb', '#f06666',
+            '#ffc266', '#ffff66', '#66b966', '#66a3e0', '#c285ff', '#888888', '#a10000', '#b26b00',
+            '#b2b200', '#006100', '#0047b2', '#6b24b2', '#444444', '#5c0000', '#663d00', '#666600',
+            '#003700', '#002966', '#3d1466', 'custom-color'
+          ]}],          // dropdown with defaults from theme
+        [{'font': []}],
+        [{'align': []}],
+
+        ['clean'],                                         // remove formatting button
+
+        ['link', 'image', 'video']                         // link and image, video
+      ],
+      quilEditor: null as Quill | null,
     }
   },
   setup: (props, ctx) => {
@@ -79,10 +116,50 @@ export default defineComponent({
   //     },  4000);
   //   },  1000);
   // },
-  created(){
+  created() {
     this.editorData = this.value;
+    // Set quil content on create.
+    // this.$refs.myQuillEditor.quill.setContents(this.value);
+
+  },
+  mounted() {
+    this.quilEditor = new Quill(this.$refs.myQuillEditor, {
+      modules: {
+        toolbar: this.quilToolbar
+      },
+      //theme: 'bubble',
+      theme: 'snow',
+      formats: ['bold', 'underline', 'header', 'italic', 'strike', 'blockquote', 'code-block', 'list', 'bullet', 'script', 'indent', 'direction', 'size', 'color', 'background', 'font', 'align', 'clean', 'link', 'image', 'video'],
+      placeholder: "Type something in here!"
+    });
+
+    if (null !== this.quilEditor) {
+      this.quilEditor.root.innerHTML = this.value;
+
+      this.quilEditor.on('text-change', () => this.updateQuil());
+
+      // Show toolbar on focus.
+      // this.quilEditor.on('focus', () => {
+      //   this.showToolbar = true;});
+    }
   },
   methods: {
+    updateContent(name: 'text-change', delta: Delta, oldContents: Delta, source) {
+      // this.editorData = content;
+      console.log({name, delta, oldContents, source});
+      this.$emit('update:modelValue', this.editorData);
+    },
+    updateQuil() {
+      // this.$emit('input', this.editor.getText() ? this.editor.root.innerHTML : '');
+      const content = this.quilEditor.getText() ? this.quilEditor.root.innerHTML : '';
+      // get html content.
+      // const content = this.quilEditor.root.innerHTML;
+      console.log({content});
+      this.$emit('update:modelValue', content);
+    },
+    initQuilEditor() {
+
+    },
     initEditor() {
       const dis = this;
       wp.editor.initialize(dis.divId, {
