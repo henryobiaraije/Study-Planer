@@ -69,8 +69,6 @@ class UserCard extends Model {
 		}
 		Initializer::add_debug( $all_user_cards );
 
-//		$deck_group_uncategorized_id = get_uncategorized_deck_group_id();
-//		$deck_uncategorized_id  = get_uncategorized_deck_id();
 		$topic_uncategorized_id = get_uncategorized_topic_id();
 
 		// Remove all card groups in any collection.
@@ -436,9 +434,14 @@ class UserCard extends Model {
 		foreach ( $user_cards as $user_card ) {
 			$card_group               = $user_card->card_group;
 			$cards[ $card_group->id ] = $card_group->cards;
-			foreach ( $card_group->cards as $card ) {
-				$card_ids[] = $card->id;
+			if ( is_array( $card_group->cards ) ) {
+				foreach ( $card_group->cards as $card ) {
+					$card_ids[] = $card->id;
+				}
 			}
+//			foreach ( $card_group->cards as $card ) {
+//				$card_ids[] = $card->id;
+//			}
 			$card_group_ids[] = $card_group->id;
 		}
 

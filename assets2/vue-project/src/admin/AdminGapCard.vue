@@ -17,30 +17,32 @@
             <!--							<input-editor-->
             <!--									:value="gapCardGroup.whole_question"-->
             <!--									v-model="gapCardGroup.whole_question" ></input-editor >-->
-<!--            <input-editor-b-->
-<!--                :value="gapCardGroup.whole_question"-->
-<!--                v-model="gapCardGroup.whole_question"></input-editor-b>-->
+            <!--            <input-editor-b-->
+            <!--                :value="gapCardGroup.whole_question"-->
+            <!--                v-model="gapCardGroup.whole_question"></input-editor-b>-->
             <input-editor v-model="gapCardGroup.whole_question" :value="gapCardGroup.whole_question"></input-editor>
           </div>
         </div>
       </div>
-      <div class="card-preview rounded-3 p-2 bg-sp-300 border-1 border-sp-200">
-        <h3 class="font-bold fs-5  my-2">Cards formed ({{ gapCard.items.value.length }})
-          <i class="fa fa-recycle fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer"></i></h3>
-        <ul>
-          <li v-for="(item,itemIndex) in gapCard.items.value"
-              :data-hash="item.hash"
-              class="bg-white p-2 rounded-3">
-            <ul>
-              <li><b>Question:</b>
+      <div class="card-preview mp-ql-editor-content-wrapper  rounded-3 p-2 bg-sp-300 border-1 border-sp-200">
+        <div class="ql-editor px-4">
+          <h3 class="font-bold fs-5  my-2">Cards formed ({{ gapCard.items.value.length }})
+            <i class="fa fa-recycle fs-6 bg-white p-1 rounded-full hover:rotate-180 cursor-pointer"></i></h3>
+          <div>
+            <div v-for="(item,itemIndex) in gapCard.items.value"
+                 :data-hash="item.hash"
+                 class="bg-white px-6 py-2 rounded-3 my-2">
+              <div class="pl-6 py-2 border border-solid border-gray-100 flex flex-col gap-2">
+                <b>Question:</b>
                 <div v-html="item.question"></div>
-              </li>
-              <li><b>Answer:</b>
+              </div>
+              <div class="pl-6 py-2 border border-solid border-gray-100 flex flex-col gap-2">
+                <b>Answer:</b>
                 <div v-html="item.answer"></div>
-              </li>
-            </ul>
-          </li>
-        </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="sm:flex-1 md:flex-initial bg-sp-300 shadow rounded sm:p-2 md:p-4" style="max-width: 300px">

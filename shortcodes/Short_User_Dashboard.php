@@ -8,6 +8,7 @@ use Model\Study;
 use StudyPlannerPro\Initializer;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Services\FileService;
+
 use function StudyPlannerPro\get_template_path;
 use function StudyPlannerPro\sp_get_user_study;
 
@@ -48,7 +49,6 @@ class Short_User_Dashboard {
 	}
 
 	public function init(): void {
-
 	}
 
 	final public function load_view( $attr ): string {
@@ -76,6 +76,7 @@ class Short_User_Dashboard {
 			}
 			</style>
 		';
+		$html .= '<div class="admin-1"></div';
 		$html .= "
 			<script>
 				<link
@@ -89,11 +90,9 @@ class Short_User_Dashboard {
 	}
 
 	public function get_page_data() {
-
 	}
 
 	public function localize_data(): void {
-
 	}
 
 	final public function register_scripts(): void {
@@ -108,6 +107,13 @@ class Short_User_Dashboard {
 		$css_heatmap = '//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.css';
 		$js          = FileService::mp_get_js_url( 'main-admin' );
 		$css         = FileService::mp_get_css_url( 'main-admin' );
+
+		$js_dir      = Initializer::$plugin_url . '/assets2/vue-second/js';
+		$js_admin_1  = $js_dir . '/admin/admin-1.js';
+		$css_admin_1 = $js_dir . '/admin/admin-1.css';
+
+		wp_register_style( 'admin-1122', $css_admin_1, [], Initializer::$script_version );
+		wp_register_script( 'admin-1122', $js_admin_1, [ 'jquery' ], Initializer::$script_version, true );
 
 		wp_register_style( 'sp-sc-user-dashboard', $css, [], Initializer::$script_version );
 		wp_register_script( 'sp-sc-user-dashboard', $js, [ 'jquery' ], Initializer::$script_version, true );
@@ -125,6 +131,8 @@ class Short_User_Dashboard {
 			wp_enqueue_script( 'sp-d3-js' );
 			wp_enqueue_script( 'sp-js-heatmap' );
 			wp_enqueue_style( 'sp-css-heatmap' );
+			wp_enqueue_style( 'admin-1122');
+			wp_enqueue_script( 'admin-1122');
 
 			$dis->localize_data();
 		} );

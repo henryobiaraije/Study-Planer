@@ -31,33 +31,40 @@
             <div v-if="'basic' === currentQuestion?.card_group.card_type"
                  class="sp-basic-question w-full text-center"
                  style="font-family: 'Montserrat', sans-serif;">
-<!--              <div-->
-<!--                  v-html="(currentQuestion.card_group.reverse || showOnlyAnswers) ? currentQuestion.answer : currentQuestion.question "-->
-<!--                  class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center mb-2"></div>-->
-<!--              <div v-show="showCurrentAnswer" style="font-family: 'Montserrat', sans-serif;"-->
-<!--                   v-html="(currentQuestion.card_group.reverse) ? currentQuestion.question : currentQuestion.answer"-->
-<!--                   class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>-->
-<!--              Modified: Display basic card normally as reverse cards will now generate 2 cards and ask them separately-->
+              <!--              <div-->
+              <!--                  v-html="(currentQuestion.card_group.reverse || showOnlyAnswers) ? currentQuestion.answer : currentQuestion.question "-->
+              <!--                  class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center mb-2"></div>-->
+              <!--              <div v-show="showCurrentAnswer" style="font-family: 'Montserrat', sans-serif;"-->
+              <!--                   v-html="(currentQuestion.card_group.reverse) ? currentQuestion.question : currentQuestion.answer"-->
+              <!--                   class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>-->
+              <!--              Modified: Display basic card normally as reverse cards will now generate 2 cards and ask them separately-->
 
               <div
                   v-html="currentQuestion.question "
-                  class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center mb-2"></div>
+                  class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2  mb-2 "></div>
               <div v-show="showCurrentAnswer" style="font-family: 'Montserrat', sans-serif;"
                    v-html="currentQuestion.answer"
-                   class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>            </div>
+                   class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 !text-left "></div>
+            </div>
             <!-- </editor-fold desc="Basic Card"> -->
 
             <!-- <editor-fold desc="Gap Card"> -->
-            <div v-else-if="'gap' === currentQuestion.card_group.card_type"
-                 class="sp-gap-question w-full text-center ">
-              <div v-show="!showCurrentAnswer && !showOnlyAnswers"
-                   @click="_showAnswer()" v-html="currentQuestion.question"
-                   style="font-family: 'Montserrat', sans-serif;"
-                   class=" p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto "></div>
-              <!-- <hr style="border-top-width: 1px;border-color: #b2b2b2;margin: 10px;"/> -->
-              <div v-show="showCurrentAnswer || showOnlyAnswers" v-html="currentQuestion.answer"
-                   style="font-family: 'Montserrat', sans-serif;"
-                   class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>
+            <div
+                v-else-if="'gap' === currentQuestion.card_group.card_type"
+                class="mp-ql-editor-content-wrapper">
+              <div class="ql-editor">
+                <div
+                     class="sp-gap-question w-full !text-left ">
+                  <div v-show="!showCurrentAnswer && !showOnlyAnswers"
+                       @click="_showAnswer()" v-html="currentQuestion.question"
+                       style="font-family: 'Montserrat', sans-serif;"
+                       class=" p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto "></div>
+                  <!-- <hr style="border-top-width: 1px;border-color: #b2b2b2;margin: 10px;"/> -->
+                  <div v-show="showCurrentAnswer || showOnlyAnswers" v-html="currentQuestion.answer"
+                       style="font-family: 'Montserrat', sans-serif;"
+                       class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 !text-left "></div>
+                </div>
+              </div>
             </div>
             <!-- </editor-fold desc="Gap Card"> -->
 

@@ -1059,6 +1059,7 @@ class CardGroup extends Model {
 			$query->whereIn( 'cg.card_type', $args['card_types'] );
 		}
 
+
 		// Search.
 		if ( $args['search'] ) {
 			$query->where( 'cg.name', 'like', '%' . $args['search'] . '%' );
@@ -1090,8 +1091,15 @@ class CardGroup extends Model {
 				->limit( $args['per_page'] );
 		}
 
+//		wp_send_json_error( array(
+//			'args'  => $args,
+//			'query' => $query->toSql(),
+//			"all"   => $query->get()->all()
+//		) );
+
 		$all            = $query->get()->all();
 		$card_group_ids = array_column( $all, 'id' );
+
 
 //		Common::send_error( 'test', array(
 //			'args'                => $args,

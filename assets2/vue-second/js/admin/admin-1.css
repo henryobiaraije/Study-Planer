@@ -1,0 +1,21 @@
+/*!******************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/css/css-test.css ***!
+  \******************************************************************************************************************/
+.testing-class{
+    color:blue;
+}
+/*!**********************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/scss/admin-2.scss ***!
+  \**********************************************************************************************************************************************************/
+.test-here h1 {
+  color: green;
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/scss/counter.scss?vue&type=style&index=0&lang=css&external ***!
+  \*****************************************************************************************************************************************************************************************************************************************************/
+.counter-test p {
+  color: blue;
+  font-weight: bold;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYWRtaW4vYWRtaW4tMS5jc3MiLCJtYXBwaW5ncyI6Ijs7O0FBQUE7SUFDSSxVQUFVO0FBQ2QsQzs7OztBQ0RFO0VBQ0U7QUFBSixDOzs7O0FDREU7RUFDRTtFQUNBO0FBQUosQyIsInNvdXJjZXMiOlsid2VicGFjazovL3Z1ZS1zZWNvbmQvLi9zcmMvY3NzL2Nzcy10ZXN0LmNzcyIsIndlYnBhY2s6Ly92dWUtc2Vjb25kLy4vc3JjL3Njc3MvYWRtaW4tMi5zY3NzIiwid2VicGFjazovL3Z1ZS1zZWNvbmQvLi9zcmMvc2Nzcy9jb3VudGVyLnNjc3MiXSwic291cmNlc0NvbnRlbnQiOlsiLnRlc3RpbmctY2xhc3N7XHJcbiAgICBjb2xvcjpibHVlO1xyXG59IiwiLnRlc3QtaGVyZXtcclxuICBoMXtcclxuICAgIGNvbG9yOiBncmVlbjtcclxuICB9XHJcbn0iLCIuY291bnRlci10ZXN0IHAge1xuICBjb2xvcjogYmx1ZTtcbiAgZm9udC13ZWlnaHQ6IGJvbGQ7XG59Il0sIm5hbWVzIjpbXSwic291cmNlUm9vdCI6IiJ9*/

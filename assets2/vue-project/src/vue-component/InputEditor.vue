@@ -1,5 +1,5 @@
 <template>
-  <div style="background-color: #fff;padding: 2px;min-width: 20px;">
+  <div style="background-color: #fff;padding: 2px;min-width: 20px; " class="">
     <!--    <div :id="divId" style="min-height: 30px" v-html="value"></div>-->
     <!--    <div :id="divId" style="min-height: 30px" v-html="value">{{ value }}</div>-->
     <!--    <ckeditor :editor="editor" v-model="editorData" :config="editorConfig" :data="value"></ckeditor>-->
@@ -241,5 +241,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+
 
 </style>
