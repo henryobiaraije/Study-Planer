@@ -48,6 +48,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php81" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/polyfill-php73" />
+      <excludeFolder url="file://$MODULE_DIR$/assets2/vue-project" />
     </content>
     <content url="file://$MODULE_DIR$/adocs/working/working-28-feb-2022" />
     <content url="file://$MODULE_DIR$/../woocommerce" />

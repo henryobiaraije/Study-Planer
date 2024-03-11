@@ -44,7 +44,9 @@ class FileService {
 							$matching_files[] = [ $file_path, $relative_file_path ];
 						} elseif ( is_dir( $file_path ) ) {
 							// If it's a directory, recursively call the function with updated relative path.
-							$subfolder_matching_files = $this->get_files_recursive( $file_path, $extension, $relative_file_path );
+							$subfolder_matching_files = $this->get_files_recursive( $file_path,
+								$extension,
+								$relative_file_path );
 							foreach ( $subfolder_matching_files as $subfile ) {
 								$matching_files[] = $subfile;
 							}
@@ -72,7 +74,9 @@ class FileService {
 		$js_url    = '';
 		foreach ( $all_files as $file ) {
 			if ( str_contains( $file[1], $file_name ) ) {
-				$js_url = Initializer::$js_url . '/' . str_replace( '\\', '/', $file[1] ); // e.g. 'js/admin/admin-topics.js
+				$js_url = Initializer::$js_url . '/' . str_replace( '\\',
+						'/',
+						$file[1] ); // e.g. 'js/admin/admin-topics.js
 				break;
 			}
 		}
@@ -89,5 +93,16 @@ class FileService {
 		return ( new self() )->mp_get_file_url( $file_name, 'css' );
 	}
 
+	public static function mp_get_js_url_second( string $file_name ): string {
+		$js_dir = Initializer::$plugin_url . '/assets2/vue-second/js';
+
+		return $js_dir . $file_name . '.js';
+	}
+
+	public static function mp_get_css_url_second( string $file_name ): string {
+		$css_dir = Initializer::$plugin_url . '/assets2/vue-second/js';
+
+		return $css_dir . $file_name . '.css';
+	}
 
 }

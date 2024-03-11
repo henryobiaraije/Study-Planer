@@ -99,8 +99,12 @@ class AdminTopics {
 		// $js = FileService::mp_get_js_url('admin-topics');
 		// $css = FileService::mp_get_css_url('admin-topics');
 		// $js = "http://localhost:5173/src/admin/admin-topics.ts";
-		$js  = FileService::mp_get_js_url( 'main-admin' );
-		$css = FileService::mp_get_css_url( 'main-admin' );
+
+//		$js  = FileService::mp_get_js_url( 'main-admin' );
+//		$css = FileService::mp_get_css_url( 'main-admin' );
+
+		$js  = FileService::mp_get_js_url_second( '/admin/admin-topics' );
+		$css = FileService::mp_get_css_url_second( '/admin/admin-topics' );
 
 		wp_enqueue_editor();
 		wp_register_style( 'sp-admin-topics', $css, array(), Initializer::$script_version );
@@ -118,6 +122,5 @@ class AdminTopics {
 			}
 		);
 	}
-
 
 }

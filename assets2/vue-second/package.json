@@ -13,6 +13,7 @@
   "devDependencies": {
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
+    "autoprefixer": "^10.4.18",
     "babel-loader": "^9.1.3",
     "css-loader": "^6.10.0",
     "css-minimizer-webpack-plugin": "^6.0.0",
@@ -23,6 +24,7 @@
     "sass": "^1.71.1",
     "sass-loader": "^14.1.1",
     "tailwind": "^4.0.0",
+    "tailwindcss": "^3.4.1",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.2",
     "vue": "^3.4.21",
@@ -33,5 +35,26 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.2",
     "webpack-merge": "^5.10.0"
+  },
+  "dependencies": {
+    "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
+    "@types/chart.js": "^2.9.41",
+    "@types/js-cookie": "^3.0.6",
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.2",
+    "crypto-js": "^4.2.0",
+    "js-cookie": "^3.0.5",
+    "postcss-import": "^16.0.1",
+    "postcss-nested": "^6.0.1",
+    "postcss-nesting": "^12.1.0",
+    "timeago.js": "^4.0.2",
+    "underscore": "^1.13.6",
+    "vue-good-table-next": "^0.2.1",
+    "vue-multiselect": "^3.0.0-alpha.2",
+    "vue3-calendar-heatmap": "^2.0.5",
+    "vue3-toastify": "^0.2.1",
+    "vuetify": "^3.5.8",
+    "vuetify-datetime-picker": "^2.1.1",
+    "vuex": "^4.1.0"
   }
 }

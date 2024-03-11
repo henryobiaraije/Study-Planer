@@ -16,8 +16,14 @@
     //    "sourceMap": true,
     //    "strict": true,
     "strict": false,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
     // neccessary to use vue class component
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   }
-}
+ }
 

@@ -8,6 +8,7 @@ const devMode = process.env.NODE_ENV !== "production";
 module.exports = {
     entry: {
         'admin/admin-1': './src/admin-1.ts',
+        'admin/admin-topics': './src/admin/admin-topics.ts',
         // 'admin/admin-deck-groups': './src/admin/admin-deck-groups.ts',
         // 'admin/admin-tags': './src/admin/admin-tags.ts',
         // 'admin/admin-decks': './src/admin/admin-decks.ts',
@@ -109,6 +110,7 @@ module.exports = {
     resolve: {
         alias: {
             // vue: 'vue/dist/vue.js' // to prevent (you are running the run time version of vue)
+            "@": path.resolve(__dirname, 'src'),
         },
         extensions: ['.tsx', '.ts', '.js', '.vue'],
         // modules: ['node_modules', path.resolve(__dirname, 'core')]
