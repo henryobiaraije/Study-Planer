@@ -90,8 +90,11 @@ class AdminDeckGroups {
 		// $css = FileService::mp_get_css_url( 'admin-deck-groups' );
 		// $css = Initializer::$js_url . '/admin/admin-deck-groups.css';
 		// $js  = Initializer::$js_url . '/admin/admin-deck-groups.js';
-		$js  = FileService::mp_get_js_url( 'main-admin' );
-		$css = FileService::mp_get_css_url( 'main-admin' );
+//		$js  = FileService::mp_get_js_url( 'main-admin' );
+//		$css = FileService::mp_get_css_url( 'main-admin' );
+
+		$js  = FileService::mp_get_js_url_second( '/admin/admin-deck-groups' );
+		$css = FileService::mp_get_css_url_second( '/admin/admin-deck-groups' );
 
 		wp_register_style( 'sp-admin-deck-groups', $css, array(), Initializer::$script_version );
 		wp_register_script( 'sp-admin-deck-groups', $js, array( 'jquery' ), Initializer::$script_version, true );

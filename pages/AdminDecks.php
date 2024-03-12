@@ -92,8 +92,11 @@ class AdminDeck {
 		// $css = Initializer::$css_url . '/admin/admin-deck-groups.css';
 		// $css = Initializer::$js_url . '/admin/admin-decks.css';
 		// $js  = Initializer::$js_url . '/admin/admin-decks.js';
-		$js  = FileService::mp_get_js_url( 'main-admin' );
-		$css = FileService::mp_get_css_url( 'main-admin' );
+//		$js  = FileService::mp_get_js_url( 'main-admin' );
+//		$css = FileService::mp_get_css_url( 'main-admin' );
+
+		$js  = FileService::mp_get_js_url_second( '/admin/admin-decks' );
+		$css = FileService::mp_get_css_url_second( '/admin/admin-decks' );
 
 		wp_register_style( 'sp-admin-decks', $css, array(), Initializer::$script_version );
 		wp_register_script( 'sp-admin-decks', $js, array( 'jquery' ), Initializer::$script_version, true );

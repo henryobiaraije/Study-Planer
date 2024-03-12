@@ -9,9 +9,9 @@ module.exports = {
     entry: {
         'admin/admin-1': './src/admin-1.ts',
         'admin/admin-topics': './src/admin/admin-topics.ts',
-        // 'admin/admin-deck-groups': './src/admin/admin-deck-groups.ts',
+        'admin/admin-deck-groups': './src/admin/admin-deck-groups.ts',
         // 'admin/admin-tags': './src/admin/admin-tags.ts',
-        // 'admin/admin-decks': './src/admin/admin-decks.ts',
+        'admin/admin-decks': './src/admin/admin-decks.ts',
         // 'admin/admin-basic-card': './src/admin/admin-basic-card.ts',
         // 'admin/admin-gap-card': './src/admin/admin-gap-card.ts',
         // 'admin/admin-table-card': './src/admin/admin-table-card.ts',
