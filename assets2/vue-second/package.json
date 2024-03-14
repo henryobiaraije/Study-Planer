@@ -40,6 +40,7 @@
     "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
     "@types/chart.js": "^2.9.41",
     "@types/js-cookie": "^3.0.6",
+    "@vueup/vue-quill": "^1.2.0",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.2",
     "crypto-js": "^4.2.0",

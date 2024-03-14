@@ -12,7 +12,7 @@ module.exports = {
         'admin/admin-deck-groups': './src/admin/admin-deck-groups.ts',
         'admin/admin-tags': './src/admin/admin-tags.ts',
         'admin/admin-decks': './src/admin/admin-decks.ts',
-        // 'admin/admin-basic-card': './src/admin/admin-basic-card.ts',
+        'admin/admin-basic-card': './src/admin/admin-basic-cards.ts',
         // 'admin/admin-gap-card': './src/admin/admin-gap-card.ts',
         // 'admin/admin-table-card': './src/admin/admin-table-card.ts',
         // 'admin/admin-image-card': './src/admin/admin-image-card.ts',

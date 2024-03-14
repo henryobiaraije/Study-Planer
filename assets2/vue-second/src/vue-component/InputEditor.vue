@@ -17,7 +17,7 @@ import useTagSearch from "@/composables/useTagSearch";
 import useBasicCard from "@/composables/useBasicCard";
 import {spClientData} from "@/functions";
 // import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import InlineEditor from '@ckeditor/ckeditor5-build-inline';
+// import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 import {Delta, Quill, QuillEditor} from "@vueup/vue-quill";
 
 // import { Essentials } from '@ckeditor/ckeditor5-essentials';
@@ -56,7 +56,7 @@ export default defineComponent({
       showMain: false,
       divId: '',
       newContent: '',
-      editor: InlineEditor,
+      // editor: InlineEditor,
       editorData: '',
       editorConfig: {},
       quilToolbar: [
