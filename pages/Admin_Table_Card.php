@@ -94,8 +94,8 @@ class Admin_Table_Card {
 		$dis = $this;
 		// $css = Initializer::$js_url . '/admin/admin-table-card.css';
 		// $js  = Initializer::$js_url . '/admin/admin-table-card.js';
-		$js  = FileService::mp_get_js_url( 'main-admin' );
-		$css = FileService::mp_get_css_url( 'main-admin' );
+//		$js  = FileService::mp_get_js_url( 'main-admin' );
+//		$css = FileService::mp_get_css_url( 'main-admin' );
 
 		$js  = FileService::mp_get_js_url_second( '/admin/admin-table-card' );
 		$css = FileService::mp_get_css_url_second( '/admin/admin-table-card' );

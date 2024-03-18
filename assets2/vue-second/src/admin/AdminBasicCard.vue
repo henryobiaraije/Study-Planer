@@ -246,11 +246,15 @@ export default defineComponent({
   created() {
     // jQuery('.all-loading').hide();
     this.basicCard.load().then(() => {
+      // @ts-ignore
       jQuery('.all-loading').hide();
+      // @ts-ignore
       jQuery('.all-loaded').show();
       this.showMain = true;
     }).catch(() => {
+      // @ts-ignore
       jQuery('.all-loading').hide();
+      // @ts-ignore
       jQuery('.all-error').show();
     });
     this.triggerLoadMultiSelects();

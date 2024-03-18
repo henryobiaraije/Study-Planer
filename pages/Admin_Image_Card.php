@@ -71,14 +71,12 @@ class Admin_Image_Card {
 				remove_all_actions( 'admin_notices' );
 			}
 		);
-
 	}
 
 	/**
 	 * Add admin menus
 	 */
 	public function add_admin_menu(): void {
-
 		add_submenu_page(
 			'study-planner-pro',
 			'Image Card',
@@ -103,7 +101,6 @@ class Admin_Image_Card {
 	}
 
 	public function get_page_data(): array {
-
 		return array();
 	}
 
@@ -117,8 +114,11 @@ class Admin_Image_Card {
 		// $js  = Initializer::$js_url . '/admin/admin-image-card.js';
 		// $js_rotatable = Initializer::$js_url . '/admin/rotatable.js';
 		$js_rotatable = Initializer::$plugin_url . '/assets/src/libs/rotatable.js';
-		$js           = FileService::mp_get_js_url( 'main-admin' );
-		$css          = FileService::mp_get_css_url( 'main-admin' );
+//		$js           = FileService::mp_get_js_url( 'main-admin' );
+//		$css          = FileService::mp_get_css_url( 'main-admin' );
+
+		$js = FileService::mp_get_js_url_second( '/admin/admin-image-card' );
+		$css = FileService::mp_get_css_url_second( '/admin/admin-image-card' );
 
 		wp_register_style( 'sp-admin-image-card', $css, array(), Initializer::$script_version );
 		wp_register_script( 'sp-admin-image-card', $js, array( 'jquery' ), Initializer::$script_version, true );
@@ -127,7 +127,7 @@ class Admin_Image_Card {
 		// enqueue the scripts
 		add_action(
 			'sp_enqueue_default_admin_image_card',
-			function () use ( $dis ) {
+			static function () use ( $dis ) {
 				do_action( 'sp_enqueue_default_admin_scripts' );
 				wp_enqueue_style( 'sp-admin-image-card' );
 				wp_enqueue_script( 'sp-admin-image-card' );
@@ -137,11 +137,13 @@ class Admin_Image_Card {
 		);
 
 		wp_enqueue_style( 'sp-jquery-style', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css', array(), 1.0 );
-		wp_enqueue_script( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/jquery-ui.js', array( 'jquery' ), 1.0, true );
+		wp_enqueue_script( 'jquery-ui',
+			'https://code.jquery.com/ui/1.12.1/jquery-ui.js',
+			array( 'jquery' ),
+			1.0,
+			true );
 		wp_enqueue_script( 'jquery-rotatable', $js_rotatable, array( 'jquery' ), 1.0, true );
-
 		// wp_enqueue_script( 'jquery-ui-core' );
 	}
-
 
 }

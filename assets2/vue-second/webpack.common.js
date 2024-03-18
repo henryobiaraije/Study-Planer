@@ -15,7 +15,7 @@ module.exports = {
         'admin/admin-basic-card': './src/admin/admin-basic-cards.ts',
         'admin/admin-gap-card': './src/admin/admin-gap-card.ts',
         'admin/admin-table-card': './src/admin/admin-table-card.ts',
-        // 'admin/admin-image-card': './src/admin/admin-image-card.ts',
+        'admin/admin-image-card': './src/admin/admin-image-card.ts',
         // 'admin/admin-settings': './src/admin/admin-settings.ts',
         // 'admin/admin-all-cards': './src/admin/admin-all-cards.ts',
         // 'public/sc-user-dashboard': './src/shortcodes/sc-user-dashboard.ts',

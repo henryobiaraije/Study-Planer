@@ -290,14 +290,18 @@ export default defineComponent({
   },
   created() {
     this.useImageCard._load().then(() => {
+      // @ts-ignore
       jQuery('.all-loading').hide();
+      // @ts-ignore
       jQuery('.all-loaded').show();
       this.showMain = true;
       setTimeout(() => {
         this.useImageCard._addEvents();
       }, 1000);
     }).catch(() => {
+      // @ts-ignore
       jQuery('.all-loading').hide();
+      // @ts-ignore
       jQuery('.all-error').show();
     });
     this.triggerLoadMultiSelects();
@@ -315,4 +319,4 @@ export default defineComponent({
 
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
-<style src="@/css/admin/admin-image-card.scss"></style>
+<!--<style src="@/css/admin/admin-image-card.scss"></style>-->
