@@ -331,11 +331,15 @@ export default defineComponent({
   created() {
     console.log('created ', this.tableCard);
     this.tableCard._load().then(() => {
+      // @ts-ignore
       jQuery('.all-loading').hide();
+      // @ts-ignore
       jQuery('.all-loaded').show();
       this.showMain = true;
     }).catch((e) => {
+      // @ts-ignore
       jQuery('.all-loading').hide();
+      // @ts-ignore
       jQuery('.all-error').show();
     });
     this.triggerLoadMultiSelects();
@@ -349,10 +353,9 @@ export default defineComponent({
       this.searchTags.search('');
     }
   }
-
 });
 
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
-<style src="@/css/admin/admin-table-card.scss"></style>
+<!--<style src="@/css/admin/admin-table-card.scss"></style>-->
 <!--<style src="vue-multiselect/dist/vue-multiselect.css"></style>-->

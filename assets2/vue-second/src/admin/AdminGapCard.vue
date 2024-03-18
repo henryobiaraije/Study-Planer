@@ -242,11 +242,15 @@ export default defineComponent({
   },
   created() {
     this.gapCard.load().then(() => {
+      // @ts-ignore
       jQuery('.all-loading').hide();
+      // @ts-ignore
       jQuery('.all-loaded').show();
       this.showMain = true;
     }).catch(() => {
+      // @ts-ignore
       jQuery('.all-loading').hide();
+      // @ts-ignore
       jQuery('.all-error').show();
     });
     this.triggerLoadMultiSelects();
@@ -263,5 +267,5 @@ export default defineComponent({
 });
 
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+<!--<style src="vue-multiselect/dist/vue-multiselect.css"></style>-->
 <!--<style src="vue-multiselect/dist/vue-multiselect.css"></style>-->

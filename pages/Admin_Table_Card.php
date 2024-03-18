@@ -97,6 +97,9 @@ class Admin_Table_Card {
 		$js  = FileService::mp_get_js_url( 'main-admin' );
 		$css = FileService::mp_get_css_url( 'main-admin' );
 
+		$js  = FileService::mp_get_js_url_second( '/admin/admin-table-card' );
+		$css = FileService::mp_get_css_url_second( '/admin/admin-table-card' );
+
 		wp_register_style( 'sp-admin-table-card', $css, array(), Initializer::$script_version );
 		wp_register_script( 'sp-admin-table-card', $js, array( 'jquery' ), Initializer::$script_version, true );
 		wp_enqueue_editor();
