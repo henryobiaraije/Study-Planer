@@ -128,7 +128,7 @@ class Initializer {
 	public static $extra_url;
 	// todo change to false later during production
 	public static $debug_mode = true;
-	public static $script_version = '3.1.6';
+	public static $script_version = '3.1.7';
 	public static $nonce_key = 'e5824f448200111383345g424';
 	public static $ajax_action = 'sp_pro_ajax_action_4fef425g424r5q5g6q';
 	public static $localize_id = 'pereere_dot_com_sp_pro_general_localize_4736';
@@ -380,7 +380,7 @@ class Initializer {
 		self::$image_dir    = $plugin_dir . '/assets/images';
 		self::$image_url    = $plugin_url . '/assets/images';
 		if ( self::$debug_mode ) {
-			self::$script_version = time();
+//			self::$script_version = time();
 		}
 	}
 

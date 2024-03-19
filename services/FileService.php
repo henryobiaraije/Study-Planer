@@ -94,15 +94,37 @@ class FileService {
 	}
 
 	public static function mp_get_js_url_second( string $file_name ): string {
-		$js_dir = Initializer::$plugin_url . '/assets2/vue-second/js';
+		$script_version = Initializer::$script_version;
+		$js_dir         = Initializer::$plugin_url . '/assets2/vue-second/js';
 
-		return $js_dir . $file_name . '.js';
+		///admin-assign-topics-1710862104.js?v=1710862104&ver=17108621040
+		// \wp-content\plugins\study-planner-pro\assets2\vue-second\js\admin\admin-assign-topics-3.1.7.js
+		// /wp-content/plugins/study-planner-pro/assets2/vue-second/js-/admin/admin-assign-topics-3.1.7.js?v=1710862646&ver=3.1.7
+		$time = time();
+
+		return "{$js_dir}{$file_name}-$script_version.js?v=$time";
+
+//		return sprintf(
+//			'%1$s?v=%2$s',
+//			sprintf( '%1$s/%2$s-%3$s.js', $js_dir, $file_name, $script_version ),
+//			$script_version
+//		);
+//		return $js_dir . $file_name . '.js';
 	}
 
 	public static function mp_get_css_url_second( string $file_name ): string {
-		$css_dir = Initializer::$plugin_url . '/assets2/vue-second/js';
+		$css_dir        = Initializer::$plugin_url . '/assets2/vue-second/js';
+		$script_version = Initializer::$script_version;
 
-		return $css_dir . $file_name . '.css';
+//		return sprintf(
+//			'%1$s?v=%2$s',
+//			sprintf( '%1$s/%2$s-%3$s.css', $css_dir, $file_name, $script_version ),
+//			$script_version
+//		);
+		$time = time();
+
+		return "{$css_dir}{$file_name}-$script_version.css?v=$time";
+//		return $css_dir . $file_name . '.css';
 	}
 
 }

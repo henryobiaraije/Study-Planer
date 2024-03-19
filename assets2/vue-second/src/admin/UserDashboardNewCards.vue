@@ -234,6 +234,7 @@ export default defineComponent({
     },
   },
   created() {
+    // @ts-ignore
     jQuery('.all-loading').hide();
     this.allCards.forNewCards.value = true;
     this.allCards.search(

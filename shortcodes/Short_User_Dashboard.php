@@ -105,15 +105,18 @@ class Short_User_Dashboard {
 		$d3js        = '//d3js.org/d3.v3.min.js';
 		$js_heatmap  = '//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js';
 		$css_heatmap = '//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.css';
-		$js          = FileService::mp_get_js_url( 'main-admin' );
-		$css         = FileService::mp_get_css_url( 'main-admin' );
+//		$js          = FileService::mp_get_js_url( 'main-admin' );
+//		$css         = FileService::mp_get_css_url( 'main-admin' );
 
-		$js_dir      = Initializer::$plugin_url . '/assets2/vue-second/js';
-		$js_admin_1  = $js_dir . '/admin/admin-1.js';
-		$css_admin_1 = $js_dir . '/admin/admin-1.css';
+		$js = FileService::mp_get_js_url_second( '/shortcodes/sc-study-dashboard' );
+		$css = FileService::mp_get_css_url_second( '/shortcodes/sc-study-dashboard' );
 
-		wp_register_style( 'admin-1122', $css_admin_1, [], Initializer::$script_version );
-		wp_register_script( 'admin-1122', $js_admin_1, [ 'jquery' ], Initializer::$script_version, true );
+//		$js_dir      = Initializer::$plugin_url . '/assets2/vue-second/js';
+//		$js_admin_1  = $js_dir . '/admin/admin-1.js';
+//		$css_admin_1 = $js_dir . '/admin/admin-1.css';
+//
+//		wp_register_style( 'admin-1122', $css_admin_1, [], Initializer::$script_version );
+//		wp_register_script( 'admin-1122', $js_admin_1, [ 'jquery' ], Initializer::$script_version, true );
 
 		wp_register_style( 'sp-sc-user-dashboard', $css, [], Initializer::$script_version );
 		wp_register_script( 'sp-sc-user-dashboard', $js, [ 'jquery' ], Initializer::$script_version, true );

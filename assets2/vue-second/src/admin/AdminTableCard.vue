@@ -91,13 +91,15 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr v-for="(item2,itemIndex2) in item.question"
-                      :class="{'bg-gray-100' : (itemIndex2 / 2 > 0)}"
-                      v-if="itemIndex2 !== 0">
-                    <td v-for="(item3,itemIndex3) in item2" class="table-cell border-1 border-sp-200">
-                      <div v-html="item3"></div>
-                    </td>
-                  </tr>
+                  <template v-for="(item2,itemIndex2) in item.question">
+                    <tr
+                        :class="{'bg-gray-100' : (itemIndex2 / 2 > 0)}"
+                        v-if="itemIndex2 !== 0">
+                      <td v-for="(item3,itemIndex3) in item2" class="table-cell border-1 border-sp-200">
+                        <div v-html="item3"></div>
+                      </td>
+                    </tr>
+                  </template>
                   </tbody>
                 </table>
               </li>
@@ -112,13 +114,15 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr v-for="(item2,itemIndex2) in item.answer"
-                      :class="{'bg-gray-100' : (itemIndex2 / 2 > 0)}"
-                      v-if="itemIndex2 !== 0">
-                    <td v-for="(item3,itemIndex3) in item2" class="table-cell border-1 border-sp-200">
-                      <div v-html="item3"></div>
-                    </td>
-                  </tr>
+                  <template v-for="(item2,itemIndex2) in item.answer">
+                    <tr
+                        :class="{'bg-gray-100' : (itemIndex2 / 2 > 0)}"
+                        v-if="itemIndex2 !== 0">
+                      <td v-for="(item3,itemIndex3) in item2" class="table-cell border-1 border-sp-200">
+                        <div v-html="item3"></div>
+                      </td>
+                    </tr>
+                  </template>
                   </tbody>
                 </table>
               </li>
