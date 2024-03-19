@@ -248,6 +248,7 @@ export default defineComponent({
     }
   },
   created() {
+    // @ts-ignore
     jQuery('.all-loading').hide();
     this.collections.loadItems();
     console.log('created now');

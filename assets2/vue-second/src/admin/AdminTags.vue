@@ -158,6 +158,7 @@ export default defineComponent({
     },
   },
   created() {
+    // @ts-ignore
     jQuery('.all-loading').hide();
     this.tags.loadItems();
     console.log('created now');

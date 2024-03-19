@@ -179,6 +179,7 @@ export default defineComponent({
     }
   },
   created() {
+    // @ts-ignore
     jQuery('.all-loading').hide();
     this.deckGroups.loadItems();
     console.log('created now');

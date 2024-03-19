@@ -287,6 +287,7 @@ export default defineComponent({
     },
   },
   created() {
+    // @ts-ignore
     jQuery('.all-loading').hide();
     this.decks.loadItems();
     console.log('created now');

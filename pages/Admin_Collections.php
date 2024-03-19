@@ -79,7 +79,6 @@ class Admin_Collections {
 	}
 
 	public function get_page_data(): array {
-
 		return array();
 	}
 
@@ -92,19 +91,22 @@ class Admin_Collections {
 		// $css = Initializer::$css_url . '/admin/admin-deck-groups.css';
 		// $css = Initializer::$js_url . '/admin/admin-decks.css';
 		// $js  = Initializer::$js_url . '/admin/admin-decks.js';
-		$js  = FileService::mp_get_js_url( 'main-admin' );
-		$css = FileService::mp_get_css_url( 'main-admin' );
+//		$js  = FileService::mp_get_js_url( 'main-admin' );
+//		$css = FileService::mp_get_css_url( 'main-admin' );
 
-		wp_register_style( 'sp-admin-decks', $css, array(), Initializer::$script_version );
-		wp_register_script( 'sp-admin-decks', $js, array( 'jquery' ), Initializer::$script_version, true );
+		$js = FileService::mp_get_js_url_second( '/admin/admin-collection' );
+		$css = FileService::mp_get_css_url_second( '/admin/admin-collection' );
+
+		wp_register_style( 'sp-admin-collections', $css, array(), Initializer::$script_version );
+		wp_register_script( 'sp-admin-collections', $js, array( 'jquery' ), Initializer::$script_version, true );
 
 		// enqueue the scripts
 		add_action(
 			'sp_enqueue_default_admin_collections',
-			function () use ( $dis ) {
+			static function () use ( $dis ) {
 				do_action( 'sp_enqueue_default_admin_scripts' );
-				wp_enqueue_style( 'sp-admin-decks' );
-				wp_enqueue_script( 'sp-admin-decks' );
+				wp_enqueue_style( 'sp-admin-collections' );
+				wp_enqueue_script( 'sp-admin-collections' );
 
 				$dis->localize_data();
 			}
