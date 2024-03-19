@@ -6,7 +6,7 @@
       <div class="mb-4">
         <!--              <?php \StudyPlannerPro\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>-->
       </div>
-      <div v-if="null !== currentQuestion && !currentQuestion.has_updated"
+      <div v-if="(null !== currentQuestion) && (undefined !== currentQuestion) && (!currentQuestion.has_updated)"
            class="sp-question min-h-[65vh] flex align-items-center overflow-x-auto moxal-y-hidden"
            style="background-repeat: no-repeat;background-size: cover;"
            :style="{'background-image' : 'url('+currentQuestion?.card_group?.bg_image_url+')'}">

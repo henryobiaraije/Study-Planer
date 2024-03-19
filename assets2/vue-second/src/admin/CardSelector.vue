@@ -254,7 +254,9 @@ export default defineComponent({
   },
   created() {
     console.log('now created');
+    // @ts-ignore
     jQuery('.all-loading').hide();
+    // @ts-ignore
     jQuery('.all-loaded').show();
     this.showMain = true;
 

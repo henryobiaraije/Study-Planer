@@ -34,7 +34,6 @@ class Admin_Assign_Topic {
 	public function initialize(): void {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
 		add_action( 'init', array( $this, 'init' ) );
-
 	}
 
 	public function init(): void {
@@ -46,7 +45,6 @@ class Admin_Assign_Topic {
 				remove_all_actions( 'admin_notices' );
 			}
 		);
-
 	}
 
 	/**
@@ -78,7 +76,6 @@ class Admin_Assign_Topic {
 	}
 
 	public function get_page_data(): array {
-
 		return array();
 	}
 
@@ -90,8 +87,11 @@ class Admin_Assign_Topic {
 		$dis = $this;
 		// $css = Initializer::$js_url . '/admin/admin-gap-card.css';
 		// $js  = Initializer::$js_url . '/admin/admin-gap-card.js';
-		$js  = FileService::mp_get_js_url( 'main-admin' );
-		$css = FileService::mp_get_css_url( 'main-admin' );
+//		$js  = FileService::mp_get_js_url( 'main-admin' );
+//		$css = FileService::mp_get_css_url( 'main-admin' );
+
+		$js = FileService::mp_get_js_url_second( '/admin/admin-assign-topics' );
+		$css = FileService::mp_get_css_url_second( '/admin/admin-assign-topics' );
 
 		wp_register_style( 'sp-admin-assign-topic', $css, array(), Initializer::$script_version );
 		wp_register_script( 'sp-admin-assign-topic', $js, array( 'jquery' ), Initializer::$script_version, true );
@@ -109,7 +109,6 @@ class Admin_Assign_Topic {
 				$dis->localize_data();
 			}
 		);
-
 	}
 
 }

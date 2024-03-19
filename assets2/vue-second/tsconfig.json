@@ -13,7 +13,8 @@
     "allowJs": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    //    "sourceMap": true,
+    "sourceMap": true,
+    "inlineSourceMap": true,
     //    "strict": true,
     "strict": false,
     "experimentalDecorators": true,
@@ -25,5 +26,5 @@
       ]
     }
   }
- }
+}
 

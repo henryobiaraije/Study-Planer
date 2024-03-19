@@ -17,6 +17,7 @@ module.exports = {
         'admin/admin-table-card': './src/admin/admin-table-card.ts',
         'admin/admin-image-card': './src/admin/admin-image-card.ts',
         'admin/admin-collection': './src/admin/admin-collection.ts',
+        'admin/admin-assign-topics': './src/admin/admin-assign-topics.ts',
         // 'admin/admin-settings': './src/admin/admin-settings.ts',
         // 'admin/admin-all-cards': './src/admin/admin-all-cards.ts',
         // 'public/sc-user-dashboard': './src/shortcodes/sc-user-dashboard.ts',

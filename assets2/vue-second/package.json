@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --watch --config webpack.dev.js"
+    "start": "webpack --watch --config webpack.dev.js",
+    "start-source-map": "webpack --watch --config webpack.dev.js --env sourceMap"
   },
   "keywords": [],
   "author": "",
@@ -50,6 +51,7 @@
     "postcss-nesting": "^12.1.0",
     "timeago.js": "^4.0.2",
     "underscore": "^1.13.6",
+    "v-pagination-3": "^0.1.7",
     "vue-good-table-next": "^0.2.1",
     "vue-multiselect": "^3.0.0-alpha.2",
     "vue3-calendar-heatmap": "^2.0.5",
