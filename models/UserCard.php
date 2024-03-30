@@ -82,7 +82,6 @@ class UserCard extends Model {
 		$user_cards_not_studied = self::get_new_cards_not_answered_but_added( $user_id,
 			$user_cards_answered['card_ids'] );
 
-
 		$card_groups = CardGroup
 			::query()
 			// Exclude all card groups in any collection.
@@ -183,6 +182,123 @@ class UserCard extends Model {
 			'debug'                             => Initializer::$debug,
 			'study_ids'                         => $user_studies['study_ids'],
 		);
+	}
+
+	/**
+	 * Used for when both topics and decks can be studied.
+	 *
+	 * @param int $user_id
+	 *
+	 * @return array|array[]
+	 */
+	public static function get_new_user_cards_to_study( int $user_id ): array {
+		$sql = array(
+			'select' => array(),
+			'where'  => array()
+		);
+
+		global $wpdb;
+		$prefix                 = $wpdb->prefix;
+		$topic_uncategorized_id = get_uncategorized_topic_id();
+
+		$w_cards = '';
+
+		/**
+		 * For New Cards
+		 * - Get all user cards
+		 * - Remove all cards in collection
+		 * -
+		 */
+
+		$tb_cards             = "{$prefix}sp_cards";
+		$tb_card_groups       = "{$prefix}sp_card_groups";
+		$tb_user_cards        = "{$prefix}sp_user_cards";
+		$tb_study             = "{$prefix}sp_study";
+		$tb_decks             = "{$prefix}sp_decks";
+		$tb_deck_groups       = "{$prefix}sp_deck_groups";
+		$tb_topics            = "{$prefix}sp_topics";
+		$tb_collections       = "{$prefix}sp_collections";
+		$tb_answered          = "{$prefix}sp_answered";
+		$tb_tags              = "{$prefix}sp_tags";
+		$tb_taggable          = "{$prefix}sp_taggables";
+		$tb_taggable_excluded = "{$prefix}sp_taggables_excluded";
+
+		$sql_all_user_cards = "";
+
+		// Exclude all card in the uncategorized topics.
+		$sql_cards_in_uncategorized_topic = "
+			SELECT c_uc.id from {$tb_cards} as c_uc
+			WHERE c_uc.card_group_id IN (
+			  # List of card groups in uncategorized topics
+			  SELECT cg_uc.id from {$tb_card_groups} as cg_uc
+			  WHERE cg_uc.topic_id = {$topic_uncategorized_id}
+			)	 
+		";
+
+		$result_cards_in_uncategorized_topics = $wpdb->get_results( $sql_cards_in_uncategorized_topic, ARRAY_A );
+
+		// Exclude all cards in collections.
+		$sql_exclude_collection = " 
+			SELECT id from {$tb_cards} as c_cl
+			WHERE c_cl.card_group_id IN (
+				 # List of card groups in a collection
+				 SELECT id from {$tb_card_groups} 
+				 WHERE collection_id > 0
+			)
+		";
+
+		$result_cards_in_collections = $wpdb->get_results( $sql_exclude_collection, ARRAY_A );
+
+		$sql_new_cards = "
+			SELECT id from {$tb_cards} as c
+			WHERE c.card_group_id IN (
+				# List of card_groups in user cards.
+				SELECT id from {$tb_card_groups} as cg
+				WHERE id IN (
+						# List of cg ids in user_cards.
+						SELECT card_group_id from {$tb_user_cards} as uc
+						WHERE uc.user_id = {$user_id}
+				) 
+			)
+			AND c.id NOT IN (
+				# List of card_ids that have been answred before.
+				SELECT DISTINCT card_id from {$tb_answered} as a
+				WHERE a.study_id IN (
+					# List of user study ids.                        
+					SELECT id FROM {$tb_study} 
+					WHERE user_id = {$user_id}
+				) 
+			)
+		";
+
+		$new_results = $wpdb->get_results( $sql_new_cards, ARRAY_A );
+
+		// Get new cards.
+		$sql = "
+			SELECT * from {$tb_cards} as c1 
+			WHERE c1.id NOT IN ($sql_exclude_collection) 
+			AND c1.id IN ($sql_new_cards) 
+			AND c1.id NOT IN ($sql_cards_in_uncategorized_topic)
+		";
+
+//		$sql = "
+//			SELECT * from {$tb_cards} as c1
+//			WHERE c1.id NOT IN ($sql_exclude_collection)
+//			WHERE c1.id IN ($sql_new_cards)
+//		";
+
+//		$sql = "
+//			SELECT * from {$tb_cards} as c1
+//			# WHERE c.id NOT IN ($sql_exclude_collection)
+//			WHERE c1.id IN ($sql_new_cards)
+//			# WHERE c.topic_id != $topic_uncategorized_id
+//		";
+
+
+		$results = $wpdb->get_results( $sql, ARRAY_A );
+
+
+		return array();
 	}
 
 	/**

@@ -17,8 +17,9 @@
         </div>
       </template>
     </template>
-    <v-progress-linear v-if="userCards.ajaxLoadUserCard.value.sending && userDeckGroups.length > 0" color="primary"
-                       indeterminate></v-progress-linear>
+    <v-progress-linear
+        v-if="userCards.ajaxLoadUserCard.value.sending && userDeckGroups.length > 0" color="primary"
+        indeterminate></v-progress-linear>
   </div>
 </template>
 <script lang="ts">

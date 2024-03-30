@@ -109,7 +109,9 @@
         ></vue-mulitiselect>
       </div>
       <div class="bg-white my-2 p-2 rounded shadow">
-        <span> Collection </span>
+        <span> Collection
+          <button type="button" @click="clearCollection" class="mx-4 !text-gray-500 !hover:bg-gray-100" style="opacity: 50%">Clear</button>
+        </span>
         <vue-mulitiselect
             v-model="gapCardGroup.collection"
             :options="collections.searchResults.value"
@@ -262,6 +264,10 @@ export default defineComponent({
       this.collections.search('');
       this.topics.search('');
       this.searchTags.search('');
+    },
+    clearCollection() {
+      this.gapCardGroup.collection_id = null;
+      this.gapCardGroup.collection = null;
     }
   }
 });

@@ -972,9 +972,7 @@ class AjaxHelper {
 		$card_group->name           = $cg_name;
 		$card_group->deck_id        = $e_deck_id;
 		$card_group->reverse        = false;
-		if ( $e_collection_id ) {
-			$card_group->collection_id = $e_collection_id;
-		}
+		$card_group->collection_id  = $e_collection_id;
 		if ( $e_topic_id ) {
 			$card_group->topic_id = $e_topic_id;
 		}

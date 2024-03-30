@@ -270,6 +270,7 @@ export default defineComponent({
     this.deckGroupMulti.search('');
     this.decksMulti.search('');
     this.topicsMulti.search('');
+    this.searchCards();
   },
   methods: {
     UseUserCards,

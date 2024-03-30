@@ -964,10 +964,12 @@ class AjaxFrontHelper {
 		$params = $post[ Common::VAR_2 ]['params'];
 		Initializer::verify_post( $post, true );
 
+		$user_id           = get_current_user_id();
 		// Delete all studies without deck or topic.
 		Study::delete_all_studies_without_deck_or_topic();
 
-		$user_id           = get_current_user_id();
+		UserCard::get_new_user_cards_to_study( $user_id);
+
 		$user_card_details = UserCard
 			::get_user_cards_to_study( $user_id );
 

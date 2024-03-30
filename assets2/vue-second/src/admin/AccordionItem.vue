@@ -175,7 +175,8 @@ export default defineComponent({
       windowWidth: window.innerWidth,
       viewDialogEditStudy: false,
       studyToEdit: null as null | _Study,
-      studyIsActive: true
+      studyIsActive: true,
+      isLoadingCards: false
     }
   },
   setup: (props, ctx) => {
@@ -462,6 +463,8 @@ export default defineComponent({
         study_all_new: true,
         study_all_on_hold: true,
         active: false,
+        id: 0,
+        user: undefined
       } as _Study);
     }
   },
@@ -506,13 +509,16 @@ export default defineComponent({
       if (Object.keys(this.item).includes('studies') && (this.item?.['studies'].length > 0)) {
         let study = this.item?.['studies'][0];
         let theStudy: _Study = JSON.parse(this.customStringify(study)) as _Study;
-        // console.log('saving now', {theStudy});
         setTimeout(() => {
-          this.userDash.xhrCreateOrUpdateStudy(theStudy)
-              .then((response) => {
-                // this.userCards.loadUserCards();
-              });
-
+          if (!this.isLoadingCards) {
+            this.isLoadingCards = true;
+            this
+                .userDash.xhrCreateOrUpdateStudy(theStudy)
+                .then((response) => {
+                  this.userCards.loadUserCards();
+                  this.isLoadingCards = false;
+                });
+          }
         }, 1000);
       }
     },
