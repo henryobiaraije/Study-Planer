@@ -91,7 +91,7 @@
             {{ props.row.card_type }}
           </div>
           <div v-else-if="props.column.field === 'cards'">
-            {{ props.row.cards_count }} Cards
+            {{ props.row.cards.length }} Cards
           </div>
           <div v-else-if="props.column.field === 'deck'">
             {{ props.row.deck ? props.row.deck.name : '' }}

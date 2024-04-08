@@ -369,3 +369,7 @@ function phinx_migrate(): void {
 	}
 }
 
+
+function sp_in_sql_mode(){
+	return true;
+}

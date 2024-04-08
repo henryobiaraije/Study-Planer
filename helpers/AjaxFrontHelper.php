@@ -719,7 +719,7 @@ class AjaxFrontHelper {
 		$all               = $post[ Common::VAR_2 ]['study'];
 		$deck_id           = (int) sanitize_text_field( null !== $all['deck'] ? $all['deck']['id'] : 0 );
 		$study_id          = (int) sanitize_text_field( in_array( 'id', $all, true ) ? $all['id'] : 0 );
-		$tags              = in_array( 'tags', $all, true ) ? $all['tags'] : [];
+		$tags              = array_key_exists( 'tags', $all ) ? $all['tags'] : array();
 		$no_of_new         = (int) sanitize_text_field( $all['no_of_new'] );
 		$no_on_hold        = (int) sanitize_text_field( $all['no_on_hold'] );
 		$no_to_revise      = (int) sanitize_text_field( $all['no_to_revise'] );
@@ -964,11 +964,11 @@ class AjaxFrontHelper {
 		$params = $post[ Common::VAR_2 ]['params'];
 		Initializer::verify_post( $post, true );
 
-		$user_id           = get_current_user_id();
+		$user_id = get_current_user_id();
 		// Delete all studies without deck or topic.
 		Study::delete_all_studies_without_deck_or_topic();
 
-		UserCard::get_new_user_cards_to_study( $user_id);
+//		UserCard::get_new_user_cards_to_study_new_cards( $user_id);
 
 		$user_card_details = UserCard
 			::get_user_cards_to_study( $user_id );

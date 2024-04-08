@@ -10,6 +10,8 @@ export class Store {
     public static ajaxRequestCount: Array<number> = [];
     public static nonce = '';
 
+    public static localize: InitAdminValues = null;
+
     constructor() {
 
     }
@@ -28,8 +30,10 @@ export class Store {
     }
 
     /** */
-
     public static initAdmin(value: InitAdminValues) {
+        this.localize = value;
+        console.log({value})
+        console.trace();
         this.nonce = value.nonce;
         // this._nn   = true;
         this.st();
@@ -106,5 +110,6 @@ interface InitAdminValues {
     serverUrl: string,
     actionString: string,
     nonce: string,
+    icon_settings_image: string,
 }
 

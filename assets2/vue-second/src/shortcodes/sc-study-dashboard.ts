@@ -19,11 +19,15 @@ console.log("testing admin 1");
 
 declare var pereere_dot_com_sp_pro_general_localize_4736: any;
 const localize = pereere_dot_com_sp_pro_general_localize_4736;
-Store.initAdmin({
+// Store.initAdmin(localize);
+const toStoreInStore = {
+    ...localize,
     serverUrl: localize.ajax_url,
     actionString: localize.ajax_action,
     nonce: localize.nonce,
-});
+};
+console.log({toStoreInStore});
+Store.initAdmin(toStoreInStore);
 
 const myCustomLightTheme = {
     dark: false,

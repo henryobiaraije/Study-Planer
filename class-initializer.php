@@ -250,6 +250,8 @@ class Initializer {
 		$default_bg_image = (int) get_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, 0 );
 
 		self::$general_localize['default_bg_image'] = $default_bg_image;
+		// C:\laragon\www\Test-Site-Wordpress\wp-content\plugins\study-planner-pro\assets2\vue-second\images\settings-small.png
+		self::$general_localize['icon_settings_image'] = self::$plugin_url . '/assets2/vue-second/images/settings-small.png';
 		// Common::in_script([
 		// 'in_footer',
 		// 'localiz' => self::$general_localize,

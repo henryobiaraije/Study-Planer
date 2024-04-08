@@ -34,7 +34,8 @@
                      class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
                   <v-icon left class="cursor-pointer">
                     mdi-cog-outline
-                  </v-icon>
+                  </v-icon
+                  <img :src="settingsImageUrl"/>
                 </div>
               </div>
               <div class="header-counts flex-initial px-2 text-sm">
@@ -148,6 +149,7 @@ import StudySettingsModal from "@/admin/StudySettingsModal.vue";
 import useUserDashboard from "@/composables/useUserDashboard";
 import SwitchComp from "@/components/SwitchComp.vue";
 import useToggle from "@/composables/useToggle";
+import {Store} from "@/static/store";
 
 export default defineComponent({
   name: 'AccordionItem',
@@ -187,6 +189,12 @@ export default defineComponent({
     }
   },
   computed: {
+    settingsImageUrl() {
+      const localize = Store.localize;
+      const image = localize.icon_settings_image;
+      console.log("settingsImageUrl", {image});
+      return image;
+    },
     isToggled() {
       return this.uToggle.isToggled(this.theItem.itemType + '-' + this.theItem.id);
     },
