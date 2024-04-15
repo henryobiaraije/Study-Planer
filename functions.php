@@ -196,7 +196,7 @@ function sp_get_user_debug_form( int $user_id = null ): array {
 	// format to: 2020-12-31 23:59:59.
 	$current_study_date = date( 'Y-m-d H:i:s', strtotime( $current_study_date ) );
 
-	if( ! $current_study_date ) {
+	if ( ! $current_study_date ) {
 		$current_study_date = date( 'Y-m-d H:i:s' );
 	}
 
@@ -369,7 +369,10 @@ function phinx_migrate(): void {
 	}
 }
 
-
-function sp_in_sql_mode(){
+/**
+ * When true, debug info will be added to certain sql queries when returned.
+ * @return bool
+ */
+function sp_in_sql_mode(): bool {
 	return true;
 }

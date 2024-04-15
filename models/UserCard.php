@@ -530,23 +530,32 @@ class UserCard extends Model {
 		$study_to_array = $study->toArray();
 
 		$debug = array(
-			'variables'           => array(),
-			'uncategorized_topic' => array(),
-			'collections'         => array(),
-			'study_to_array'      => $study_to_array,
-			'study_id'            => $study_id,
-			'user_cards'          => array(),
-			'included_tags'       => array(
+			'variables'                    => array(),
+			'uncategorized_topic'          => array(),
+			'collections'                  => array(),
+			'study_to_array'               => $study_to_array,
+			'study_id'                     => $study_id,
+			'user_cards'                   => array(),
+			'cards_answered'               => array(),
+			'cards_not_answered'           => array(),
+			'included_tags'                => array(
 				'included' => false,
 			),
-			'excluded_tags'       => array(
+			'excluded_tags'                => array(
 				'excluded' => false,
 			),
-			'topic'               => array(),
-			'deck'                => array(),
-			'new'                 => array(),
-			'revise'              => array(),
-			'on_hold'             => array(),
+			'topic'                        => array(),
+			'deck'                         => array(),
+			'new'                          => array(),
+			'revise'                       => array(),
+			'on_hold'                      => array(),
+			'cards_new'                    => array(),
+			'cards_revision'               => array(),
+			'cards_on_hold'                => array(),
+			'count_studied_today_new'      => array(),
+			'count_studied_today_revision' => array(),
+			'count_studied_today_on_hold'  => array(),
+			'sp_in_sql_mode'               => sp_in_sql_mode()
 		);
 
 		// <editor-fold desc="Variables" >
@@ -601,20 +610,25 @@ class UserCard extends Model {
 			)	 
 		";
 		if ( sp_in_sql_mode() ) {
+			$start_time_uncategorized                  = time();
 			$sub_result_cards_in_uncategorized_topics_ = $wpdb->get_results( $sql_cards_in_uncategorized_topic, ARRAY_A );
+			$_stop_time_uncategorized_query            = time();
 			$sub_result_cards_in_uncategorized_topics  = array_map(
 				static function ( $val ) {
 					return $val['id'];
 				},
 				$sub_result_cards_in_uncategorized_topics_
 			);
+			$_stop_time_uncategorized_query_loop       = time();
+			$debug                                     = self::format_debug_data( $debug, 'uncategorized_topic', array(
+				'sql_cards_in_uncategorized_topic'          => $sql_cards_in_uncategorized_topic,
+				'sub_result_cards_in_uncategorized_topics_' => $sub_result_cards_in_uncategorized_topics_,
+				'sub_result_cards_in_uncategorized_topics'  => $sub_result_cards_in_uncategorized_topics,
+				'mill_seconds_for_query'                    => ( $_stop_time_uncategorized_query - $start_time_uncategorized ),
+				'mill_seconds_with'                         => $_stop_time_uncategorized_query_loop - $start_time_uncategorized,
+			) );
 		}
 
-		$debug = self::format_debug_data( $debug, 'uncategorized_topic', array(
-			'sql_cards_in_uncategorized_topic'          => $sql_cards_in_uncategorized_topic,
-			'sub_result_cards_in_uncategorized_topics_' => $sub_result_cards_in_uncategorized_topics_ ?? [],
-			'sub_result_cards_in_uncategorized_topics'  => $sub_result_cards_in_uncategorized_topics ?? []
-		) );
 
 		// </editor-fold desc="Uncategorized Topics" >
 
@@ -629,20 +643,25 @@ class UserCard extends Model {
 			)
 		";
 		if ( sp_in_sql_mode() ) {
-			$sub_result_cards_in_collections_ = $wpdb->get_results( $sql_exclude_collection, ARRAY_A );
-			$sub_result_cards_in_collections  = array_map(
+			$_start_time_collections              = time();
+			$sub_result_cards_in_collections_     = $wpdb->get_results( $sql_exclude_collection, ARRAY_A );
+			$_stop_time_collections               = time();
+			$sub_result_cards_in_collections      = array_map(
 				static function ( $val ) {
 					return $val['id'];
 				},
 				$sub_result_cards_in_collections_
 			);
+			$_stop_time_and_query_loop_collection = time();
+			$debug                                = self::format_debug_data( $debug, 'collections', array(
+				'sql_exclude_collection'           => $sql_exclude_collection,
+				'sub_result_cards_in_collections_' => $sub_result_cards_in_collections_,
+				'sub_result_cards_in_collections'  => $sub_result_cards_in_collections,
+				'mill_seconds_for_query'           => ( $_stop_time_collections - $_start_time_collections ),
+				'mill_seconds_with'                => ( $_stop_time_and_query_loop_collection - $_start_time_collections ),
+			) );
 		}
 
-		$debug = self::format_debug_data( $debug, 'collections', array(
-			'sql_exclude_collection'           => $sql_exclude_collection,
-			'sub_result_cards_in_collections_' => $sub_result_cards_in_collections_ ?? array(),
-			'sub_result_cards_in_collections'  => $sub_result_cards_in_collections ?? array(),
-		) );
 
 		// </editor-fold desc="Collections" >
 
@@ -662,27 +681,33 @@ class UserCard extends Model {
 			)
 		";
 		if ( sp_in_sql_mode() ) {
-			$sub_result_cards_in_user_cards_ = $wpdb->get_results( $sql_user_cards, ARRAY_A );
-			$sub_result_cards_in_user_cards  = array_map(
+			$_start_time_user_cards               = time();
+			$sub_result_cards_in_user_cards_      = $wpdb->get_results( $sql_user_cards, ARRAY_A );
+			$_stop_time_user_cards                = time();
+			$sub_result_cards_in_user_cards       = array_map(
 				static function ( $val ) {
 					return $val['id'];
 				},
 				$sub_result_cards_in_user_cards_
 			);
+			$_stop_time_and_query_loop_user_cards = time();
+			$debug                                = self::format_debug_data( $debug, 'user_cards', array(
+				'sql_user_cards'                  => $sql_exclude_collection,
+				'sub_result_cards_in_user_cards_' => $sub_result_cards_in_user_cards_,
+				'sub_result_cards_in_user_cards'  => $sub_result_cards_in_user_cards,
+				'mill_seconds_for_query'          => ( $_stop_time_user_cards - $_start_time_user_cards ),
+				'mill_seconds_with'               => ( $_stop_time_and_query_loop_user_cards - $_start_time_user_cards ),
+			) );
 		}
 
-		$debug = self::format_debug_data( $debug, 'user_cards', array(
-			'sql_user_cards'                  => $sql_exclude_collection,
-			'sub_result_cards_in_user_cards_' => $sub_result_cards_in_user_cards_ ?? array(),
-			'sub_result_cards_in_user_cards'  => $sub_result_cards_in_user_cards ?? array(),
-		) );
 
 		// </editor-fold desc="User Cards " >
 
 		// <editor-fold desc="Topic Cards" >
 
 		// Get cards in topic.
-		$sql_cards_in_topic = "
+		if ( ! empty( $study->topic_id ) ) {
+			$sql_cards_in_topic = "
 				SELECT id FROM $tb_cards as c_t
 				WHERE c_t.card_group_id IN (
 					# List of card_groups in topic
@@ -690,28 +715,35 @@ class UserCard extends Model {
 					WHERE cg_t.topic_id = $topic_id	
 				) 
 		";
-		if ( sp_in_sql_mode() ) {
-			$sub_result_cards_in_topic_ = $wpdb->get_results( $sql_cards_in_topic, ARRAY_A );
-			$sub_result_cards_in_topic  = array_map(
-				static function ( $val ) {
-					return $val['id'];
-				},
-				$sub_result_cards_in_topic_
-			);
-		}
+			if ( sp_in_sql_mode() ) {
+				$_start_time_topic               = time();
+				$sub_result_cards_in_topic_      = $wpdb->get_results( $sql_cards_in_topic, ARRAY_A );
+				$_stop_time_topics               = time();
+				$sub_result_cards_in_topic       = array_map(
+					static function ( $val ) {
+						return $val['id'];
+					},
+					$sub_result_cards_in_topic_
+				);
+				$_stop_time_and_query_loop_topic = time();
+				$debug                           = self::format_debug_data( $debug, 'topic', array(
+					'sql_cards_in_topic'         => $sql_cards_in_topic,
+					'sub_result_cards_in_topic_' => $sub_result_cards_in_topic_ ?? array(),
+					'sub_result_cards_in_topic'  => $sub_result_cards_in_topic ?? array(),
+					'mill_seconds_for_query'     => ( $_stop_time_topics - $_start_time_topic ),
+					'mill_seconds_with'          => ( $_stop_time_and_query_loop_topic - $_start_time_topic ),
+				) );
+			}
 
-		$debug = self::format_debug_data( $debug, 'topic', array(
-			'sql_cards_in_topic'         => $sql_cards_in_topic,
-			'sub_result_cards_in_topic_' => $sub_result_cards_in_topic_ ?? array(),
-			'sub_result_cards_in_topic'  => $sub_result_cards_in_topic ?? array(),
-		) );
+		}
 
 		// </editor-fold desc="Topic Cards" >
 
 		// <editor-fold desc="Deck Cards" >
 
 		// Get cards in decks. (In all topics in a deck)
-		$sql_cards_in_deck = "
+		if ( ! empty( $study->deck_id ) ) {
+			$sql_cards_in_deck = "
 				SELECT id FROM $tb_cards as c_t
 				WHERE c_t.card_group_id IN (
 					# List of card_groups in topic
@@ -723,52 +755,59 @@ class UserCard extends Model {
 					)
 			   )
 		";
-		if ( sp_in_sql_mode() ) {
-			$sub_result_cards_in_deck_ = $wpdb->get_results( $sql_cards_in_deck, ARRAY_A );
-			$sub_result_cards_in_deck  = array_map(
-				static function ( $val ) {
-					return $val['id'];
-				},
-				$sub_result_cards_in_deck_
-			);
+			if ( sp_in_sql_mode() ) {
+				$_start_time_deck               = time();
+				$sub_result_cards_in_deck_      = $wpdb->get_results( $sql_cards_in_deck, ARRAY_A );
+				$_stop_time_deck                = time();
+				$sub_result_cards_in_deck       = array_map(
+					static function ( $val ) {
+						return $val['id'];
+					},
+					$sub_result_cards_in_deck_
+				);
+				$_stop_time_and_query_loop_deck = time();
+				$debug                          = self::format_debug_data( $debug, 'deck', array(
+					'sql_cards_in_deck'         => $sql_cards_in_deck,
+					'sub_result_cards_in_deck_' => $sub_result_cards_in_deck_ ?? array(),
+					'sub_result_cards_in_deck'  => $sub_result_cards_in_deck ?? array(),
+					'mill_seconds_for_query'    => ( $_stop_time_deck - $_start_time_deck ),
+					'mill_seconds_with'         => ( $_stop_time_and_query_loop_deck - $_start_time_deck ),
+				) );
+			}
 		}
-
-		$debug = self::format_debug_data( $debug, 'deck', array(
-			'sql_cards_in_deck'         => $sql_cards_in_deck,
-			'sub_result_cards_in_deck_' => $sub_result_cards_in_deck_ ?? array(),
-			'sub_result_cards_in_deck'  => $sub_result_cards_in_deck ?? array(),
-		) );
 		// </editor-fold desc="Deck Cards" >
 
 		// <editor-fold desc="Tags Decisions" >
 
 		// Tags to include.
-		$sql_tags_to_include = "";
-		$sql_tags_to_exclude = "";
-		$_include            = false;
-		$_exclude            = false;
-		if ( empty( $tags_to_include ) && ! empty( $tags_to_exclude ) ) {
-			// Include all. Dont do anything.
-			$_include = true;
-		} else {
-			if ( ! empty( $tags_to_include ) ) {
-				// Included tags set? Return only cards in these tags.
-				$_include = true;
-			} else {
-				if ( ! empty( $tags_to_exclude ) ) {
-					// Considered only when $included_tags is empty.
-					// Return only cards not in these tags.
-					$_exclude = true;
-				}
-			}
-		}
+//		$sql_tags_to_include = "";
+//		$sql_tags_to_exclude = "";
+
+//		$use_tags_included = false;
+//		$use_tags_excluded = false;
+
+		$_exclude = false;
+//		if ( empty( $tags_to_include ) && empty( $tags_to_exclude ) ) {
+//			// If none is set, just avoid using tags or excluded tags at all.
+//		} else {
+//			if ( ! empty( $tags_to_include ) ) {
+//				// Included tags set? Return only cards in these tags.
+//				$use_tags_included = true;
+//			} else {
+//				if ( ! empty( $tags_to_exclude ) ) {
+//					// Considered only when $included_tags is empty.
+//					// Return only cards not in these tags.
+//					$use_tags_excluded = true;
+//				}
+//			}
+//		}
 
 		// </editor-fold desc="Tags Decisions" >
 
 		// <editor-fold desc="Included Tags">
 
-		if ( $_include && ! empty( $tags_to_include ) ) {
-
+		if ( ! empty( $tags_to_include ) ) {
+			$debug['included_tags']['included'] = true;
 			// Get card groups in Included_tags.
 			$implode_tags                     = '(' . implode( ',', $tags_to_include ) . ')';
 			$sql_cards_groups_in_include_tags = "
@@ -777,15 +816,27 @@ class UserCard extends Model {
 				 AND tga_tint.taggable_type = '{$taggable_type_card_groups}'
 			";
 			if ( sp_in_sql_mode() ) {
-				$sub_result_cards_groups_in_include_tags_ = $wpdb->get_results( $sql_cards_groups_in_include_tags, ARRAY_A );
-				$sub_result_cards_groups_in_include_tags  = array_map(
+				$_start_time_card_groups_in_include           = time();
+				$sub_result_cards_groups_in_include_tags_     = $wpdb->get_results( $sql_cards_groups_in_include_tags, ARRAY_A );
+				$_stop_time_card_groups_in_include            = time();
+				$sub_result_cards_groups_in_include_tags      = array_map(
 					static function ( $val ) {
 						return $val['taggable_id'];
 					},
 					$sub_result_cards_groups_in_include_tags_
 				);
+				$_stop_time_query_loop_card_groups_in_include = time();
+				$debug                                        = self::format_debug_data( $debug, 'included_tags', array(
+					'tags_to_include'                          => $tags_to_include,
+					'implode_tags'                             => $implode_tags,
+					//
+					'sql_cards_groups_in_include_tags'         => $sql_cards_groups_in_include_tags,
+					'sub_result_cards_groups_in_include_tags_' => $sub_result_cards_groups_in_include_tags_,
+					'sub_result_cards_groups_in_include_tags'  => $sub_result_cards_groups_in_include_tags,
+					'mill_seconds_for_query'                   => ( $_stop_time_card_groups_in_include - $_start_time_card_groups_in_include ),
+					'mill_seconds_with'                        => $_stop_time_query_loop_card_groups_in_include - $_start_time_card_groups_in_include,
+				) );
 			}
-
 			$sql_tags_to_include = "
 				SELECT c_in.id from $tb_cards  as c_in
 				WHERE c_in.card_group_id IN (
@@ -794,35 +845,33 @@ class UserCard extends Model {
 				)
 			";
 			if ( sp_in_sql_mode() ) {
+				$_start_time_cards_in_include_tags  = time();
 				$sub_result_cards_in_included_tags_ = $wpdb->get_results( $sql_tags_to_include, ARRAY_A );
+				$_stop_time_card_in_include         = time();
 				$sub_result_cards_in_included_tags  = array_map(
 					static function ( $val ) {
 						return $val['id'];
 					},
 					$sub_result_cards_in_included_tags_ ?? array()
 				);
+				$_stop_time_query_loop_card_include = time();
+				$debug                              = self::format_debug_data( $debug, 'included_tags', array(
+					'sql_tags_to_include'                => $sql_tags_to_include,
+					'sub_result_cards_in_included_tags_' => $sub_result_cards_in_included_tags_,
+					'sub_result_cards_in_included_tags'  => $sub_result_cards_in_included_tags,
+					'mill_seconds_for_query'             => ( $_stop_time_card_in_include - $_start_time_cards_in_include_tags ),
+					'mill_seconds_with'                  => ( $_stop_time_query_loop_card_include - $_start_time_cards_in_include_tags ),
+				) );
 			}
 
-			$debug = self::format_debug_data( $debug, 'included_tags', array(
-				'_include'                                 => $_include,
-				'tags_to_include'                          => $tags_to_include,
-				'implode_tags'                             => $implode_tags,
-				//
-				'sql_cards_groups_in_include_tags'         => $sql_cards_groups_in_include_tags,
-				'sub_result_cards_groups_in_include_tags_' => $sub_result_cards_groups_in_include_tags_ ?? array(),
-				'sub_result_cards_groups_in_include_tags'  => $sub_result_cards_groups_in_include_tags ?? array(),
-				//
-				'sql_tags_to_include'                      => $sql_tags_to_include,
-				'sub_result_cards_in_included_tags_'       => $sub_result_cards_in_included_tags_ ?? array(),
-				'sub_result_cards_in_included_tags'        => $sub_result_cards_in_included_tags ?? array(),
-			) );
 		}
 
 		// </editor-fold desc="Included Tags">
 
 		// <editor-fold desc="Excluded Tags">
 		// Excluded Tags.
-		if ( ! $_include && ! empty( $tags_to_exclude ) ) {
+		if ( empty( $tags_to_include ) && ! empty( $tags_to_exclude ) ) {
+			$debug['excluded_tags']['excluded'] = true;
 			// Get card groups in Included_tags.
 			$implode_excluded_tags            = '(' . implode( ',', $tags_to_exclude ) . ')';
 			$sql_cards_groups_in_exclude_tags = "
@@ -831,14 +880,28 @@ class UserCard extends Model {
 				 AND tgae_tint.taggable_type = {$taggable_type_card_groups}
 			";
 			if ( sp_in_sql_mode() ) {
-				$sub_result_cards_groups_in_excluded_tags_ = $wpdb->get_results( $sql_cards_groups_in_exclude_tags, ARRAY_A );
-				$sub_result_cards_groups_in_excluded_tags  = array_map(
+				$_start_time_card_groups_in_excluded_tags              = time();
+				$sub_result_cards_groups_in_excluded_tags_             = $wpdb->get_results( $sql_cards_groups_in_exclude_tags, ARRAY_A );
+				$_stop_time_card_groups_in_excluded_tab                = time();
+				$sub_result_cards_groups_in_excluded_tags              = array_map(
 					static function ( $val ) {
 						return $val['taggable_id'];
 					},
-					$sub_result_cards_groups_in_include_tags_
+					$sub_result_cards_groups_in_excluded_tags_
 				);
+				$_stop_time_and_query_loop_card_groups_in_excluded_tab = time();
+				$debug                                                 = self::format_debug_data( $debug, 'excluded_tags', array(
+					'tags_to_exlude'                            => $tags_to_exclude,
+					'implode_excluded_tags'                     => $implode_excluded_tags,
+					//
+					'sql_cards_groups_in_exclude_tags'          => $sql_cards_groups_in_exclude_tags,
+					'sub_result_cards_groups_in_excluded_tags_' => $sub_result_cards_groups_in_excluded_tags_,
+					'sub_result_cards_groups_in_excluded_tags'  => $sub_result_cards_groups_in_excluded_tags,
+					'mill_seconds_for_query'                    => ( $_stop_time_card_groups_in_excluded_tab - $_start_time_card_groups_in_excluded_tags ),
+					'mill_seconds_with'                         => ( $_stop_time_and_query_loop_card_groups_in_excluded_tab - $_start_time_card_groups_in_excluded_tags ),
+				) );
 			}
+
 
 			$sql_cards_in_tags_to_exclude = "
 				SELECT id from $tb_cards  as c_in 
@@ -852,73 +915,125 @@ class UserCard extends Model {
 				)
 			";
 			if ( sp_in_sql_mode() ) {
-				$sub_result_cards_in_excluded_tags_ = $wpdb->get_results( $sql_cards_in_tags_to_exclude, ARRAY_A );
-				$sub_result_cards_in_excluded_tags  = array_map(
+				$_start_time_cards_in_excluded_tags               = time();
+				$sub_result_cards_in_excluded_tags_               = $wpdb->get_results( $sql_cards_in_tags_to_exclude, ARRAY_A );
+				$_stop_time_cards_in_excluded_tags                = time();
+				$sub_result_cards_in_excluded_tags                = array_map(
 					static function ( $val ) {
 						return $val['id'];
 					},
 					$sub_result_cards_in_excluded_tags_ ?? array()
 				);
+				$_stop_time_and_query_loop_cards__in_excluded_tab = time();
+				$debug                                            = self::format_debug_data( $debug, 'excluded_tags', array(
+					'sql_cards_in_tags_to_exclude'       => $sql_cards_in_tags_to_exclude,
+					'sub_result_cards_in_excluded_tags_' => $sub_result_cards_in_excluded_tags_,
+					'sub_result_cards_in_excluded_tags'  => $sub_result_cards_in_excluded_tags,
+					'mill_seconds_for_query'             => ( $_stop_time_cards_in_excluded_tags - $_start_time_cards_in_excluded_tags ),
+					'mill_seconds_with'                  => ( $_stop_time_and_query_loop_cards__in_excluded_tab - $_start_time_cards_in_excluded_tags ),
+				) );
 			}
-
-			$debug = self::format_debug_data( $debug, 'excluded_tags', array(
-				'_include'                                  => $_include,
-				'tags_to_exlude'                            => $tags_to_exclude,
-				'implode_excluded_tags'                     => $implode_excluded_tags,
-				//
-				'sql_cards_groups_in_exclude_tags'          => $sql_cards_groups_in_exclude_tags,
-				'sub_result_cards_groups_in_excluded_tags_' => $sub_result_cards_groups_in_excluded_tags_ ?? array(),
-				'sub_result_cards_groups_in_excluded_tags'  => $sub_result_cards_groups_in_excluded_tags ?? array(),
-				//
-				'sql_cards_in_tags_to_exclude'              => $sql_cards_in_tags_to_exclude,
-				'sub_result_cards_in_excluded_tags_'        => $sub_result_cards_in_excluded_tags_ ?? array(),
-				'sub_result_cards_in_excluded_tags'         => $sub_result_cards_in_excluded_tags ?? array(),
-			) );
 		}
-
 
 		// </editor-fold desc="Excluded Tags">
 
-		// <editor-fold desc="Answered Cards">
+		// <editor-fold desc="Answered Cards Distinct">
 
 		// Distinct answered card_ids
-		$sql_distinct_answered_cards         = "
+		$sql_distinct_answered_cards = "
 			SELECT DISTINCT card_id from {$tb_answered} as a 
 			WHERE a.study_id = {$study_id}
 		";
-		$sub_result_distinct_answered_cards_ = $wpdb->get_results( $sql_distinct_answered_cards, ARRAY_A );
-		$sub_result_distinct_answered_cards  = array_map(
-			static function ( $val ) {
-				return $val['card_id'];
-			},
-			$sub_result_distinct_answered_cards_ ?? array()
-		);
+		if ( sp_in_sql_mode() ) {
+			$_start_time_answered_cards               = time();
+			$sub_result_distinct_answered_cards_      = $wpdb->get_results( $sql_distinct_answered_cards, ARRAY_A );
+			$_stop_time_answered_cards                = time();
+			$sub_result_distinct_answered_cards       = array_map(
+				static function ( $val ) {
+					return $val['card_id'];
+				},
+				$sub_result_distinct_answered_cards_ ?? array()
+			);
+			$_stop_time_and_query_loop_answered_cards = time();
+			$debug                                    = self::format_debug_data( $debug, 'new_cards', array(
+				'sql_distinct_answered_cards'         => $sql_distinct_answered_cards,
+				'sub_result_distinct_answered_cards_' => $sub_result_distinct_answered_cards_,
+				'sub_result_distinct_answered_cards'  => $sub_result_distinct_answered_cards,
+				'mill_seconds_for_query'              => ( $_stop_time_answered_cards - $_start_time_answered_cards ),
+				'mill_seconds_with'                   => ( $_stop_time_and_query_loop_answered_cards - $_start_time_answered_cards ),
+			) );
+		}
 
+		// </editor-fold desc="Answered Cards ">
+
+		// <editor-fold desc="Cards Not in Answered">
 		// Get new cards.
-		$sql_new_cards   = "
+		$sql_not_answered = "
 			SELECT id from {$tb_cards} as c_new
 			WHERE c_new.id NOT IN (
 				{$sql_distinct_answered_cards}
 			)
 		";
-		$sub_result_new_ = $wpdb->get_results( $sql_new_cards, ARRAY_A );
-		$sub_result_new  = array_map(
+		if ( sp_in_sql_mode() ) {
+			$_start_time_not_answered_cards               = time();
+			$sub_not_answered_                            = $wpdb->get_results( $sql_not_answered, ARRAY_A );
+			$_stop_time_not_answered_cards                = time();
+			$sub_not_answered                             = array_map(
+				static function ( $val ) {
+					return $val['id'];
+				},
+				$sub_not_answered_ ?? array()
+			);
+			$_stop_time_and_query_loop_not_answered_cards = time();
+			$debug                                        = self::format_debug_data( $debug, 'new_cards', array(
+				'sql_not_answered'       => $sql_not_answered,
+				'sub_not_answered_'      => $sub_not_answered_ ?? array(),
+				'sub_not_answered'       => $sub_not_answered ?? array(),
+				'mill_seconds_for_query' => ( $_stop_time_not_answered_cards - $_start_time_not_answered_cards ),
+				'mill_seconds_with'      => ( $_stop_time_and_query_loop_not_answered_cards - $_start_time_not_answered_cards ),
+			) );
+		}
+
+		// </editor-fold desc="Cards Not answered">
+
+		// Get new cards.
+		$result_sql_new = sprintf( "
+			SELECT * from {$tb_cards} as c1 
+			WHERE c1.id IN ($sql_user_cards) 
+			AND c1.id NOT IN ($sql_exclude_collection) 
+			AND c1.id NOT IN ($sql_cards_in_uncategorized_topic) 
+			AND c1.id IN ($sql_not_answered) 
+			%1$s 
+			%2$s 
+			%3$s 
+			%4$s 
+		",
+			! empty( $sql_cards_in_topic ) ? "AND c1.id IN ($sql_cards_in_topic)" : '',
+			! empty( $sql_cards_in_deck ) ? "AND c1.id IN ($sql_cards_in_deck)" : '',
+			! empty( $sql_tags_to_include ) ? "AND c1.id IN ($sql_tags_to_include)" : '',
+			! empty( $sql_cards_in_tags_to_exclude ) ? "AND c1.id NOT IN ($sql_cards_in_tags_to_exclude)" : '',
+		);
+		// todo add limits later.
+		$_start_time_cards_new               = time();
+		$result_new_cards__                  = $wpdb->get_results( $result_sql_new, ARRAY_A );
+		$_stop_time_cards_new                = time();
+		$result_new_cards_ids_               = array_map(
 			static function ( $val ) {
 				return $val['id'];
 			},
-			$sub_result_new_ ?? array()
+			$result_new_cards__
 		);
-
-		// </editor-fold desc="Answered Cards">
-
-		// Get new cards.
-//		$sql_new = "
-//			SELECT * from {$tb_cards} as c1
-//			WHERE c1.id NOT IN ($sql_exclude_collection)
-//			AND c1.id NOT IN ($sql_cards_in_uncategorized_topic)
-//			AND c1.id IN ($sql_user_cards)
-//			AND c1.id IN ($sql_new_cards)
-//		";
+		$_stop_time_and_query_loop_cards_new = time();
+		if ( sp_in_sql_mode() ) {
+			$debug = self::format_debug_data( $debug, 'cards_new', array(
+				'result_sql_new'            => $result_sql_new,
+				'sub_result_cards_in_deck_' => $sub_result_cards_in_deck_,
+				'result_new_cards__'        => $result_new_cards__,
+				'result_new_cards_ids_'     => $result_new_cards_ids_,
+				'mill_seconds_for_query'    => ( $_stop_time_cards_new - $_start_time_cards_new ),
+				'mill_seconds_with'         => ( $_stop_time_and_query_loop_cards_new - $_start_time_cards_new ),
+			) );
+		}
 
 //		$results_new_ = $wpdb->get_results( $sql_new, ARRAY_A );
 //		$results_new  = array_map(

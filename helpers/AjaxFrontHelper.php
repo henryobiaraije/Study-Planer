@@ -727,7 +727,8 @@ class AjaxFrontHelper {
 		$study_all_new     = (bool) sanitize_text_field( $all['study_all_new'] );
 		$study_all_on_hold = (bool) sanitize_text_field( $all['study_all_on_hold'] );
 		$all_tags          = (bool) sanitize_text_field( $all['all_tags'] );
-		$tags_excluded     = in_array( 'tags_excluded', $all, true ) ? $all['tags_excluded'] : [];
+//		$tags_excluded     = in_array( 'tags_excluded', $all, true ) ? $all['tags_excluded'] : [];
+		$tags_excluded     = array_key_exists( 'tags_excluded', $all ) ? $all['tags_excluded'] : array();
 		$topic_id          = (int) sanitize_text_field( null !== $all['topic'] ? $all['topic']['id'] : 0 );
 		$active            = (bool) sanitize_text_field( $all['active'] );
 
