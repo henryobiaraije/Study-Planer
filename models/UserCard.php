@@ -6,29 +6,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Model\Answered;
 use Model\Card;
 use Model\CardGroup;
-use Model\Deck;
 use Model\DeckGroup;
 use Model\Study;
-use Model\Topic;
 use Model\User;
 use StudyPlannerPro\Initializer;
 use StudyPlannerPro\Libs\Common;
-use StudyPlannerPro\Models\Tag;
-
-use function StudyPlannerPro\get_uncategorized_deck_group_id;
-use function StudyPlannerPro\get_uncategorized_deck_id;
 use function StudyPlannerPro\get_uncategorized_topic_id;
-use function StudyPlannerPro\get_user_timezone_date_early_morning_today;
-use function StudyPlannerPro\get_user_timezone_date_midnight_today;
 use function StudyPlannerPro\sp_get_user_studies;
-use function StudyPlannerPro\sp_get_user_study;
 use function StudyPlannerPro\sp_in_sql_mode;
 
 class UserCard extends Model {
@@ -503,13 +493,13 @@ class UserCard extends Model {
 	 */
 	private static function format_debug_data( array $debug, string $key, array $data ): array {
 		$last_count = count( $debug[ $key ] );
-		$new_data   = array();
-		if ( ! empty( $debug[ $key ] ) ) {
-			$new_data = $data;
-		} else {
-			$new_data = array_merge( $data );
-		}
-		$debug[ $key ][ $last_count + 1 . '_log' ] = $new_data;
+//		$new_data   = array();
+//		if ( ! empty( $debug[ $key ] ) ) {
+//			$new_data = $data;
+//		} else {
+//			$new_data = $data;
+//		}
+		$debug[ $key ][ $last_count + 1 . '_log' ] = $data;
 
 		return $debug;
 	}
@@ -526,8 +516,24 @@ class UserCard extends Model {
 		int $topic_id = 0
 	) {
 
-		$study_id       = $study->id;
-		$study_to_array = $study->toArray();
+		$study_id           = $study->id;
+		$study_no_of_new    = $study->no_of_new;
+		$study_no_to_revise = $study->no_to_revise;
+		$study_no_on_hold   = $study->no_on_hold;
+		$study_to_array     = $study->toArray();
+		$today_datetime     = Common::getDateTime();
+		$today_date         = Common::get_date();
+
+		if ( $study->study_all_new ) {
+			$study_no_of_new = 10000;
+		}
+		if ( $study->revise_all ) {
+			$study_no_to_revise = 10000;
+		}
+		if ( $study->study_all_on_hold ) {
+			$study_no_on_hold = 10000;
+		}
+
 
 		$debug = array(
 			'variables'                    => array(),
@@ -546,15 +552,22 @@ class UserCard extends Model {
 			),
 			'topic'                        => array(),
 			'deck'                         => array(),
-			'new'                          => array(),
-			'revise'                       => array(),
-			'on_hold'                      => array(),
-			'cards_new'                    => array(),
-			'cards_revision'               => array(),
-			'cards_on_hold'                => array(),
+			//
 			'count_studied_today_new'      => array(),
 			'count_studied_today_revision' => array(),
 			'count_studied_today_on_hold'  => array(),
+			//
+			'due_and_in_revision'          => array(),
+			'due_and_on_hold'              => array(),
+			'due_till_today'               => array(),
+			//
+			'answered_as_new_today'        => array(),
+			'answered_as_revision_today'   => array(),
+			'answered_as_on_hold_today'    => array(),
+			//
+			'result_cards_new'             => array(),
+			'result_cards_revision'        => array(),
+			'result_cards_on_hold'         => array(),
 			'sp_in_sql_mode'               => sp_in_sql_mode()
 		);
 
@@ -943,6 +956,7 @@ class UserCard extends Model {
 		$sql_distinct_answered_cards = "
 			SELECT DISTINCT card_id from {$tb_answered} as a 
 			WHERE a.study_id = {$study_id}
+			ORDER BY id DESC
 		";
 		if ( sp_in_sql_mode() ) {
 			$_start_time_answered_cards               = time();
@@ -996,18 +1010,184 @@ class UserCard extends Model {
 
 		// </editor-fold desc="Cards Not answered">
 
-		// Get new cards.
-		$result_sql_new = sprintf( "
+		// <editor-fold desc="Cards Due in Revision">
+		$sql_cards_due_in_revision = "
+			SELECT id from {$tb_cards} as c_due_rev
+			WHERE c_due_rev.id IN (
+				{$sql_distinct_answered_cards}
+			)
+			AND grade != 'hold'  
+			AND next_due_at < {$today_datetime}
+		";
+		if ( sp_in_sql_mode() ) {
+			$_start_time_due_and_in_revision               = time();
+			$sub_due_in_revision_                          = $wpdb->get_results( $sql_cards_due_in_revision, ARRAY_A );
+			$_stop_time_due_and_in_revision                = time();
+			$sub_due_in_revision                           = array_map(
+				static function ( $val ) {
+					return $val['id'];
+				},
+				$sub_due_in_revision_ ?? array()
+			);
+			$_stop_time_and_query_loop_due_and_in_revision = time();
+			$debug                                         = self::format_debug_data( $debug, 'due_and_in_revision', array(
+				'sql_cards_due_in_revision_distinct' => $sql_cards_due_in_revision,
+				'sub_due_in_revision_'               => $sub_due_in_revision_,
+				'sub_due_in_revision'                => $sub_due_in_revision,
+				'mill_seconds_for_query'             => ( $_stop_time_due_and_in_revision - $_start_time_due_and_in_revision ),
+				'mill_seconds_with'                  => ( $_stop_time_and_query_loop_due_and_in_revision - $_start_time_due_and_in_revision ),
+			) );
+		}
+
+		// </editor-fold desc="Cards Due in Revision">
+
+		// <editor-fold desc="Cards Due and on hold">
+		$sql_cards_due_and_on_hold = "
+			SELECT id from {$tb_cards} as c_due_rev
+			WHERE c_due_rev.id IN (
+				{$sql_distinct_answered_cards}
+			)
+			AND grade = 'revision'  
+			AND next_due_at < {$today_datetime}
+		";
+		if ( sp_in_sql_mode() ) {
+			$_start_time_due_and_on_hold               = time();
+			$sub_due_and_on_hold_                      = $wpdb->get_results( $sql_cards_due_and_on_hold, ARRAY_A );
+			$_stop_time_due_and_on_hold                = time();
+			$sub_due_and_on_hold                       = array_map(
+				static function ( $val ) {
+					return $val['id'];
+				},
+				$sub_due_and_on_hold_ ?? array()
+			);
+			$_stop_time_and_query_loop_due_and_on_hold = time();
+			$debug                                     = self::format_debug_data( $debug, 'due_and_on_hold', array(
+				'sql_cards_due_in_revision_distinct' => $sql_cards_due_in_revision,
+				'sub_due_and_on_hold_'               => $sub_due_and_on_hold_,
+				'sub_due_and_on_hold'                => $sub_due_and_on_hold,
+				'mill_seconds_for_query'             => ( $_stop_time_due_and_on_hold - $_start_time_due_and_on_hold ),
+				'mill_seconds_with'                  => ( $_stop_time_and_query_loop_due_and_on_hold - $_start_time_due_and_on_hold ),
+			) );
+		}
+
+		// </editor-fold desc="Cards Due and on Hold">
+
+		// <editor-fold desc="Answered as New Today">
+		$sql_cards_answered_as_new_today                 = "
+			SELECT a_new.card_id from {$tb_answered} as a_new 
+			WHERE a_new.study_id = {$study_id} 
+			AND a_new.created_at >= {$today_date}  
+			 AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
+			AND a_new.answered_as_new = 1
+		";
+		$_start_time_answered_as_new_today               = time();
+		$sub_answered_as_new_today_                      = $wpdb->get_results( $sql_cards_answered_as_new_today, ARRAY_A );
+		$_stop_time_answered_as_new_today                = time();
+		$sub_answered_as_new_today                       = array_map(
+			static function ( $val ) {
+				return $val['id'];
+			},
+			$sub_answered_as_new_today_ ?? array()
+		);
+		$_stop_time_and_query_loop_answered_as_new_today = time();
+		$count_answered_as_new_today                     = count( $sub_answered_as_new_today );
+		$limit_new                                       = $study_no_of_new - $count_answered_as_new_today;
+		$debug                                           = self::format_debug_data( $debug, 'answered_as_new_today', array(
+			'sql'                         => $sql_cards_answered_as_new_today,
+			'sub_result'                  => $sub_answered_as_new_today_,
+			'sub_result_array'            => $sub_answered_as_new_today,
+			'mill_seconds_for_query'      => ( $_stop_time_answered_as_new_today - $_start_time_answered_as_new_today ),
+			'mill_seconds_with_array'     => ( $_stop_time_and_query_loop_answered_as_new_today - $_start_time_answered_as_new_today ),
+			'count_answered_as_new_today' => $count_answered_as_new_today,
+			'limit_new'                   => $limit_new,
+			'study_no_of_new'             => $study_no_of_new
+		) );
+
+		// </editor-fold desc="Answered As New Today">
+
+		// <editor-fold desc="Answered as Revision Today">
+		$sql_cards_answered_as_revision_today                 = "
+			SELECT a_new.card_id from {$tb_answered} as a_new 
+			WHERE a_new.study_id = {$study_id} 
+			AND a_new.created_at >= {$today_date}  
+			AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
+			AND a_new.answered_as_revised = 1
+		";
+		$_start_time_answered_as_revision_today               = time();
+		$sub_answered_as_revision_today_                      = $wpdb->get_results( $sql_cards_answered_as_revision_today, ARRAY_A );
+		$_stop_time_answered_as_revision_today                = time();
+		$sub_answered_as_revision_today                       = array_map(
+			static function ( $val ) {
+				return $val['id'];
+			},
+			$sub_answered_as_revision_today_ ?? array()
+		);
+		$_stop_time_and_query_loop_answered_as_revision_today = time();
+		$count_answered_as_revision_today                     = count( $sub_answered_as_revision_today );
+		$limit_revise                                         = $study_no_to_revise - $count_answered_as_revision_today;
+		$debug                                                = self::format_debug_data( $debug, 'answered_as_revision_today', array(
+			'sql'                              => $sql_cards_answered_as_revision_today,
+			'sub_result'                       => $sub_answered_as_revision_today_,
+			'sub_result_array'                 => $sub_answered_as_revision_today,
+			'mill_seconds_for_query'           => ( $_stop_time_answered_as_revision_today - $_start_time_answered_as_revision_today ),
+			'mill_seconds_with_array'          => ( $_stop_time_and_query_loop_answered_as_revision_today - $_start_time_answered_as_revision_today ),
+			'limit_revise'                     => $limit_revise,
+			'study_no_to_revise'               => $study_no_to_revise,
+			'count_answered_as_revision_today' => $count_answered_as_revision_today,
+		) );
+
+		// </editor-fold desc="Answered As Revision Today">
+
+		// <editor-fold desc="Answered as On Hold Today">
+		$sql_cards_answered_as_on_hold_today = "
+			SELECT a_new.card_id from {$tb_answered} as a_new 
+			WHERE a_new.study_id = {$study_id} 
+			AND a_new.created_at >= {$today_date}  
+			AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
+			AND a_new.answered_as_on_hold = 1
+		";
+		if ( sp_in_sql_mode() ) {
+			$_start_time_answered_as_on_hold_today_today          = time();
+			$sub_answered_as_on_hold_today_                       = $wpdb->get_results( $sql_cards_answered_as_on_hold_today, ARRAY_A );
+			$_stop_time_answered_as_on_hold_today                 = time();
+			$sub_answered_as_on_hold_today                        = array_map(
+				static function ( $val ) {
+					return $val['id'];
+				},
+				$sub_answered_as_on_hold_today_ ?? array()
+			);
+			$_stop_time_and_query_loop_answered_as_revision_today = time();
+			$count_answered_as_on_hold_today                      = count( $sub_answered_as_on_hold_today );
+			$limit_on_hold                                        = $study_no_on_hold - $count_answered_as_on_hold_today;
+			$debug                                                = self::format_debug_data( $debug, 'answered_as_on_hold_today', array(
+				'sql'                             => $sql_cards_answered_as_on_hold_today,
+				'sub_result'                      => $sub_answered_as_on_hold_today_,
+				'sub_result_array'                => $sub_answered_as_on_hold_today,
+				'mill_seconds_for_query'          => ( $_stop_time_answered_as_on_hold_today - $_start_time_answered_as_on_hold_today_today ),
+				'mill_seconds_with_array'         => ( $_stop_time_and_query_loop_answered_as_revision_today - $_start_time_answered_as_on_hold_today_today ),
+				'limit_on_hold'                   => $limit_on_hold,
+				'study_no_on_hold'                => $study_no_on_hold,
+				'count_answered_as_on_hold_today' => $count_answered_as_on_hold_today,
+			) );
+		}
+
+		// </editor-fold desc="Answered As Oh Hold Today">
+
+
+		// <editor-fold desc="New Cards">
+		$result_sql_new = "
 			SELECT * from {$tb_cards} as c1 
 			WHERE c1.id IN ($sql_user_cards) 
 			AND c1.id NOT IN ($sql_exclude_collection) 
 			AND c1.id NOT IN ($sql_cards_in_uncategorized_topic) 
 			AND c1.id IN ($sql_not_answered) 
-			%1$s 
-			%2$s 
-			%3$s 
-			%4$s 
-		",
+			LIMIT {$limit_new} 
+			";
+		$result_sql_new .= sprintf( '
+					%1$s 
+					%2$s 
+					%3$s 
+					%4$s ',
 			! empty( $sql_cards_in_topic ) ? "AND c1.id IN ($sql_cards_in_topic)" : '',
 			! empty( $sql_cards_in_deck ) ? "AND c1.id IN ($sql_cards_in_deck)" : '',
 			! empty( $sql_tags_to_include ) ? "AND c1.id IN ($sql_tags_to_include)" : '',
@@ -1025,7 +1205,7 @@ class UserCard extends Model {
 		);
 		$_stop_time_and_query_loop_cards_new = time();
 		if ( sp_in_sql_mode() ) {
-			$debug = self::format_debug_data( $debug, 'cards_new', array(
+			$debug = self::format_debug_data( $debug, 'result_cards_new', array(
 				'result_sql_new'            => $result_sql_new,
 				'sub_result_cards_in_deck_' => $sub_result_cards_in_deck_,
 				'result_new_cards__'        => $result_new_cards__,
@@ -1034,6 +1214,97 @@ class UserCard extends Model {
 				'mill_seconds_with'         => ( $_stop_time_and_query_loop_cards_new - $_start_time_cards_new ),
 			) );
 		}
+		// </editor-fold desc="New Cards">
+
+		// <editor-fold desc="Revision Cards">
+
+		$result_sql_revision = "
+			SELECT * from {$tb_cards} as c1 
+			WHERE c1.id IN ($sql_user_cards) 
+			AND c1.id NOT IN ($sql_exclude_collection) 
+			AND c1.id NOT IN ($sql_cards_in_uncategorized_topic) 
+			AND c1.id IN ($sql_cards_due_in_revision) 
+			LIMIT {$limit_revise} ";
+		$result_sql_revision .= sprintf( '
+					%1$s 
+					%2$s 
+					%3$s 
+					%4$s 
+				',
+			! empty( $sql_cards_in_topic ) ? "AND c1.id IN ($sql_cards_in_topic)" : '',
+			! empty( $sql_cards_in_deck ) ? "AND c1.id IN ($sql_cards_in_deck)" : '',
+			! empty( $sql_tags_to_include ) ? "AND c1.id IN ($sql_tags_to_include)" : '',
+			! empty( $sql_cards_in_tags_to_exclude ) ? "AND c1.id NOT IN ($sql_cards_in_tags_to_exclude)" : '',
+		);
+		// todo add limits later.
+		$_start_time_cards_revision              = time();
+		$result_revision_cards__                 = $wpdb->get_results( $result_sql_revision, ARRAY_A );
+		$_stop_time_cards_revision               = time();
+		$result_revision_cards_ids_              = array_map(
+			static function ( $val ) {
+				return $val['id'];
+			},
+			$result_revision_cards__
+		);
+		$_stop_time_and_query_loop_cards_revsion = time();
+		if ( sp_in_sql_mode() ) {
+			$debug = self::format_debug_data( $debug, 'cards_revision', array(
+				'result_sql_revision'        => $result_sql_revision,
+				'result_revision_cards__'    => $result_revision_cards__,
+				'result_revision_cards_ids_' => $result_revision_cards_ids_,
+				'mill_seconds_for_query'     => ( $_stop_time_cards_revision - $_start_time_cards_revision ),
+				'mill_seconds_with'          => ( $_stop_time_and_query_loop_cards_revsion - $_start_time_cards_revision ),
+			) );
+		}
+		// </editor-fold desc="Revision Cards">
+
+		// <editor-fold desc="On Hold Cards">
+
+		$result_sql_on_hold = "
+			SELECT * from {$tb_cards} as c1 
+			WHERE c1.id IN ($sql_user_cards) 
+			AND c1.id NOT IN ($sql_exclude_collection) 
+			AND c1.id NOT IN ($sql_cards_in_uncategorized_topic) 
+			AND c1.id IN ($sql_cards_due_and_on_hold) 
+			LIMIT {$limit_on_hold} 
+		";
+		$result_sql_on_hold .= sprintf( '
+			%1$s 
+			%2$s 
+			%3$s 
+			%4$s ',
+			! empty( $sql_cards_in_topic ) ? "AND c1.id IN ($sql_cards_in_topic)" : '',
+			! empty( $sql_cards_in_deck ) ? "AND c1.id IN ($sql_cards_in_deck)" : '',
+			! empty( $sql_tags_to_include ) ? "AND c1.id IN ($sql_tags_to_include)" : '',
+			! empty( $sql_cards_in_tags_to_exclude ) ? "AND c1.id NOT IN ($sql_cards_in_tags_to_exclude)" : '',
+		);
+		// todo add limits later.
+		$_start_time_cards_on_hold               = time();
+		$result_on_hold_cards__                  = $wpdb->get_results( $result_sql_on_hold, ARRAY_A );
+		$_stop_time_cards_on_hold                = time();
+		$result_on_hold_cards_ids_               = array_map(
+			static function ( $val ) {
+				return $val['id'];
+			},
+			$result_on_hold_cards__
+		);
+		$_stop_time_and_query_loop_cards_on_hold = time();
+		if ( sp_in_sql_mode() ) {
+			$debug = self::format_debug_data( $debug, 'cards_on_hold', array(
+				'result_sql_on_hold'        => $result_sql_on_hold,
+				'result_on_hold_cards__'    => $result_on_hold_cards__,
+				'result_on_hold_cards_ids_' => $result_on_hold_cards_ids_,
+				'mill_seconds_for_query'    => ( $_stop_time_cards_on_hold - $_start_time_cards_on_hold ),
+				'mill_seconds_with'         => ( $_stop_time_and_query_loop_cards_on_hold - $_start_time_cards_on_hold ),
+			) );
+		}
+		// </editor-fold desc="On Hold Cards">
+
+
+		// Get for revision cards
+		// Get for on hold cards
+		// Get for  on hold
+		// Get already studied today for all
 
 //		$results_new_ = $wpdb->get_results( $sql_new, ARRAY_A );
 //		$results_new  = array_map(

@@ -427,12 +427,17 @@ class AjaxFrontHelper {
 
 		$answered_as_new     = false;
 		$answered_as_revised = false;
+		$answered_as_on_hold = false;
 
 		$_answered_before = Answered::where( 'card_id', '=', $card_id )->first();
 		if ( empty( $_answered_before ) ) {
 			$answered_as_new = true;
 		} else {
-			$answered_as_revised = true;
+			if ( $_answered_before->grade === 'hold' ) {
+				$answered_as_on_hold = true;
+			} else {
+				$answered_as_revised = true;
+			}
 		}
 
 		$study_log = StudyLog
@@ -458,6 +463,7 @@ class AjaxFrontHelper {
 			'next_due_at'         => $next_due_date,
 			'answered_as_new'     => $answered_as_new,
 			'answered_as_revised' => $answered_as_revised,
+			'answered_as_on_hold' => $answered_as_on_hold,
 			'started_at'          => $study_log->created_at,
 			'created_at'          => $debug_user['current_study_date'],
 			'updated_at'          => $debug_user['current_study_date'],
@@ -501,6 +507,7 @@ class AjaxFrontHelper {
 
 		$answered_as_new     = false;
 		$answered_as_revised = false;
+		$answered_as_on_hold = false;
 
 		// Check if answered before.
 		$_answered_before = Answered
@@ -510,7 +517,11 @@ class AjaxFrontHelper {
 		if ( empty( $_answered_before ) ) {
 			$answered_as_new = true;
 		} else {
-			$answered_as_revised = true;
+			if ( $_answered_before->grade === 'hold' ) {
+				$answered_as_on_hold = true;
+			} else {
+				$answered_as_revised = true;
+			}
 		}
 
 		$study_log = StudyLog
@@ -530,6 +541,7 @@ class AjaxFrontHelper {
 			'grade'               => $grade,
 			'answered_as_new'     => $answered_as_new,
 			'answered_as_revised' => $answered_as_revised,
+			'answered_as_on_hold' => $answered_as_on_hold,
 			'started_at'          => $study_log->created_at,
 			'created_at'          => $debug_form['current_study_date'],
 			'updated_at'          => $debug_form['current_study_date'],
@@ -728,9 +740,9 @@ class AjaxFrontHelper {
 		$study_all_on_hold = (bool) sanitize_text_field( $all['study_all_on_hold'] );
 		$all_tags          = (bool) sanitize_text_field( $all['all_tags'] );
 //		$tags_excluded     = in_array( 'tags_excluded', $all, true ) ? $all['tags_excluded'] : [];
-		$tags_excluded     = array_key_exists( 'tags_excluded', $all ) ? $all['tags_excluded'] : array();
-		$topic_id          = (int) sanitize_text_field( null !== $all['topic'] ? $all['topic']['id'] : 0 );
-		$active            = (bool) sanitize_text_field( $all['active'] );
+		$tags_excluded = array_key_exists( 'tags_excluded', $all ) ? $all['tags_excluded'] : array();
+		$topic_id      = (int) sanitize_text_field( null !== $all['topic'] ? $all['topic']['id'] : 0 );
+		$active        = (bool) sanitize_text_field( $all['active'] );
 
 		if ( empty( $deck_id ) && empty( $topic_id ) ) {
 			Common::send_error( 'Either deck or topic must be selected.' );

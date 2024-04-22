@@ -28,6 +28,7 @@ class Answered extends Model {
 		'ease_factor',
 		'answered_as_new',
 		'answered_as_revised',
+		'answered_as_on_hold',
 		'next_due_answered',
 		'next_interval',
 		'next_due_at',
@@ -48,6 +49,7 @@ class Answered extends Model {
 	protected $casts = [
 		'next_due_answered'   => 'boolean',
 		'answered_as_revised' => 'boolean',
+		'answered_as_on_hold' => 'boolean',
 		'answered_as_new'     => 'boolean',
 		'answer'              => 'array',
 	];
@@ -79,10 +81,10 @@ class Answered extends Model {
 		}
 	}
 
-    public static function delete_all_cards_a_user_has_studied(int $user_id, array $card_group_ids){
-        $cards = Card::whereIn('card_group_id', $card_group_ids)->get();
-        $card_ids = $cards->pluck('id')->toArray();
+	public static function delete_all_cards_a_user_has_studied( int $user_id, array $card_group_ids ) {
+		$cards    = Card::whereIn( 'card_group_id', $card_group_ids )->get();
+		$card_ids = $cards->pluck( 'id' )->toArray();
 
-	    return Answered::whereIn('card_id', $card_ids)->forceDelete();
-    }
+		return Answered::whereIn( 'card_id', $card_ids )->forceDelete();
+	}
 }
