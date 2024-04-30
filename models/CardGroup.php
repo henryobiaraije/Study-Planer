@@ -870,14 +870,18 @@ class CardGroup extends Model {
 		$total     = self
 			::get_card_groups_simple_with_ordering_query( $args, true );
 		$total_sql = $total->toSql();
-		$total     = $total
-			->get()
-			->count();
+		$total     = $total->get();
+
+		if ( count( $total ) > 0 ) {
+			$total = $total[0]->all_count;
+		} else {
+			$total = 0;
+		}
 
 		// For new cards, or remove cards,  we are reading all at once. So the total is the total of the card groups.
-		if ( $args['for_new_cards'] || $args['for_remove_from_study_deck'] ) {
+//		if ( $args['for_new_cards'] || $args['for_remove_from_study_deck'] ) {
 //			$total = $card_groups->count();
-		}
+//		}
 //		$total = $total_2;
 
 		// Convert table and image card questions and anwers to array.
@@ -917,33 +921,21 @@ class CardGroup extends Model {
 		// Join tables and apply aliases
 		$query = Manager
 			::table( SP_TABLE_CARD_GROUPS . ' as cg' )
-			->select( 'cg.*',
-				Manager::raw( 'COUNT(c.id) as cards_count' ),
-				'd.name as deck_name',
-				'dg.name as deck_group_name',
-				't.name as topic_name',
-				'cl.name as collection_name',
-				'c.id as card_id',
-				'uc.id as user_card_id' )
+//			->select( 'cg.*',
+//				Manager::raw( 'COUNT(c.id) as cards_count' ),
+//				Manager::raw( 'COUNT(*) as cards_groups_count' ),
+//				'd.name as deck_name',
+//				'dg.name as deck_group_name',
+//				't.name as topic_name',
+//				'cl.name as collection_name',
+//				'c.id as card_id',
+//				'uc.id as user_card_id' )
 			->leftJoin( SP_TABLE_DECKS . ' AS d', 'd.id', '=', 'cg.deck_id' )
 			->leftJoin( SP_TABLE_DECK_GROUPS . ' AS dg', 'dg.id', '=', 'd.deck_group_id' )
 			->leftJoin( SP_TABLE_TOPICS . ' AS t', 't.id', '=', 'cg.topic_id' )
 			->leftJoin( SP_TABLE_COLLECTIONS . ' AS cl', 'cl.id', '=', 'cg.collection_id' )
 			->leftJoin( SP_TABLE_CARDS . ' AS c', 'c.card_group_id', '=', 'cg.id' )
 			->leftJoin( SP_TABLE_USER_CARDS . ' AS uc', 'uc.card_group_id', '=', 'cg.id' );
-
-		// Apply conditions based on parameters
-//		if ( $args['from_front_end'] ) {
-//			$query->where( function ( $query ) use ( $args ) {
-//				$query->whereNotNull( 'cg.deck_group_id' )
-//				      ->orWhereNotNull( 'cg.deck_id' )
-//				      ->orWhereNotNull( 'cg.topic_id' )
-//				      ->orWhere( 'uc.for_add_to_study_deck', true )
-//				      ->orWhere( 'uc.for_remove_from_study_deck', true )
-//				      ->orWhere( 'uc.for_new_cards', true )
-//				      ->orWhereNotNull( 'uc.user_id' );
-//			} );
-//		}
 
 		if ( $args['for_add_to_study_deck'] ) {
 			// If for_add_to_study_deck, then return only the cards the user is not studying currently.
@@ -960,12 +952,7 @@ class CardGroup extends Model {
 				      ->where( 'user_id', $args['user_id'] );
 			} );
 		} elseif ( $args['for_new_cards'] ) {
-			// Get the topics of the cards the user is studying.
-
-//			$user_study             = sp_get_user_study( $args['user_id'] );
-//			$user_study_id          = $user_study->id;
-//			$last_answered_card_ids = UserCard::get_all_last_answered_user_cards( $args['user_id'], $user_study_id );
-//			$new_cards_not_answered_but_added = UserCard::get_new_cards_not_answered_but_added( $args['user_id'], $user_study_id, $last_answered_card_ids['card_ids'] );
+			// Filter by the topics of the cards the user is studying.
 			$ignored_card_group_ids = sp_get_user_ignored_card_group_ids( $args['user_id'] );
 
 			// Get group ids being studied.
@@ -1003,13 +990,6 @@ class CardGroup extends Model {
 		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
 		$only_deck       = $args['deck_id'] && ! $args['topic_id'];
 		$only_topic      = $args['topic_id'];
-
-//		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
-//		$only_deck       = ! $args['deck_group_id'] && $args['deck_id'] && ! $args['topic_id'];
-//		$only_topic      = ! $args['deck_group_id'] && ! $args['deck_id'] && $args['topic_id'];
-
-//		$with_both_deck_group__deck__topic = $args['deck_group_id'] && $args['deck_id'] && $args['topic_id'];
-//		$with_both_deck__topic             = ! $args['deck_group_id'] && $args['deck_id'] && $args['topic_id'];
 
 		if ( $only_deck_group ) {
 			// Add conditions for 'only_deck_group'
@@ -1076,18 +1056,31 @@ class CardGroup extends Model {
 			$query->whereNotIn( 'cg.topic_id', $args['topic_ids_to_exclude'] );
 		}
 
-
 		// Group by cd.id
-		$query = $query
-			->groupBy( [ 'cg.id' ] );
+//		$query = $query
+//			->groupBy( [ 'cg.id' ] );
 
 		if ( $for_total ) {
 			return $query
-				->offset( 0 )
-				->limit( 99999999 );
+				->select(
+					Manager::raw( 'COUNT(DISTINCT cg.id) as all_count' ),
+				);
+//			return $query
+//				->select( "cg.id" )
+//				->distinct();
 		} else {
 			$query = $query
+				->select( 'cg.*',
+					Manager::raw( 'COUNT(c.id) as cards_count' ),
+					Manager::raw( 'COUNT(*) as cards_groups_count' ),
+					'd.name as deck_name',
+					'dg.name as deck_group_name',
+					't.name as topic_name',
+					'cl.name as collection_name',
+					'c.id as card_id',
+					'uc.id as user_card_id' )
 				->offset( $offset )
+				->groupBy( [ 'cg.id' ] )
 				->limit( $args['per_page'] );
 		}
 

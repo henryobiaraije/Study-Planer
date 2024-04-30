@@ -157,7 +157,7 @@
     <!-- Pagination -->
     <div v-show="'found' === activeTab" class="card-pagination py-2">
       <pagination
-          itemtype="button"
+          itemtype="div"
           :records="allCards.tableData.value.totalRecords"
           v-model="form.page"
           :per-page="perPage"
@@ -249,7 +249,7 @@ export default defineComponent({
       return this.userCards.form.value;
     },
     perPage() {
-      return 50;
+      return this.allCards.perPage.value;
     },
   },
   created() {

@@ -705,7 +705,7 @@ class UserCard extends Model {
 			);
 			$_stop_time_and_query_loop_user_cards = time();
 			$debug                                = self::format_debug_data( $debug, 'user_cards', array(
-				'sql_user_cards'                  => $sql_exclude_collection,
+				'sql_user_cards'                  => $sql_user_cards,
 				'sub_result_cards_in_user_cards_' => $sub_result_cards_in_user_cards_,
 				'sub_result_cards_in_user_cards'  => $sub_result_cards_in_user_cards,
 				'mill_seconds_for_query'          => ( $_stop_time_user_cards - $_start_time_user_cards ),
@@ -1139,40 +1139,37 @@ class UserCard extends Model {
 		// </editor-fold desc="Answered As Revision Today">
 
 		// <editor-fold desc="Answered as On Hold Today">
-		$sql_cards_answered_as_on_hold_today = "
+		$sql_cards_answered_as_on_hold_today                  = "
 			SELECT a_new.card_id from {$tb_answered} as a_new 
 			WHERE a_new.study_id = {$study_id} 
 			AND a_new.created_at >= {$today_date}  
 			AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
 			AND a_new.answered_as_on_hold = 1
 		";
-		if ( sp_in_sql_mode() ) {
-			$_start_time_answered_as_on_hold_today_today          = time();
-			$sub_answered_as_on_hold_today_                       = $wpdb->get_results( $sql_cards_answered_as_on_hold_today, ARRAY_A );
-			$_stop_time_answered_as_on_hold_today                 = time();
-			$sub_answered_as_on_hold_today                        = array_map(
-				static function ( $val ) {
-					return $val['id'];
-				},
-				$sub_answered_as_on_hold_today_ ?? array()
-			);
-			$_stop_time_and_query_loop_answered_as_revision_today = time();
-			$count_answered_as_on_hold_today                      = count( $sub_answered_as_on_hold_today );
-			$limit_on_hold                                        = $study_no_on_hold - $count_answered_as_on_hold_today;
-			$debug                                                = self::format_debug_data( $debug, 'answered_as_on_hold_today', array(
-				'sql'                             => $sql_cards_answered_as_on_hold_today,
-				'sub_result'                      => $sub_answered_as_on_hold_today_,
-				'sub_result_array'                => $sub_answered_as_on_hold_today,
-				'mill_seconds_for_query'          => ( $_stop_time_answered_as_on_hold_today - $_start_time_answered_as_on_hold_today_today ),
-				'mill_seconds_with_array'         => ( $_stop_time_and_query_loop_answered_as_revision_today - $_start_time_answered_as_on_hold_today_today ),
-				'limit_on_hold'                   => $limit_on_hold,
-				'study_no_on_hold'                => $study_no_on_hold,
-				'count_answered_as_on_hold_today' => $count_answered_as_on_hold_today,
-			) );
-		}
+		$_start_time_answered_as_on_hold_today                = time();
+		$sub_answered_as_on_hold_today_                       = $wpdb->get_results( $sql_cards_answered_as_on_hold_today, ARRAY_A );
+		$_stop_time_answered_as_on_hold_today                 = time();
+		$sub_answered_as_on_hold_today                        = array_map(
+			static function ( $val ) {
+				return $val['id'];
+			},
+			$sub_answered_as_on_hold_today_ ?? array()
+		);
+		$_stop_time_and_query_loop_answered_as_revision_today = time();
+		$count_answered_as_on_hold_today                      = count( $sub_answered_as_on_hold_today );
+		$limit_on_hold                                        = $study_no_on_hold - $count_answered_as_on_hold_today;
+		$debug                                                = self::format_debug_data( $debug, 'answered_as_on_hold_today', array(
+			'sql'                             => $sql_cards_answered_as_on_hold_today,
+			'sub_result'                      => $sub_answered_as_on_hold_today_,
+			'sub_result_array'                => $sub_answered_as_on_hold_today,
+			'mill_seconds_for_query'          => ( $_stop_time_answered_as_on_hold_today - $_start_time_answered_as_on_hold_today ),
+			'mill_seconds_with_array'         => ( $_stop_time_and_query_loop_answered_as_revision_today - $_start_time_answered_as_on_hold_today ),
+			'limit_on_hold'                   => $limit_on_hold,
+			'study_no_on_hold'                => $study_no_on_hold,
+			'count_answered_as_on_hold_today' => $count_answered_as_on_hold_today,
+		) );
 
 		// </editor-fold desc="Answered As Oh Hold Today">
-
 
 		// <editor-fold desc="New Cards">
 		$result_sql_new = "
@@ -1195,23 +1192,22 @@ class UserCard extends Model {
 		);
 		// todo add limits later.
 		$_start_time_cards_new               = time();
-		$result_new_cards__                  = $wpdb->get_results( $result_sql_new, ARRAY_A );
+		$result_new_cards_ids_               = $wpdb->get_results( $result_sql_new, ARRAY_A );
 		$_stop_time_cards_new                = time();
-		$result_new_cards_ids_               = array_map(
+		$result_new_cards_ids                = array_map(
 			static function ( $val ) {
 				return $val['id'];
 			},
-			$result_new_cards__
+			$result_new_cards_ids_
 		);
 		$_stop_time_and_query_loop_cards_new = time();
 		if ( sp_in_sql_mode() ) {
 			$debug = self::format_debug_data( $debug, 'result_cards_new', array(
-				'result_sql_new'            => $result_sql_new,
-				'sub_result_cards_in_deck_' => $sub_result_cards_in_deck_,
-				'result_new_cards__'        => $result_new_cards__,
-				'result_new_cards_ids_'     => $result_new_cards_ids_,
-				'mill_seconds_for_query'    => ( $_stop_time_cards_new - $_start_time_cards_new ),
-				'mill_seconds_with'         => ( $_stop_time_and_query_loop_cards_new - $_start_time_cards_new ),
+				'result_sql_new'         => $result_sql_new,
+				'result_new_cards_ids'   => $result_new_cards_ids,
+				'result_new_cards_ids_'  => $result_new_cards_ids_,
+				'mill_seconds_for_query' => ( $_stop_time_cards_new - $_start_time_cards_new ),
+				'mill_seconds_with'      => ( $_stop_time_and_query_loop_cards_new - $_start_time_cards_new ),
 			) );
 		}
 		// </editor-fold desc="New Cards">
@@ -1238,20 +1234,20 @@ class UserCard extends Model {
 		);
 		// todo add limits later.
 		$_start_time_cards_revision              = time();
-		$result_revision_cards__                 = $wpdb->get_results( $result_sql_revision, ARRAY_A );
+		$result_revision_cards_ids_              = $wpdb->get_results( $result_sql_revision, ARRAY_A );
 		$_stop_time_cards_revision               = time();
-		$result_revision_cards_ids_              = array_map(
+		$result_revision_cards_ids               = array_map(
 			static function ( $val ) {
 				return $val['id'];
 			},
-			$result_revision_cards__
+			$result_revision_cards_ids_
 		);
 		$_stop_time_and_query_loop_cards_revsion = time();
 		if ( sp_in_sql_mode() ) {
 			$debug = self::format_debug_data( $debug, 'cards_revision', array(
 				'result_sql_revision'        => $result_sql_revision,
-				'result_revision_cards__'    => $result_revision_cards__,
 				'result_revision_cards_ids_' => $result_revision_cards_ids_,
+				'result_revision_cards_ids'  => $result_revision_cards_ids,
 				'mill_seconds_for_query'     => ( $_stop_time_cards_revision - $_start_time_cards_revision ),
 				'mill_seconds_with'          => ( $_stop_time_and_query_loop_cards_revsion - $_start_time_cards_revision ),
 			) );
@@ -1280,26 +1276,25 @@ class UserCard extends Model {
 		);
 		// todo add limits later.
 		$_start_time_cards_on_hold               = time();
-		$result_on_hold_cards__                  = $wpdb->get_results( $result_sql_on_hold, ARRAY_A );
+		$result_on_hold_cards_ids_               = $wpdb->get_results( $result_sql_on_hold, ARRAY_A );
 		$_stop_time_cards_on_hold                = time();
-		$result_on_hold_cards_ids_               = array_map(
+		$result_on_hold_cards_ids                = array_map(
 			static function ( $val ) {
 				return $val['id'];
 			},
-			$result_on_hold_cards__
+			$result_on_hold_cards_ids_
 		);
 		$_stop_time_and_query_loop_cards_on_hold = time();
 		if ( sp_in_sql_mode() ) {
 			$debug = self::format_debug_data( $debug, 'cards_on_hold', array(
 				'result_sql_on_hold'        => $result_sql_on_hold,
-				'result_on_hold_cards__'    => $result_on_hold_cards__,
 				'result_on_hold_cards_ids_' => $result_on_hold_cards_ids_,
+				'result_on_hold_cards_ids'  => $result_on_hold_cards_ids,
 				'mill_seconds_for_query'    => ( $_stop_time_cards_on_hold - $_start_time_cards_on_hold ),
 				'mill_seconds_with'         => ( $_stop_time_and_query_loop_cards_on_hold - $_start_time_cards_on_hold ),
 			) );
 		}
 		// </editor-fold desc="On Hold Cards">
-
 
 		// Get for revision cards
 		// Get for on hold cards

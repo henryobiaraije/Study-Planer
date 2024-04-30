@@ -169,6 +169,7 @@ export default function (status = 'publish') {
     let searchResults = ref<Array<_CardGroup>>([]);
     const _editCounter = ref<{ [key: number]: { counter: number } }>({});
     const page = ref(1);
+    const perPage = ref(10);
     const fromFrontend = ref(false);
     const forAddToStudyDeck = ref(false);
     const forRemoveFromStudyDeck = ref(false);
@@ -317,7 +318,7 @@ jQuery(modalEditId.value)[0];
                 spClientData().nonce,
                 {
                     params: {
-                        per_page: 50,
+                        per_page: perPage.value,
                         page: page.value,
                         search_keyword: query,
                         status: 'publish',
@@ -501,7 +502,7 @@ jQuery(modalEditId.value)[0];
 
     return {
         ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch, ajaxRestore,
-        page,
+        page,perPage,
         total, create, itemToEdit, editedItems, tableData, load, newItem,
         onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
         onSortChange, onColumnFilter, updateEditing,
