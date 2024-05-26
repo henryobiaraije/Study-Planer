@@ -5,11 +5,14 @@ namespace StudyPlannerPro;
 use DateTime;
 use Model\Study;
 use Phinx\Console\PhinxApplication;
+use Phinx\Migration\Manager;
 use Phinx\Wrapper\TextWrapper;
 use StudyPlannerPro\Db\Initialize_Db;
 use StudyPlannerPro\Libs\Common;
 use StudyPlannerPro\Libs\Settings;
 use StudyPlannerPro\Services\Log_Service;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\StreamOutput;
 
 function load_template( $template ) {
 	require __DIR__ . '/templates/' . $template . '.php';
@@ -354,19 +357,63 @@ define( 'SP_TABLE_USER_CARDS', SP_DB_PREFIX . 'user_cards' );
 /**
  * Create a new migration.
  */
+
 function phinx_migrate(): void {
 	$phinx = new PhinxApplication();
 	$phinx->setAutoExit( false );
-	$log = mp_log();
-
 	$wrap = new TextWrapper( $phinx );
 	$wrap->setOption( 'configuration', __DIR__ . '/phinx.php' );
 	$wrap->getMigrate( 'development' );
 	if ( $wrap->getExitCode() ) {
+		// Log error.
+		$exist_code = $wrap->getExitCode();
+		error_log( print_r( [
+			'exit_code' => $exist_code,
+		], true ) );
+	}
+}
+
+function phinx_migrate5(): void {
+	$phinx = new PhinxApplication();
+	$phinx->setAutoExit( false );
+//	$log = mp_log();
+
+	$wrap = new TextWrapper( $phinx );
+	$wrap->setOption( 'configuration', __DIR__ . '/phinx.php' );
+	$wrap->getMigrate( 'development' );
+//	error_log( 'Migrated' );
+	if ( $wrap->getExitCode() ) {
+		// Log error.
+		$exist_code = $wrap->getExitCode();
+		error_log( print_r( [
+			'exit_code' => $exist_code,
+		], true ) );
 		if ( $log instanceof Log_Service ) {
 			$log->log( 'Phinx migrations encountered an error.', array() );
 		}
 	}
+}
+
+
+function phinx_migrate4(): void {
+	$output    = [];
+	$returnVar = 0;
+//	exec( './vendor/bin/phinx.bat migrate', $output, $returnVar );
+//
+//// Output the result
+//	if ( $returnVar === 0 ) {
+////		echo "Migration successful\n";
+////		echo implode("\n", $output);
+//		error_log( print_r( [
+//			'success' => 'Migration successful',
+//			'output'  => $output,
+//		], true ) );
+//	} else {
+//		error_log( print_r( [
+//			'error'  => 'Migration failed',
+//			'output' => $output,
+//		], true ) );
+//	}
 }
 
 /**

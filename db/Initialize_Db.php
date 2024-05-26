@@ -147,20 +147,21 @@ class Initialize_Db {
 	}
 
 	public function create_tables() {
-		$this->create_table_deck_group();
-		$this->create_table_deck();
-		$this->create_table_tags();
-		$this->create_table_taggable();
-		$this->create_table_taggable_excluded();
-		$this->create_table_card_group();
-		$this->create_table_cards();
-		$this->create_table_study();
-		$this->create_table_answered();
-		$this->create_table_study_log();
-		$this->create_answer_log();
-		$this->create_table_topics();
-		$this->create_table_collections();
-		$this->create_table_user_cards();
+		return;
+//		$this->create_table_deck_group();
+//		$this->create_table_deck();
+//		$this->create_table_tags();
+//		$this->create_table_taggable();
+//		$this->create_table_taggable_excluded();
+//		$this->create_table_card_group();
+//		$this->create_table_cards();
+//		$this->create_table_study();
+//		$this->create_table_answered();
+//		$this->create_table_study_log();
+//		$this->create_answer_log();
+//		$this->create_table_topics();
+//		$this->create_table_collections();
+//		$this->create_table_user_cards();
 	}
 
 	public function create_table_deck_group() {

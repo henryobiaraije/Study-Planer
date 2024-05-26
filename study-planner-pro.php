@@ -35,18 +35,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/class-initializer.php';
+//phinx_migrate();
 
 use StudyPlannerPro\Db\Initialize_Db;
 use StudyPlannerPro\Initializer;
 
 use function StudyPlannerPro\phinx_migrate;
 
-Initialize_Db::get_instance();
-$initializer = Initializer::get_instance();
 
-register_activation_hook( __FILE__, [ $initializer, 'on_activate' ] );
-register_deactivation_hook( __FILE__, [ $initializer, 'on_deactivate' ] );
-register_uninstall_hook( __FILE__, [ Initializer::class, 'on_uninstall' ] );
+//Initialize_Db::get_instance();
+//$initializer = Initializer::get_instance();
+//register_activation_hook( __FILE__, [ $initializer, 'on_activate' ] );
+//register_deactivation_hook( __FILE__, [ $initializer, 'on_deactivate' ] );
+//register_uninstall_hook( __FILE__, [ Initializer::class, 'on_uninstall' ] );
 
 //phinx_create_migration( 'AddDeckGroupIdToStudy');
 

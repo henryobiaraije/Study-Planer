@@ -565,6 +565,7 @@ class Initializer {
 	}
 
 	public function on_activate() {
+		phinx_migrate();
 		//
 		// Initialize_Db::get_instance()->create_tables();
 		// Initialize_Db::get_instance()->create_default_rows();
