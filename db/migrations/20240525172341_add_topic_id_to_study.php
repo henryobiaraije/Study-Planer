@@ -28,6 +28,7 @@ final class AddTopicIdToStudy extends AbstractMigration {
 		//				}
 		//			);
 		//		}
+		require_once __DIR__ . '/table-definitions.php';
 		$exist = $this->hasTable( SP_TABLE_STUDY );
 		if ( ! $exist ) {
 			return;

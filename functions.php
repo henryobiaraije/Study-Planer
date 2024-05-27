@@ -259,9 +259,7 @@ function sp_get_user_studies( int $user_id ): array {
 }
 
 function sp_get_db_prefix() {
-	global $wpdb;
-
-	return $wpdb->prefix . 'sp_';
+	return  'sp_';
 }
 
 /**
@@ -367,9 +365,10 @@ function phinx_migrate(): void {
 	if ( $wrap->getExitCode() ) {
 		// Log error.
 		$exist_code = $wrap->getExitCode();
-		error_log( print_r( [
-			'exit_code' => $exist_code,
-		], true ) );
+//		error_log( print_r( [
+//			'exit_code' => $exist_code,
+//		], true ) );
+		die( 'Migration should be done' );
 	}
 }
 

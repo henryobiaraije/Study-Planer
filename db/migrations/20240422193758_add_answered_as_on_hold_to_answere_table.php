@@ -17,6 +17,7 @@ final class AddAnsweredAsOnHoldToAnswereTable extends AbstractMigration {
 	 * with the Table class.
 	 */
 	public function change(): void {
+		require_once __DIR__ . '/table-definitions.php';
 		$this->table( SP_TABLE_ANSWERED )
 		     ->addColumn( 'answered_as_on_hold', 'boolean', [
 			     'default' => 0,

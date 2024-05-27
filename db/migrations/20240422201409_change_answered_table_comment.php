@@ -17,6 +17,7 @@ final class ChangeAnsweredTableComment extends AbstractMigration {
 	 * with the Table class.
 	 */
 	public function change(): void {
+		require_once __DIR__ . '/table-definitions.php';
 		$this->table( SP_TABLE_ANSWERED )
 		     ->changeComment( 'If the previouls answer of this card for this study was revised, i.e Not answered as new and also not answered as onhold.' );
 	}

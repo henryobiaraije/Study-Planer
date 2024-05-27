@@ -93,7 +93,6 @@ class Initialize_Db {
 		$this->create_default_deck( $deck_group );
 	}
 
-
 	private function create_default_deck( $deck_group ): void {
 		$deck = Deck::query()
 		            ->where( 'name', '=', 'Uncategorized' )

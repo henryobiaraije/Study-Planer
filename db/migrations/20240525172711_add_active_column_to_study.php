@@ -30,6 +30,7 @@ final class AddActiveColumnToStudy extends AbstractMigration {
 	//			);
 	//		}
 	public function change(): void {
+		require_once __DIR__ . '/table-definitions.php';
 		$exists = $this->hasTable( SP_TABLE_STUDY );
 		if ( ! $exists ) {
 			return;

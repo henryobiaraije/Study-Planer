@@ -19,6 +19,7 @@ final class AddTopicIdToCardGroups extends AbstractMigration {
 		//				}
 		//			);
 		//		}
+		require_once __DIR__ . '/table-definitions.php';
 		$exists = $this->hasTable( SP_TABLE_CARD_GROUPS );
 		if ( ! $exists ) {
 			return;

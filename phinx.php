@@ -36,7 +36,6 @@ return
 				'pass'    => DB_PASSWORD,
 				'port'    => '3306',
 				'charset' => defined( 'DB_CHARSET' ) ? DB_CHARSET : 'utf8',
-				'prefix'  => 'wptr_'
 			],
 			'development'             => [
 				'adapter' => 'mysql',
@@ -46,7 +45,6 @@ return
 				'pass'    => DB_PASSWORD,
 				'port'    => '3306',
 				'charset' => defined( 'DB_CHARSET' ) ? DB_CHARSET : 'utf8',
-				'prefix'  => 'wp_'
 			],
 			'testing'                 => [
 				'adapter' => 'mysql',

@@ -17,6 +17,7 @@ final class ChangeTheCommentAndPopuseOfAnsweredAsRevisedInAnswerTable2 extends A
 	 * with the Table class.
 	 */
 	public function change(): void {
+		require_once __DIR__ . '/table-definitions.php';
 		$this->table( SP_TABLE_ANSWERED )
 		     ->changeColumn(
 			     "answered_as_revised", "string", [

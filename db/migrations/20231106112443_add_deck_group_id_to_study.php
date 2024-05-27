@@ -17,8 +17,9 @@ final class AddDeckGroupIdToStudy extends AbstractMigration {
 	 * with the Table class.
 	 */
 	public function change(): void {
+		require_once __DIR__ . '/table-definitions.php';
 		$this->table( SP_TABLE_STUDY )
-		     ->addColumn( 'deck_group_id', 'integer', [ 'null' => true ] )
+		     ->addColumn( SP_TABLE_STUDY, 'integer', [ 'null' => true ] )
 		     ->update();
 	}
 

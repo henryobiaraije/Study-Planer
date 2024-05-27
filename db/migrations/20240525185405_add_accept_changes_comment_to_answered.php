@@ -25,6 +25,7 @@ final class AddAcceptChangesCommentToAnswered extends AbstractMigration {
 		//				}
 		//			);
 		//		}
+		require_once __DIR__ . '/table-definitions.php';
 		$exists = $this->hasTable( SP_TABLE_ANSWERED );
 		if ( ! $exists ) {
 			return;

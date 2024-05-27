@@ -35,12 +35,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/class-initializer.php';
-//phinx_migrate();
+
 
 use StudyPlannerPro\Db\Initialize_Db;
 use StudyPlannerPro\Initializer;
 
 use function StudyPlannerPro\phinx_migrate;
+
+phinx_migrate();
 
 
 //Initialize_Db::get_instance();
@@ -52,7 +54,7 @@ use function StudyPlannerPro\phinx_migrate;
 //phinx_create_migration( 'AddDeckGroupIdToStudy');
 
 add_action( 'init', static function () {
-	phinx_migrate();
+//	phinx_migrate();
 } );
 
 // Do next.
