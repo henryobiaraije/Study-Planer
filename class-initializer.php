@@ -7,6 +7,7 @@ namespace StudyPlannerPro;
 
 use Illuminate\Database\Capsule\Manager;
 use Model\DeckGroup;
+use Model\Topic;
 use StudyPlannerPro\Db\Initialize_Db;
 use StudyPlannerPro\Helpers\AjaxFrontHelper;
 use StudyPlannerPro\Helpers\AjaxHelper;
@@ -26,6 +27,7 @@ use StudyPlannerPro\Pages\AdminDeck;
 use StudyPlannerPro\Pages\AdminDeckGroups;
 use StudyPlannerPro\Pages\AdminTopics;
 use StudyPlannerPro\Rest\Rest_File_Upload_Controller;
+use StudyPlannerPro\Services\Debug_Data_Manager;
 use StudyPlannerPro\Services\Log_Service;
 use StudyPlannerPro\Shortcodes\Short_User_Dashboard;
 
@@ -191,6 +193,7 @@ class Initializer {
 		Admin_Settings::get_instance();
 		Admin_Collections::get_instance();
 		Admin_Assign_Topic::get_instance();
+		( new Debug_Data_Manager() )->init();
 
 		( new Rest_File_Upload_Controller() )->init();
 
@@ -566,6 +569,7 @@ class Initializer {
 
 	public function on_activate() {
 		phinx_migrate();
+		Topic::make_sure_card_groups_with_real_topic_also_have_the_right_parent_deck();
 		//
 		// Initialize_Db::get_instance()->create_tables();
 		// Initialize_Db::get_instance()->create_default_rows();

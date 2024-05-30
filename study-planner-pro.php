@@ -45,17 +45,17 @@ use function StudyPlannerPro\phinx_migrate;
 phinx_migrate();
 
 
-//Initialize_Db::get_instance();
-//$initializer = Initializer::get_instance();
-//register_activation_hook( __FILE__, [ $initializer, 'on_activate' ] );
-//register_deactivation_hook( __FILE__, [ $initializer, 'on_deactivate' ] );
-//register_uninstall_hook( __FILE__, [ Initializer::class, 'on_uninstall' ] );
+Initialize_Db::get_instance();
+$initializer = Initializer::get_instance();
+register_activation_hook( __FILE__, [ $initializer, 'on_activate' ] );
+register_deactivation_hook( __FILE__, [ $initializer, 'on_deactivate' ] );
+register_uninstall_hook( __FILE__, [ Initializer::class, 'on_uninstall' ] );
 
 //phinx_create_migration( 'AddDeckGroupIdToStudy');
 
-add_action( 'init', static function () {
+//add_action( 'init', static function () {
 //	phinx_migrate();
-} );
+//} );
 
 // Do next.
 // - sort loaded study deck groups by cards count down the chain.

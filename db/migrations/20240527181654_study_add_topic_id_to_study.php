@@ -4,8 +4,7 @@ declare( strict_types=1 );
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddCollectionIdToCardGroupsTable extends AbstractMigration {
-
+final class StudyAddTopicIdToStudy extends AbstractMigration {
 	/**
 	 * Change Method.
 	 *
@@ -20,8 +19,8 @@ final class AddCollectionIdToCardGroupsTable extends AbstractMigration {
 	public function change(): void {
 		require_once __DIR__ . '/table-definitions.php';
 		global $wpdb;
-		$table_name  = SP_TABLE_CARD_GROUPS;
-		$column_name = 'collection_id';
+		$table_name  = SP_TABLE_STUDY;
+		$column_name = 'topic_id';
 
 		// Check if the table exists
 		if ( ! $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) == $table_name ) {
@@ -37,7 +36,7 @@ final class AddCollectionIdToCardGroupsTable extends AbstractMigration {
 		$tb_study       = SP_TABLE_STUDY;
 		$tb_cards       = SP_TABLE_CARDS;
 		$tb_collections = SP_TABLE_COLLECTIONS;
-		// SQL statement to create the table
+		// SQL statement to create the table.
 		$sql = "
 			ALTER TABLE {$table_name}
 			ADD COLUMN {$column_name} BIGINT(20) UNSIGNED DEFAULT 0,
@@ -54,6 +53,4 @@ final class AddCollectionIdToCardGroupsTable extends AbstractMigration {
 			error_log( 'Error creating table ' . $table_name . ': ' . $wpdb->last_error );
 		}
 	}
-
-
 }

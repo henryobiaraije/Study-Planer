@@ -4,7 +4,7 @@ declare( strict_types=1 );
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddCardLastUpdatedAtToAnswered extends AbstractMigration {
+final class AnsweredAddCardLastUpdatedAt extends AbstractMigration {
 	/**
 	 * Change Method.
 	 *
@@ -17,6 +17,7 @@ final class AddCardLastUpdatedAtToAnswered extends AbstractMigration {
 	 * with the Table class.
 	 */
 	public function change(): void {
+		require_once __DIR__ . '/table-definitions.php';
 		// 		if ( ! $this->schema_builder->hasColumn( SP_TABLE_ANSWERED, 'card_last_updated_at' ) ) {
 		//			Capsule::schema()->table(
 		//				SP_TABLE_ANSWERED,
@@ -25,17 +26,20 @@ final class AddCardLastUpdatedAtToAnswered extends AbstractMigration {
 		//				}
 		//			);
 		//		}
-		require_once __DIR__ . '/table-definitions.php';
-		$exists = $this->hasTable( SP_TABLE_ANSWERED );
-		if ( ! $exists ) {
+		$table_name  = SP_TABLE_ANSWERED;
+		$column_name = 'card_last_updated_at';
+		$tb_exists   = $this->hasTable( $table_name );
+		if ( ! $tb_exists ) {
 			return;
 		}
 
-		$table = $this->table( SP_TABLE_ANSWERED, [ 'id' => false, 'primary_key' => 'id' ] );
-		if ( $table->hasColumn( 'card_last_updated_at' ) ) {
-			$table
-				->addColumn( 'card_last_updated_at', 'timestamp', [ 'default' => 'CURRENT_TIMESTAMP' ] )
-				->update();
+		$col_exists = $this->table( $table_name )->hasColumn( $column_name );
+		if ( $col_exists ) {
+			return;
 		}
+
+		$this->table( $table_name )
+		     ->addColumn( $column_name, 'datetime', [ 'null' => true, 'after' => 'updated_at' ] )
+		     ->update();
 	}
 }

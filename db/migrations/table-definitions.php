@@ -5,7 +5,8 @@ namespace StudyPlannerPro\Db\Migration;
 global $wpdb;
 
 if ( ! defined( 'SP_DB_PREFIX' ) ) {
-	$prefix = 'sp_';
+	$db_prefix = $wpdb->prefix;
+	$prefix    = $db_prefix . 'sp_';
 	define( 'SP_DB_PREFIX', $prefix );
 }
 

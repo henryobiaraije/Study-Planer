@@ -45,7 +45,8 @@ class RunOnceHelpers {
     private static $instance;
 
     private function __construct() {
-        $this->run_all_once();
+		add_action('init', [$this, 'run_all_once']);
+//        $this->run_all_once();
     }
 
     public static function get_instance(): self {

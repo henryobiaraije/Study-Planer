@@ -259,7 +259,9 @@ function sp_get_user_studies( int $user_id ): array {
 }
 
 function sp_get_db_prefix() {
-	return  'sp_';
+	global $wpdb;
+
+	return $wpdb->prefix . 'sp_';
 }
 
 /**
@@ -368,7 +370,7 @@ function phinx_migrate(): void {
 //		error_log( print_r( [
 //			'exit_code' => $exist_code,
 //		], true ) );
-		die( 'Migration should be done' );
+//		die( 'Migration should be done' );
 	}
 }
 
