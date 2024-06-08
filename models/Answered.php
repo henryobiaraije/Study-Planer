@@ -67,6 +67,10 @@ class Answered extends Model {
 	}
 
 	protected function getCastType( $key ) {
+
+		if ( empty( $this->card->card_group ) ) {
+			return $this->type;
+		}
 		$card_type             = $this->card->card_group->card_type;
 		$is_question_or_answer = in_array( $key, [ 'answer' ] );
 		$is_table_or_image     = in_array( $card_type, [ 'image', 'table' ] );

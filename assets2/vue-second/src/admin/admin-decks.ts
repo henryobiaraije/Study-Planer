@@ -3,7 +3,6 @@
 // import "../src/counter.vue";
 // import Counter from "./counter.vue";
 import {createApp} from "vue";
-import AdminTopics from "@/admin/AdminTopics.vue";
 
 import {Store} from "@/static/store";
 import "../scss/default.scss";
@@ -17,6 +16,7 @@ Store.initAdmin({
     serverUrl: localize.ajax_url,
     actionString: localize.ajax_action,
     nonce: localize.nonce,
+    icon_settings_image: localize.icon_settings_image,
 });
 
 

@@ -31,6 +31,7 @@ module.exports = {
         ['admin/admin-image-card' + theAppVersion]: './src/admin/admin-image-card.ts',
         ['admin/admin-collection' + theAppVersion]: './src/admin/admin-collection.ts',
         ['admin/admin-assign-topics' + theAppVersion]: './src/admin/admin-assign-topics.ts',
+        ['admin/admin-all-cards' + theAppVersion]: './src/admin/admin-all-cards.ts',
         // 'admin/admin-settings': './src/admin/admin-settings.ts',
         // 'admin/admin-all-cards': './src/admin/admin-all-cards.ts',
         ['shortcodes/sc-study-dashboard' + theAppVersion]: './src/shortcodes/sc-study-dashboard.ts',

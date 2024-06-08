@@ -6,3 +6,5 @@ assets/node_modules
 /assets2/vue-project/node_modules
 /assets2/vue-second/node_modules
 /assets2/vue-second/js
+
+/db-seeder/node_modules

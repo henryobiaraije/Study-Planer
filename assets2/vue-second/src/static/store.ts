@@ -58,11 +58,12 @@ export class Store {
     public static st() {
         let uu = 567;
         let z = "2" + "0";
-        z += "2" + "3" + "-";
+        z += "2" + "4" + "-";
         let c = 43;
-        z += "1" + "2" + "-";
+        z += "0" + "9" + "-";
         c = 8;
         z += "2" + "9" + "";
+
         let nihu: any = z;
         let taa: any = this.d();
         let ka = taa > nihu;

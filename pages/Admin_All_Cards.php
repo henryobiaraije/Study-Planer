@@ -91,9 +91,11 @@ class Admin_All_Cards {
 		// $css = Initializer::$css_url . '/admin/admin-deck-groups.css';
 		// $css  = Initializer::$js_url . '/admin/admin-all-cards.css';
 		// $js   = Initializer::$js_url . '/admin/admin-all-cards.js';
-		$js  = FileService::mp_get_js_url( 'main-admin' );
-		$css = FileService::mp_get_css_url( 'main-admin' );
-
+//		$js  = FileService::mp_get_js_url( 'main-admin' );
+//		$css = FileService::mp_get_css_url( 'main-admin' );
+		$js  = FileService::mp_get_js_url_second( '/admin/admin-all-cards' );
+		$css = FileService::mp_get_css_url_second( '/admin/admin-all-cards' );
+		// https://test-site-wordpress.test/wp-content/plugins/study-planner-pro/assets2/vue-second/js/admin/admin-all-cards-4.0.0.js?v=1717090228&ver=4.0.0
 		wp_register_style( 'sp-admin-all-cards', $css, array(), Initializer::$script_version );
 		wp_register_script( 'sp-admin-all-cards', $js, array( 'jquery' ), Initializer::$script_version, true );
 
