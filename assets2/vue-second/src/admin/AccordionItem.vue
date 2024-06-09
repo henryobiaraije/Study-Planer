@@ -34,7 +34,7 @@
                      class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
                   <v-icon left class="cursor-pointer">
                     mdi-cog-outline
-                  </v-icon
+                  </v-icon>
                   <img :src="settingsImageUrl"/>
                 </div>
               </div>
@@ -190,6 +190,7 @@ export default defineComponent({
   },
   computed: {
     settingsImageUrl() {
+
       const localize = Store.localize;
       const image = localize.icon_settings_image;
       console.log("settingsImageUrl", {image});
@@ -236,7 +237,118 @@ export default defineComponent({
 
       return count;
     },
-    cardsCountByType(): { newCards: number, revision: number, onHold: number } {
+    cardsCountByType__(): { newCards: number, revision: number, onHold: number } {
+      const counts = {
+        newCards: 0,
+        revision: 0,
+        onHold: 0,
+      };
+
+      const item = this.item;
+      const theItem = this.theItem;
+      const userCards = this.userCards;
+      const newCardIds: number[] = userCards.newCardIds.value;
+      const revisionCardIds: number[] = userCards.revisionCardIds.value;
+      const holdCardIds: number[] = userCards.onHoldCardIds.value;
+
+      if ('deck_group' === theItem.itemType) {
+        counts.newCards = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countNewCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countNewCards(topic.cards ?? []);
+          }, 0);
+        }, 0);
+        counts.revision = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countRevisionCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countRevisionCards(topic.cards ?? []);
+          }, 0);
+        }, 0);
+        counts.onHold = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countOnHoldCards(topic.cards ?? []);
+          }, 0);
+        }, 0);
+      } else if ('deck' === theItem.itemType) {
+        counts.newCards = [(item as _Deck)].reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countNewCards(deck.cards ?? []);
+            return deckCardsCount + acc;
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countNewCards(topic.cards ?? []);
+          }, 0);
+        }, 0);
+        counts.revision = [(item as _Deck)].reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countRevisionCards(deck.cards ?? []);
+            return deckCardsCount + acc;
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countRevisionCards(topic.cards ?? []);
+          }, 0);
+        }, 0);
+        counts.onHold = [(item as _Deck)].reduce((acc, deck: _Deck) => {
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckCardsCount: number = 0;
+          if (deckHasActiveStudy) { //
+            deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
+            return deckCardsCount + acc;
+          }
+          return deckCardsCount + acc + deck.topics.reduce((acc, topic) => {
+            return acc + this.countOnHoldCards(topic.cards ?? []);
+          }, 0);
+        }, 0);
+      } else if ('topic' === theItem.itemType) {
+        counts.newCards = [(item as _Topic)].reduce((acc, topic: _Topic) => {
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicCardsCount: number = 0;
+          if (topicHasActiveStudy) { //
+            topicCardsCount = this.countNewCards(topic.cards ?? []);
+            return topicCardsCount + acc;
+          }
+          return topicCardsCount + acc;
+        }, 0);
+        counts.revision = [(item as _Topic)].reduce((acc, topic: _Topic) => {
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicCardsCount: number = 0;
+          if (topicHasActiveStudy) { //
+            topicCardsCount = this.countRevisionCards(topic.cards ?? []);
+            return topicCardsCount + acc;
+          }
+          return topicCardsCount + acc;
+        }, 0);
+        counts.onHold = [(item as _Topic)].reduce((acc, topic: _Topic) => {
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicCardsCount: number = 0;
+          if (topicHasActiveStudy) { //
+            topicCardsCount = this.countOnHoldCards(topic.cards ?? []);
+            return topicCardsCount + acc;
+          }
+          return topicCardsCount + acc;
+        }, 0);
+      }
+
+      return counts;
+    },
+    cardsCountByType_(): { newCards: number, revision: number, onHold: number } {
       const counts = {
         newCards: 0,
         revision: 0,
@@ -406,15 +518,18 @@ export default defineComponent({
       return {
         onHold: {
           title: 'On hold',
-          count: this.cardsCountByType.onHold,
+          // count: this.cardsCountByType.onHold,
+          count: this.item?.count_on_hold,
         },
         revision: {
           title: 'Revision',
-          count: this.cardsCountByType.revision,
+          // count: this.cardsCountByType.revision,
+          count: this.item?.count_revision
         },
         newCards: {
           title: 'New Cards',
-          count: this.cardsCountByType.newCards,
+          // count: this.cardsCountByType.newCards,
+          count: this.item?.count_new_cards
         },
       }
     },
@@ -542,7 +657,6 @@ export default defineComponent({
       this.uToggle.toggle(this.theItem.itemType + '-' + this.theItem.id);
       // this.showChildren = !this.showChildren;
     },
-
     viewCard() {
       // console.log('view card');
       if ('topic' !== this.theItem.itemType && 'deck' !== this.theItem.itemType) {

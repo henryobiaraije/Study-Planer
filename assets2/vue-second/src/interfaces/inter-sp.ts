@@ -10,6 +10,9 @@ export interface _DeckGroup {
     updated_at: boolean,
     decks: Array<_Deck>;
     studies: _Study[];
+    count_new_cards?: number;
+    count_revision?: number;
+    count_on_hold?: number;
 }
 
 export interface _Deck {
@@ -23,6 +26,9 @@ export interface _Deck {
     topics: Array<_Topic>;
     studies: Array<_Study>;
     cards?: Array<_Card>;
+    count_new_cards?: number;
+    count_revision?: number;
+    count_on_hold?: number;
 }
 
 export interface _Topic {
@@ -36,6 +42,9 @@ export interface _Topic {
     card_groups: Array<_CardGroup>;
     studies: Array<_Study>;
     cards?: Array<_Card>;
+    count_new_cards?: number;
+    count_revision?: number;
+    count_on_hold?: number;
 }
 
 export type _TopicNew = Partial<_Topic & Pick<_Topic, 'name' | 'deck' | 'tags'>>;

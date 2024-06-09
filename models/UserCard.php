@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -120,46 +121,78 @@ class UserCard extends Model {
 
 		// encode all questions in deck groups.
 		foreach ( $deck_groups as $deck_group ) {
+			$deck_group->count_new_cards = 0;
+			$deck_group->count_revision  = 0;
+			$deck_group->count_on_hold   = 0;
+
 			foreach ( $deck_group->decks as $deck ) {
+				$deck->count_new_cards = 0;
+				$deck->count_revision  = 0;
+				$deck->count_on_hold   = 0;
 //				if ( 37 !== $deck->id ) {
 //					continue; // todo its for test, remove;
 //				}
 				$study = $deck->studies->first();
 				if ( $study instanceof Study ) {
-					$cards       = self::get_cards_to_study_in_study(
-						$study,
-						$interested_card_group_ids,
-						$user_cards_not_studied['card_ids'],
-						$user_cards_answered['revision_and_due_ids'],
-						$user_cards_answered['on_hold_and_due_ids']
-					);
-					$deck->cards = $cards;
-					Initializer::add_debug_with_key(
-						'getting_cards_for_deck__' . $deck->name,
-						array(
-//							'cards' => $cards,
-							'user_cards_not_studied' => $user_cards_not_studied,
-							'user_cards_answered'    => $user_cards_answered,
-						)
-					);
+					if ( $study->active ) {
+						$cards_to_study = self::get_study_cards(
+							$user_id,
+							$study,
+							$study->all_tags ? array() : $study->tags()->get()->pluck( 'id' )->toArray(),
+							$study->all_tags ? array() : $study->tags_excluded()->get()->pluck( 'id' )->toArray(),
+							$study->no_of_new > 0 ? $study->no_of_new : 1000,
+							$study->no_to_revise > 0 ? $study->no_to_revise : 1000,
+							$study->no_on_hold > 0 ? $study->no_on_hold : 1000,
+							$deck->id,
+							0
+						);
+
+//					$topic->count_new_cards = count( $cards_to_study['new_cards'] );
+						// set new counts.
+						$deck->count_new_cards       += count( $cards_to_study['new_cards'] );
+						$deck_group->count_new_cards += count( $cards_to_study['new_cards'] );
+						// set revision counts.
+						$deck->count_revision       += count( $cards_to_study['revision_cards'] );
+						$deck_group->count_revision += count( $cards_to_study['revision_cards'] );
+						// set on hold counts.
+						$deck->count_on_hold       += count( $cards_to_study['on_hold_cards'] );
+						$deck_group->count_on_hold += count( $cards_to_study['on_hold_cards'] );
+
+						$deck->cards = $cards_to_study['all_cards'];
+					} else {
+						$deck->cards = array();
+					}
+//					$cards       = self::get_cards_to_study_in_study(
+//						$study,
+//						$interested_card_group_ids,
+//						$user_cards_not_studied['card_ids'],
+//						$user_cards_answered['revision_and_due_ids'],
+//						$user_cards_answered['on_hold_and_due_ids']
+//					);
+
+
 				} else {
 					$deck->cards = array();
 				}
 
 				foreach ( $deck->topics as $topic ) {
+					$topic->count_new_cards = 0;
+					$topic->count_revision  = 0;
+					$topic->count_on_hold   = 0;
+
 					$study = $topic->studies->first();
 
 					if ( $study instanceof Study ) {
 						if ( ! $study->active ) {
 							continue;
 						}
-						$cards          = self::get_cards_to_study_in_study(
-							$study,
-							$interested_card_group_ids,
-							$user_cards_not_studied['card_ids'],
-							$user_cards_answered['revision_and_due_ids'],
-							$user_cards_answered['on_hold_and_due_ids']
-						);
+//						$cards          = self::get_cards_to_study_in_study(
+//							$study,
+//							$interested_card_group_ids,
+//							$user_cards_not_studied['card_ids'],
+//							$user_cards_answered['revision_and_due_ids'],
+//							$user_cards_answered['on_hold_and_due_ids']
+//						);
 						$cards_to_study = self::get_study_cards(
 							$user_id,
 							$study,
@@ -171,7 +204,23 @@ class UserCard extends Model {
 							0,
 							$topic->id
 						);
-						$topic->cards   = $cards;
+
+						// set new counts.
+						$topic->count_new_cards      = count( $cards_to_study['new_cards'] );
+						$deck->count_new_cards       += count( $cards_to_study['new_cards'] );
+						$deck_group->count_new_cards += count( $cards_to_study['new_cards'] );
+						// set revision counts.
+						$topic->count_revision      = count( $cards_to_study['revision_cards'] );
+						$deck->count_revision       += count( $cards_to_study['revision_cards'] );
+						$deck_group->count_revision += count( $cards_to_study['revision_cards'] );
+						// set on hold counts.
+						$topic->count_on_hold      = count( $cards_to_study['on_hold_cards'] );
+						$deck->count_on_hold       += count( $cards_to_study['on_hold_cards'] );
+						$deck_group->count_on_hold += count( $cards_to_study['on_hold_cards'] );
+
+//						$topic->cards   = $cards;
+//						$topic->cards     = [];
+						$topic->cards = $cards_to_study['all_cards'];
 					} else {
 						$topic->cards = array();
 					}
@@ -651,10 +700,10 @@ class UserCard extends Model {
 //			$new_data = $data;
 //		}
 //		$debug[ $key ][ $last_count + 1 . '_log' ] = $data;
-		$debug[ $key ]                  = $data;
-		$debug['all_logs_sequential'][] = array(
-			$key => $data
-		);
+		$debug[ $key ] = $data;
+
+		$count_sequential                                                   = count( $debug['all_logs_sequential'] );
+		$debug['all_logs_sequential'][ $count_sequential + 1 . '_' . $key ] = $data;
 
 
 		return $debug;
@@ -962,7 +1011,7 @@ class UserCard extends Model {
 		// <editor-fold desc="User Studies">
 
 		$sql_user_studies = "
-		   SELECT s_u_s.id from {$tb_study} as s_u_s
+		   SELECT s_u_s.id FROM {$tb_study} as s_u_s
             WHERE s_u_s.user_id = {$study_user_id}
 		";
 		$debug            = self::execute_query(
@@ -977,12 +1026,11 @@ class UserCard extends Model {
 		// <editor-fold desc="Answered Cards' answer id Distinct by card id">
 
 		$sql_last_answer_ids_by_card_id = "
-            SELECT MAX(id) as id from {$tb_answered} as a 
-            WHERE a.study_id IN (
-                # List of user study ids.
+            SELECT MAX(id) FROM {$tb_answered} as a_last
+            WHERE a_last.study_id IN (
 				{$sql_user_studies}
             )
-            GROUP BY card_id
+            GROUP BY a_last.card_id
 		";
 		$debug                          = self::maybe_execute_query(
 			$sql_last_answer_ids_by_card_id,
@@ -998,17 +1046,15 @@ class UserCard extends Model {
 		// Distinct answered card_ids
 //		$sql_distinct_answered_cards = "
 //			SELECT DISTINCT card_id from {$tb_answered} as a
-//			WHERE a.study_id = {$study_id}
+//			where a.study_id = {$study_id}
 //			ORDER BY id DESC
 //		";
 		$sql_distinct_answered_cards = "
 			SELECT card_id from {$tb_answered} as a_answered
 			WHERE a_answered.study_id IN(
-				# List of user study ids.
 				{$sql_user_studies}
 			)
-			WHERE a_answered.id IN (
-				# List of last answer ids by card id.
+			AND a_answered.id IN (
 				{$sql_last_answer_ids_by_card_id}
 			)
 		";
@@ -1040,11 +1086,12 @@ class UserCard extends Model {
 
 		// <editor-fold desc="Cards Due in Revision">
 		$sql_cards_due_in_revision = "
-			SELECT a_due_rev.card_id from {$tb_answered} as a_due_rev
+			SELECT a_due_rev.card_id from {$tb_answered} as a_due_rev 
 			WHERE a_due_rev.id IN (
 				{$sql_last_answer_ids_by_card_id}
-			)
-			AND a_due_rev.grade != 'hold'  
+			) 
+			AND 1 = 1
+			AND a_due_rev.grade != 'hold'   
 			AND a_due_rev.next_due_at < '{$today_datetime}'
 		";
 		$debug                     = self::maybe_execute_query(
@@ -1058,12 +1105,12 @@ class UserCard extends Model {
 
 		// <editor-fold desc="Cards Due and on hold">
 		$sql_cards_due_and_on_hold = " 
-			SELECT a_due_rev.card_id from {$tb_answered} as a_due_rev 
-			WHERE a_due_rev.id IN (
+			SELECT a_due_hold.card_id from {$tb_answered} as a_due_hold 
+			WHERE a_due_hold.id IN (
 				{$sql_last_answer_ids_by_card_id}
 			)
-			WHERE a_due_rev.grade = 'hold'
-			AND a_due_rev.next_due_at < '{$today_datetime}'
+			AND a_due_hold.grade = 'hold'
+			AND a_due_hold.next_due_at < '{$today_datetime}'
 		";
 		$debug                     = self::maybe_execute_query(
 			$sql_cards_due_and_on_hold,
@@ -1097,46 +1144,46 @@ class UserCard extends Model {
 		// </editor-fold desc="Answered As New Today">
 
 		// <editor-fold desc="Answered as Revision Today">
-		$sql_cards_answered_as_revision_today                 = "
+		$sql_cards_answered_as_revision_today                                    = "
 			SELECT a_new.card_id from {$tb_answered} as a_new 
 			WHERE a_new.study_id = {$study_id} 
 			AND a_new.created_at >= {$today_date}  
 			AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
 			AND a_new.answered_as_revised = 1
 		";
-		$debug                                                 = self::execute_query(
+		$debug                                                                   = self::execute_query(
 			$sql_cards_answered_as_revision_today,
 			'card_id',
 			$debug,
 			'answered_as_revision_today'
 		);
-		$count_answered_as_revision_today                       = count( $debug['answered_as_revision_today']['sql_result'] );
-		$limit_revise                                           = $study_no_to_revise - $count_answered_as_revision_today;
-		$debug['answered_as_revision_today']['study_no_to_revise'] = $study_no_to_revise;
+		$count_answered_as_revision_today                                        = count( $debug['answered_as_revision_today']['sql_result'] );
+		$limit_revise                                                            = $study_no_to_revise - $count_answered_as_revision_today;
+		$debug['answered_as_revision_today']['study_no_to_revise']               = $study_no_to_revise;
 		$debug['answered_as_revision_today']['count_answered_as_revision_today'] = $count_answered_as_revision_today;
-		$debug['answered_as_revision_today']['limit_revise'] = $limit_revise;
+		$debug['answered_as_revision_today']['limit_revise']                     = $limit_revise;
 
 		// </editor-fold desc="Answered As Revision Today">
 
 		// <editor-fold desc="Answered as On Hold Today">
-		$sql_cards_answered_as_on_hold_today                  = "
+		$sql_cards_answered_as_on_hold_today                                   = "
 			SELECT a_new.card_id from {$tb_answered} as a_new 
 			WHERE a_new.study_id = {$study_id} 
 			AND a_new.created_at >= {$today_date}  
 			AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
 			AND a_new.answered_as_on_hold = 1
 		";
-		$debug                                                = self::execute_query(
+		$debug                                                                 = self::execute_query(
 			$sql_cards_answered_as_on_hold_today,
 			'card_id',
 			$debug,
 			'answered_as_on_hold_today'
 		);
-		$count_answered_as_on_hold_today                      = count( $debug['answered_as_on_hold_today']['sql_result'] );
-		$limit_on_hold                                        = $study_no_on_hold - $count_answered_as_on_hold_today;
-		$debug['answered_as_on_hold_today']['study_no_on_hold'] = $study_no_on_hold;
+		$count_answered_as_on_hold_today                                       = count( $debug['answered_as_on_hold_today']['sql_result'] );
+		$limit_on_hold                                                         = $study_no_on_hold - $count_answered_as_on_hold_today;
+		$debug['answered_as_on_hold_today']['study_no_on_hold']                = $study_no_on_hold;
 		$debug['answered_as_on_hold_today']['count_answered_as_on_hold_today'] = $count_answered_as_on_hold_today;
-		$debug['answered_as_on_hold_today']['limit_on_hold'] = $limit_on_hold;
+		$debug['answered_as_on_hold_today']['limit_on_hold']                   = $limit_on_hold;
 
 		// </editor-fold desc="Answered As Oh Hold Today">
 
@@ -1192,12 +1239,12 @@ class UserCard extends Model {
 			! empty( $sql_cards_in_tags_to_exclude ) ? "AND c1.id NOT IN ($sql_cards_in_tags_to_exclude)" : '',
 			$limit_revise
 		);
-//		$debug              = self::execute_query(
-//			$result_sql_revision,
-//			'id',
-//			$debug,
-//			'revision_cards'
-//		);
+		$debug               = self::execute_query(
+			$result_sql_revision,
+			'id',
+			$debug,
+			'revision_cards'
+		);
 		// </editor-fold desc="Revision Cards">
 
 		// <editor-fold desc="On Hold Cards">
@@ -1223,21 +1270,71 @@ class UserCard extends Model {
 			! empty( $sql_cards_in_tags_to_exclude ) ? "AND c1.id NOT IN ($sql_cards_in_tags_to_exclude)" : '',
 			$limit_on_hold
 		);
+		$debug              = self::execute_query(
+			$result_sql_on_hold,
+			'id',
+			$debug,
+			'on_hold_cards'
+		);
 
 		// </editor-fold desc="On Hold Cards">
 
+		$args_new  = array_values( array_column( $debug['new_cards']['sql_result'], 'id' ) );
+		$new_cards = Card::whereIn( 'id', $args_new )->get();
+		$new_cards = self::parse_image_and_table_cards( $new_cards );
+
+		$args_revision  = array_values( array_column( $debug['revision_cards']['sql_result'], 'id' ) );
+		$revision_cards = Card::whereIn( 'id', $args_revision )->get();
+		$revision_cards = self::parse_image_and_table_cards( $revision_cards );
+
+		$args_on_hold  = array_values( array_column( $debug['on_hold_cards']['sql_result'], 'id' ) );
+		$on_hold_cards = Card::whereIn( 'id', $args_on_hold )->get();
+		$on_hold_cards = self::parse_image_and_table_cards( $on_hold_cards );
+
+//		$new_cards_array = $new_cards->toArray();
+
+		$all_cards = $new_cards->merge( $revision_cards );
+		$all_cards = $all_cards->shuffle();
+
+
 		$ret = array(
-			'new_cards'         => Card::find( array_column( $debug['new_cards'], 'id' ) ),
-			'new_card_ids'      => array(),
-			'revision_cards'    => array(),
-			'revision_card_ids' => array(),
-			'on_hold_cards'     => array(),
-			'on_hold_card_ids'  => array(),
+			'new_cards'      => $new_cards,
+			'revision_cards' => $revision_cards,
+			'on_hold_cards'  => $on_hold_cards,
+			'all_cards'      => $all_cards,
 		);
+
+		Initializer::add_debug_with_key( 'user_study_cards', $debug );
 
 		$wpdb->hide_errors();
 
 		return $ret;
+	}
+
+	/**
+	 * Convert image and table cards' questions and answers to valid json.
+	 *
+	 * @param Collection $cards
+	 *
+	 * @return Collection
+	 */
+	public static function parse_image_and_table_cards( Collection $cards ): Collection {
+		$collection = new Collection();
+		foreach ( $cards as $card ) {
+			$card_type = $card->card_group->card_type;
+			if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
+				if ( ! is_array( $card->answer ) ) {
+					$card->answer = json_decode( $card->answer );
+				}
+				if ( ! is_array( $card->question ) ) {
+					$card->question = json_decode( $card->question );
+				}
+			}
+//			$all_cards[] = $card;
+			$collection->push( $card );
+		}
+
+		return $collection;
 	}
 
 	/**
@@ -1983,7 +2080,7 @@ class UserCard extends Model {
 		return self::format_debug_data( $debug, $debug_key, array(
 			'sql'                                 => $sql,
 			'sql_result'                          => $sql_result,
-			"sub_result{$return_column}s"         => $result_card_ids,
+			"sub_result_{$return_column}s"        => $result_card_ids,
 			'sql_result_mili_seconds'             => ( $stop_time_result - $start_time ),
 			'sql_result_mili_seconds_for_mapping' => ( $stop_time - $start_time_mapping ),
 		) );

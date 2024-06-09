@@ -8,7 +8,6 @@ import Cookies from "js-cookie";
 import {spClientData} from "@/functions";
 import {toast} from "vue3-toastify";
 import {Store} from "@/static/store";
-import selectedCardsAssign from "@/components/SelectedCardsAssign.vue";
 import {TriggerHelper} from "@/classes/TriggerHelper";
 
 declare var bootstrap;
@@ -175,15 +174,15 @@ export default function (status = 'publish') {
     /**
      * User's cards they have not studied before.
      */
-    const newCardIds = ref<number[]>([]);
+    // const newCardIds = ref<number[]>([]);
     /**
      * User's cards they have studied before, is due but was on hold.
      */
-    const onHoldCardIds = ref<number[]>([]);
+    // const onHoldCardIds = ref<number[]>([]);
     /**
      * User's cards they have studied before, is due but was on hold.
      */
-    const revisionCardIds = ref<number[]>([]);
+    // const revisionCardIds = ref<number[]>([]);
     const debugForm = ref<{
         current_study_date: string,
     }>({
@@ -245,7 +244,7 @@ export default function (status = 'publish') {
     };
     const xhrAssignTopics = () => {
         if (Store.//@ts-ignore
-jQuery()) {
+            jQuery()) {
             return;
         }
 
@@ -290,7 +289,7 @@ jQuery()) {
     };
     const xhrAddCards = (cardGroups: _CardGroup[] = []) => {
         if (Store.//@ts-ignore
-jQuery()) {
+            jQuery()) {
             return Promise.resolve();
         }
         const handleAjax: HandleAjax = new HandleAjax(ajaxAddCards.value);
@@ -392,7 +391,7 @@ jQuery()) {
     };
     const xhrLoadUserCards = () => {
         if (Store.//@ts-ignore
-jQuery()) {
+            jQuery()) {
             return;
         }
 
@@ -412,27 +411,23 @@ jQuery()) {
                 },
                 funcSuccess(done: InterFuncSuccess<{
                     deck_groups: Array<_DeckGroup>,
-                    new_card_ids: number[],
-                    on_hold_card_ids: number[],
-                    revision_card_ids: number[],
-                    user_card_group_ids_being_studied: number[],
+                    // new_card_ids: number[],
+                    // on_hold_card_ids: number[],
+                    // revision_card_ids: number[],
+                    // user_card_group_ids_being_studied: number[],
                 }>) {
                     handleAjax.stop();
                     userDeckGroups.value = [];
                     setTimeout(() => {
                         let deckGroups = done.data.deck_groups;
                         deckGroups = sortCardByCardCountOnGroups(deckGroups);
-                        // deckGroups = filterOutItemsWithoutCardsTheUserIsStudying(deckGroups, done.data.user_card_group_ids_being_studied);
                         userDeckGroups.value = deckGroups;
-                        newCardIds.value = done.data.new_card_ids;
-                        onHoldCardIds.value = done.data.on_hold_card_ids;
-                        revisionCardIds.value = done.data.revision_card_ids;
-                        // newCardIds.value = [42, 43];
-                        // onHoldCardIds.value = [44, 45];
-                        // revisionCardIds.value = [46];
+                        // newCardIds.value = done.data.new_card_ids;
+                        // onHoldCardIds.value = done.data.on_hold_card_ids;
+                        // revisionCardIds.value = done.data.revision_card_ids;
                     }, 50);
 
-                    console.log('loadUserCard',{done});
+                    console.log('loadUserCard', {done});
 
                     resolve(done);
                 },
@@ -581,7 +576,7 @@ jQuery()) {
         ajaxRemoveCard, removeCard: xhrRemoveCard,
         ajaxLoadUserCard, loadUserCards: xhrLoadUserCards, userDeckGroups,
         ajaxLoadDebugForm, loadDebugForm: xhrLoadUserDebugForm, debugForm, saveDebugForm: xhrSaveUserDebugForm,
-        newCardIds, onHoldCardIds, revisionCardIds, ajaxAddCard,
+        // newCardIds, onHoldCardIds, revisionCardIds, ajaxAddCard,
         clearSelectedCards, removeSelectedCard,
     };
 

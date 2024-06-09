@@ -11,21 +11,6 @@
            style="background-repeat: no-repeat;background-size: cover;"
            :style="{'background-image' : 'url('+currentQuestion?.card_group?.bg_image_url+')'}">
         <div v-if="!allAnswered" class="flex flex-col gap-2 w-full">
-          <!--          <v-carousel-->
-          <!--              height="400"-->
-          <!--              hide-delimiters-->
-          <!--              progress="primary"-->
-          <!--              v-model="index"-->
-          <!--              :show-arrows="false"-->
-          <!--          >-->
-          <!--            <v-carousel-item-->
-          <!--                v-for="(oneCard, cardIndex) in cards"-->
-          <!--                :key="cardIndex"-->
-          <!--            >-->
-          <!--              <v-sheet-->
-          <!--                  height="100%"-->
-          <!--                  style="background: transparent !important;"-->
-          <!--              >-->
           <div class="d-flex fill-height justify-center align-center max-h-[55vh] overflow-auto">
             <!-- <editor-fold desc="Basic Card"> -->
             <div v-if="'basic' === currentQuestion?.card_group.card_type"

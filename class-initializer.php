@@ -53,7 +53,7 @@ class Initializer {
 	/**
 	 * @var bool $can_add_debug Whether to add debug data or not.
 	 */
-	public static bool $can_add_debug = false;
+	public static bool $can_add_debug = true;
 
 	/**
 	 * Add debug data.
