@@ -49,6 +49,18 @@ export interface _Topic {
 
 export type _TopicNew = Partial<_Topic & Pick<_Topic, 'name' | 'deck' | 'tags'>>;
 
+export type _AnswerLog = {
+    id: number,
+    study_id: number,
+    card_id: number,
+    last_card_updated_at: string,
+    accepted_change_comment: string,
+    question: "",
+    answer: "",
+    created_at: "2024-06-09 14: 17: 20",
+    updated_at: "2024-06-09 14: 17: 20",
+}
+
 export interface _Tag {
     id: string;
     name: string;
@@ -95,6 +107,7 @@ export interface _Card extends _TimeStamps {
     has_updated?: boolean;
     old_question?: any;
     old_answer?: any;
+    answer_log?: null | _AnswerLog
 }
 
 

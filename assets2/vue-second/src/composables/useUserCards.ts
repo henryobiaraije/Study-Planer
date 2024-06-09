@@ -182,12 +182,12 @@ export default function (status = 'publish') {
     /**
      * User's cards they have studied before, is due but was on hold.
      */
-    // const revisionCardIds = ref<number[]>([]);
+        // const revisionCardIds = ref<number[]>([]);
     const debugForm = ref<{
-        current_study_date: string,
-    }>({
-        current_study_date: '',
-    });
+            current_study_date: string,
+        }>({
+            current_study_date: '',
+        });
 
     watchEffect(() => {
         if (oneSpecificCard.value) {
@@ -417,11 +417,14 @@ export default function (status = 'publish') {
                     // user_card_group_ids_being_studied: number[],
                 }>) {
                     handleAjax.stop();
-                    userDeckGroups.value = [];
+                    // userDeckGroups.value = [];
+                    let deckGroups = done.data.deck_groups;
+                    deckGroups = sortCardByCardCountOnGroups(deckGroups);
+                    userDeckGroups.value = deckGroups;
                     setTimeout(() => {
-                        let deckGroups = done.data.deck_groups;
-                        deckGroups = sortCardByCardCountOnGroups(deckGroups);
-                        userDeckGroups.value = deckGroups;
+                        // let deckGroups = done.data.deck_groups;
+                        // deckGroups = sortCardByCardCountOnGroups(deckGroups);
+                        // userDeckGroups.value = deckGroups;
                         // newCardIds.value = done.data.new_card_ids;
                         // onHoldCardIds.value = done.data.on_hold_card_ids;
                         // revisionCardIds.value = done.data.revision_card_ids;
@@ -509,17 +512,18 @@ export default function (status = 'publish') {
 
         // Sort on group level, on decks level and on the topics level.
         return groups.sort((a, b) => {
-            return b.decks.reduce((acc, deck) => {
-                const cardCount = deck.cards?.length;
-                return acc + cardCount + deck.topics.reduce((acc, topic) => {
-                    return acc + topic.cards?.length;
-                }, 0);
-            }, 0) - a.decks.reduce((acc, deck) => {
-                const cardCount = deck.cards?.length;
-                return acc + cardCount + deck.topics.reduce((acc, topic) => {
-                    return acc + topic.cards?.length;
-                }, 0);
-            }, 0);
+            return (b.count_new_cards + b.count_revision + b.count_on_hold) - (a.count_new_cards + a.count_revision + a.count_on_hold);
+            // return b.decks.reduce((acc, deck) => {
+            //     const cardCount = deck.cards?.length;
+            //     return acc + cardCount + deck.topics.reduce((acc, topic) => {
+            //         return acc + topic.cards?.length;
+            //     }, 0);
+            // }, 0) - a.decks.reduce((acc, deck) => {
+            //     const cardCount = deck.cards?.length;
+            //     return acc + cardCount + deck.topics.reduce((acc, topic) => {
+            //         return acc + topic.cards?.length;
+            //     }, 0);
+            // }, 0);
         });
     }
 
@@ -532,22 +536,24 @@ export default function (status = 'publish') {
 
         // Sort on group level, on decks level and on the topics level.
         return decks.sort((a, b) => {
-            return b.topics.reduce((acc, topic) => {
-                return acc + topic.card_groups.reduce((acc, cardGroup) => {
-                    return acc + cardGroup.cards.length;
-                }, 0);
-            }, 0) - a.topics.reduce((acc, topic) => {
-                return acc + topic.card_groups.reduce((acc, cardGroup) => {
-                    return acc + cardGroup.cards.length;
-                }, 0);
-            }, 0);
+            return b.count_new_cards + b.count_revision + b.count_on_hold - a.count_new_cards - a.count_revision - a.count_on_hold;
+            // return b.topics.reduce((acc, topic) => {
+            //     return acc + topic.card_groups.reduce((acc, cardGroup) => {
+            //         return acc + cardGroup.cards.length;
+            //     }, 0);
+            // }, 0) - a.topics.reduce((acc, topic) => {
+            //     return acc + topic.card_groups.reduce((acc, cardGroup) => {
+            //         return acc + cardGroup.cards.length;
+            //     }, 0);
+            // }, 0);
         });
     }
 
     function sortCardByCardCountOnTopics(topics: _Topic[]): _Topic[] {
         // Sort on group level, on decks level and on the topics level.
         return topics.sort((a, b) => {
-            return b.cards?.length - a.cards?.length;
+            return b.count_new_cards + b.count_revision + b.count_on_hold - a.count_new_cards - a.count_revision - a.count_on_hold;
+            // return b.cards?.length - a.cards?.length;
         });
     }
 

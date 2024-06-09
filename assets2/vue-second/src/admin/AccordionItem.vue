@@ -50,11 +50,12 @@
                  :class="[cssLeftRight.right]"
             >
               <template v-for="(stat,statKey) in stats">
-                <span class="on-hold bg-white font-semibold flex gap-2 justify-center ">
+                <span class="on-hold bg-white  flex gap-2 justify-center "
+                      :class="[stat.count > 0 ? cssLeftRight.right + 'font-semibold' : ' font-normal']">
                   <span class="text-sm px-2 py-1">{{ stat.title }}:</span>
                   <span
-                      class="text-sm px-2 rounded-full flex items-center font-semibold"
-                      :class="[cssLeftRight.left]"
+                      class="text-sm px-2 rounded-full flex items-center "
+                      :class="[stat.count > 0 ? cssLeftRight.left + 'font-semibold' : ' font-normal']"
                   >{{ stat.count }}</span>
                 </span>
               </template>

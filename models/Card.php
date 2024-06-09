@@ -59,6 +59,10 @@ class Card extends Model {
 		return $this->belongsTo( CardGroup::class );
 	}
 
+	public function answer_log() {
+		return $this->hasOne( AnswerLog::class , 'card_id' );
+	}
+
 	//    public function studies()
 	//    {
 	//        return $this->hasManyThrough(Study::class, Answered::class);
