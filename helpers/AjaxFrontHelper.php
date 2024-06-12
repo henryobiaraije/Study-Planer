@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Automattic\WooCommerce\Admin\Notes\WC_Admin_Note;
 use DateTime;
 use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Eloquent\Model;
@@ -558,12 +559,15 @@ class AjaxFrontHelper {
 				'created_at' => sp_get_user_debug_form()['current_study_date'],
 			] );
 		}
-		$old_log->update( [
+		$is_table_or_image = in_array( $card_group->card_type, [ 'table', 'image' ] );
+
+		$arg_update_old_log = [
 			'last_card_updated_at'    => $new_card['updated_at'],
 			'accepted_change_comment' => $accept_changes_comment,
-			'question'                => $e_question,
-			'answer'                  => $e_answer,
-		] );
+			'question'                => $is_table_or_image ? wp_json_encode( $e_question ) : $e_question,
+			'answer'                  => $is_table_or_image ? wp_json_encode( $e_answer ) : $e_answer,
+		];
+		$old_log->update( $arg_update_old_log );
 
 		try {
 			$next_due = new Card_Due_Date_Service( [

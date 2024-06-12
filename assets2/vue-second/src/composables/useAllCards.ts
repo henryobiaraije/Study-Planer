@@ -1,5 +1,5 @@
 import {onBeforeUnmount, onMounted, ref} from "vue";
-import type {_CardGroup, _Deck, _DeckGroup, _Tag, _Topic, CardType} from "@/interfaces/inter-sp";
+import type {_CardGroup, _Collection, _Deck, _DeckGroup, _Tag, _Topic, CardType} from "@/interfaces/inter-sp";
 import type {_Ajax} from "@/classes/HandleAjax";
 import {HandleAjax} from "@/classes/HandleAjax";
 import {type InterFuncSuccess, Server} from "@/static/server";
@@ -248,7 +248,7 @@ export default function (status = 'publish') {
         itemToEdit.value = item;
         modalEditId.value = modalId;
         const modalElement = //@ts-ignore
-jQuery(modalId)[0];
+            jQuery(modalId)[0];
         const myModal = new bootstrap.Modal(modalElement);
         myModal.show();
         modalElement.addEventListener('shown.bs.modal', function () {
@@ -260,7 +260,7 @@ jQuery(modalId)[0];
     }
     const closeEditModal = () => {
         const modalElement = //@ts-ignore
-jQuery(modalEditId.value)[0];
+            jQuery(modalEditId.value)[0];
         const myModal = new bootstrap.Modal(modalElement);
         myModal.hide();
         editedItems.value = null;
@@ -309,7 +309,8 @@ jQuery(modalEditId.value)[0];
         deck: null | _Deck = null,
         topic: null | _Topic = null,
         cardTypes: [] | CardType[] = [],
-        topicsToExclude: _Topic[] = []
+        topicsToExclude: _Topic[] = [],
+        collection: null | _Collection = null,
     ) => {
         console.log('search', {topicsToExclude})
         const handleAjax: HandleAjax = new HandleAjax(ajaxSearch.value);
@@ -322,6 +323,7 @@ jQuery(modalEditId.value)[0];
                         page: page.value,
                         search_keyword: query,
                         status: 'publish',
+                        collection: collection,
                         deck_group: deckGroup,
                         deck: deck,
                         topic: topic,
@@ -502,7 +504,7 @@ jQuery(modalEditId.value)[0];
 
     return {
         ajax, ajaxUpdate, ajaxTrash, ajaxDelete, ajaxCreate, ajaxSearch, ajaxRestore,
-        page,perPage,
+        page, perPage,
         total, create, itemToEdit, editedItems, tableData, load, newItem,
         onSelect, onEdit, onSearch, onPageChange, onPerPageChange, loadItems,
         onSortChange, onColumnFilter, updateEditing,

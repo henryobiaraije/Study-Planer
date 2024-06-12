@@ -255,7 +255,7 @@ export default defineComponent({
       console.log({query, searchFor})
       this.allCards.search(searchFor);
     },
-    viewCard(cardGroupId: number): _CardGroup[] {
+    viewCard(cardGroupId: number) {
       console.log({cardGroupId});
       this.cardsToView = this.allCards.tableData.value.rows.find((item: _CardGroup) => item.id === cardGroupId).cards;
       this.viewDialog = true;

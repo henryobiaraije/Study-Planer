@@ -1,6 +1,6 @@
 // @ts-ignore
 import {Ref, ref, watch, watchEffect} from "vue";
-import type {_Card, _CardGroup, _Deck, _DeckGroup, _Tag, _Topic, CardType} from "@/interfaces/inter-sp";
+import type {_Card, _CardGroup, _Collection, _Deck, _DeckGroup, _Tag, _Topic, CardType} from "@/interfaces/inter-sp";
 import type {_Ajax} from "@/classes/HandleAjax";
 import {HandleAjax} from "@/classes/HandleAjax";
 import {type InterFuncSuccess, Server} from "@/static/server";
@@ -157,6 +157,7 @@ export default function (status = 'publish') {
     const theForm = {
         topicToAssign: null as null | _Topic,
         selectedCards: [] as _CardGroup[],
+        collection: null as _Collection,
         group: null as null | _DeckGroup,
         deck: null as null | _Deck,
         topic: null as null | _Topic,

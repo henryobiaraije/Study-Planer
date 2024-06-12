@@ -58,7 +58,7 @@
               class="bg-white p-2 rounded-3 overflow-x-auto">
             <ul class="flex !list-none !m-0 !p-0">
               <li><b>Question {{ itemIndex + 1 }} :</b>
-                <div class="image-area" :style="{height: item.question.h+'px' }">
+                <div class="image-area" :style="{height: Number(item.question.h)+'px' }">
                   <div :id="'main-preview-'+item.question.hash" class="image-area-inner-preview image-card-view ">
 											<span v-for="(item2,itemIndex2) in item.question.boxes" :id="'sp-box-preview-'+item2.hash"
                             :class="{'show-box': item2.show, 'asked-box' : item2.asked, 'hide-box' : item2.hide }"
@@ -70,14 +70,13 @@
                 </div>
               </li>
               <li><b>Answer:</b>
-                <div class="image-area" :style="{height: item.answer.h+'px' }">
+                <div class="image-area" :style="{height: Number(item.answer.h)+'px' }">
                   <div :id="'main-preview-'+item.answer.hash" class="image-area-inner-preview image-card-view ">
 											<span v-for="(item2,itemIndex2) in item.answer.boxes" :id="'sp-box-preview-'+item2.hash"
                             :class="{'show-box': item2.show, 'hide-box' : item2.hide }"
                             :key="item2.hash" class="sp-box-preview">
-<!--												<span v-if="item2.imageUrl.length < 2" >{{item.c_number}}</span >-->
 												<img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl" alt=""
-                             :style="{width : item2.w+'px', height : item2.h+'px'}">
+                             :style="{width : Number(item2.w)+'px', height : Number(item2.h)+'px'}">
 											</span>
                   </div>
                 </div>

@@ -247,7 +247,7 @@ export default defineComponent({
     );
   },
   methods: {
-    viewCard(cardGroupId: number): _CardGroup[] {
+    viewCard(cardGroupId: number) {
       // const cardsToView = this.allCards.tableData.value.rows.find((item: _CardGroup) => item.id === cardGroupId).cards;
       // console.log({cardGroupId, cardsToView});
       this.cardsToView = this.allCards.tableData.value.rows.find((item: _CardGroup) => item.id === cardGroupId).cards;

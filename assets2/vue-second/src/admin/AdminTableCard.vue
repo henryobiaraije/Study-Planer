@@ -39,8 +39,8 @@
           </thead>
           <tbody>
           <template v-for="(item,itemIndex) in tableCard.tableItem.value">
-            <tr :class="{'bg-gray-100' : (itemIndex / 2 > 0)}"
-                v-if="itemIndex !== 0">
+            <tr :class="{'bg-gray-100' : (Number(itemIndex) / 2 > 0)}" v-if="itemIndex !== 0">
+<!--            <tr :class="{'bg-gray-100' : (itemIndex / 2 > 0)}" v-if="itemIndex !== 0">-->
               <td @dblclick="tableCard._openTableActionModal(itemIndex2,itemIndex)"
                   v-for="(item2,itemIndex2) in tableCard.tableItem.value[itemIndex]"
                   class="table-cell border-1 border-sp-200">

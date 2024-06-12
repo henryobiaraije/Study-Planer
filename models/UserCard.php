@@ -230,7 +230,7 @@ class UserCard extends Model {
 		}
 
 		return array(
-			'deck_groups'                       => $deck_groups->all(),
+			'deck_groups' => $deck_groups->all(),
 //			'new_card_ids'                      => $user_cards_not_studied['card_ids'],
 //			'on_hold_card_ids'                  => $user_cards_answered['on_hold_and_due_ids'],
 //			'revision_card_ids'                 => $user_cards_answered['revision_and_due_ids'],
@@ -609,7 +609,6 @@ class UserCard extends Model {
 		$sql_cards_in_uncategorized_topic = "
 			SELECT c_uc.id from {$tb_cards} as c_uc
 			WHERE c_uc.card_group_id IN (
-			  # List of card groups in uncategorized topics
 			  SELECT cg_uc.id from {$tb_card_groups} as cg_uc
 			  WHERE cg_uc.topic_id = {$topic_uncategorized_id}
 			)	 
@@ -621,7 +620,6 @@ class UserCard extends Model {
 		$sql_exclude_collection = " 
 			SELECT id from {$tb_cards} as c_cl
 			WHERE c_cl.card_group_id IN (
-				 # List of card groups in a collection
 				 SELECT id from {$tb_card_groups} 
 				 WHERE collection_id > 0
 			)
@@ -633,19 +631,15 @@ class UserCard extends Model {
 		$sql_new_cards = "
 			SELECT id from {$tb_cards} as c
 			WHERE c.card_group_id IN (
-				# List of card_groups in user cards.
 				SELECT id from {$tb_card_groups} as cg
 				WHERE id IN (
-						# List of cg ids in user_cards.
 						SELECT card_group_id from {$tb_user_cards} as uc
 						WHERE uc.user_id = {$user_id}
 				) 
 			)
 			AND c.id NOT IN (
-				# List of card_ids that have been answred before.
 				SELECT DISTINCT card_id from {$tb_answered} as a
 				WHERE a.study_id IN (
-					# List of user study ids.                        
 					SELECT id FROM {$tb_study} 
 					WHERE user_id = {$user_id}
 				) 
@@ -720,7 +714,6 @@ class UserCard extends Model {
 		int $deck_id = 0,
 		int $topic_id = 0
 	) {
-
 		$study_id           = $study->id;
 		$study_no_of_new    = $study->no_of_new;
 		$study_no_to_revise = $study->no_to_revise;
@@ -748,11 +741,12 @@ class UserCard extends Model {
 			'study_to_array'               => $study_to_array,
 			'study_id'                     => $study_id,
 			//
+			'user_cards_groups'            => array(),
 			'user_cards'                   => array(),
+			'user_studies'                 => array(),
+			//
 			'topic_cards'                  => array(),
 			'deck_cards'                   => array(),
-			//
-			'user_studies'                 => array(),
 			//
 			'cards_answered_distinct'      => array(),
 			'cards_not_answered'           => array(),
@@ -829,7 +823,6 @@ class UserCard extends Model {
 		$sql_cards_in_uncategorized_topic = "
 			SELECT c_uc.id from {$tb_cards} as c_uc
 			WHERE c_uc.card_group_id IN (
-			  # List of card groups in uncategorized topics
 			  SELECT cg_uc.id from {$tb_card_groups} as cg_uc
 			  WHERE cg_uc.topic_id = {$topic_uncategorized_id}
 			)	 
@@ -847,7 +840,6 @@ class UserCard extends Model {
 		$sql_exclude_collection = " 
 			SELECT id from {$tb_cards} as c_cl
 			WHERE c_cl.card_group_id IN (
-				 # List of card groups in a collection
 				 SELECT id from {$tb_card_groups} 
 				 WHERE collection_id > 0
 			)
@@ -861,18 +853,33 @@ class UserCard extends Model {
 
 		// </editor-fold desc="Collections" >
 
+
+		// <editor-fold desc="User Cards Groups " >
+		$sql_user_card_groups = "
+			SELECT id from {$tb_card_groups} as cg
+			WHERE id IN (
+				 SELECT card_group_id from {$tb_user_cards} as uc 
+				 WHERE uc.user_id = $study_user_id 
+			)
+		";
+		$debug                = self::maybe_execute_query(
+			$sql_user_card_groups,
+			'id',
+			$debug,
+			'user_cards_groups',
+		);
+		// </editor-fold desc="User Cards Groups " >
+
+
 		// <editor-fold desc="User Cards " >
 
 		// Get cards in user cards.
 		$sql_user_cards = "
 			SELECT id from {$tb_cards} as c
 			WHERE c.card_group_id IN (
-				# List of card_groups in user cards.
 				SELECT id from {$tb_card_groups} as cg
 				WHERE id IN (
-						# List of cg ids in user_cards.
-						SELECT card_group_id from {$tb_user_cards} as uc
-						WHERE uc.user_id = $study_user_id 
+						{$sql_user_card_groups}
 				)
 			)
 		";
@@ -892,7 +899,6 @@ class UserCard extends Model {
 			$sql_cards_in_topic = "
 				SELECT id FROM $tb_cards as c_t
 				WHERE c_t.card_group_id IN (
-					# List of card_groups in topic
 					SELECT id from {$tb_card_groups} as cg_t 
 					WHERE cg_t.topic_id = $topic_id	
 				) 
@@ -913,10 +919,8 @@ class UserCard extends Model {
 			$sql_cards_in_deck = "
 				SELECT id FROM $tb_cards as c_t
 				WHERE c_t.card_group_id IN (
-					# List of card_groups in topic
 				    SELECT id from {$tb_card_groups} as cg_t
 				    WHERE cg_t.topic_id IN (
-						# List of topics in deck
 						SELECT id from {$tb_topics} as t_d
 						WHERE t_d.deck_id = $deck_id
 					)
@@ -954,7 +958,6 @@ class UserCard extends Model {
 			$sql_cards_in_tags_to_include = "
 				SELECT c_in.id from $tb_cards  as c_in
 				WHERE c_in.card_group_id IN (
-					# List of card groups in tags.
 					 {$sql_cards_groups_in_include_tags}
 				)
 			";
@@ -975,27 +978,26 @@ class UserCard extends Model {
 
 			// Get card groups in Included_tags.
 			$implode_excluded_tags            = '(' . implode( ',', $tags_to_exclude ) . ')';
-			$sql_cards_groups_in_exclude_tags = "
-				 SELECT taggable_id from {$tb_taggable_excluded} as tgae_tint
+			$sql_all_cards_groups_in_excluded = "
+				 SELECT taggable_id from {$tb_taggable} as tgae_tint
 				 WHERE tgae_tint.tag_id IN {$implode_excluded_tags} 	
 				 AND tgae_tint.taggable_type = '{$taggable_type_card_groups}'
+				 AND tgae_tint.taggable_id IN (
+				 	${sql_user_card_groups}
+				)
 			";
 			$debug                            = self::execute_query(
-				$sql_cards_groups_in_exclude_tags,
+				$sql_all_cards_groups_in_excluded,
 				'taggable_id',
 				$debug,
 				'excluded_tags_taggable',
 			);
 
+			// So these are the cards in the excluded tags.
 			$sql_cards_in_tags_to_exclude = "
 				SELECT id from $tb_cards  as c_in 
 				WHERE c_in.card_group_id IN (
-					# List of card groups in tags.
-					SELECT cg_in.id from {$tb_card_groups} as cg_in 
-					WHERE cg_in.id IN (
-						# List of tags joined to card group in taggable.
-						{$sql_cards_groups_in_exclude_tags}
-					)
+						{$sql_all_cards_groups_in_excluded}
 				)
 			";
 			$debug                        = self::execute_query(
@@ -1191,15 +1193,23 @@ class UserCard extends Model {
 		$query_sql_new = "
 			SELECT c1.id from {$tb_cards} as c1 
 			WHERE c1.id IN ($sql_user_cards) 
+			  -- Collection
 			AND c1.id NOT IN ($sql_exclude_collection) 
+			  -- Uncategorized Topic
 			AND c1.id NOT IN ($sql_cards_in_uncategorized_topic) 
+			  -- Not answered
 			AND c1.id IN ($sql_not_answered) 
 			";
 		$query_sql_new .= sprintf( '
+					-- Topic
 					%1$s 
+					-- Deck
 					%2$s 
+					-- Included Tags
 					%3$s 
+					-- Excluded Tags
 					%4$s 
+					-- Limit
 					LIMIT %5$d 
 					',
 			! empty( $sql_cards_in_topic ) ? "AND c1.id IN ($sql_cards_in_topic)" : '',

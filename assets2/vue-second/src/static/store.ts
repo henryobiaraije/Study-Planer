@@ -9,6 +9,7 @@ export class Store {
     private static _nn: boolean = false;
     public static ajaxRequestCount: Array<number> = [];
     public static nonce = '';
+    public static isAdmin = false;
 
     public static localize: InitAdminValues = null;
 
@@ -39,6 +40,9 @@ export class Store {
         this.st();
         this._serverUrl = value.serverUrl;
         this._action = value.actionString;
+        if ('is_admin' in value) {
+            this.isAdmin = value.is_admin === true;
+        }
     }
 
     static get action(): string {
@@ -111,6 +115,7 @@ interface InitAdminValues {
     serverUrl: string,
     actionString: string,
     nonce: string,
-    icon_settings_image: string,
+    icon_settings_image?: string,
+    is_admin?: boolean,
 }
 

@@ -16,6 +16,7 @@ Store.initAdmin({
     serverUrl: localize.ajax_url,
     actionString: localize.ajax_action,
     nonce: localize.nonce,
+    icon_settings_image: ''
 });
 
 

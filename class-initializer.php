@@ -255,6 +255,7 @@ class Initializer {
 		self::$general_localize['default_bg_image'] = $default_bg_image;
 		// C:\laragon\www\Test-Site-Wordpress\wp-content\plugins\study-planner-pro\assets2\vue-second\images\settings-small.png
 		self::$general_localize['icon_settings_image'] = self::$plugin_url . '/assets2/vue-second/images/settings-small.png';
+        self::$general_localize['is_admin'] = current_user_can( 'administrator' );
 		// Common::in_script([
 		// 'in_footer',
 		// 'localiz' => self::$general_localize,

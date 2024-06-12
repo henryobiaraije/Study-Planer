@@ -230,7 +230,7 @@ export default defineComponent({
     clearSelected() {
       this.$emit('clear-selected');
     },
-    viewCard(cardGroupId: number): _CardGroup[] {
+    viewCard(cardGroupId: number) {
       if (this.myStore.store.inAddCards) {
         // Display all cards in all groups if in AddCards page.
         let cartsCountTillToStart = 0;

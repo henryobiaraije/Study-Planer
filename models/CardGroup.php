@@ -823,6 +823,7 @@ class CardGroup extends Model {
 			'per_page'                   => 5,
 			'with_trashed'               => false,
 			'only_trashed'               => false,
+			'collection_id'              => null,
 			'deck_group_id'              => null,
 			'deck_id'                    => null,
 			'topic_id'                   => null,
@@ -848,6 +849,7 @@ class CardGroup extends Model {
 		// if from front end, then either deck_group_id or deck_id or topic_id must be provided.
 		if (
 			true === $args['from_front_end']
+			&& null === $args['collection_id']
 			&& null === $args['deck_group_id']
 			&& null === $args['deck_id']
 			&& null === $args['topic_id']
@@ -1059,6 +1061,11 @@ class CardGroup extends Model {
 		// Group by cd.id
 //		$query = $query
 //			->groupBy( [ 'cg.id' ] );
+
+		// Collections.
+		if ( $args['collection_id'] ) {
+			$query->where( 'cg.collection_id', $args['collection_id'] );
+		}
 
 		if ( $for_total ) {
 			return $query

@@ -1,7 +1,32 @@
 <template>
   <div class="assign-topics gap-4 flex flex-col ">
-    <!--   Group, Deck, Topic -->
+    <!-- Collections   Group, Deck, Topic -->
     <div class="flex flex-col gap-3">
+      <!--  Collections -->
+      <div class="w-full" v-if="isAdmin">
+        <div class="flex-1 group ">
+          <span class="text-base items-center flex gap-2 w-full mb-2 font-medium">
+            <span>Collections*</span>
+            <span @click="clearGroup"
+                  class="hidden px-2 py-1 text-xs bg-gray-300 font-normal group-hover:inline-block cursor-pointer hover:bg-gray-400">Clear</span>
+          </span>
+          <vue-mulitiselect
+              v-model="userCards.form.value.collection"
+              :options="collections.searchResults.value"
+              :multiple="false"
+              :loading="deckGroupMulti.ajaxSearch.value.sending || deckGroupMulti.ajax.value.sending"
+              :searchable="true"
+              :allowEmpty="false"
+              :close-on-select="true"
+              :taggable="false"
+              :createTag="false"
+              @search-change="collections.search"
+              placeholder="Collection"
+              label="name"
+              track-by="id"
+          ></vue-mulitiselect>
+        </div>
+      </div>
       <div class="flex flex-col lg:flex-row gap-4 ">
         <!--  Group -->
         <div class="flex-1 group ">
@@ -191,6 +216,7 @@ import useUserCards from "@/composables/useUserCards";
 import UseUserCards from "@/composables/useUserCards";
 import Cookies from "js-cookie";
 import {TriggerHelper} from "@/classes/TriggerHelper";
+import {Store} from "@/static/store";
 
 export default defineComponent({
   name: 'CardSelector',
@@ -251,6 +277,9 @@ export default defineComponent({
     perPage() {
       return this.allCards.perPage.value;
     },
+    isAdmin() {
+      return Store.isAdmin;
+    }
   },
   created() {
     console.log('now created');
@@ -270,6 +299,7 @@ export default defineComponent({
     this.deckGroupMulti.search('');
     this.decksMulti.search('');
     this.topicsMulti.search('');
+    this.collections.search('');
     this.searchCards();
   },
   methods: {
@@ -282,7 +312,8 @@ export default defineComponent({
           this.userCards.form.value.deck,
           this.userCards.form.value.topic,
           this.userCards.form.value.cardTypes,
-          null !== this.topicToAssign ? [this.topicToAssign] : []
+          null !== this.topicToAssign ? [this.topicToAssign] : [],
+          this.userCards.form.value.collection
       );
     },
     cardSelected(card: _CardGroup) {
@@ -328,6 +359,9 @@ export default defineComponent({
         console.log('topic to assign change', {topicToAssign: this.topicToAssign})
         this.searchCards();
       }, 100);
+    },
+    'userCards.form.value.collection': function (newVal, oldVal) {
+      this.searchCards();
     },
     'userCards.form.value.group': function (newVal, oldVal) {
       const form = this.userCards.form.value;

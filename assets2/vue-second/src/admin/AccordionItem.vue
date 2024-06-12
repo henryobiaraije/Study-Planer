@@ -589,7 +589,7 @@ export default defineComponent({
         active: false,
         id: 0,
         user: undefined
-      } as _Study);
+      } as unknown as _Study);
     }
   },
   methods: {

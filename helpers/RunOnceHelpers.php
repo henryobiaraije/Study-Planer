@@ -5,8 +5,8 @@
 
 namespace StudyPlannerPro\Helpers;
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 use DateTime;
@@ -39,81 +39,83 @@ use function StudyPlannerPro\get_card_group_background_image;
  * @package StudyPlannerPro\Helpers
  */
 class RunOnceHelpers {
-    /**
-     * @var self $instance
-     */
-    private static $instance;
+	/**
+	 * @var self $instance
+	 */
+	private static $instance;
 
-    private function __construct() {
-		add_action('init', [$this, 'run_all_once']);
+	private function __construct() {
+		add_action( 'init', [ $this, 'run_all_once' ] );
 //        $this->run_all_once();
-    }
+	}
 
-    public static function get_instance(): self {
-        if (self::$instance) {
-            return self::$instance;
-        }
+	public static function get_instance(): self {
+		if ( self::$instance ) {
+			return self::$instance;
+		}
 
-        self::$instance = new self();
+		self::$instance = new self();
 
-        return self::$instance;
-    }
+		return self::$instance;
+	}
 
-    public function run_all_once() {
-        $this->run_once_update_answers_last_updated_card_ids();
-        $this->run_once_fill_the_answer_log();
-    }
+	public function run_all_once() {
+		$this->run_once_update_answers_last_updated_card_ids();
+		$this->run_once_fill_the_answer_log();
+	}
 
-    public function run_once_update_answers_last_updated_card_ids() {
+	public function run_once_update_answers_last_updated_card_ids() {
 		return;
-        $option = get_option('spROUpdAnsLasUpdCId', false);
-        if ($option) {
-            return;
-        }
-        //        dd($option);
-        $table = Manager
-            ::table(SP_TABLE_ANSWERED.' as a')
-            ->leftJoin(SP_TABLE_CARDS.' as c', 'c.id', '=', 'a.card_id')
-            ->update([
-                'a.card_last_updated_at' => Manager::raw('c.updated_at'),
-                'a.answer'               => Manager::raw('c.answer'),
-                'a.question'             => Manager::raw('c.question'),
-            ]);
-        update_option('spROUpdAnsLasUpdCId', true);
-    }
+		$option = get_option( 'spROUpdAnsLasUpdCId', false );
+		if ( $option ) {
+			return;
+		}
+		//        dd($option);
+		$table = Manager
+			::table( SP_TABLE_ANSWERED . ' as a' )
+			->leftJoin( SP_TABLE_CARDS . ' as c', 'c.id', '=', 'a.card_id' )
+			->update( [
+				'a.card_last_updated_at' => Manager::raw( 'c.updated_at' ),
+				'a.answer'               => Manager::raw( 'c.answer' ),
+				'a.question'             => Manager::raw( 'c.question' ),
+			] );
+		update_option( 'spROUpdAnsLasUpdCId', true );
+	}
 
-    public function run_once_fill_the_answer_log() {
-        $option = get_option('spROFillAnswerLog', false);
-        if ($option) {
-            //            return;
-        }
-        //        dd($option);
-        $query_answers = Answered
-            ::where('grade', '!=', 'hold')
-            ->groupBy('id')
-            ->orderByDesc('id')
-            ->get();
-        foreach ($query_answers as $answer) {
-            $old_log = AnswerLog
-                ::where('study_id', '=', $answer->study_id)
-                ->where('card_id', '=', $answer->card_id)
-                ->get()->first();
-            if (empty($old_log)) {
-                $old_log = AnswerLog::create([
-                    'study_id' => $answer->study_id,
-                    'card_id'  => $answer->card_id,
-                ]);
-            }
-            $old_log->update([
-                'last_card_updated_at'    => $answer->card_last_updated_at,
-                'accepted_change_comment' => '',
-                'question'                => $answer->question,
-                'answer'                  => $answer->answer,
-            ]);
-        }
+	public function run_once_fill_the_answer_log() {
+		$option = get_option( 'spROFillAnswerLog2', false );
+		if ( $option ) {
+			return;
+		}
+		//        dd($option);
+		$query_answers = Answered
+			::where( 'grade', '!=', 'hold' )
+			->groupBy( 'id' )
+			->orderByDesc( 'id' )
+			->get();
+		foreach ( $query_answers as $answer ) {
+			$old_log = AnswerLog
+				::where( 'study_id', '=', $answer->study_id )
+				->where( 'card_id', '=', $answer->card_id )
+				->get()->first();
+			if ( empty( $old_log ) ) {
+				$old_log = AnswerLog::create( [
+					'study_id' => $answer->study_id,
+					'card_id'  => $answer->card_id,
+				] );
+			}
+			if ( ! empty( $answer->question ) && ! empty( $answer->answer ) ) {
+				$old_log->update( [
+					'last_card_updated_at'    => $answer->card_last_updated_at,
+					'accepted_change_comment' => '',
+					'question'                => $answer->question,
+					'answer'                  => $answer->answer,
+				] );
+			}
+		}
 
-        update_option('spROFillAnswerLog', true);
-    }
+		update_option( 'spROFillAnswerLog2', true );
+	}
 
 
 }

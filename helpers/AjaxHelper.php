@@ -172,6 +172,7 @@ class AjaxHelper {
 		$page                         = (int) sanitize_text_field( $params['page'] );
 		$search_keyword               = sanitize_text_field( $params['search_keyword'] );
 		$status                       = sanitize_text_field( $params['status'] );
+		$e_deck_collection            = $params['collection'];
 		$e_deck_group                 = $params['deck_group'];
 		$e_deck                       = $params['deck'];
 		$e_topic                      = $params['topic'];
@@ -182,6 +183,7 @@ class AjaxHelper {
 		$e_for_new_cards              = $params['for_new_cards'] === true;
 		$e_topic_ids_to_exclude       = $params['topic_ids_to_exclude'];
 
+		$collection_id       = is_array( $e_deck_collection ) ? $e_deck_collection['id'] : null;
 		$deck_group_id       = is_array( $e_deck_group ) ? $e_deck_group['id'] : null;
 		$deck_id             = is_array( $e_deck ) ? $e_deck['id'] : null;
 		$topic_id            = is_array( $e_topic ) ? $e_topic['id'] : null;
@@ -196,6 +198,7 @@ class AjaxHelper {
 				'page'                       => $page,
 				'per_page'                   => $per_page,
 				'only_trashed'               => ( 'trash' === $status ) ? true : false,
+				'collection_id'              => $collection_id,
 				'deck_group_id'              => $deck_group_id,
 				'deck_id'                    => $deck_id,
 				'topic_id'                   => $topic_id,
@@ -2596,8 +2599,11 @@ class AjaxHelper {
 			)
 		);
 		foreach ( $args['collections'] as $item ) {
-			$id = (int) sanitize_text_field( $item['id'] );
-			Collections::find( $id )->delete();
+			$id   = (int) sanitize_text_field( $item['id'] );
+			$find = Collections::find( $id );
+			if ( ! empty( $find ) ) {
+				$find->delete();
+			}
 		}
 
 		Common::send_success( 'Trashed successfully.' );

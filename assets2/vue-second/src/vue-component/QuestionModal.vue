@@ -1,6 +1,24 @@
 <template>
   <!--  <div class="sp sp-modal">-->
   <v-progress-linear :model-value="percentComplete" :height="5" color="primary"></v-progress-linear>
+  <div class="chose-updated-or-old-card flex flex-col gap-3">
+    <div class="info text-center py-3">This card has been updated since the last time you answered it.</div>
+    <v-card>
+      <v-tabs
+          v-model="tab"
+          align-tabs="center"
+          color="deep-purple-accent-4"
+      >
+        <v-tab :value="1">Old Card</v-tab>
+        <v-tab :value="2">New Card</v-tab>
+      </v-tabs>
+    </v-card>
+    <div class="py-4 text-center">
+      <button class="py-2 px-8 text-base font-bold rounded-md bg-gray-100 border border-solid border-gray-300 hover:bg-gray-300 ">Use
+        this version
+      </button>
+    </div>
+  </div>
   <div class="admin-image-card">
     <form @submit.prevent="" class="modal-content min-w-[85vw]" style="height: 100%;">
       <div class="mb-4">
@@ -16,20 +34,11 @@
             <div v-if="'basic' === currentQuestion?.card_group.card_type"
                  class="sp-basic-question w-full text-center"
                  style="font-family: 'Montserrat', sans-serif;">
-              <!--              <div-->
-              <!--                  v-html="(currentQuestion.card_group.reverse || showOnlyAnswers) ? currentQuestion.answer : currentQuestion.question "-->
-              <!--                  class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center mb-2"></div>-->
-              <!--              <div v-show="showCurrentAnswer" style="font-family: 'Montserrat', sans-serif;"-->
-              <!--                   v-html="(currentQuestion.card_group.reverse) ? currentQuestion.question : currentQuestion.answer"-->
-              <!--                   class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 text-center "></div>-->
-              <!--              Modified: Display basic card normally as reverse cards will now generate 2 cards and ask them separately-->
-
-              <div
-                  v-html="currentQuestion.question "
-                  class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2  mb-2 "></div>
-              <div v-show="showCurrentAnswer" style="font-family: 'Montserrat', sans-serif;"
-                   v-html="currentQuestion.answer"
-                   class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 !text-left "></div>
+              <QuestionBasicCard
+                  :show-current-answer="showCurrentAnswer"
+                  :answer="currentQuestion.answer"
+                  question="currentQuestion.question"
+              />
             </div>
             <!-- </editor-fold desc="Basic Card"> -->
 
@@ -37,105 +46,39 @@
             <div
                 v-else-if="'gap' === currentQuestion.card_group.card_type"
                 class="mp-ql-editor-content-wrapper">
-              <div class="ql-editor">
-                <div
-                     class="sp-gap-question w-full !text-left ">
-                  <div v-show="!showCurrentAnswer && !showOnlyAnswers"
-                       @click="_showAnswer()" v-html="currentQuestion.question"
-                       style="font-family: 'Montserrat', sans-serif;"
-                       class=" p-2 rounded-2 text-center mb-4 lg:max-w-4xl m-auto "></div>
-                  <!-- <hr style="border-top-width: 1px;border-color: #b2b2b2;margin: 10px;"/> -->
-                  <div v-show="showCurrentAnswer || showOnlyAnswers" v-html="currentQuestion.answer"
-                       style="font-family: 'Montserrat', sans-serif;"
-                       class="sp-answer lg:max-w-4xl m-auto  p-2 rounded-2 !text-left "></div>
-                </div>
-              </div>
+
+              <QuestionGapCard
+                  :current-question="currentQuestion"
+                  :show-current-answer="showCurrentAnswer"
+                  :show-only-answers="showOnlyAnswers"
+                  :_show-answer="_showAnswer"
+              />
+
             </div>
             <!-- </editor-fold desc="Gap Card"> -->
 
             <!-- <editor-fold desc="Table Card"> -->
             <div v-else-if="'table' === currentQuestion.card_group.card_type"
                  class="sp-table-question m-auto w-full">
-              <v-table v-if="!showCurrentAnswer && !showOnlyAnswers">
-                <thead>
-                <tr>
-                  <th v-for="(column,columnIndex) in oneCard.question[0]"
-                      class="table-cell border-1 border-sp-200 text-center">
-                    <div v-html="column"></div>
-                  </th>
-                </tr>
-                </thead>
-                <tbody>
-                <template v-for="(row,rowIndex) in oneCard.question">
-                  <tr v-if="rowIndex !== 0"
-                      :class="{'bg-gray-100' : (rowIndex / 2 > 0)}"
-                  >
-                    <td v-for="(column,columnIndex) in row" class="table-cell border-1 border-sp-200 text-center">
-                      <div v-html="column"></div>
-                    </td>
-                  </tr>
-                </template>
-                </tbody>
-              </v-table>
-              <v-table v-if="showCurrentAnswer || showOnlyAnswers">
-                <thead>
-                <tr>
-                  <th v-for="(column,columnIndex) in oneCard.answer[0]"
-                      class="table-cell border-1 border-sp-200 text-center">
-                    <div v-html="column"></div>
-                  </th>
-                </tr>
-                </thead>
-                <tbody>
-                <template v-for="(row,rowIndex) in oneCard.answer">
-                  <tr v-if="rowIndex !== 0"
-                      :class="{'bg-gray-100' : (rowIndex / 2 > 0)}"
-                  >
-                    <td v-for="(column,columnIndex) in row" class="table-cell border-1 border-sp-200 text-center">
-                      <div v-html="column"></div>
-                    </td>
-                  </tr>
-                </template>
-                </tbody>
-              </v-table>
+
+              <QuestionTableCard
+                  :question="currentQuestion.question"
+                  :answer="currentQuestion.answer"
+                  :show-current-answer="showCurrentAnswer"
+                  :show-only-answers="showOnlyAnswers"
+                  :one-card="oneCard"
+              ></QuestionTableCard>
+
             </div>
             <!-- </editor-fold desc="Table Card"> -->
 
             <!-- <editor-fold desc="Image Card"> -->
             <div v-else-if="'image' === oneCard.card_group.card_type" class="w-full">
-              <div v-show="!showOnlyAnswers && !showCurrentAnswer" class="sp-image-question m-auto mb-2 relative">
-                <div class="image-area" :style="{height: oneCard.question.h+'px' }">
-                  <!--                    <div class="image-area" :style="{height: 300+'px' }">-->
-                  <div :id="'main-preview-'+oneCard.question.hash"
-                       class="image-area-inner-preview image-card-view inline-block relative">
-                           <span v-for="(box,boxIndex) in oneCard.question.boxes"
-                                 style="font-family: 'Montserrat', sans-serif;"
-                                 :id="'sp-box-preview-'+box.hash"
-                                 :class="{'show-box': box.show, 'asked-box' : box.asked, 'hide-box' : box.hide }"
-                                 :key="box.hash"
-                                 class="sp-box-preview relative inline-block">
-                             <span v-if="box.imageUrl.length < 2"></span>
-                            <img v-if="box.imageUrl.length > 0" :src="box.imageUrl" alt="">
-                          </span>
-                  </div>
-                </div>
-              </div>
-              <div v-show="showCurrentAnswer || showOnlyAnswers" class="sp-image-question m-auto ">
-                <div class="image-area" :style="{height: oneCard.answer.h+'px' }">
-                  <div :id="'main-preview-'+oneCard.answer.hash"
-                       class="image-area-inner-preview image-card-view ">
-                               <span v-for="(item2,itemIndex2) in oneCard.answer.boxes"
-                                     style="font-family: 'Montserrat', sans-serif;"
-                                     :id="'sp-box-preview-'+item2.hash"
-                                     :class="{'show-box': item2.show, 'hide-box' : item2.hide }"
-                                     :key="item2.hash" class="sp-box-preview">
-                                  <span v-if="item2.imageUrl.length < 2"></span>
-                                  <img v-if="item2.imageUrl.length > 0" :src="item2.imageUrl"
-                                       alt="">
-                               </span>
-                  </div>
-                </div>
-              </div>
+              <QuestionImageCard
+                  :one-card="oneCard"
+                  :show-current-answer="showCurrentAnswer"
+                  :show-only-answers="showOnlyAnswers"
+              />
             </div>
             <!-- </editor-fold desc="Image Card"> -->
           </div>
@@ -288,6 +231,10 @@ import useImageCard from "@/composables/useImageCard";
 import {spClientData} from "@/functions";
 import useUserCards from "@/composables/useUserCards";
 import useMyStore from "@/composables/useMyStore";
+import QuestionBasicCard from "@/vue-component/QuestionBasicCard.vue";
+import QuestionImageCard from "@/vue-component/QuestionImageCard.vue";
+import QuestionTableCard from "@/vue-component/QuestionTableCard.vue";
+import QuestionGapCard from "@/vue-component/QuestionGapCard.vue";
 
 export default defineComponent({
   computed: {
@@ -471,6 +418,7 @@ export default defineComponent({
   },
   data() {
     return {
+      tab: null,
       // questionIndex: 0,
       showCurrentAnswer: false,
       showGrade: false,
@@ -480,6 +428,10 @@ export default defineComponent({
   },
   name: 'QuestionModal',
   components: {
+    QuestionGapCard,
+    QuestionTableCard,
+    QuestionImageCard,
+    QuestionBasicCard,
     'ajax-action': AjaxAction,
   },
   props: {

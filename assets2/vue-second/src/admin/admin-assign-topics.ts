@@ -24,6 +24,7 @@ Store.initAdmin({
     serverUrl: localize.ajax_url,
     actionString: localize.ajax_action,
     nonce: localize.nonce,
+    is_admin: localize['is_admin'],
 });
 
 const myCustomLightTheme = {
