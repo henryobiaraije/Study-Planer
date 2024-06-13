@@ -714,13 +714,14 @@ class UserCard extends Model {
 		int $deck_id = 0,
 		int $topic_id = 0
 	) {
-		$study_id           = $study->id;
-		$study_no_of_new    = $study->no_of_new;
-		$study_no_to_revise = $study->no_to_revise;
-		$study_no_on_hold   = $study->no_on_hold;
-		$study_to_array     = $study->toArray();
-		$today_datetime     = Common::getDateTime();
-		$today_date         = Common::get_date();
+		$study_id                   = $study->id;
+		$study_no_of_new            = $study->no_of_new;
+		$study_no_to_revise         = $study->no_to_revise;
+		$study_no_on_hold           = $study->no_on_hold;
+		$study_to_array             = $study->toArray();
+		$today_datetime             = Common::getDateTime();
+		$today_date                 = Common::get_date();
+		$today_date_with_empty_time = Common::get_date_with_empty_time( false );
 
 		if ( $study->study_all_new ) {
 			$study_no_of_new = 10000;
@@ -1127,8 +1128,8 @@ class UserCard extends Model {
 		$sql_cards_answered_as_new_today                               = "
 			SELECT a_new.card_id from {$tb_answered} as a_new 
 			WHERE a_new.study_id = {$study_id} 
-			AND a_new.created_at >= {$today_date}  
-			 AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
+			AND a_new.created_at >= '{$today_date_with_empty_time}' 
+			AND a_new.created_at < ('{$today_date_with_empty_time}' + INTERVAL 1 DAY)
 			AND a_new.answered_as_new = 1
 		";
 		$debug                                                         = self::execute_query(
@@ -1149,8 +1150,8 @@ class UserCard extends Model {
 		$sql_cards_answered_as_revision_today                                    = "
 			SELECT a_new.card_id from {$tb_answered} as a_new 
 			WHERE a_new.study_id = {$study_id} 
-			AND a_new.created_at >= {$today_date}  
-			AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
+			AND a_new.created_at >= '{$today_date_with_empty_time}'  
+			AND a_new.created_at < ('{$today_date_with_empty_time}' + INTERVAL 1 DAY)
 			AND a_new.answered_as_revised = 1
 		";
 		$debug                                                                   = self::execute_query(
@@ -1171,8 +1172,8 @@ class UserCard extends Model {
 		$sql_cards_answered_as_on_hold_today                                   = "
 			SELECT a_new.card_id from {$tb_answered} as a_new 
 			WHERE a_new.study_id = {$study_id} 
-			AND a_new.created_at >= {$today_date}  
-			AND a_new.created_at <= ({$today_date} + INTERVAL 1 DAY)
+			AND a_new.created_at >= '{$today_date_with_empty_time}'  
+			AND a_new.created_at < ('{$today_date_with_empty_time}' + INTERVAL 1 DAY)
 			AND a_new.answered_as_on_hold = 1
 		";
 		$debug                                                                 = self::execute_query(
@@ -1290,15 +1291,24 @@ class UserCard extends Model {
 		// </editor-fold desc="On Hold Cards">
 
 		$args_new  = array_values( array_column( $debug['new_cards']['sql_result'], 'id' ) );
-		$new_cards = Card::query()->with( [ 'card_group', 'answer_log' ] )->whereIn( 'id', $args_new )->get();
+		$new_cards = Card::query()->with( [
+			'card_group',
+			'answer_log',
+		] )->whereIn( 'id', $args_new )->get();
 		$new_cards = self::parse_image_and_table_cards( $new_cards );
 
 		$args_revision  = array_values( array_column( $debug['revision_cards']['sql_result'], 'id' ) );
-		$revision_cards = Card::query()->with( [ 'card_group', 'answer_log' ] )->whereIn( 'id', $args_revision )->get();
+		$revision_cards = Card::query()->with( [
+			'card_group',
+			'answer_log',
+		] )->whereIn( 'id', $args_revision )->get();
 		$revision_cards = self::parse_image_and_table_cards( $revision_cards );
 
 		$args_on_hold  = array_values( array_column( $debug['on_hold_cards']['sql_result'], 'id' ) );
-		$on_hold_cards = Card::query()->with( [ 'card_group', 'answer_log' ] )->whereIn( 'id', $args_on_hold )->get();
+		$on_hold_cards = Card::query()->with( [
+			'card_group',
+			'answer_log',
+		] )->whereIn( 'id', $args_on_hold )->get();
 		$on_hold_cards = self::parse_image_and_table_cards( $on_hold_cards );
 
 //		$new_cards_array = $new_cards->toArray();

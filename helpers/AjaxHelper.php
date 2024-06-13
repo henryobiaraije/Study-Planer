@@ -428,6 +428,7 @@ class AjaxHelper {
 		$e_tags              = $e_card_group['tags'];
 		$cg_name             = sanitize_text_field( $e_card_group['name'] );
 		$image_type          = $e_card_group['image_type'];
+		$today_datetime = Common::getDateTime();
 		if ( ! in_array( $image_type, get_default_image_display_type() ) ) {
 			Common::send_error( 'Please select a valid image display type' );
 		}
@@ -522,7 +523,7 @@ class AjaxHelper {
 			$card->hash          = $hash;
 			$card->c_number      = $c_number;
 			$card->card_group_id = $card_group->id;
-			$card->save();
+			$card->update();
 			$c_numbers_updated[] = $c_number;
 			// Common::send_error( [
 			// 'ajax_admin_create_new_basic_card',

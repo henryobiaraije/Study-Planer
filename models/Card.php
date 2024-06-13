@@ -60,8 +60,9 @@ class Card extends Model {
 	}
 
 	public function answer_log() {
-		return $this->hasOne( AnswerLog::class , 'card_id' );
+		return $this->hasOne( AnswerLog::class, 'card_id' );
 	}
+
 
 	//    public function studies()
 	//    {

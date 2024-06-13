@@ -1,7 +1,7 @@
 <template>
   <!--  <div class="sp sp-modal">-->
   <v-progress-linear :model-value="percentComplete" :height="5" color="primary"></v-progress-linear>
-  <div class="chose-updated-or-old-card flex flex-col gap-3">
+  <div v-if="hasUpdated" class="chose-updated-or-old-card flex flex-col gap-3">
     <div class="info text-center py-3">This card has been updated since the last time you answered it.</div>
     <v-card>
       <v-tabs
@@ -14,7 +14,9 @@
       </v-tabs>
     </v-card>
     <div class="py-4 text-center">
-      <button class="py-2 px-8 text-base font-bold rounded-md bg-gray-100 border border-solid border-gray-300 hover:bg-gray-300 ">Use
+      <button
+          class="py-2 px-8 text-base font-bold rounded-md bg-gray-100 border border-solid border-gray-300 hover:bg-gray-300 ">
+        Use
         this version
       </button>
     </div>
@@ -24,31 +26,31 @@
       <div class="mb-4">
         <!--              <?php \StudyPlannerPro\load_template('shortcodes/dashboard/template-part-accept-changes'); ?>-->
       </div>
-      <div v-if="(null !== currentQuestion) && (undefined !== currentQuestion) && (!currentQuestion.has_updated)"
+      <div v-if="(null !== currentCard) && (undefined !== currentCard) && (!currentCard.has_updated)"
            class="sp-question min-h-[65vh] flex align-items-center overflow-x-auto moxal-y-hidden"
            style="background-repeat: no-repeat;background-size: cover;"
-           :style="{'background-image' : 'url('+currentQuestion?.card_group?.bg_image_url+')'}">
+           :style="{'background-image' : 'url('+currentCard?.card_group?.bg_image_url+')'}">
         <div v-if="!allAnswered" class="flex flex-col gap-2 w-full">
           <div class="d-flex fill-height justify-center align-center max-h-[55vh] overflow-auto">
             <!-- <editor-fold desc="Basic Card"> -->
-            <div v-if="'basic' === currentQuestion?.card_group.card_type"
+            <div v-if="'basic' === currentCard?.card_group.card_type"
                  class="sp-basic-question w-full text-center"
                  style="font-family: 'Montserrat', sans-serif;">
               <QuestionBasicCard
                   :show-current-answer="showCurrentAnswer"
-                  :answer="currentQuestion.answer"
-                  question="currentQuestion.question"
+                  :answer="answer"
+                  :question="question"
               />
             </div>
             <!-- </editor-fold desc="Basic Card"> -->
 
             <!-- <editor-fold desc="Gap Card"> -->
             <div
-                v-else-if="'gap' === currentQuestion.card_group.card_type"
+                v-else-if="'gap' === currentCard.card_group.card_type"
                 class="mp-ql-editor-content-wrapper">
-
               <QuestionGapCard
-                  :current-question="currentQuestion"
+                  :question="question"
+                  :answer="answer"
                   :show-current-answer="showCurrentAnswer"
                   :show-only-answers="showOnlyAnswers"
                   :_show-answer="_showAnswer"
@@ -58,12 +60,10 @@
             <!-- </editor-fold desc="Gap Card"> -->
 
             <!-- <editor-fold desc="Table Card"> -->
-            <div v-else-if="'table' === currentQuestion.card_group.card_type"
+            <div v-else-if="'table' === currentCard.card_group.card_type"
                  class="sp-table-question m-auto w-full">
 
               <QuestionTableCard
-                  :question="currentQuestion.question"
-                  :answer="currentQuestion.answer"
                   :show-current-answer="showCurrentAnswer"
                   :show-only-answers="showOnlyAnswers"
                   :one-card="oneCard"
@@ -143,7 +143,7 @@
           </div>
           <!-- </editor-fold desc="Prev & Next"> -->
 
-          <template v-if="'study' === purpose">
+          <template v-if="'study' === purpose && !hasUpdated">
             <p class="text-xl font-semibold text-center py-2">{{ index + 1 }}/{{ cards.length }}</p>
 
             <!-- <editor-fold desc="Buttons (Show Answer | Hold)"> -->
@@ -172,29 +172,29 @@
               <div class="flex flex-wrap gap-4 justify-center align-center py-4 px-2">
                 <v-btn
                     color="primary"
-                    @keyup.1="answer('again')"
-                    @click="answer('again')"
+                    @keyup.1="answerNow('again')"
+                    @click="answerNow('again')"
                 >
                   Again (1)
                 </v-btn>
                 <v-btn
                     color="primary"
-                    @keyup.2="answer('hard')"
-                    @click="answer('hard')"
+                    @keyup.2="answerNow('hard')"
+                    @click="answerNow('hard')"
                 >
                   Hard (2)
                 </v-btn>
                 <v-btn
                     color="primary"
-                    @keyup.3="answer('good')"
-                    @click="answer('good')"
+                    @keyup.3="answerNow('good')"
+                    @click="answerNow('good')"
                 >
                   Good (3)
                 </v-btn>
                 <v-btn
                     color="primary"
-                    @keyup.4="answer('easy')"
-                    @click="answer('easy')"
+                    @keyup.4="answerNow('easy')"
+                    @click="answerNow('easy')"
                 >
                   Easy (4)
                 </v-btn>
@@ -226,7 +226,7 @@
 import {defineComponent} from "vue";
 import AjaxAction from "@/vue-component/AjaxAction.vue";
 import useUserDashboard from "@/composables/useUserDashboard";
-import type {_Card, _CardGroup, _Study} from "@/interfaces/inter-sp";
+import type {_AnswerLog, _Card, _CardGroup, _Study} from "@/interfaces/inter-sp";
 import useImageCard from "@/composables/useImageCard";
 import {spClientData} from "@/functions";
 import useUserCards from "@/composables/useUserCards";
@@ -238,14 +238,70 @@ import QuestionGapCard from "@/vue-component/QuestionGapCard.vue";
 
 export default defineComponent({
   computed: {
-    currentQuestion(): _Card {
+    question(): string {
+      if (!this.hasUpdated()) {
+        return this.currentCard.question;
+      }
+
+      if (1 === this.tab) {
+        return this.currentCard.question;
+      } else if (2 === this.tab) {
+        return this.currentCard?.answer_log?.question;
+      }
+
+      return this.currentCard.question;
+    },
+    answer(): string {
+      if (!this.hasUpdated()) {
+        return this.currentCard.answer;
+      }
+
+      if (1 === this.tab) {
+        return this.currentCard.answer;
+      } else if (2 === this.tab) {
+        return this.currentCard?.answer_log?.answer;
+      }
+
+      return this.currentCard.answer;
+    },
+    currentCard(): _Card {
       return this.cards[this.index];
     },
     inAddQuestions() {
       return this.myStore.store.inAddCards;
     },
     oneCard(): _Card {
-      return this.cards[this.index];
+      const card = this.cards[this.index];
+      console.log({card})
+
+      if (this.hasUpdated()) {
+        // Consider the tabs.
+        if (1 === this.tab) {
+          return {
+            ...card,
+          };
+        } else if (2 === this.tab) {
+          if (card.answer_log.question && card.answer_log.answer) {
+            card.question = card.answer_log.question;
+            card.answer = card.answer_log.answer;
+          }
+          return {
+            ...card,
+          };
+        }
+      } else {
+        // Only show those from answer log.
+        if ('answer_log' in card) {
+          if (card.answer_log.question && card.answer_log.answer) {
+            card.question = card.answer_log.question;
+            card.answer = card.answer_log.answer;
+          }
+          return {
+            ...card
+          };
+        }
+      }
+      return card;
     },
     percentComplete(): number {
       return Math.round((this.index / this.cards.length) * 100);
@@ -312,7 +368,7 @@ export default defineComponent({
         // useImageCard().applyBoxesPreviewCssOld(card.old_answer.boxes);
       }
     },
-    answer(grade: string) {
+    answerNow(grade: string) {
       // console.log(grade)
       const card = this.cards[this.index];
       if (this.study) {
@@ -391,6 +447,22 @@ export default defineComponent({
       }
       this.next();
     },
+    hasUpdated() {
+      const card: _Card = this.cards[this.index];
+      if (!card.answer_log) {
+        return false;
+      }
+
+      const answerLog: _AnswerLog = card.answer_log;
+
+      const cardUpdatedAt = card.updated_at;
+      const answerLogUpdatedAt = answerLog.updated_at;
+
+      const dateCard = new Date(cardUpdatedAt);
+      const dateAnswerLog = new Date(answerLogUpdatedAt);
+
+      return dateCard > dateAnswerLog;
+    }
   },
   setup: (props, ctx) => {
     return {
@@ -415,10 +487,19 @@ export default defineComponent({
       this.injectImageCardCss(card);
     }, 100);
     this.recordStudyLogStart();
+
+    this.tabsData.card = JSON.parse(JSON.stringify(this.cards[this.index]));
+    if (this.cards[this.index].answer_log) {
+      this.tabsData.answerLog = JSON.parse(JSON.stringify(this.cards[this.index].answer_log));
+    }
   },
   data() {
     return {
       tab: null,
+      tabsData: {
+        card: null as _Card,
+        answerLog: null as _AnswerLog
+      },
       // questionIndex: 0,
       showCurrentAnswer: false,
       showGrade: false,

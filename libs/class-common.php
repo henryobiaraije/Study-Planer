@@ -658,6 +658,19 @@ class Common {
 		return date( 'Y-m-d', strtotime( self::getDateTime( $days, $hours ) ) );
 	}
 
+
+	/**
+	 * Get date with empty time.
+	 * e.g. 2020-01-01 00:00:00 => 2020-01-01 where 00:00:00 is the time.
+	 *
+	 * @param int $days
+	 * @param int $hours
+	 *
+	 * @return string
+	 */
+	public static function get_date_with_empty_time( int $days = 0, int $hours = 0 ): string {
+		return  date( 'Y-m-d', strtotime( self::getDateTime( $days, $hours ) ) );
+	}
 	public
 	static function getTime() {
 		return date( 'H:i:s' );

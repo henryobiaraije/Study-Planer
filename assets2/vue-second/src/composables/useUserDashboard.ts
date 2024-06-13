@@ -408,7 +408,7 @@ export default function (status = 'publish') {
                     {
                         button,
                         study,
-                        currentQuestion
+                        currentCard: currentQuestion
                     }
                 ],
                 what: "front_sp_pro_ajax_front_accept_changes",
@@ -548,7 +548,7 @@ export default function (status = 'publish') {
         ajax, ajaxSaveStudy, ajaxLoadingCard,
         deckGroups, studyToEdit, startStudy, _getQuestions,
         load, openStudyModal, closeStudyModal, allQuestions,
-        currentQuestion, answeredCount,
+        currentCard: currentQuestion, answeredCount,
         showCurrentAnswer, showGrade, _hold, _acceptChanges,
         _showAnswer, _markAnswer, lastAnsweredDebugData,
         xhrRecordStudyLog, xhrMarkAnswer, xhrMarkAnswerOnHold,

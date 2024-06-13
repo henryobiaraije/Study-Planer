@@ -22,13 +22,21 @@
         class=""
         max-width="344"
     >
-      <v-text-field
-          label="Study Date"
-          hide-details="auto"
-          v-model="userCard.debugForm.value.current_study_date"
-          type="datetime-local"
-          :loading="userCard.ajaxLoadDebugForm.value.sending"
-      ></v-text-field>
+      <!--      <v-text-field-->
+      <!--          label="Study Date"-->
+      <!--          hide-details="auto"-->
+      <!--          v-model="userCard.debugForm.value.current_study_date"-->
+      <!--          type="datetime-local"-->
+      <!--          :loading="userCard.ajaxLoadDebugForm.value.sending"-->
+      <!--      ></v-text-field>-->
+      <div class="flex flex-col gap-1">
+        <div class="text-base text-gray-600">Custom Current Study Date</div>
+<!--        <input class="py-3 px-2 w-full" type="" v-model="userCard.debugForm.value.current_study_date"-->
+        <input class="py-3 px-2 w-full" type="datetime-local"
+               :value="userCard.debugForm.value.current_study_date"
+               @change="userCard.debugForm.value.current_study_date = formatDate($event.target.value)"
+        >
+      </div>
       <!--      <v-datetime-picker-->
       <!--          label="Current Date"-->
       <!--          v-model="userCard.debugForm.value.current_study_date"-->
@@ -81,7 +89,11 @@ export default defineComponent({
   created() {
     this.userCard.loadDebugForm();
   },
-  methods: {}
+  methods: {
+    formatDate(date: string) {
+      return date.replace('T', ' ').replace('Z', '');
+    }
+  }
 });
 
 </script>

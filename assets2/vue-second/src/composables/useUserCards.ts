@@ -94,6 +94,7 @@ const totals = ref({
     active: 0,
     trashed: 0
 });
+const loadedOnce = ref(false);
 
 export default function (status = 'publish') {
     const ajaxSave = ref<_Ajax>({
@@ -418,17 +419,26 @@ export default function (status = 'publish') {
                     // user_card_group_ids_being_studied: number[],
                 }>) {
                     handleAjax.stop();
-                    // userDeckGroups.value = [];
                     let deckGroups = done.data.deck_groups;
                     deckGroups = sortCardByCardCountOnGroups(deckGroups);
-                    userDeckGroups.value = deckGroups;
+                    userDeckGroups.value = [];
+
+
+
                     setTimeout(() => {
+                        userDeckGroups.value = deckGroups;
+                        // deckGroups.forEach((deckGroup) => {
+                        //     userDeckGroups.value.push(deckGroup);
+                        // });
+                        // userDeckGroups.value = deckGroups;
                         // let deckGroups = done.data.deck_groups;
                         // deckGroups = sortCardByCardCountOnGroups(deckGroups);
                         // userDeckGroups.value = deckGroups;
                         // newCardIds.value = done.data.new_card_ids;
                         // onHoldCardIds.value = done.data.on_hold_card_ids;
                         // revisionCardIds.value = done.data.revision_card_ids;
+
+                        loadedOnce.value = true;
                     }, 50);
 
                     console.log('loadUserCard', {done});
@@ -576,6 +586,7 @@ export default function (status = 'publish') {
     }
 
     return {
+        loadedOnce,
         ajaxSave: ajaxSave, save: xhrSave, form: form,
         oneSpecificCard, assignTopics: xhrAssignTopics, ajaxAssignTopics,
         ajaxAddCards, addCards: xhrAddCards,

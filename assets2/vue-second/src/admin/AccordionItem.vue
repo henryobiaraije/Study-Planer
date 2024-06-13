@@ -93,7 +93,7 @@
         <v-card-actions>
           <div class="flex flex-row justify-between items-center w-full">
             <span class="flex-1 text-xl !font-bold">Study Cards</span>
-            <span class="flex-initial"><v-btn color="primary" block @click="viewDialog = false">Close</v-btn></span>
+            <span class="flex-initial"><v-btn color="primary" block @click="closeQuestionDialog">Close</v-btn></span>
           </div>
         </v-card-actions>
         <template v-if="null !== studyToEdit">
@@ -126,7 +126,7 @@
           <div class="flex flex-row justify-between items-center w-full">
             <span class="flex-1 text-xl !font-bold">Study Settings</span>
             <span class="flex-initial"><v-btn color="primary"
-                                              @click="viewDialogEditStudy = false">Close</v-btn></span>
+                                              @click="closeStudyDialog">Close</v-btn></span>
           </div>
         </v-card-actions>
         <template v-if="studyToEdit">
@@ -593,6 +593,16 @@ export default defineComponent({
     }
   },
   methods: {
+    closeQuestionDialog(){
+      console.log('closeQuestionDialog');
+      this.viewDialog = false;
+      this.userCards.loadUserCards();
+    },
+    closeStudyDialog(){
+      console.log('closeStudyDialog');
+      this.viewDialogEditStudy = false;
+      // this.userCards.loadUserCards();
+    },
     countNewCards(cards: _Card[]): number {
       const newCardIds: number[] = this.userCards.newCardIds.value;
       let count = cards.reduce((acc, card) => {

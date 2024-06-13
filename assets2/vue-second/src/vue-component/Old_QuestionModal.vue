@@ -292,7 +292,7 @@ import useMyStore from "@/composables/useMyStore";
 
 export default defineComponent({
   computed: {
-    currentQuestion(): _Card {
+    currentCard(): _Card {
       return this.cards[this.index];
     },
     inAddQuestions() {

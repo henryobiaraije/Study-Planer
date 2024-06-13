@@ -49,14 +49,6 @@ import type {_Card, _CardGroup, _Study} from "@/interfaces/inter-sp";
 export default defineComponent({
   name: "QuestionTableCard",
   props: {
-    question: {
-      type: String,
-      required: true
-    },
-    answer: {
-      type: String,
-      required: true
-    },
     showCurrentAnswer: {
       type: Boolean,
       required: true
