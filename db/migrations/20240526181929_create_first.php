@@ -39,7 +39,7 @@ final class CreateFirst extends AbstractMigration {
 		$table_name = SP_TABLE_DECK_GROUPS;
 
 		// Check if the table exists
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) == $table_name ) {
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name ) {
 			return;
 		}
 

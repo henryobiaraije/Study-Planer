@@ -60,8 +60,11 @@ class RunOnceHelpers {
 	}
 
 	public function run_all_once() {
-		$this->run_once_update_answers_last_updated_card_ids();
-		$this->run_once_fill_the_answer_log();
+		$deck_group_table_exists = Manager::schema()->hasTable( SP_TABLE_DECK_GROUPS );
+		if ( $deck_group_table_exists ) {
+			$this->run_once_update_answers_last_updated_card_ids();
+			$this->run_once_fill_the_answer_log();
+		}
 	}
 
 	public function run_once_update_answers_last_updated_card_ids() {

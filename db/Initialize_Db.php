@@ -37,9 +37,14 @@ class Initialize_Db {
 
 		// Initialize_Db::get_instance()->create_tables();
 		// Initialize_Db::get_instance()->create_default_rows();
-		$this->create_tables();
-		$this->create_default_rows();
-		$this->assign_all_card_groups_to_uncategorized_topic();
+
+		// Check if deck_group table exists.
+		$deck_group_table_exists = $this->schema_builder->hasTable( SP_TABLE_DECK_GROUPS );
+		if ( $deck_group_table_exists ) {
+			$this->create_tables();
+			$this->create_default_rows();
+			$this->assign_all_card_groups_to_uncategorized_topic();
+		}
 	}
 
 	public function initialize() {

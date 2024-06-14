@@ -215,7 +215,7 @@ class Initializer {
 			2
 		);
 
-		DeckGroup::get_totals();
+//		DeckGroup::get_totals();
 		// $only_trashed = DeckGroup::onlyTrashed()->toSql();
 		// dd($only_trashed);
 		// $active = DeckGroup::query()
@@ -570,7 +570,7 @@ class Initializer {
 
 	public function on_activate() {
 		phinx_migrate();
-		Topic::make_sure_card_groups_with_real_topic_also_have_the_right_parent_deck();
+//		Topic::make_sure_card_groups_with_real_topic_also_have_the_right_parent_deck();
 		//
 		// Initialize_Db::get_instance()->create_tables();
 		// Initialize_Db::get_instance()->create_default_rows();

@@ -23,10 +23,17 @@ final class AddCommentToAnswerLogTable extends AbstractMigration {
 			return;
 		}
 
-		$this->table( 'answer_log' )
-		     ->addColumn( 'comment', 'Holds the last question and answer answered by user, unique by study_id, card_id. This way, when
-		     we show the user their last answered card detals from here and when admin updates a card, we ask the user to chose one and then store ther
-		     selection back here and continues to serve questions and answers from here instead.', [ 'null' => true ] )
+		$this->table( $table )
+		     ->addColumn(
+			     'comment',
+			     'text',
+			     [
+				     'comment' => 'Holds the last question and answer answered by user, unique by study_id, card_id. This way, when
+					 we show the user their last answered card detals from here and when admin updates a card, we ask the user to chose one and then store ther
+					 selection back here and continues to serve questions and answers from here instead.',
+				     'null'    => true
+			     ]
+		     )
 		     ->update();
 	}
 }
