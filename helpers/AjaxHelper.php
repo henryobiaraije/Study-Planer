@@ -428,7 +428,7 @@ class AjaxHelper {
 		$e_tags              = $e_card_group['tags'];
 		$cg_name             = sanitize_text_field( $e_card_group['name'] );
 		$image_type          = $e_card_group['image_type'];
-		$today_datetime = Common::getDateTime();
+		$today_datetime      = Common::getDateTime();
 		if ( ! in_array( $image_type, get_default_image_display_type() ) ) {
 			Common::send_error( 'Please select a valid image display type' );
 		}
@@ -506,24 +506,31 @@ class AjaxHelper {
 
 		$c_numbers_updated = array();
 		foreach ( $e_cards as $one_card ) {
-			$question = wp_json_encode( $one_card['question'] );
-			$answer   = wp_json_encode( $one_card['answer'] );
-			$c_number = $one_card['c_number'];
-			$card_id  = $one_card['id'];
-			$hash     = $one_card['hash'];
-			$card     = new Card();
+			$question    = wp_json_encode( $one_card['question'] );
+			$answer      = wp_json_encode( $one_card['answer'] );
+			$c_number    = $one_card['c_number'];
+			$card_id     = $one_card['id'];
+			$hash        = $one_card['hash'];
+			$card        = new Card();
+			$is_new_card = true;
 			if ( ! empty( $card_id ) ) {
 				$card = Card::find( $card_id );
 				if ( empty( $card ) ) {
-					$card = new Card();
+					$card        = new Card();
+					$is_new_card = true;
 				}
 			}
 			$card->question      = $question;
 			$card->answer        = $answer;
 			$card->hash          = $hash;
 			$card->c_number      = $c_number;
+			$card->updated_at    = $today_datetime;
 			$card->card_group_id = $card_group->id;
-			$card->update();
+			if ( $is_new_card ) {
+				$card->save();
+			} else {
+				$card->update();
+			}
 			$c_numbers_updated[] = $c_number;
 			// Common::send_error( [
 			// 'ajax_admin_create_new_basic_card',
@@ -827,26 +834,35 @@ class AjaxHelper {
 			}
 		}
 		$c_numbers_updated = array();
+		$c_lds_updated     = array();
 		foreach ( $e_cards as $one_card ) {
-			$question = wp_json_encode( $one_card['question'] );
-			$answer   = wp_json_encode( $one_card['answer'] );
-			$c_number = $one_card['c_number'];
-			$card_id  = $one_card['id'];
-			$hash     = $one_card['hash'];
-			$card     = new Card();
+			$question    = wp_json_encode( $one_card['question'] );
+			$answer      = wp_json_encode( $one_card['answer'] );
+			$c_number    = $one_card['c_number'];
+			$card_id     = $one_card['id'];
+			$hash        = $one_card['hash'];
+			$card        = new Card();
+			$is_new_card = false;
 			if ( ! empty( $card_id ) ) {
 				$card = Card::find( $card_id );
 				if ( empty( $card ) ) {
-					$card = new Card();
+					$card        = new Card();
+					$is_new_card = true;
 				}
 			}
 			$card->question      = $question;
 			$card->answer        = $answer;
 			$card->hash          = $hash;
 			$card->c_number      = $c_number;
+			$card->updated_at    = Common::getDateTime();
 			$card->card_group_id = $card_group->id;
-			$card->save();
+			if ( $is_new_card ) {
+				$card->save();
+			} else {
+				$card->update();
+			}
 			$c_numbers_updated[] = $c_number;
+			$c_lds_updated[]     = $card->id;
 			// Common::send_error( [
 			// 'ajax_admin_create_new_basic_card',
 			// 'post'                 => $post,
@@ -869,9 +885,19 @@ class AjaxHelper {
 		}
 		Manager::commit();
 		// Delete cards without not updated
-		$all_cards = CardGroup::find( $cg_id )->cards()
-		                      ->whereNotIn( 'c_number', $c_numbers_updated )
-		                      ->forceDelete();
+//		$all_cards = CardGroup::find( $cg_id )->cards()
+//		                      ->whereNotIn( 'c_number', $c_numbers_updated )
+//		                      ->forceDelete();
+		// Remove anything that is not int.
+		$c_lds_updated = array_filter( $c_lds_updated, 'is_int' );
+		$to_delete     = Card
+			::query()
+			->where( 'card_group_id', $cg_id )
+			->whereNotIn( 'id', $c_lds_updated )
+			->forceDelete();
+//		if ( $to_delete ) {
+
+//		}
 		//
 		// Common::send_error( [
 		// 'ajax_admin_create_new_basic_card',
@@ -990,26 +1016,35 @@ class AjaxHelper {
 			}
 		}
 		$c_numbers_updated = array();
+		$c_lds_updated     = array();
 		foreach ( $e_cards as $one_card ) {
-			$question = $one_card['question'];
-			$answer   = $one_card['answer'];
-			$c_number = $one_card['c_number'];
-			$card_id  = $one_card['id'];
-			$hash     = $one_card['hash'];
-			$card     = new Card();
+			$question    = $one_card['question'];
+			$answer      = $one_card['answer'];
+			$c_number    = $one_card['c_number'];
+			$card_id     = $one_card['id'];
+			$hash        = $one_card['hash'];
+			$card        = new Card();
+			$is_new_card = false;
 			if ( ! empty( $card_id ) ) {
 				$card = Card::find( $card_id );
 				if ( empty( $card ) ) {
-					$card = new Card();
+					$card        = new Card();
+					$is_new_card = true;
 				}
 			}
 			$card->question      = $question;
 			$card->answer        = $answer;
 			$card->hash          = $hash;
 			$card->c_number      = $c_number;
+			$card->updated_at    = Common::getDateTime();
 			$card->card_group_id = $card_group->id;
-			$card->save();
+			if ( $is_new_card ) {
+				$card->save();
+			} else {
+				$card->update();
+			}
 			$c_numbers_updated[] = $c_number;
+			$c_lds_updated[]     = $card->id;
 			// Common::send_error( [
 			// 'ajax_admin_create_new_basic_card',
 			// 'post'                 => $post,
@@ -1032,9 +1067,16 @@ class AjaxHelper {
 		}
 		Manager::commit();
 		// Delete cards without not updated
-		$all_cards = CardGroup::find( $cg_id )->cards()
-		                      ->whereNotIn( 'c_number', $c_numbers_updated )
-		                      ->forceDelete();
+//		$all_cards = CardGroup::find( $cg_id )->cards()
+//		                      ->whereNotIn( 'c_number', $c_numbers_updated )
+//		                      ->forceDelete();
+		// Remove anything that is not int.
+		$c_lds_updated = array_filter( $c_lds_updated, 'is_int' );
+		$to_delete     = Card
+			::query()
+			->where( 'card_group_id', $cg_id )
+			->whereNotIn( 'id', $c_lds_updated )
+			->forceDelete();
 
 		if ( $e_set_bg_as_default ) {
 			update_option( Settings::OP_DEFAULT_CARD_BG_IMAGE, $bg_image_id );
@@ -1482,6 +1524,7 @@ class AjaxHelper {
 				$card->answer        = $question;
 				$card->hash          = bin2hex( random_bytes( 30 ) );
 				$card->c_number      = 'c2';
+				$card->updated_at    = Common::getDateTime();
 				$card->card_group_id = $card_group->id;
 				$card->save();
 			}

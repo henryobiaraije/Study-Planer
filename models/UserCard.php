@@ -1223,7 +1223,7 @@ class UserCard extends Model {
 			$query_sql_new,
 			'id',
 			$debug,
-			'new_cards'
+			'result_cards_new'
 		);
 
 		// </editor-fold desc="New Cards">
@@ -1254,7 +1254,7 @@ class UserCard extends Model {
 			$result_sql_revision,
 			'id',
 			$debug,
-			'revision_cards'
+			'result_cards_revision'
 		);
 		// </editor-fold desc="Revision Cards">
 
@@ -1285,26 +1285,26 @@ class UserCard extends Model {
 			$result_sql_on_hold,
 			'id',
 			$debug,
-			'on_hold_cards'
+			'result_cards_on_hold'
 		);
 
 		// </editor-fold desc="On Hold Cards">
 
-		$args_new  = array_values( array_column( $debug['new_cards']['sql_result'], 'id' ) );
+		$args_new  = array_values( array_column( $debug['result_cards_new']['sql_result'], 'id' ) );
 		$new_cards = Card::query()->with( [
 			'card_group',
 			'answer_log',
 		] )->whereIn( 'id', $args_new )->get();
 		$new_cards = self::parse_image_and_table_cards( $new_cards );
 
-		$args_revision  = array_values( array_column( $debug['revision_cards']['sql_result'], 'id' ) );
+		$args_revision  = array_values( array_column( $debug['result_cards_revision']['sql_result'], 'id' ) );
 		$revision_cards = Card::query()->with( [
 			'card_group',
 			'answer_log',
 		] )->whereIn( 'id', $args_revision )->get();
 		$revision_cards = self::parse_image_and_table_cards( $revision_cards );
 
-		$args_on_hold  = array_values( array_column( $debug['on_hold_cards']['sql_result'], 'id' ) );
+		$args_on_hold  = array_values( array_column( $debug['result_cards_on_hold']['sql_result'], 'id' ) );
 		$on_hold_cards = Card::query()->with( [
 			'card_group',
 			'answer_log',
@@ -1350,6 +1350,19 @@ class UserCard extends Model {
 					$card->question = json_decode( $card->question );
 				}
 			}
+
+			$answer_log = $card->answer_log;
+			if ( ! empty( $answer_log ) ) {
+				if ( in_array( $card_type, array( 'table', 'image' ) ) ) {
+					if ( ! is_array( $answer_log->answer ) ) {
+						$answer_log->answer = json_decode( $answer_log->answer );
+					}
+					if ( ! is_array( $answer_log->question ) ) {
+						$answer_log->question = json_decode( $answer_log->question );
+					}
+				}
+			}
+
 //			$all_cards[] = $card;
 			$collection->push( $card );
 		}

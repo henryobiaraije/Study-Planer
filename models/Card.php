@@ -28,6 +28,8 @@ class Card extends Model {
 		'answer',
 		'x_position',
 		'y_position',
+		'updated_at',
+		'created_at',
 	];
 
 	protected $casts = [

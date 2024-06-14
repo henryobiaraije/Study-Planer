@@ -6,8 +6,8 @@
          style="font-family: 'Montserrat', sans-serif;">
       <QuestionBasicCard
           :show-current-answer="showCurrentAnswer"
-          :answer="answer"
-          :question="question"
+          :one-card="oneCard"
+          :show-only-answers="showOnlyAnswers"
       />
     </div>
     <!-- </editor-fold desc="Basic Card"> -->
@@ -17,11 +17,10 @@
         v-else-if="'gap' === currentCard.card_group.card_type"
         class="mp-ql-editor-content-wrapper">
       <QuestionGapCard
-          :question="question"
-          :answer="answer"
           :show-current-answer="showCurrentAnswer"
           :show-only-answers="showOnlyAnswers"
-          :_show-answer="_showAnswer"
+          :_show-answer="showAnswer"
+          :one-card="oneCard"
       />
 
     </div>
@@ -77,7 +76,7 @@ export default defineComponent({
     }
   },
   created() {
-
+    console.log('re created', {oneCard: this.oneCard});
   },
   data() {
     return {}
@@ -90,6 +89,29 @@ export default defineComponent({
     QuestionBasicCard,
     'ajax-action': AjaxAction,
   },
+  props: {
+    currentCard: {
+      type: Object as () => _Card,
+      required: true
+    },
+    showCurrentAnswer: {
+      type: Boolean,
+      required: true
+    },
+    showOnlyAnswers: {
+      type: Boolean,
+      required: true
+    },
+    oneCard: {
+      type: Object as () => _Card,
+      required: true
+    },
+    showAnswer: {
+      type: Function,
+      required: true
+    }
+  },
+
 });
 
 </script>
