@@ -422,10 +422,29 @@ export default function (status = 'publish') {
                 }>) {
                     handleAjax.stop();
                     let deckGroups = done.data.deck_groups;
+
+                    // Filter out items not in user study.
+                    // deckGroups
+                    //     .map(deckGroup => {
+                    //         deckGroup.decks = deckGroup
+                    //             .decks
+                    //             .map(deck => {
+                    //                 return deck;
+                    //             })
+                    //             .filter((deck) => {
+                    //                 return deck.in_user_cards;
+                    //             });
+                    //         return deckGroup;
+                    //     })
+                    //     .filter((deckGroup) => {
+                    //
+                    //         return deckGroup.in_user_cards;
+                    //     });
+
+
                     deckGroups = sortCardByCardCountOnGroups(deckGroups);
                     userDeckGroups.value = [];
                     userCardsCount.value = Number(done.data.user_cards_count);
-
 
 
                     setTimeout(() => {

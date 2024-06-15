@@ -13,6 +13,7 @@ export interface _DeckGroup {
     count_new_cards?: number;
     count_revision?: number;
     count_on_hold?: number;
+    in_user_cards?: boolean;
 }
 
 export interface _Deck {
@@ -29,6 +30,7 @@ export interface _Deck {
     count_new_cards?: number;
     count_revision?: number;
     count_on_hold?: number;
+    in_user_cards?: boolean;
 }
 
 export interface _Topic {
@@ -45,6 +47,7 @@ export interface _Topic {
     count_new_cards?: number;
     count_revision?: number;
     count_on_hold?: number;
+    in_user_cards?: boolean;
 }
 
 export type _TopicNew = Partial<_Topic & Pick<_Topic, 'name' | 'deck' | 'tags'>>;

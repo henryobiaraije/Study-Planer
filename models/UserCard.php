@@ -46,50 +46,17 @@ class UserCard extends Model {
 	 * @return array|array[]
 	 */
 	public static function get_user_cards_to_study( int $user_id ): array {
-//		$today_datetime = Common::getDateTime();
-//		$today_date     = Common::get_date();
-		// Get all user cards.
-//		$all_user_cards = self::get_all_user_cards( $user_id );
-//		if ( empty( $all_user_cards['card_group_ids'] ) ) {
-//			return array(
-//				'deck_groups'                       => array(),
-//				'new_card_ids'                      => array(),
-//				'on_hold_card_ids'                  => array(),
-//				'revision_card_ids'                 => array(),
-//				'user_card_group_ids_being_studied' => array()
-//			);
-//		}
-//		Initializer::add_debug( $all_user_cards );
-
-		$topic_uncategorized_id = get_uncategorized_topic_id();
-
-		// Remove all card groups in any collection.
-//		$card_groups_in_collection = CardGroup::get_card_groups_in_any_collections();
-
-		// Get all user studies.
-//		$user_studies = sp_get_user_studies( $user_id );
-
-		// User un-studied topics.
-//		$user_cards_answered    = self::get_all_last_answered_user_cards( $user_studies['study_ids'] );
-//		$user_cards_not_studied = self::get_new_cards_not_answered_but_added( $user_id,
-//			$user_cards_answered['card_ids'] );
-
-//		$card_groups = CardGroup
-//			::query()
-//			// Exclude all card groups in any collection.
-//			->whereNotIn( 'id', $card_groups_in_collection['card_group_ids'] )
-//			// Exclude card groups in uncategorized topic.
-//			->where( 'topic_id', '!=', $topic_uncategorized_id )
-//			// Include only card groups in the user cards
-//			->whereIn( 'id', $all_user_cards['card_group_ids'] );
-
-//		$interested_card_group_ids = $card_groups->get()->pluck( 'id' )->toArray();
-
+		$in_user_cards_detail = self::get_groups_decks_and_topic_ids_in_user_cards( $user_id );
 		$deck_groups = DeckGroup
 			::with(
 				array(
 					'decks.topics.card_groups.cards',
-					'decks.topics',
+					'decks.topics' 	   => function ( $q ) use ( $in_user_cards_detail ) {
+						$q->whereIn( 'id', $in_user_cards_detail['topic_ids'] );
+					},
+					'decks'                => function ( $q ) use ( $in_user_cards_detail ) {
+						$q->whereIn( 'id', $in_user_cards_detail['deck_ids'] );
+					},
 					// Decks.
 					'decks.studies'        => function ( $q ) use ( $user_id ) {
 						$q->where( 'user_id', '=', $user_id );
@@ -105,34 +72,27 @@ class UserCard extends Model {
 					'decks.topics.studies.topic',
 					'decks.topics.studies.tags',
 					'decks.topics.studies.tags_excluded',
-//					'studies'              => function ( $q ) use ( $user_id ) {
-//						$q->where( 'user_id', '=', $user_id );
-//					},
-//					'studies.tags',
-//					'studies.tags_excluded',
 				)
-			)->get();
-		// Limit to only interested card groups.
-//			->whereHas(
-//				'decks.topics.card_groups',
-//				function ( $query ) use ( $interested_card_group_ids ) {
-//					$query->whereIn( 'id', $interested_card_group_ids );
-//				}
-//			)->get();
+			)
+			->whereIn( 'id', $in_user_cards_detail['deck_group_ids'] )
+			->get();
+
+
+
 
 		// encode all questions in deck groups.
 		foreach ( $deck_groups as $deck_group ) {
 			$deck_group->count_new_cards = 0;
 			$deck_group->count_revision  = 0;
 			$deck_group->count_on_hold   = 0;
+			$deck_group->in_user_cards   = in_array( $deck_group->id, $in_user_cards_detail['deck_group_ids'] );
 
 			foreach ( $deck_group->decks as $deck ) {
 				$deck->count_new_cards = 0;
 				$deck->count_revision  = 0;
 				$deck->count_on_hold   = 0;
-//				if ( 37 !== $deck->id ) {
-//					continue; // todo its for test, remove;
-//				}
+				$deck->in_user_cards   = in_array( $deck->id, $in_user_cards_detail['deck_ids'] );
+
 				$study = $deck->studies->first();
 				if ( $study instanceof Study ) {
 					if ( $study->active ) {
@@ -180,6 +140,7 @@ class UserCard extends Model {
 					$topic->count_new_cards = 0;
 					$topic->count_revision  = 0;
 					$topic->count_on_hold   = 0;
+					$topic->in_user_cards   = in_array( $topic->id, $in_user_cards_detail['topic_ids'] );
 
 					$study = $topic->studies->first();
 
@@ -187,13 +148,6 @@ class UserCard extends Model {
 						if ( ! $study->active ) {
 							continue;
 						}
-//						$cards          = self::get_cards_to_study_in_study(
-//							$study,
-//							$interested_card_group_ids,
-//							$user_cards_not_studied['card_ids'],
-//							$user_cards_answered['revision_and_due_ids'],
-//							$user_cards_answered['on_hold_and_due_ids']
-//						);
 						$cards_to_study = self::get_study_cards(
 							$user_id,
 							$study,
@@ -219,8 +173,6 @@ class UserCard extends Model {
 						$deck->count_on_hold       += count( $cards_to_study['on_hold_cards'] );
 						$deck_group->count_on_hold += count( $cards_to_study['on_hold_cards'] );
 
-//						$topic->cards   = $cards;
-//						$topic->cards     = [];
 						$topic->cards = $cards_to_study['all_cards'];
 					} else {
 						$topic->cards = array();
@@ -236,11 +188,6 @@ class UserCard extends Model {
 		return array(
 			'deck_groups'      => $deck_groups->all(),
 			'user_cards_count' => $user_cards,
-//			'new_card_ids'                      => $user_cards_not_studied['card_ids'],
-//			'on_hold_card_ids'                  => $user_cards_answered['on_hold_and_due_ids'],
-//			'revision_card_ids'                 => $user_cards_answered['revision_and_due_ids'],
-//			'user_card_group_ids_being_studied' => $all_user_cards['card_group_ids'],
-//			'study_ids'                         => $user_studies['study_ids'],
 		);
 	}
 
@@ -530,6 +477,65 @@ class UserCard extends Model {
 			'user_card_group_ids_being_studied' => $all_user_cards['card_group_ids'],
 			'debug'                             => Initializer::$debug,
 			'study_ids'                         => $user_studies['study_ids'],
+		);
+	}
+
+	public static function get_groups_decks_and_topic_ids_in_user_cards( int $user_id ): array {
+		$table_names               = self::get_table_names();
+		$tb_cards                  = $table_names['tb_cards'];
+		$tb_card_groups            = $table_names['tb_card_groups'];
+		$tb_user_cards             = $tb_user_cards = $table_names['tb_user_cards'];
+		$tb_study                  = $tb_study = $table_names['tb_study'];
+		$tb_decks                  = $tb_decks = $table_names['tb_decks'];
+		$tb_deck_groups            = $table_names['tb_deck_groups'];
+		$tb_topics                 = $table_names['tb_topics'];
+		$tb_collections            = $table_names['tb_collections'];
+		$tb_answered               = $table_names['tb_answered'];
+		$tb_tags                   = $table_names['tb_tags'];
+		$tb_taggable               = $table_names['tb_taggable'];
+		$tb_taggable_excluded      = $table_names['tb_taggable_excluded'];
+		$taggable_type_card_groups = 'Model\\\CardGroup';
+		$taggable_type_study       = 'Model\Study';
+
+		$sql_user_card_groups = "
+			SELECT cg_uc.card_group_id from {$tb_user_cards} as cg_uc
+			WHERE cg_uc.user_id IN ({$user_id})
+		";
+
+		$sql_user_topics = "
+			SELECT t_33.topic_id from {$tb_card_groups} as t_33
+			WHERE t_33.id IN ({$sql_user_card_groups})
+			AND t_33.topic_id IS NOT NULL
+		";
+
+		$sql_user_decks = "
+			SELECT d_44.deck_id from {$tb_topics} as d_44
+			WHERE d_44.id IN (
+			    {$sql_user_topics}
+			)
+		";
+
+		$sql_user_deck_groups = "
+			SELECT dg_55.deck_group_id from {$tb_decks} as dg_55 
+			WHERE dg_55.id IN (
+			    {$sql_user_decks}
+			)
+		";
+
+		global $wpdb;
+
+		$result_topics = $wpdb->get_results( $sql_user_topics, ARRAY_A );
+		$result_decks  = $wpdb->get_results( $sql_user_decks, ARRAY_A );
+		$result_groups = $wpdb->get_results( $sql_user_deck_groups, ARRAY_A );
+
+		$topic_ids = array_map( 'intval', array_column( $result_topics, 'topic_id' ) );
+		$deck_ids  = array_map( 'intval', array_column( $result_decks, 'deck_id' ) );
+		$group_ids = array_map( 'intval', array_column( $result_groups, 'deck_group_id' ) );
+
+		return array(
+			'deck_group_ids' => $group_ids,
+			'deck_ids'       => $deck_ids,
+			'topic_ids'      => $topic_ids,
 		);
 	}
 
