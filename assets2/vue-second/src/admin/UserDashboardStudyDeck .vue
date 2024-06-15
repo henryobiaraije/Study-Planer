@@ -2,7 +2,7 @@
   <div class="user-study-deck pt-2 pb-6">
     <v-progress-linear v-if="userCards.ajaxLoadUserCard.value.sending" color="primary"
                        indeterminate></v-progress-linear>
-    <template v-if="!userCards.ajaxLoadUserCard.value.sending && userDeckGroups.length === 0 && !userCards.loadedOnce">
+    <template v-if="!userCards.ajaxLoadUserCard.value.sending && userCards.userCardsCount < 1">
       <div class="mp-slide-in">
         <v-alert type="warning" dismissible>
           Please add cards to your deck on the "Add Cards" tab.

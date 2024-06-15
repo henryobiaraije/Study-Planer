@@ -105,11 +105,11 @@ class UserCard extends Model {
 					'decks.topics.studies.topic',
 					'decks.topics.studies.tags',
 					'decks.topics.studies.tags_excluded',
-					'studies'              => function ( $q ) use ( $user_id ) {
-						$q->where( 'user_id', '=', $user_id );
-					},
-					'studies.tags',
-					'studies.tags_excluded',
+//					'studies'              => function ( $q ) use ( $user_id ) {
+//						$q->where( 'user_id', '=', $user_id );
+//					},
+//					'studies.tags',
+//					'studies.tags_excluded',
 				)
 			)->get();
 		// Limit to only interested card groups.
@@ -229,8 +229,13 @@ class UserCard extends Model {
 			}
 		}
 
+		$user_cards = UserCard::query()
+		                      ->where( 'user_id', '=', $user_id )
+		                      ->get()->count();
+
 		return array(
-			'deck_groups' => $deck_groups->all(),
+			'deck_groups'      => $deck_groups->all(),
+			'user_cards_count' => $user_cards,
 //			'new_card_ids'                      => $user_cards_not_studied['card_ids'],
 //			'on_hold_card_ids'                  => $user_cards_answered['on_hold_and_due_ids'],
 //			'revision_card_ids'                 => $user_cards_answered['revision_and_due_ids'],

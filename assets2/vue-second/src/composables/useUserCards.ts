@@ -173,6 +173,7 @@ export default function (status = 'publish') {
     // page: 1,
     // activeTab: 'found',
     const userDeckGroups = ref<_DeckGroup[]>([]) as Ref<_DeckGroup[]>;
+    const userCardsCount = ref(0);
     /**
      * User's cards they have not studied before.
      */
@@ -413,6 +414,7 @@ export default function (status = 'publish') {
                 },
                 funcSuccess(done: InterFuncSuccess<{
                     deck_groups: Array<_DeckGroup>,
+                    user_cards_count: number,
                     // new_card_ids: number[],
                     // on_hold_card_ids: number[],
                     // revision_card_ids: number[],
@@ -422,6 +424,7 @@ export default function (status = 'publish') {
                     let deckGroups = done.data.deck_groups;
                     deckGroups = sortCardByCardCountOnGroups(deckGroups);
                     userDeckGroups.value = [];
+                    userCardsCount.value = Number(done.data.user_cards_count);
 
 
 
@@ -588,6 +591,7 @@ export default function (status = 'publish') {
     return {
         loadedOnce,
         ajaxSave: ajaxSave, save: xhrSave, form: form,
+        userCardsCount,
         oneSpecificCard, assignTopics: xhrAssignTopics, ajaxAssignTopics,
         ajaxAddCards, addCards: xhrAddCards,
         ajaxIgnoreCard, ignoreCard: xhrIgnoreCard,
