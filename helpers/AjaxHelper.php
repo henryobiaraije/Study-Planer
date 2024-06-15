@@ -190,7 +190,8 @@ class AjaxHelper {
 		$card_types          = is_array( $e_card_types ) ? $e_card_types : array();
 		$e_topics_to_exclude = is_array( $e_topic_ids_to_exclude ) ? $e_topic_ids_to_exclude : array();
 
-		$user_id = get_current_user_id();
+		$user_id       = get_current_user_id();
+		$user_is_admin = current_user_can( 'administrator' );
 
 		$items = CardGroup::get_card_groups_simple_with_ordering(
 			array(
@@ -212,7 +213,14 @@ class AjaxHelper {
 				'order_by_deck_name'         => true,
 				'order_by_topic'             => true,
 				'topic_ids_to_exclude'       => $e_topics_to_exclude,
+				'user_is_admin'              => $user_is_admin,
 			)
+		);
+
+		$items['items'] = array_map( static function ( $item ) {
+			return $item->toArray();
+		},
+			$items['items']
 		);
 
 		Common::send_success( 'Cards  found 2.', $items );
@@ -1226,12 +1234,12 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_load_cards_groups( $post ): void {
-		$params         = $post[ Common::VAR_2 ]['params'];
-		$per_page       = (int) sanitize_text_field( $params['per_page'] );
-		$page           = (int) sanitize_text_field( $params['page'] );
-		$search_keyword = sanitize_text_field( $params['search_keyword'] );
-		$status         = sanitize_text_field( $params['status'] );
-		$card_groups    = CardGroup::get_card_groups(
+		$params                     = $post[ Common::VAR_2 ]['params'];
+		$per_page                   = (int) sanitize_text_field( $params['per_page'] );
+		$page                       = (int) sanitize_text_field( $params['page'] );
+		$search_keyword             = sanitize_text_field( $params['search_keyword'] );
+		$status                     = sanitize_text_field( $params['status'] );
+		$card_groups                = CardGroup::get_card_groups(
 			array(
 				'search'       => $search_keyword,
 				'page'         => $page,
@@ -1239,7 +1247,13 @@ class AjaxHelper {
 				'only_trashed' => ( 'trash' === $status ) ? true : false,
 			)
 		);
-		$totals         = CardGroup::get_totals();
+		$card_groups['card_groups'] = array_map(
+			static function ( $item ) {
+				return $item->toArray();
+			},
+			$card_groups['card_groups']
+		);
+		$totals                     = CardGroup::get_totals();
 
 		Common::send_success(
 			'Card group loaded.',

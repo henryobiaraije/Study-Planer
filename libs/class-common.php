@@ -594,12 +594,15 @@ class Common {
 		$arr[ 'ghi30' . time() ]   = $extra;
 		$arr[ 'use_' . time() ]    = $use;
 		$arr[ 'dbg' . time() ]     = Initializer::$debug;
-		echo( json_encode( $arr ) );
+		try {
+			echo( json_encode( $arr, JSON_THROW_ON_ERROR ) );
+		} catch ( \JsonException $e ) {
+			echo( wp_json_encode( $arr ) );
+		}
 		die;
 	}
 
-	public
-	function sendOut(
+	public function sendOut(
 		$status,
 		$data,
 		$message

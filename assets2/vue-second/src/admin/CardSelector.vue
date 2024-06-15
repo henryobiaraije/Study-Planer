@@ -7,7 +7,7 @@
         <div class="flex-1 group ">
           <span class="text-base items-center flex gap-2 w-full mb-2 font-medium">
             <span>Collections*</span>
-            <span @click="clearGroup"
+            <span @click="clearCollection"
                   class="hidden px-2 py-1 text-xs bg-gray-300 font-normal group-hover:inline-block cursor-pointer hover:bg-gray-400">Clear</span>
           </span>
           <vue-mulitiselect
@@ -346,6 +346,10 @@ export default defineComponent({
       this.userCards.form.value.topic = null;
       this.searchCards();
     },
+    clearCollection(){
+      this.userCards.form.value.collection = null;
+      this.searchCards();
+    }
   },
   watch: {
     'userCards.form.value.topicToAssign': function (newVal, oldVal) {

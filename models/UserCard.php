@@ -528,7 +528,7 @@ class UserCard extends Model {
 		);
 	}
 
-	protected static function get_table_names() {
+	public static function get_table_names() {
 		global $wpdb;
 		$prefix = $wpdb->prefix;
 
@@ -2038,8 +2038,7 @@ class UserCard extends Model {
 	 *
 	 * @return int[]
 	 */
-	public
-	static function get_cards_in_revision_for_today(
+	private static function get_cards_in_revision_for_today(
 		int $user_id,
 		int $user_study_id,
 		array $last_answered_card_ids_in_revision_and_due = array()
@@ -2080,11 +2079,7 @@ class UserCard extends Model {
 		);
 	}
 
-
-	private
-	static function maybe_execute_query(
-		string $sql, string $return_column, array $debug, string $debug_key
-	): array {
+	private static function maybe_execute_query( string $sql, string $return_column, array $debug, string $debug_key ): array {
 		global $wpdb;
 		if ( sp_in_sql_mode() ) {
 			return self::execute_query( $sql, $return_column, $debug, $debug_key );
@@ -2093,10 +2088,7 @@ class UserCard extends Model {
 		return array();
 	}
 
-	private
-	static function execute_query(
-		string $sql, string $return_column, array $debug, string $debug_key
-	): array {
+	private static function execute_query( string $sql, string $return_column, array $debug, string $debug_key ): array {
 		global $wpdb;
 		$start_time         = time();
 		$sql_result         = $wpdb->get_results( $sql, ARRAY_A );

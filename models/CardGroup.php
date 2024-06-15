@@ -23,6 +23,7 @@ use StudyPlannerPro\Models\UserCard;
 
 use function StudyPlannerPro\sp_get_user_ignored_card_group_ids;
 use function StudyPlannerPro\sp_get_user_study;
+use function StudyPlannerPro\sp_in_sql_mode;
 
 class CardGroup extends Model {
 	protected $table = SP_TABLE_CARD_GROUPS;
@@ -838,9 +839,11 @@ class CardGroup extends Model {
 			'order_by_deck_name'         => false,
 			'order_by_topic'             => false,
 			'topic_ids_to_exclude'       => [],
+			'user_is_admin'              => false,
 		);
 
 		$args = wp_parse_args( $args, $default );
+
 
 //		Common::send_error( 'test', array(
 //			'args' => $args
@@ -864,21 +867,23 @@ class CardGroup extends Model {
 			];
 		}
 
-		$card_groups     = self
+		$read        = self
 			::get_card_groups_simple_with_ordering_query( $args );
-		$cards_group_sql = $card_groups->toSql();
-		$card_groups     = $card_groups->get();
+		$card_groups = $read['card_groups'];
+		$total       = $read['total'];
+//		$cards_group_sql = $card_groups->toSql();
+//		$card_groups     = $card_groups->get();
+//
+//		$total     = self
+//			::get_card_groups_simple_with_ordering_query( $args, true );
+//		$total_sql = $total->toSql();
+//		$total     = $total->get();
 
-		$total     = self
-			::get_card_groups_simple_with_ordering_query( $args, true );
-		$total_sql = $total->toSql();
-		$total     = $total->get();
-
-		if ( count( $total ) > 0 ) {
-			$total = $total[0]->all_count;
-		} else {
-			$total = 0;
-		}
+//		if ( count( $total ) > 0 ) {
+//			$total = $total[0]->all_count;
+//		} else {
+//			$total = 0;
+//		}
 
 		// For new cards, or remove cards,  we are reading all at once. So the total is the total of the card groups.
 //		if ( $args['for_new_cards'] || $args['for_remove_from_study_deck'] ) {
@@ -917,9 +922,316 @@ class CardGroup extends Model {
 	 * @param array $args
 	 * @param array $for_total Set to true to return query that is usable to get query.
 	 *
-	 * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+	 * @return array
 	 */
 	public static function get_card_groups_simple_with_ordering_query( $args, bool $for_total = false ) {
+
+		$only_deck_group = $args['deck_group_id'] && ! $args['deck_id'] && ! $args['topic_id'];
+		$only_deck       = $args['deck_id'] && ! $args['topic_id'];
+		$only_topic      = $args['topic_id'];
+
+		$debug = array(
+			'args'                           => $args,
+			'for_total'                      => $for_total,
+			//
+			'only_deck_group'                => $only_deck_group,
+			'only_deck'                      => $only_deck,
+			'only_topic'                     => $only_topic,
+			//
+			'user_card_groups'               => array(),
+			'user_card_groups_topics'        => array(),
+			//
+			'card_groups_in_deck_group'      => array(),
+			'card_groups_in_deck'            => array(),
+			'card_groups_in_topic'           => array(),
+			//
+			'card_groups_in_any_collection'  => array(),
+			'card_groups_in_this_collection' => array(),
+			//
+			'card_groups_all'                => array(),
+			'card_groups_all_total'          => array()
+		);
+
+		$user_ignored_card_group_ids     = sp_get_user_ignored_card_group_ids( $args['user_id'] );
+		$user_ignored_card_group_ids_sql = implode( ',', $user_ignored_card_group_ids );
+		$card_types_sql                  = '';
+		if ( $args['card_types'] ) {
+			foreach ( $args['card_types'] as $card_type ) {
+				$card_types_sql .= "'$card_type',";
+			}
+
+			$card_types_sql = rtrim( $card_types_sql, ',' );
+		}
+
+
+		// <editor-fold desc="Variables" >
+		/**
+		 * For All
+		 * - Exclude tags
+		 * - Include tags
+		 * - Cards must be in user cards
+		 * -
+		 */
+		global $wpdb;
+		$wpdb->show_errors();
+		$prefix = $wpdb->prefix;
+
+		$table_names               = UserCard::get_table_names();
+		$tb_cards                  = $table_names['tb_cards'];
+		$tb_card_groups            = $table_names['tb_card_groups'];
+		$tb_user_cards             = $tb_user_cards = $table_names['tb_user_cards'];
+		$tb_study                  = $tb_study = $table_names['tb_study'];
+		$tb_decks                  = $tb_decks = $table_names['tb_decks'];
+		$tb_deck_groups            = $table_names['tb_deck_groups'];
+		$tb_topics                 = $table_names['tb_topics'];
+		$tb_collections            = $table_names['tb_collections'];
+		$tb_answered               = $table_names['tb_answered'];
+		$tb_tags                   = $table_names['tb_tags'];
+		$tb_taggable               = $table_names['tb_taggable'];
+		$tb_taggable_excluded      = $table_names['tb_taggable_excluded'];
+		$taggable_type_card_groups = 'Model\\\CardGroup';
+		$taggable_type_study       = 'Model\Study';
+
+		// </editor-fold desc="Variables" >
+
+		// <editor-fold desc="Card Groups in User Cards" >
+		$sql_user_card_groups = "
+			SELECT cg_uc.card_group_id from {$tb_user_cards} as cg_uc
+			WHERE cg_uc.user_id IN ({$args['user_id']})
+		";
+		$debug                = self::maybe_execute_query(
+			$sql_user_card_groups,
+			'id',
+			$debug,
+			'user_card_groups'
+		);
+
+		// </editor-fold desc="Card Groups in User Cards" >
+
+		// <editor-fold desc="Topics of Card Groups Being Studied" >
+
+		$sql_user_card_groups_topics = "
+			SELECT cg_topics.topic_id from {$tb_card_groups} as cg_topics
+			WHERE cg_topics.id IN ({$sql_user_card_groups})
+			AND cg_topics.topic_id IS NOT NULL
+		";
+		$debug                       = self::maybe_execute_query(
+			$sql_user_card_groups_topics,
+			'id',
+			$debug,
+			'user_card_groups_topics'
+		);
+
+		// </editor-fold desc="Topics of Card Groups Being Studied" >
+
+		// <editor-fold desc="Card Groups in Deck Group" >
+
+		if ( $only_deck_group ) {
+			$sql_card_groups_in_deck_group = "
+				SELECT cg_in_dg.id from {$tb_card_groups} as cg_in_dg
+				WHERE cg_in_dg.topic_id IN (
+					SELECT t_in_d_in_dg.id from {$tb_topics} as t_in_d_in_dg
+					WHERE t_in_d_in_dg.deck_id IN (
+						SELECT d_in_dg.id from {$tb_decks} as d_in_dg
+						WHERE d_in_dg.deck_group_id IN ({$args['deck_group_id']})
+					)
+				)
+			";
+			$debug                         = self::maybe_execute_query(
+				$sql_card_groups_in_deck_group,
+				'id',
+				$debug,
+				'card_groups_in_deck_group'
+			);
+		}
+
+		// </editor-fold desc="Card Groups in Deck Group" >
+
+		// <editor-fold desc="Card Groups in Deck " >
+
+		if ( $only_deck ) {
+			$sql_card_groups_in_deck = "
+				SELECT cg_in_d_only.id from {$tb_card_groups} as cg_in_d_only
+				WHERE cg_in_d_only.topic_id IN (
+					SELECT t_in_d_only_in_dg.id from {$tb_topics} as t_in_d_only_in_dg
+					WHERE t_in_d_only_in_dg.deck_id IN ({$args['deck_id']})
+				)
+			";
+			$debug                   = self::maybe_execute_query(
+				$sql_card_groups_in_deck,
+				'id',
+				$debug,
+				'card_groups_in_deck'
+			);
+		}
+
+		// </editor-fold desc="Card Groups in Deck " >
+
+		// <editor-fold desc="Card Groups in Topic" >
+
+		if ( $only_topic ) {
+			$sql_card_groups_in_topic = "
+				SELECT cg_in_t_only.id from {$tb_card_groups} as cg_in_t_only
+				WHERE cg_in_t_only.topic_id IN ({$args['topic_id']})
+			";
+			$debug                    = self::maybe_execute_query(
+				$sql_card_groups_in_topic,
+				'id',
+				$debug,
+				'card_groups_in_topic'
+			);
+		}
+
+		// </editor-fold desc="Card Groups in Topic" >
+
+		// <editor-fold desc="Card Groups in Collection" >
+
+		if ( ! $args['user_is_admin'] ) {
+			$sql_card_groups_in_any_collection = "
+			SELECT cg_in_any_cl.id from {$tb_card_groups} as cg_in_any_cl
+			WHERE cg_in_any_cl.collection_id IN (
+				SELECT id from {$tb_collections}
+			)
+		";
+			$debug                             = self::maybe_execute_query(
+				$sql_card_groups_in_any_collection,
+				'id',
+				$debug,
+				'card_groups_in_any_collection'
+			);
+		}
+
+		// </editor-fold desc="Card Groups in Collection" >
+
+		// <editor-fold desc="Card Groups in This Collection" >
+
+		if ( $args['collection_id'] && $args['user_is_admin'] ) {
+			$sql_card_groups_in_this_collection = "
+			SELECT cg_in_this_cl.id from {$tb_card_groups} as cg_in_this_cl
+			WHERE cg_in_this_cl.collection_id IN ({$args['collection_id']})
+		";
+			$debug                              = self::maybe_execute_query(
+				$sql_card_groups_in_this_collection,
+				'id',
+				$debug,
+				'card_groups_in_this_collection'
+			);
+		}
+
+		// </editor-fold desc="Card Groups in this Collection" >
+
+		// <editor-fold desc="All Card Groups" >
+
+		$sql_card_groups_all_base = sprintf( '
+				-- Exclude card groups in user cards because you have already added them.
+				%1$s
+				-- Include card groups in user is studying
+				%2$s
+				-- Include card groups from topics in user is studying Then also ignore the card groups the user is ignoring.
+				%3$s
+				-- Only include card groups in deck group
+				%4$s
+				-- Only include card groups in deck
+				%5$s
+			',
+			$args['for_add_to_study_deck']
+				? "AND cg_all.id NOT IN ({$sql_user_card_groups})"
+				: '',
+			$args['for_remove_from_study_deck']
+				? "AND cg_all.id IN ({$sql_user_card_groups})"
+				: '',
+			$args['for_new_cards']
+				? "AND cg_all.topic_id IN ({$sql_user_card_groups_topics}) 
+					AND cg_all.id NOT IN ({$user_ignored_card_group_ids_sql})"
+				: '',
+			$only_deck_group ? "AND cg_all.id IN ({$sql_card_groups_in_deck_group})" : '',
+			$only_deck ? "AND cg_all.id IN ({$sql_card_groups_in_deck})" : '',
+		);
+		$sql_card_groups_all_base .= sprintf( '
+				-- Only include card groups in topic
+				%1$s
+				-- Flter by card types
+				%2$s
+				-- Search by card group name
+				%3$s
+				-- If not admin, filter out all card groups in ANY collection.
+				%4$s
+				-- If admin, AND collection_id is provided, then filter out card groups not in this collection.
+				%5$s
+				
+			',
+			$only_topic ? "AND cg_all.id IN ({$sql_card_groups_in_topic})" : '',
+			$card_types_sql
+				? "AND cg_all.card_type IN ({$card_types_sql})"
+				: '',
+			$args['search'] ? "AND cg_all.name LIKE '%{$args['search']}%'" : '',
+			! empty( $sql_card_groups_in_any_collection )
+				? "AND cg_all.id NOT IN ({$sql_card_groups_in_any_collection})"
+				: '',
+			! empty( $sql_card_groups_in_this_collection ) ? "AND cg_all.id IN ({$sql_card_groups_in_this_collection})" : '',
+
+		);
+
+		$sql_card_groups_all = sprintf(
+			'
+				SELECT cg_all.id from %1$s as cg_all 
+					WHERE 1 = 1	
+					%2$s
+					-- Offset and limit
+					%3$s
+				',
+			$tb_card_groups,
+			$sql_card_groups_all_base,
+			"LIMIT {$args['per_page']} OFFSET " . ( $args['page'] - 1 ) * $args['per_page']
+		);
+
+		$debug = self::execute_query(
+			$sql_card_groups_all,
+			'id',
+			$debug,
+			'card_groups_all'
+		);
+
+		$sql_card_groups_all_total = sprintf( '
+			SELECT COUNT(cg_all.id) as all_count from %1$s as cg_all
+				WHERE 1 = 1	
+				%2$s
+		',
+			$tb_card_groups,
+			$sql_card_groups_all_base
+		);
+		$debug                     = self::execute_query(
+			$sql_card_groups_all_total,
+			'all_count',
+			$debug,
+			'card_groups_all_total'
+		);
+
+		// </editor-fold desc="Card Groups in Collection" >
+
+		$all_card_groups = self
+			::query()
+			->whereIn( 'id', $debug['card_groups_all']['sub_result_ids'] )
+			->with( 'cards', 'tags', 'deck.deck_group', 'topic', 'collection' )
+			->orderBy( 'id' )
+			->get();
+
+		return array(
+			'total'       => $debug['card_groups_all_total']['sql_result'][0]['all_count'],
+			'card_groups' => $all_card_groups
+		);
+
+//		return self
+//			::query()
+//			->whereIn( 'id', $debug['card_groups_all'] )
+//			->with( 'cards', 'tags', 'deck.deck_group', 'topic', 'collection' )
+//			->orderBy( 'id' );
+	}
+
+
+	public static function get_card_groups_simple_with_ordering_query__old_with_eloquent( $args, bool $for_total = false ) {
+
+
 		// Join tables and apply aliases
 		$query = Manager
 			::table( SP_TABLE_CARD_GROUPS . ' as cg' )
@@ -1152,5 +1464,62 @@ class CardGroup extends Model {
 			'card_group_ids' => $card_groups->pluck( 'id' )->all(),
 		);
 	}
+
+	/**
+	 * Add data to debug array.
+	 *
+	 * @param array $debug The debug array.
+	 * @param string $key Key of one value in $debug.
+	 * @param array $data The data to log.
+	 *
+	 * @return array
+	 */
+	private static function format_debug_data( array $debug, string $key, array $data ): array {
+		$debug[ $key ] = $data;
+
+		if ( empty( $debug['all_logs_sequential_assign'] ) ) {
+			$debug['all_logs_sequential_assign'] = array();
+		}
+		$count_sequential                                                          = count( $debug['all_logs_sequential_assign'] );
+		$debug['all_logs_sequential_assign'][ $count_sequential + 1 . '_' . $key ] = $data;
+
+
+		return $debug;
+	}
+
+
+	public static function maybe_execute_query( string $sql, string $return_column, array $debug, string $debug_key ): array {
+		global $wpdb;
+		if ( sp_in_sql_mode() ) {
+			return self::execute_query( $sql, $return_column, $debug, $debug_key );
+		}
+
+		return array();
+	}
+
+	public static function execute_query( string $sql, string $return_column, array $debug, string $debug_key ): array {
+		global $wpdb;
+		$start_time         = time();
+		$sql_result         = $wpdb->get_results( $sql, ARRAY_A );
+		$stop_time_result   = time();
+		$start_time_mapping = time();
+		$result_card_ids    = array_map(
+			static function ( $val ) use ( $return_column ) {
+				return $val[ $return_column ];
+			},
+			$sql_result ?? array()
+		);
+		$stop_time          = time();
+
+		return self::format_debug_data( $debug, $debug_key, array(
+			'sql'                                 => $sql,
+			'sql_result'                          => $sql_result,
+			"sub_result_{$return_column}s"        => $result_card_ids,
+			'sql_result_mili_seconds'             => ( $stop_time_result - $start_time ),
+			'sql_result_mili_seconds_for_mapping' => ( $stop_time - $start_time_mapping ),
+		) );
+
+	}
+
 
 }

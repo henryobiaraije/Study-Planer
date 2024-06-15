@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Plugin Name:       Study Planner Pro
  * Plugin URI:        https://www.pereere.com/wordpress-plugins/study-planner-pro
  * Description:       Comes with admin dashboard to create deck groups, decks, cards. It also comes with an user dashboard where users can plan and study the cards with built in statistics. User Dashboard shortcode <code>[sp_pro_user_dashboard]</code>.
- * Version:           4.0.0
+ * Version:           5.0.1
  * Author:            Pereere Codes (mpereere@gmail.com)
  * Author URI:        https://www.pereere.com/
  * License:           GPL-2.0+
