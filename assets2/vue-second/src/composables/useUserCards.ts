@@ -591,6 +591,7 @@ export default function (status = 'publish') {
     return {
         loadedOnce,
         ajaxSave: ajaxSave, save: xhrSave, form: form,
+        ajaxAddCard,
         userCardsCount,
         oneSpecificCard, assignTopics: xhrAssignTopics, ajaxAssignTopics,
         ajaxAddCards, addCards: xhrAddCards,

@@ -1142,7 +1142,9 @@ class CardGroup extends Model {
 				: '',
 			$args['for_new_cards']
 				? "AND cg_all.topic_id IN ({$sql_user_card_groups_topics}) 
-					AND cg_all.id NOT IN ({$user_ignored_card_group_ids_sql})"
+					AND cg_all.id NOT IN ({$sql_user_card_groups})
+				" .
+				  ( empty( $user_ignored_card_group_ids_sql ) ? '' : "AND cg_all.id NOT IN ({$user_ignored_card_group_ids_sql})" )
 				: '',
 			$only_deck_group ? "AND cg_all.id IN ({$sql_card_groups_in_deck_group})" : '',
 			$only_deck ? "AND cg_all.id IN ({$sql_card_groups_in_deck})" : '',
@@ -1156,7 +1158,7 @@ class CardGroup extends Model {
 				%3$s
 				-- If not admin, filter out all card groups in ANY collection.
 				%4$s
-				-- If admin, AND collection_id is provided, then filter out card groups not in this collection.
+				-- If admin, and collection_id is provided, then filter out card groups not in this collection.
 				%5$s
 				
 			',
@@ -1172,15 +1174,18 @@ class CardGroup extends Model {
 
 		);
 
+		$some_query_was_added = str_contains( $sql_card_groups_all_base, 'AND' );
+
 		$sql_card_groups_all = sprintf(
 			'
 				SELECT cg_all.id from %1$s as cg_all 
-					WHERE 1 = 1	
 					%2$s
-					-- Offset and limit
 					%3$s
+					-- Offset and limit
+					%4$s
 				',
 			$tb_card_groups,
+			$some_query_was_added ? ' WHERE 1 = 1 ' : ' WHERE 1 = 0 ',
 			$sql_card_groups_all_base,
 			"LIMIT {$args['per_page']} OFFSET " . ( $args['page'] - 1 ) * $args['per_page']
 		);
@@ -1194,10 +1199,11 @@ class CardGroup extends Model {
 
 		$sql_card_groups_all_total = sprintf( '
 			SELECT COUNT(cg_all.id) as all_count from %1$s as cg_all
-				WHERE 1 = 1	
 				%2$s
+				%3$s
 		',
 			$tb_card_groups,
+			$some_query_was_added ? ' WHERE 1 = 1 ' : ' WHERE 1 = 0 ',
 			$sql_card_groups_all_base
 		);
 		$debug                     = self::execute_query(
