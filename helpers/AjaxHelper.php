@@ -190,7 +190,7 @@ class AjaxHelper {
 		$card_types          = is_array( $e_card_types ) ? $e_card_types : array();
 		$e_topics_to_exclude = is_array( $e_topic_ids_to_exclude ) ? $e_topic_ids_to_exclude : array();
 
-		$user_id       = get_current_user_id();
+		$user_id = get_current_user_id();
 		$user_is_admin = current_user_can( 'administrator' );
 
 		$items = CardGroup::get_card_groups_simple_with_ordering(
@@ -1234,12 +1234,12 @@ class AjaxHelper {
 	}
 
 	public function ajax_admin_load_cards_groups( $post ): void {
-		$params                     = $post[ Common::VAR_2 ]['params'];
-		$per_page                   = (int) sanitize_text_field( $params['per_page'] );
-		$page                       = (int) sanitize_text_field( $params['page'] );
-		$search_keyword             = sanitize_text_field( $params['search_keyword'] );
-		$status                     = sanitize_text_field( $params['status'] );
-		$card_groups                = CardGroup::get_card_groups(
+		$params         = $post[ Common::VAR_2 ]['params'];
+		$per_page       = (int) sanitize_text_field( $params['per_page'] );
+		$page           = (int) sanitize_text_field( $params['page'] );
+		$search_keyword = sanitize_text_field( $params['search_keyword'] );
+		$status         = sanitize_text_field( $params['status'] );
+		$card_groups    = CardGroup::get_card_groups(
 			array(
 				'search'       => $search_keyword,
 				'page'         => $page,
@@ -1253,7 +1253,7 @@ class AjaxHelper {
 			},
 			$card_groups['card_groups']
 		);
-		$totals                     = CardGroup::get_totals();
+		$totals         = CardGroup::get_totals();
 
 		Common::send_success(
 			'Card group loaded.',

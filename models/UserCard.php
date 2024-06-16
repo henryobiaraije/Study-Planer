@@ -95,7 +95,7 @@ class UserCard extends Model {
 
 				$study = $deck->studies->first();
 				if ( $study instanceof Study ) {
-					if ( $study->active ) {
+					if ( $study->active3 ) {
 						$cards_to_study = self::get_study_cards(
 							$user_id,
 							$study,
@@ -145,7 +145,7 @@ class UserCard extends Model {
 					$study = $topic->studies->first();
 
 					if ( $study instanceof Study ) {
-						if ( ! $study->active ) {
+						if ( ! $study->active3 ) {
 							continue;
 						}
 						$cards_to_study = self::get_study_cards(
@@ -297,7 +297,7 @@ class UserCard extends Model {
 					$study = $topic->studies->first();
 
 					if ( $study instanceof Study ) {
-						if ( ! $study->active ) {
+						if ( ! $study->active3 ) {
 							continue;
 						}
 						$cards          = self::get_cards_to_study_in_study(

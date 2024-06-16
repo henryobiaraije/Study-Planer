@@ -746,7 +746,7 @@ class AjaxFrontHelper {
 //		$tags_excluded     = in_array( 'tags_excluded', $all, true ) ? $all['tags_excluded'] : [];
 		$tags_excluded = array_key_exists( 'tags_excluded', $all ) ? $all['tags_excluded'] : array();
 		$topic_id      = (int) sanitize_text_field( null !== $all['topic'] ? $all['topic']['id'] : 0 );
-		$active        = (bool) sanitize_text_field( $all['active'] );
+		$active        = (bool) sanitize_text_field( $all['active3'] );
 
 		if ( empty( $deck_id ) && empty( $topic_id ) ) {
 			Common::send_error( 'Either deck or topic must be selected.' );
@@ -799,7 +799,7 @@ class AjaxFrontHelper {
 		$study->deck_id           = $deck_id;
 		$study->all_tags          = $all_tags;
 		$study->topic_id          = $topic_id;
-		$study->active            = $active;
+		$study->active3            = $active;
 
 //		Common::send_error( [
 //			'ajax_front_create_study',

@@ -92,7 +92,7 @@ export interface _Study {
     revise_all: boolean,
     study_all_new: boolean,
     study_all_on_hold: boolean,
-    active: boolean,
+    active3: boolean,
 }
 
 export type _QuestionType = string | _TableItem | _ImageItem;

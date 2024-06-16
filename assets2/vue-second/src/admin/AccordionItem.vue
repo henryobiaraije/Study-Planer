@@ -26,7 +26,7 @@
               <div v-if="showSettings" class="settings-and-switch flex gap-2">
                 <div v-if="null !== currentItemStudy" class="flex items-center">
                   <!--                  <v-switch color="primary" :input-value="studyIsActive" @change="studyChanged"></v-switch>-->
-                  <SwitchComp is-round v-model="currentItemStudy.active" @change="studyChanged"/>
+                  <SwitchComp is-round v-model="currentItemStudy.active3" @change="studyChanged"/>
                   <!--                  <SwitchComp is-round v-model="studyIsActive" @change="studyChanged"></SwitchComp>-->
                   <!--                  <v-switch color="primary" :v-model="studyIsActive" ></v-switch>-->
                 </div>
@@ -254,7 +254,7 @@ export default defineComponent({
 
       if ('deck_group' === theItem.itemType) {
         counts.newCards = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countNewCards(deck.cards ?? []);
@@ -264,7 +264,7 @@ export default defineComponent({
           }, 0);
         }, 0);
         counts.revision = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countRevisionCards(deck.cards ?? []);
