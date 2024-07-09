@@ -8,16 +8,31 @@ if ( ! defined( 'DB_HOST' ) ) {
 	define( 'DB_HOST', 'localhost' );
 }
 if ( ! defined( 'DB_NAME' ) ) {
-	define( 'DB_NAME', 'Test-Site-Wordpress' );
+//	define( 'DB_NAME', 'Test-Site-Wordpress' );
+	define( 'DB_NAME', 'medabceu_wp354' ); // pyra
 }
 if ( ! defined( 'DB_USER' ) ) {
-	define( 'DB_USER', 'root' );
+//	define( 'DB_USER', 'root' );
+	define( 'DB_USER', 'medabceu_wp354' );
 }
 if ( ! defined( 'DB_PASSWORD' ) ) {
-	define( 'DB_PASSWORD', 'aaaa' );
+//	define( 'DB_PASSWORD', 'aaaa' );
+	define( 'DB_PASSWORD', '4Sp7t)61[b' );
 }
 
 require_once __DIR__ . '/vendor/autoload.php';
+
+if( ! function_exists( 'error_log' ) ) {
+//	function phinx_migrate() {
+//		$phinx = new \Phinx\Console\PhinxApplication();
+//		$wrap  = new \Symfony\Component\Console\Input\StringInput( 'migrate' );
+//		$phinx->run( $wrap );
+//	}
+
+	function error_log( $message ) {
+		echo $message;
+	}
+}
 
 return
 	[

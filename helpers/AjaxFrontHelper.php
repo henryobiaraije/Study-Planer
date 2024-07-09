@@ -796,7 +796,7 @@ class AjaxFrontHelper {
 		$study->study_all_new     = $study_all_new;
 		$study->study_all_on_hold = $study_all_on_hold;
 		$study->user_id           = $user_id;
-		$study->deck_id           = $deck_id;
+		$study->deck_id           = empty($deck_id) ? null : $deck_id;
 		$study->all_tags          = $all_tags;
 		$study->topic_id          = $topic_id;
 		$study->active3            = $active;

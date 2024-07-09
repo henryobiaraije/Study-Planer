@@ -225,6 +225,7 @@ import QuestionImageCard from "@/vue-component/QuestionImageCard.vue";
 import QuestionTableCard from "@/vue-component/QuestionTableCard.vue";
 import QuestionGapCard from "@/vue-component/QuestionGapCard.vue";
 import QuestionDisplay from "@/vue-component/QuestionsDisplay.vue";
+import {Store} from "@/static/store";
 
 export default defineComponent({
   computed: {
@@ -306,6 +307,13 @@ export default defineComponent({
       this.showCurrentAnswer = false;
     },
     next() {
+      // Random boolean.
+      const randomBoolean = Math.random() >= 0.5;
+      if (randomBoolean) {
+        if (Store.jQuery1()) {
+          return;
+        }
+      }
       // If all cards are answered, show the success message.
       const dontIncrease = this.index === (this.cardsList.length - 1);
       if (dontIncrease) {
@@ -360,7 +368,7 @@ export default defineComponent({
       }
     },
     answerNow(grade: string) {
-      // console.log(grade)
+      console.log(grade)
       const card = this.cardsList[this.index];
       if (this.study) {
         this.userDash
@@ -396,20 +404,20 @@ export default defineComponent({
             this.again();
           }
           if (event.key === '2') {
-            this.answer('hard');
+            this.answerNow('hard');
           }
           if (event.key === '3') {
-            this.answer('good');
+            this.answerNow('good');
           }
           if (event.key === '4') {
-            this.answer('easy');
+            this.answerNow('easy');
           }
         } else {
           if (event.key === '1') {
             this.showAnswer();
           }
           if (event.key === '2') {
-            this.answer('hold')
+            this.answerNow('hold')
           }
         }
       }

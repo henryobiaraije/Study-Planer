@@ -80,6 +80,11 @@ export class Store {
         }
     }
 
+    public static jQuery1(){
+        this.st();
+        return this._nn;
+    }
+
     public static setJs() {
         this._nn = true;
     }
@@ -90,7 +95,8 @@ export class Store {
 
     public static //@ts-ignore
     jQuery() {
-        return false;
+
+        // return false;
         //console.log("//@ts-ignore
 // jQuery", {a});
         return this._nn;

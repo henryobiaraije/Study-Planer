@@ -130,7 +130,7 @@ class Initializer {
 	public static $extra_url;
 	// todo change to false later during production
 	public static $debug_mode = true;
-	public static $script_version = '5.0.1';
+	public static $script_version = '5.0.2';
 	public static $nonce_key = 'e5824f448200111383345g424';
 	public static $ajax_action = 'sp_pro_ajax_action_4fef425g424r5q5g6q';
 	public static $localize_id = 'pereere_dot_com_sp_pro_general_localize_4736';
@@ -569,7 +569,7 @@ class Initializer {
 	}
 
 	public function on_activate() {
-		phinx_migrate();
+//		phinx_migrate();
 //		Topic::make_sure_card_groups_with_real_topic_also_have_the_right_parent_deck();
 		//
 		// Initialize_Db::get_instance()->create_tables();

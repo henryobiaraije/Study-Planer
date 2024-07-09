@@ -11,12 +11,23 @@
             <div @click="toggle()" class="left flex-1 flex gap-2">
               <div v-if="'card_group' !== theItem.childrenType"
                    class="sp-icon flex-initial flex items-center px-2 text-gray-400">
-                <v-icon v-if="!isToggled" left>
-                  mdi-chevron-right
-                </v-icon>
-                <v-icon v-if="isToggled" left>
-                  mdi-chevron-up
-                </v-icon>
+                <svg v-if="!isToggled" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     style="width: 1.5rem; height: 1.5rem;"
+                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+                </svg>
+                <svg v-if="isToggled" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5"
+                     style="width: 1.5rem; height: 1.5rem;"
+                     stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5"/>
+                </svg>
+                <!--                <v-icon v-if="!isToggled" left>-->
+                <!--                  mdi-chevron-right-->
+                <!--                </v-icon>-->
+                <!--                <v-icon v-if="isToggled" left>-->
+                <!--                  mdi-chevron-up-->
+                <!--                </v-icon>-->
               </div>
               <div class="sp-name flex-1 font-medium text-black px-2 py-2 text-base">
                 <span @click.prevent="viewCard">{{ theItem.name }}</span>
@@ -32,10 +43,18 @@
                 </div>
                 <div v-if="studyActive" @click="showStudySettings"
                      class="flex flex-initial items-center hover:opacity-50 cursor-pointer">
-                  <v-icon left class="cursor-pointer">
-                    mdi-cog-outline
-                  </v-icon>
-                  <img :src="settingsImageUrl"/>
+                  <!--                  <v-icon left class="cursor-pointer">-->
+                  <!--                    mdi-cog-outline-->
+                  <!--                  </v-icon>-->
+                  <svg class="w-6 h-6 cursor-pointer hover:opacity-70" xmlns="http://www.w3.org/2000/svg" fill="none"
+                       style="width: 1.5rem; height: 1.5rem;"
+                       viewBox="0 0 24 24" stroke-width="1.5"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                  </svg>
+                  <!--                  <img :src="settingsImageUrl"/>-->
                 </div>
               </div>
               <div class="header-counts flex-initial px-2 text-sm">
@@ -274,7 +293,7 @@ export default defineComponent({
           }, 0);
         }, 0);
         counts.onHold = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
@@ -285,7 +304,7 @@ export default defineComponent({
         }, 0);
       } else if ('deck' === theItem.itemType) {
         counts.newCards = [(item as _Deck)].reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countNewCards(deck.cards ?? []);
@@ -296,7 +315,7 @@ export default defineComponent({
           }, 0);
         }, 0);
         counts.revision = [(item as _Deck)].reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countRevisionCards(deck.cards ?? []);
@@ -307,7 +326,7 @@ export default defineComponent({
           }, 0);
         }, 0);
         counts.onHold = [(item as _Deck)].reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
@@ -319,7 +338,7 @@ export default defineComponent({
         }, 0);
       } else if ('topic' === theItem.itemType) {
         counts.newCards = [(item as _Topic)].reduce((acc, topic: _Topic) => {
-          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active3;
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countNewCards(topic.cards ?? []);
@@ -328,7 +347,7 @@ export default defineComponent({
           return topicCardsCount + acc;
         }, 0);
         counts.revision = [(item as _Topic)].reduce((acc, topic: _Topic) => {
-          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active3;
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countRevisionCards(topic.cards ?? []);
@@ -337,7 +356,7 @@ export default defineComponent({
           return topicCardsCount + acc;
         }, 0);
         counts.onHold = [(item as _Topic)].reduce((acc, topic: _Topic) => {
-          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active3;
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countOnHoldCards(topic.cards ?? []);
@@ -365,7 +384,7 @@ export default defineComponent({
 
       if ('deck_group' === theItem.itemType) {
         counts.newCards = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countNewCards(deck.cards ?? []);
@@ -375,7 +394,7 @@ export default defineComponent({
           }, 0);
         }, 0);
         counts.revision = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countRevisionCards(deck.cards ?? []);
@@ -385,7 +404,7 @@ export default defineComponent({
           }, 0);
         }, 0);
         counts.onHold = (item as _DeckGroup).decks.reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
@@ -396,7 +415,7 @@ export default defineComponent({
         }, 0);
       } else if ('deck' === theItem.itemType) {
         counts.newCards = [(item as _Deck)].reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countNewCards(deck.cards ?? []);
@@ -407,7 +426,7 @@ export default defineComponent({
           }, 0);
         }, 0);
         counts.revision = [(item as _Deck)].reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countRevisionCards(deck.cards ?? []);
@@ -418,7 +437,7 @@ export default defineComponent({
           }, 0);
         }, 0);
         counts.onHold = [(item as _Deck)].reduce((acc, deck: _Deck) => {
-          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active;
+          let deckHasActiveStudy = deck.studies.length > 0 && deck.studies[0].active3;
           let deckCardsCount: number = 0;
           if (deckHasActiveStudy) { //
             deckCardsCount = this.countOnHoldCards(deck.cards ?? []);
@@ -430,7 +449,7 @@ export default defineComponent({
         }, 0);
       } else if ('topic' === theItem.itemType) {
         counts.newCards = [(item as _Topic)].reduce((acc, topic: _Topic) => {
-          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active3;
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countNewCards(topic.cards ?? []);
@@ -439,7 +458,7 @@ export default defineComponent({
           return topicCardsCount + acc;
         }, 0);
         counts.revision = [(item as _Topic)].reduce((acc, topic: _Topic) => {
-          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active3;
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countRevisionCards(topic.cards ?? []);
@@ -448,7 +467,7 @@ export default defineComponent({
           return topicCardsCount + acc;
         }, 0);
         counts.onHold = [(item as _Topic)].reduce((acc, topic: _Topic) => {
-          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active;
+          let topicHasActiveStudy = topic.studies.length > 0 && topic.studies[0].active3;
           let topicCardsCount: number = 0;
           if (topicHasActiveStudy) { //
             topicCardsCount = this.countOnHoldCards(topic.cards ?? []);
@@ -551,9 +570,9 @@ export default defineComponent({
       }
     },
     studyActive(): boolean {
-      const study = this.currentItemStudy;
+      const study: null | _Study = this.currentItemStudy;
       if (null !== study) {
-        return study.active;
+        return study.active3;
       }
       return false;
     },
@@ -586,19 +605,19 @@ export default defineComponent({
         revise_all: true,
         study_all_new: true,
         study_all_on_hold: true,
-        active: false,
+        active3: false,
         id: 0,
         user: undefined
       } as unknown as _Study);
     }
   },
   methods: {
-    closeQuestionDialog(){
+    closeQuestionDialog() {
       console.log('closeQuestionDialog');
       this.viewDialog = false;
       this.userCards.loadUserCards();
     },
-    closeStudyDialog(){
+    closeStudyDialog() {
       console.log('closeStudyDialog');
       this.viewDialogEditStudy = false;
       // this.userCards.loadUserCards();
@@ -680,7 +699,7 @@ export default defineComponent({
       }
 
       // The item's study must be active.
-      if (!this.currentItemStudy.active) {
+      if (!this.currentItemStudy.active3) {
         return;
       }
 
