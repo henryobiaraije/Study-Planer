@@ -184,6 +184,8 @@ class UserCard extends Model
                         $deck->count_on_hold += count($cards_to_study['on_hold_cards']);
                         $deck_group->count_on_hold += count($cards_to_study['on_hold_cards']);
 
+                        $topic->cards_to_study = $cards_to_study;
+
                         $topic->cards = $cards_to_study['all_cards'];
                     } else {
                         $topic->cards = array();
@@ -1367,6 +1369,7 @@ class UserCard extends Model
 //		$new_cards_array = $new_cards->toArray();
 
         $all_cards = $new_cards->merge($revision_cards);
+        $all_cards = $all_cards->merge($on_hold_cards);
         $all_cards = $all_cards->shuffle();
 
 
